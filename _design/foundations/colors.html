@@ -1,0 +1,19 @@
+<!-- @dsCard group="Foundations" -->
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>색 토큰</title>
+<link rel="stylesheet" href="../theme/tokens.css">
+<link rel="stylesheet" href="../theme/cbnu.css">
+<link rel="stylesheet" href="../theme/components.css">
+<link rel="stylesheet" href="../theme/preview.css">
+</head><body>
+<div class="doc">
+<h1>색 토큰</h1>
+<p class="lede">기존 PPT 원본에서 실측한 값. 대비비는 흰 배경 기준 계산값이다. 이 표 밖의 용도로 색을 쓰지 않는다.</p>
+<h2>빨강 계열이 셋인 이유</h2>
+<p style="font-size:13px;margin:0 0 18px">
+<code>#C00000</code>은 <b>라벨</b>, <code>#A82424</code>는 <b>문장</b>, <code>#FF0000</code>은 <b>그래프 점</b>이다.
+한 슬라이드에 셋이 같이 나오는 건 정상이지만 서로 바꿔 쓰면 위계가 무너진다.</p>
+<table><thead><tr><th></th><th>토큰</th><th>값</th><th>용도</th><th>대비비</th></tr></thead>
+<tbody><tr><td><span class="sw" style="background:#892B3C;"></span></td><td><code>--brand-crimson</code></td><td><code>#892B3C</code></td><td>푸터바 배경 전용</td><td class="pass">8.5:1 텍스트 가능</td></tr><tr><td><span class="sw" style="background:#A82424;"></span></td><td><code>--define-crimson</code></td><td><code>#A82424</code></td><td>정의문·발문 문장</td><td class="pass">7.1:1 텍스트 가능</td></tr><tr><td><span class="sw" style="background:#C00000;"></span></td><td><code>--accent-red</code></td><td><code>#C00000</code></td><td>소제목·핵심 라벨 (최다)</td><td class="pass">6.5:1 텍스트 가능</td></tr><tr><td><span class="sw" style="background:#FF0000;"></span></td><td><code>--point-red</code></td><td><code>#FF0000</code></td><td>그래프 좌표점 — 도형 전용</td><td class="fail">4.0:1 도형 전용</td></tr><tr><td><span class="sw" style="background:#0328C3;"></span></td><td><code>--accent-blue</code></td><td><code>#0328C3</code></td><td>캡션·도출 결과 (→)</td><td class="pass">10.0:1 텍스트 가능</td></tr><tr><td><span class="sw" style="background:#4472C4;"></span></td><td><code>--chart-blue</code></td><td><code>#4472C4</code></td><td>표 헤더·예산선</td><td class="pass">4.7:1 텍스트 가능</td></tr><tr><td><span class="sw" style="background:#ED7D31;"></span></td><td><code>--chart-orange</code></td><td><code>#ED7D31</code></td><td>대비 곡선 — 도형 전용</td><td class="fail">2.8:1 도형 전용</td></tr><tr><td><span class="sw" style="background:#00B050;"></span></td><td><code>--accent-green</code></td><td><code>#00B050</code></td><td>3계열 — 도형 전용</td><td class="fail">2.9:1 도형 전용</td></tr><tr><td><span class="sw" style="background:#B4C7E7;outline:1px solid #DDD;"></span></td><td><code>--guide</code></td><td><code>#B4C7E7</code></td><td>점선 보조선</td><td class="fail">1.7:1 도형 전용</td></tr><tr><td><span class="sw" style="background:#1A1A1A;"></span></td><td><code>--ink</code></td><td><code>#1A1A1A</code></td><td>제목·본문</td><td class="pass">17.4:1 텍스트 가능</td></tr><tr><td><span class="sw" style="background:#767676;"></span></td><td><code>--muted</code></td><td><code>#767676</code></td><td>표지 날짜·비활성</td><td class="pass">4.5:1 텍스트 가능</td></tr></tbody></table>
+<p class="note" style="margin-top:16px">한 슬라이드에 동시에 쓰는 색은 검정 포함 4종까지.</p>
+</div></body></html>

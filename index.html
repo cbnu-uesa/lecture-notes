@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>강의노트</title>
+<link rel="stylesheet" href="_shared/theme/tokens.css">
+<style>
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 500 16px/1.6 'Pretendard', -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 72px 24px 96px; }
+  h1 { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: -0.03em; }
+  .sub { margin: 6px 0 0; font-size: 14px; font-weight: 400; color: var(--muted); }
+  hr { border: none; border-top: 1px solid var(--rule); margin: 22px 0 0; }
+  ul { list-style: none; margin: 8px 0 0; padding: 0; }
+  li { border-bottom: 1px solid #E8E8E8; }
+  a.row {
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 17px 2px; text-decoration: none; color: var(--ink);
+  }
+  a.row:hover .name { color: var(--accent-blue); }
+  .term { flex: 0 0 96px; font-size: 13px; font-weight: 700; color: var(--accent-red); }
+  .name { flex: 1 1 auto; font-size: 17px; font-weight: 500; }
+  .count { flex: 0 0 auto; font-size: 13px; font-weight: 400; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>강의노트</h1>
+  <p class="sub">권규상 · 충북대학교</p>
+  <hr>
+  <ul id="list"></ul>
+</div>
+
+<script>
+// 새 학기를 열면 이 배열에 폴더명을 추가한다.
+const COURSES = ['2026-1학기_도시경제학입문'];
+
+(async function () {
+  const ul = document.getElementById('list');
+  for (const dir of COURSES) {
+    let c;
+    try { c = await (await fetch(dir + '/course.json')).json(); }
+    catch (e) { console.warn('course.json 없음:', dir); continue; }
+
+    const done = c.lectures.filter((l) => l.status === 'done').length;
+    const li = document.createElement('li');
+    li.innerHTML =
+      '<a class="row" href="' + dir + '/index.html">' +
+        '<span class="term"></span><span class="name"></span><span class="count"></span>' +
+      '</a>';
+    li.querySelector('.term').textContent  = c.term;
+    li.querySelector('.name').textContent  = c.title;
+    li.querySelector('.count').textContent = done + ' / ' + c.lectures.length + '강';
+    ul.append(li);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "id": "2026-1-urban-econ",
+  "title": "도시경제학입문",
+  "titleEn": "Introduction to Urban Economics",
+  "term": "2026-1학기",
+  "termEn": "Spring 2026",
+  "instructor": "KWON",
+  "label": "2026-1학기 도시경제학입문",
+  "footer": "Introduction to Urban Economics / Spring 2026 / KWON",
+
+  "_note": "date·title은 source/의 원본 pptx 표지 슬라이드에서 그대로 옮긴 값이다. status: todo=미변환, done=HTML 완료",
+
+  "lectures": [
+    { "no": 1, "title": "도시경제학 강의 소개",              "file": "01-강의소개.html",         "date": "2026. 3. 4.",  "status": "todo" },
+    { "no": 2, "title": "수요와 공급, 그리고 시장의 균형",    "file": "02-수요와공급.html",       "date": "2026. 3. 11.", "status": "done" },
+    { "no": 3, "title": "소비자 이론과 생산자 이론",          "file": "03-소비자생산자이론.html", "date": "2026. 3. 18.", "status": "todo" },
+    { "no": 4, "title": "상품시장과 경쟁",                   "file": "04-상품시장과경쟁.html",   "date": "2026. 3. 25.", "status": "todo" },
+    { "no": 5, "title": "생산요소시장과 소득분배",            "file": "05-생산요소시장.html",     "date": "2026. 4. 22.", "status": "todo" },
+    { "no": 6, "title": "정보경제이론과 시장실패, 정부실패",   "file": "06-시장실패정부실패.html", "date": "2026. 4. 29.", "status": "todo" },
+    { "no": 7, "title": "거시경제이론의 기초",                "file": "07-거시경제기초.html",     "date": "2026. 5. 6.",  "status": "todo" },
+    { "no": 8, "title": "국민소득의 결정",                   "file": "08-국민소득의결정.html",   "date": "2026. 5. 13.", "status": "todo" },
+    { "no": 9, "title": "화폐와 국제무역",                   "file": "09-화폐와국제무역.html",   "date": "2026. 5. 20.", "status": "todo" }
+  ]
+}

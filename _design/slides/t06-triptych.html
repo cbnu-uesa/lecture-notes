@@ -1,0 +1,38 @@
+<!-- @dsCard group="슬라이드 유형" -->
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>T6 3분할 비교</title>
+<link rel="stylesheet" href="../theme/tokens.css">
+<link rel="stylesheet" href="../theme/cbnu.css">
+<link rel="stylesheet" href="../theme/components.css">
+<link rel="stylesheet" href="../theme/preview.css">
+<script src="../js/charts.js"></script><script>window.addEventListener('DOMContentLoaded',function(){
+  var F = Fig.withBox({x0:32,y0:168,x1:252,y1:12});
+  F.draw('#f3', { axes:{x:'Q',y:'P'}, parts:[
+    F.curve(F.convex({x0:72,x1:232,yTop:26,yBot:142,bow:0.22})),
+    F.annot(240,146,'D',{size:14}) ]});});</script></head><body>
+<div class="stage"><div class="reveal"><div class="slides">
+<section class="s-triptych">
+  <h2>수요곡선의 형태와 가격탄력성</h2>
+  <div class="body">
+    <div style="display:flex;gap:22px;margin-top:60px">
+      <svg class="fig" viewBox="0 0 280 200" style="width:270px"><title>완전비탄력</title>
+        <path class="axis" d="M32,12 L32,168 L262,168"/>
+        <text class="axis-name" x="26" y="20" text-anchor="end">P</text>
+        <text class="axis-name" x="266" y="174">Q</text>
+        <path class="curve" d="M120,22 L120,168"/>
+        <text class="annot" x="128" y="26" style="font-size:14px">D</text></svg>
+      <svg class="fig" viewBox="0 0 280 200" style="width:270px"><title>완전탄력</title>
+        <path class="axis" d="M32,12 L32,168 L262,168"/>
+        <text class="axis-name" x="26" y="20" text-anchor="end">P</text>
+        <text class="axis-name" x="266" y="174">Q</text>
+        <path class="curve" d="M42,78 L242,78"/>
+        <text class="annot" x="250" y="83" style="font-size:14px">D</text></svg>
+      <svg class="fig" id="f3" viewBox="0 0 280 200" style="width:270px"><title>단위탄력</title></svg>
+    </div>
+    <div style="display:flex;gap:22px;margin-top:6px;text-align:center">
+      <div style="width:270px" class="cell-title">(a) 완전비탄력적</div>
+      <div style="width:270px" class="cell-title">(b) 완전탄력적</div>
+      <div style="width:270px" class="cell-title">(c) 단위탄력적</div>
+    </div>
+  </div>
+  <div class="deck-footer"><span class="ft-text">Introduction to Urban Economics / Spring 2026 / KWON</span><span class="ft-num">9</span></div></section></div></div></div></body></html>

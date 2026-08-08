@@ -1,0 +1,68 @@
+<!-- @dsCard group="그래프" -->
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>그래프 규격</title>
+<link rel="stylesheet" href="../theme/tokens.css">
+<link rel="stylesheet" href="../theme/cbnu.css">
+<link rel="stylesheet" href="../theme/components.css">
+<link rel="stylesheet" href="../theme/preview.css">
+<script src="../js/charts.js"></script>
+</head><body>
+<div class="doc reveal">
+<h1>곡선의 색 — 도해 종류에 따라 다르다</h1>
+<p class="lede">기존 노트에 두 가지 규칙이 섞여 있다. 어느 쪽 도해인지 먼저 정하고 그린다.</p>
+
+<div style="display:flex;gap:18px;flex-wrap:wrap">
+  <div><p class="note" style="margin:0 0 2px"><b>도출 과정</b> — 검정 2.5px, 이동 후만 주황 <code>.curve-alt</code></p>
+    <svg class="fig" id="c1" viewBox="0 0 300 210" style="width:300px"><title>도출</title></svg></div>
+  <div><p class="note" style="margin:0 0 2px"><b>균형 도해</b> — D 파랑 <code>.curve-demand</code> / S 빨강 <code>.curve-supply</code>, 3px</p>
+    <svg class="fig" id="c2" viewBox="0 0 300 210" style="width:300px"><title>균형</title></svg></div>
+  <div><p class="note" style="margin:0 0 2px"><b>개별 주체 합산</b> — 초록·주황·파랑, 시장 합계는 검정</p>
+    <svg class="fig" id="c3" viewBox="0 0 300 210" style="width:300px"><title>합산</title></svg></div>
+</div>
+
+<h2>SVG 규격</h2>
+<table><thead><tr><th>항목</th><th>값</th></tr></thead><tbody>
+<tr><td>기본 캔버스</td><td><code>viewBox="0 0 520 320"</code> — 플롯 영역 x 55…410, y 25…255</td></tr>
+<tr><td>축</td><td><code>#000</code> 1px, 화살촉 없음, 원점에서 위·오른쪽으로만</td></tr>
+<tr><td>곡선</td><td>2.5px <code>fill:none</code> <code>stroke-linecap:round</code> (균형 도해는 3px)</td></tr>
+<tr><td>점선 보조선</td><td><code>--guide</code> 1px, <code>stroke-dasharray="3 3"</code></td></tr>
+<tr><td>좌표점</td><td><code>--point-red</code> 채움, <code>r=4.5</code></td></tr>
+<tr><td>축 이름 / 눈금값</td><td>12px 700 / 12px 400</td></tr>
+<tr><td>정부 규제선</td><td><code>#70AD47</code> 1.6px 수평선 <code>.curve-cap</code></td></tr>
+</tbody></table>
+
+<h2>걸리기 쉬운 두 가지</h2>
+<p style="font-size:13px;margin:0 0 6px"><b>1. 캔버스 오른쪽·아래에 여유를 둔다.</b>
+x축 이름이 축 끝 바깥(x≈424)에 놓이므로 viewBox 폭이 440이면 잘린다. 520을 쓴다.
+축 왼쪽에 라벨을 붙일 땐 <code>viewBox="-62 0 582 320"</code>처럼 원점을 음수로 민다.</p>
+<p style="font-size:13px;margin:0 0 6px"><b>2. 채움 영역의 꼭짓점은 곡선 위에 있어야 한다.</b>
+잉여 삼각형의 꼭짓점이 선에서 벗어나면 색칠이 선 밖으로 삐져나온다. 직선 위의 점은 손으로 계산해 주석으로 남긴다.</p>
+<p style="font-size:13px;margin:0"><b>3.</b> MathJax는 SVG 안의 <code>&lt;text&gt;</code>를 처리하지 않는다.
+그래프 안의 기호는 LaTeX 대신 유니코드로 쓴다 — <code>P̄ Q̄ ε Δ</code>.</p>
+
+<h2>축 눈금</h2>
+<p style="font-size:13px;margin:0">설명에 등장하는 값만 찍는다. 2강 수요곡선의 눈금은 <code>25, 20, 5</code> / <code>8, 12, 29</code> 뿐이다.</p>
+</div>
+
+<script>window.addEventListener('DOMContentLoaded',function(){
+  var F = Fig.withBox({x0:34, y0:170, x1:262, y1:16});
+  var base = F.convex({x0:60,x1:250,yTop:34,yBot:150,bow:0.30});
+  F.draw('#c1', { axes:{x:'Q', y:'P'}, parts:[
+    F.curve(base),
+    F.curve(F.shift(base, 34, -18), {variant:'alt'}),
+    F.dot(120, 92) ]});
+  F.draw('#c2', { axes:{x:'Q', y:'P'}, parts:[
+    F.line(60,40,250,150,{variant:'demand'}),
+    F.line(60,150,250,40,{variant:'supply'}),
+    F.annot(256,38,'S',{size:13}), F.annot(256,154,'D',{size:13}),
+    F.line(34,120,278,120,{variant:'cap'}),
+    F.guide(155,95,{ytick:'',xtick:''}), F.dot(155,95) ]});
+  F.draw('#c3', { axes:{x:'Q', y:'P'}, parts:[
+    F.line(50,40,90,155,{variant:'i1'}),
+    F.line(72,36,104,158,{variant:'i2'}),
+    F.line(96,34,120,156,{variant:'i3'}),
+    F.line(160,44,244,150),
+    F.annot(46,28,'D₁',{size:12}), F.annot(70,24,'D₂',{size:12}),
+    F.annot(96,22,'D₃',{size:12}), F.annot(158,32,'Dₘ',{size:12}) ]});
+});</script>
+</body></html>

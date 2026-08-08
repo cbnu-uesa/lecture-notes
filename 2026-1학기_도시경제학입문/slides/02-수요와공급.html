@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2강. 수요와 공급, 그리고 시장의 균형</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<!-- 본문의 Fig.draw() 인라인 스크립트보다 먼저 로드되어야 한다 -->
+<script src="../../_shared/js/charts.js"></script>
+
+<style>
+  /* 이 강의에서만 쓰는 미세 조정 */
+  .fig-side { width: 500px; }          /* 2단 우측 그래프 */
+  .fig-solo { width: 570px; }          /* 단독 균형 도해 */
+  .fig-half { width: 430px; }          /* 2분할 잉여 그래프 */
+  .tbl-narrow th, .tbl-narrow td { min-width: 118px; }
+  .arrow-between {
+    position: absolute; left: -34px; top: 132px;
+    font-size: 32px; line-height: 1;
+  }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <div class="cover-rule top"></div>
+  <h1>2강. 수요와 공급, 그리고 시장의 균형</h1>
+  <div class="cover-rule bottom"></div>
+  <p class="cover-date">2026. 3. 11.</p>
+</section>
+
+<!-- ══ 2. 수요곡선의 도출 (원본 p.2~5를 fragment 4단계로) ══════ -->
+<section class="s-split wide-fig">
+  <h2>수요곡선의 도출</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red fragment fade-in" data-fragment-index="2">수요의 법칙</p>
+      <p class="fragment fade-in" data-fragment-index="2"
+         style="font-weight:700;margin-bottom:12px">어떤 상품의 가격이 떨어짐에 따라 소비자가 더 많은 양을 수요하는 현상</p>
+      <p class="lead t-blue fragment fade-in" data-fragment-index="2"
+         style="margin-bottom:20px">→ 우하향하는 수요곡선</p>
+
+      <p class="caption-blue">아이스크림의 가격에 따른 소비량</p>
+      <table class="tbl-narrow">
+        <thead><tr><th>가격(천원)</th><th>수요량(통/월)</th></tr></thead>
+        <tbody>
+          <tr><td>25</td><td>8</td></tr>
+          <tr><td>20</td><td>12</td></tr>
+          <tr><td>15</td><td>16</td></tr>
+          <tr><td>10</td><td>22</td></tr>
+          <tr><td>5</td><td>29</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-r" style="position:relative">
+      <div class="arrow-between fragment fade-in" data-fragment-index="0">→</div>
+      <svg class="fig fig-side" id="f-demand" viewBox="0 0 520 340" role="img">
+        <title>아이스크림의 가격과 수요량으로 그린 우하향 수요곡선</title>
+      </svg>
+      <script>
+        (function () {
+          // 표의 값 그대로 → 곡선·눈금·점이 전부 같은 수에서 나온다 (design.md §6.4)
+          const S = Fig.scale({ x: [0, 34], y: [0, 29] });
+          const DATA = [[8, 25], [12, 20], [16, 15], [22, 10], [29, 5]];
+          const D = S.curve(DATA);
+          Fig.draw('#f-demand', {
+            axes: { x: '수요량(통/월)', y: '가격(천원)' },
+            parts: [
+              Fig.curve(D, { fragment: 0 }),
+              Fig.guide(...S.p([8, 25]),  { xtick: '8',  ytick: '25', fragment: 0 }),
+              Fig.guide(...S.p([12, 20]), { xtick: '12', ytick: '20', fragment: 0 }),
+              Fig.guide(...S.p([29, 5]),  { xtick: '29', ytick: '5',  fragment: 0 }),
+              Fig.dot(...S.p([12, 20]), { fragment: 0 }),
+              Fig.annot(S.x(14), S.y(27),
+                        '마지막 단위 아이스크림을 사기 위해\n지불할 용의가 있는 금액',
+                        { size: 11, lh: 14, fragment: 1 }),
+              Fig.annot(S.x(14), S.y(23), '→ 한계편익(marginal benefit)',
+                        { tone: 'blue', size: 14, fragment: 1 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 3. 수요곡선 위의 운동과 수요곡선의 이동 (p.6) ══════════ -->
+<section class="s-split wide-fig">
+  <h2>수요곡선 위의 운동과 수요곡선의 이동</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red">수요곡선 위의 운동</p>
+      <p style="font-weight:700;margin-bottom:40px">고려대상이 되는 상품 그 자체의<br>가격이 변화해 수요량이 변화하는 것</p>
+      <p class="sub t-red">수요곡선의 이동</p>
+      <p style="font-weight:700">일정하다고 가정된 변수변화<br>(예. 소득변동, 대체품 가격 변동)로<br>수요곡선 그 자체가 움직이는 것</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig fig-side" id="f-shift" viewBox="0 0 520 340" role="img">
+        <title>수요곡선 위의 운동(A→A`)과 수요곡선의 이동(A→B)</title>
+      </svg>
+      <script>
+        (function () {
+          const S = Fig.scale({ x: [0, 34], y: [0, 29] });
+          const DATA = [[8, 25], [12, 20], [16, 15], [22, 10], [29, 5]];
+          // 이동은 데이터 공간에서 한다 — 그래야 B가 새 곡선 위에 정확히 놓인다
+          const SHIFTED = DATA.map(([q, p]) => [q + 6, p]);
+          Fig.draw('#f-shift', {
+            axes: { x: '수요량(통/월)', y: '가격(천원)' },
+            parts: [
+              Fig.curve(S.curve(DATA)),
+              Fig.curve(S.curve(SHIFTED), { variant: 'alt' }),
+              Fig.guide(...S.p([8, 25]),  { xtick: '8',  ytick: '25' }),
+              Fig.guide(...S.p([12, 20]), { xtick: '12', ytick: '20' }),
+              Fig.guide(...S.p([18, 20]), { xtick: '18', only: 'x' }),
+              Fig.guide(...S.p([29, 5]),  { xtick: '29', ytick: '5' }),
+              Fig.dot(...S.p([12, 20]), { label: 'A', lx: -18, ly: 13 }),
+              Fig.dot(...S.p([18, 20]), { open: true, label: 'B', lx: 8, ly: -9 }),
+              Fig.dot(...S.p([29, 5]),  { label: "A`", lx: -6, ly: -12 }),
+              Fig.annot(S.x(17), S.y(27.5), 'A → B: 수요곡선의 이동\n: 수요의 변화',
+                        { size: 14, tone: 'orange' }),
+              Fig.annot(S.x(19), Fig.BOX.y0 + 40, "A → A`: 수요곡선 위의 운동\n: 수요량의 변화",
+                        { size: 14, tone: 'red', anchor: 'middle' }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. 개인의 수요와 시장의 수요 (p.7) ═══════════════════ -->
+<section>
+  <h2>개인의 수요와 시장의 수요</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="font-size:var(--fs-lead)">시장의 수요 = ∑ 개인의 수요</p>
+    <p style="font-weight:700;margin-bottom:4px">각 가격에서 개별 소비자가 수요하는 양의 합<br>(단, 개인의 수요가 다른 사람의 수요에 영향을 받지 않을 경우)</p>
+
+    <svg class="fig" id="f-mktdemand" viewBox="0 0 820 300" role="img"
+         style="width:680px;margin:6px 0 0 90px">
+      <title>개별 수요곡선 D1·D2·D3를 수평으로 합해 시장수요곡선 DM을 얻는 그림</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 44, y0: 250, x1: 700, y1: 22 });
+        const S = F.scale({ x: [0, 30], y: [0, 28] });
+        // 각 직선은 목표점을 정확히 지나도록 그 점을 중점으로 잡는다
+        const thru = ([q, p], dq, dp) => S.curve([[q - dq, p + dp], [q + dq, p - dp]]);
+        const D1 = thru([6, 15], 1.8, 11), D2 = thru([7, 15], 1.2, 11),
+              D3 = thru([10, 15], 0.9, 11), DM = thru([23, 15], 6, 11);
+        F.draw('#f-mktdemand', {
+          axes: { x: '수요량(통/월)', y: '가격(천원)' },
+          parts: [
+            F.curve(D1, { variant: 'i1' }), F.curve(D2, { variant: 'i2' }),
+            F.curve(D3, { variant: 'i3' }), F.curve(DM),
+            F.annot(S.x(3.4), S.y(27.2), 'D₁', { size: 15 }),
+            F.annot(S.x(5.3), S.y(27.2), 'D₂', { size: 15 }),
+            F.annot(S.x(8.6), S.y(27.2), 'D₃', { size: 15 }),
+            F.annot(S.x(16.4), S.y(27.2), 'Dₘ', { size: 15 }),
+            F.guide(...S.p([23, 15]), { ytick: '15', only: 'y' }),
+            F.guide(...S.p([6, 15]),  { xtick: '6',  only: 'x' }),
+            F.guide(...S.p([7, 15]),  { xtick: '7',  only: 'x' }),
+            F.guide(...S.p([10, 15]), { xtick: '10', only: 'x' }),
+            F.guide(...S.p([23, 15]), { xtick: '23', only: 'x' }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 5. 수요의 탄력성 (p.8) ═══════════════════════════════ -->
+<section>
+  <h2>수요의 탄력성 (elasticity)</h2>
+  <p class="corner-note">탄력성 &gt; 1 → 탄력적<br>탄력성 &lt; 1 → 비탄력적</p>
+  <div class="body">
+    <p class="sub t-red">수요의 가격탄력성</p>
+    <p style="font-weight:700;margin-bottom:0">상품 가격의 작은 변화에 따른 수요량의 변화</p>
+    <p>(예. 아이스크림 가격 1% 증가에 따른 수요량의 2% 감소 → 아이스크림의 가격탄력성이 2)</p>
+    <p style="margin:2px 0 30px">$\varepsilon_p = -\dfrac{\Delta Q_d / Q_d}{\Delta P / P}$</p>
+
+    <p class="sub t-red">수요의 소득탄력성</p>
+    <p style="font-weight:700;margin-bottom:0">소득의 작은 변화에 따른 수요량의 변화</p>
+    <p>(예. 소득 1% 증가에 따른 아이스크림 수요(량)의 2% 증가 → 아이스크림의 소득탄력성이 2)</p>
+    <div style="display:flex;gap:64px;align-items:flex-start;margin-top:2px">
+      <p style="margin:0">$\varepsilon_m = \dfrac{\Delta Q_d / Q_d}{\Delta M / M}$</p>
+      <ul style="margin:0">
+        <li>$\varepsilon_m &lt; 0$ : 열등재</li>
+        <li>$\varepsilon_m &gt; 0$ : 정상재
+          <ul style="margin-top:6px">
+            <li>$0 &lt; \varepsilon_m &lt; 1$ : 필수재</li>
+            <li>$\varepsilon_m &gt; 1$ &nbsp;&nbsp;&nbsp;: 사치재</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 6. 수요곡선의 형태와 가격탄력성 (p.9) ════════════════ -->
+<section class="s-triptych">
+  <h2>수요곡선의 형태와 가격탄력성</h2>
+  <div class="body">
+    <p style="position:absolute;left:0;top:-6px;margin:0;font-size:var(--fs-emph);font-weight:500">
+      탄력성 &gt; 1 → 탄력적<br>탄력성 &lt; 1 → 비탄력적</p>
+    <p class="t-red" style="position:absolute;left:270px;top:-6px;margin:0;font-size:var(--fs-emph);font-weight:700">
+      Q) 만약 어떤 상품의 수요곡선이 (a)와 같다면<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;생산자는 가격을 올리는 것이 유리할까 내리는 것이 유리할까?</p>
+
+    <div style="display:flex;gap:22px;margin-top:100px">
+      <svg class="fig" viewBox="0 0 300 230" style="width:288px" role="img">
+        <title>완전비탄력적 수요곡선: 수직선</title>
+        <path class="axis" d="M34,14 L34,192 L286,192"/>
+        <text class="axis-name" x="28" y="22" text-anchor="end">P</text>
+        <text class="axis-name" x="290" y="198">Q</text>
+        <path class="curve" d="M128,26 L128,192"/>
+        <text class="annot" x="136" y="30" style="font-size:14px">D</text>
+      </svg>
+      <svg class="fig" viewBox="0 0 300 230" style="width:288px" role="img">
+        <title>완전탄력적 수요곡선: 수평선</title>
+        <path class="axis" d="M34,14 L34,192 L286,192"/>
+        <text class="axis-name" x="28" y="22" text-anchor="end">P</text>
+        <text class="axis-name" x="290" y="198">Q</text>
+        <path class="curve" d="M46,88 L262,88"/>
+        <text class="annot" x="270" y="93" style="font-size:14px">D</text>
+      </svg>
+      <svg class="fig" id="f-unit" viewBox="0 0 300 230" style="width:288px" role="img">
+        <title>단위탄력적 수요곡선: 직각쌍곡선 PQ = k</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 34, y0: 192, x1: 276, y1: 14 });
+        const C = F.convex({ x0: 76, x1: 258, yTop: 30, yBot: 162, bow: 0.22 });
+        F.draw('#f-unit', {
+          axes: { x: 'Q', y: 'P' },
+          parts: [F.curve(C), F.annot(266, 166, 'D', { size: 14 })],
+        });
+      })();
+    </script>
+    <div style="display:flex;gap:22px;margin-top:6px;text-align:center">
+      <div style="width:288px">$(a)\ \varepsilon_p = 0$</div>
+      <div style="width:288px">$(b)\ \varepsilon_p = \infty$</div>
+      <div style="width:288px">$(c)\ \varepsilon_p = 1$</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. 수요의 가격탄력성 결정요인 (p.10) ═════════════════ -->
+<section class="s-numbered">
+  <h2>수요의 가격탄력성 결정요인</h2>
+  <div class="body">
+    <ol>
+      <li>상품의 성격: 필수재 vs. 사치재</li>
+      <li>대체재의 존재여부</li>
+      <li>상품이 전체 지출에서 차지하는 비중</li>
+      <li>고려되는 기간의 길이: 단기 vs. 장기</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 8. 공급곡선의 도출 (p.11) ════════════════════════════ -->
+<section class="s-split wide-fig">
+  <h2>공급곡선의 도출</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red">공급의 법칙</p>
+      <p style="font-weight:700;margin-bottom:12px">어떤 상품의 가격이 상승함에 따라 생산자가 더 많은 양을 공급하는 현상</p>
+      <p class="lead t-blue" style="margin-bottom:20px">→ 우상향하는 공급곡선</p>
+
+      <table class="tbl-narrow">
+        <thead><tr><th>가격(천원)</th><th>공급량(만 통/월)</th></tr></thead>
+        <tbody>
+          <tr><td>25</td><td>19</td></tr>
+          <tr><td>20</td><td>17</td></tr>
+          <tr><td>15</td><td>14</td></tr>
+          <tr><td>10</td><td>11</td></tr>
+          <tr><td>5</td><td>7</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col-r" style="position:relative">
+      <div class="arrow-between">→</div>
+      <svg class="fig fig-side" id="f-supply" viewBox="0 0 520 340" role="img">
+        <title>아이스크림의 가격과 공급량으로 그린 우상향 공급곡선</title>
+      </svg>
+      <script>
+        (function () {
+          const S = Fig.scale({ x: [0, 23], y: [0, 29] });
+          // 표의 (공급량, 가격)
+          const DATA = [[7, 5], [11, 10], [14, 15], [17, 20], [19, 25]];
+          Fig.draw('#f-supply', {
+            axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+            parts: [
+              Fig.curve(S.curve(DATA)),
+              Fig.guide(...S.p([7, 5]),   { xtick: '7',  ytick: '5' }),
+              Fig.guide(...S.p([17, 20]), { xtick: '17', ytick: '20' }),
+              Fig.guide(...S.p([19, 25]), { xtick: '19', ytick: '25' }),
+              Fig.dot(...S.p([17, 20])),
+              Fig.annot(S.x(1.6), S.y(27),
+                        '마지막 단위 아이스크림을 생산할 때\n받아야할 금액',
+                        { size: 11, lh: 14 }),
+              Fig.annot(S.x(1.6), S.y(23), '→ 한계비용(marginal cost)',
+                        { tone: 'blue', size: 14 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. 공급곡선 위의 운동과 공급곡선의 이동 (p.12) ════════ -->
+<section class="s-split wide-fig">
+  <h2>공급곡선 위의 운동과 공급곡선의 이동</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red">공급곡선 위의 운동</p>
+      <p style="font-weight:700;margin-bottom:40px">고려대상이 되는 상품 그 자체의<br>가격이 변화해 공급량이 변화하는 것</p>
+      <p class="sub t-red">공급곡선의 이동</p>
+      <p style="font-weight:700">일정하다고 가정된 변수변화<br>(예. 생산요소 가격의 변동)로<br>공급곡선 그 자체가 움직이는 것</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig fig-side" id="f-sshift" viewBox="0 0 520 340" role="img">
+        <title>공급곡선 위의 운동(A→A`)과 공급곡선의 이동(A→B)</title>
+      </svg>
+      <script>
+        (function () {
+          const S = Fig.scale({ x: [0, 23], y: [0, 29] });
+          const DATA = [[7, 5], [11, 10], [14, 15], [17, 20], [19, 25]];
+          const SHIFTED = DATA.map(([q, p]) => [q - 4, p]);   // 왼쪽으로 이동
+          Fig.draw('#f-sshift', {
+            axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+            parts: [
+              Fig.curve(S.curve(DATA)),
+              Fig.curve(S.curve(SHIFTED), { variant: 'alt' }),
+              Fig.guide(...S.p([7, 5]),   { xtick: '7',  ytick: '5' }),
+              Fig.guide(...S.p([13, 20]), { xtick: '13', only: 'x' }),
+              Fig.guide(...S.p([17, 20]), { xtick: '17', ytick: '20' }),
+              Fig.guide(...S.p([19, 25]), { xtick: '19', ytick: '25' }),
+              Fig.dot(...S.p([17, 20]), { label: 'A', lx: 9, ly: 14 }),
+              Fig.dot(...S.p([19, 25]), { label: "A`", lx: 9, ly: 2 }),
+              Fig.dot(...S.p([13, 20]), { open: true }),
+              Fig.annot(S.x(8.6), S.y(28), 'A → B: 공급곡선의 이동\n: 공급의 변화',
+                        { size: 14, tone: 'orange' }),
+              Fig.annot(S.x(12), Fig.BOX.y0 + 40, "A → A`: 공급곡선 위의 운동\n: 공급량의 변화",
+                        { size: 14, tone: 'red', anchor: 'middle' }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 10. 기업의 공급과 시장의 공급 (p.13) ═════════════════ -->
+<section>
+  <h2>기업의 공급과 시장의 공급</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="font-size:var(--fs-lead)">시장의 공급 = ∑ 개별 기업의 공급</p>
+    <p style="font-weight:700;margin-bottom:4px">각 가격에서 개별 기업이 공급하는 양의 합<br>(단, 개별 기업의 공급이 다른 기업의 공급에 영향을 받지 않을 경우)</p>
+
+    <svg class="fig" id="f-mktsupply" viewBox="0 0 820 300" role="img"
+         style="width:680px;margin:6px 0 0 90px">
+      <title>개별 공급곡선 S1·S2·S3를 수평으로 합해 시장공급곡선 SM을 얻는 그림</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 44, y0: 250, x1: 700, y1: 22 });
+        const S = F.scale({ x: [0, 55], y: [0, 28] });
+        const thru = ([q, p], dq, dp) => S.curve([[q - dq, p - dp], [q + dq, p + dp]]);
+        const S1 = thru([12, 15], 3.2, 11), S2 = thru([14, 15], 4.6, 11),
+              S3 = thru([17, 15], 4.2, 11), SM = thru([43, 15], 10, 11);
+        F.draw('#f-mktsupply', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.curve(S1, { variant: 'i1' }), F.curve(S2, { variant: 'i2' }),
+            F.curve(S3, { variant: 'i3' }), F.curve(SM),
+            F.annot(S.x(13.6), S.y(27.2), 'S₁', { size: 15 }),
+            F.annot(S.x(17.4), S.y(27.2), 'S₂', { size: 15 }),
+            F.annot(S.x(21.4), S.y(27.2), 'S₃', { size: 15 }),
+            F.annot(S.x(51), S.y(27.2), 'Sₘ', { size: 15 }),
+            F.guide(...S.p([43, 15]), { ytick: '15', only: 'y' }),
+            F.guide(...S.p([12, 15]), { xtick: '12', only: 'x' }),
+            F.guide(...S.p([14, 15]), { xtick: '14', only: 'x' }),
+            F.guide(...S.p([17, 15]), { xtick: '17', only: 'x' }),
+            F.guide(...S.p([43, 15]), { xtick: '43', only: 'x' }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 11. 공급의 탄력성 (p.14) ═════════════════════════════ -->
+<section>
+  <h2>공급의 탄력성 (elasticity)</h2>
+  <p class="corner-note">탄력성 &gt; 1 → 탄력적<br>탄력성 &lt; 1 → 비탄력적</p>
+  <div class="body">
+    <p class="sub t-red">공급의 가격탄력성</p>
+    <p style="font-weight:700;margin-bottom:0">상품 가격의 작은 변화에 따른 공급량의 변화</p>
+    <p>(예. 아이스크림 가격 1% 증가에 따른 공급량의 2% 증가 → 아이스크림 공급의 가격탄력성이 2)</p>
+
+    <div style="display:flex;align-items:flex-start;gap:40px;margin-top:10px">
+      <p style="margin:0;flex:0 0 150px">$\varepsilon_p = \dfrac{\Delta Q_s / Q_s}{\Delta P / P}$</p>
+      <p class="t-red" style="margin:6px 0 0;font-weight:700;font-size:var(--fs-emph)">
+        Q) 어떤 상품이 (a)와 같은 공급곡선을 가질까?</p>
+    </div>
+
+    <div style="display:flex;gap:70px;margin:20px 0 0 50px">
+      <div style="text-align:center">
+        <svg class="fig" viewBox="0 0 320 210" style="width:350px" role="img">
+          <title>완전비탄력적 공급곡선: 수직선</title>
+          <path class="axis" d="M42,12 L42,178 L302,178"/>
+          <text class="axis-name" x="36" y="20" text-anchor="end">P</text>
+          <text class="axis-name" x="306" y="184">Q</text>
+          <path class="curve" d="M160,20 L160,178"/>
+          <text class="annot" x="168" y="24" style="font-size:14px">S</text>
+        </svg>
+        <div style="margin-top:-2px">$(a)\ \varepsilon_p = 0$</div>
+      </div>
+      <div style="text-align:center">
+        <svg class="fig" viewBox="0 0 320 210" style="width:350px" role="img">
+          <title>완전탄력적 공급곡선: 수평선</title>
+          <path class="axis" d="M42,12 L42,178 L302,178"/>
+          <text class="axis-name" x="36" y="20" text-anchor="end">P</text>
+          <text class="axis-name" x="306" y="184">Q</text>
+          <path class="curve" d="M64,82 L272,82"/>
+          <text class="annot" x="280" y="87" style="font-size:14px">S</text>
+        </svg>
+        <div style="margin-top:-2px">$(b)\ \varepsilon_p = \infty$</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 12. 공급의 탄력성 — 원점을 지나는 직선 (p.15) ═════════ -->
+<section>
+  <h2>공급의 탄력성 (elasticity)</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="font-size:var(--fs-lead);margin-bottom:10px">
+      원점을 지나는 직선 형태의 공급곡선은 모든 점에서 가격탄력성이 1</p>
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg class="fig" id="f-unitsupply" viewBox="0 0 480 340" style="width:490px" role="img">
+        <title>원점을 지나는 직선 공급곡선 P = bQ와 ΔP, ΔQ</title>
+      </svg>
+      <p style="margin:0;font-size:20px">
+        $\varepsilon_p = \dfrac{\Delta Q_s/Q_s}{\Delta P/P} = \dfrac{P}{Q_s}\cdot\dfrac{\Delta Q_s}{\Delta P}$</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 285, x1: 400, y1: 30 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const LINE = S.curve([[0, 0], [8.6, 8.6]]);   // 원점을 지나는 직선
+        F.draw('#f-unitsupply', {
+          axes: { x: 'Q', y: 'P' },
+          parts: [
+            F.curve(LINE, { variant: 'supply' }),
+            F.annot(S.x(8.9), S.y(8.6), 'S', { size: 15 }),
+            F.annot(S.x(6.2), S.y(7.6), 'P = bQ', { size: 15 }),
+            F.guide(...S.p([4, 4]), { xtick: 'Q1', ytick: 'P1' }),
+            F.guide(...S.p([5.6, 5.6]), { xtick: 'Q2', ytick: 'P2' }),
+            F.dot(...S.p([4, 4])),
+            F.dot(...S.p([5.6, 5.6])),
+            F.annot(S.x(0.8), S.y(4.9), 'ΔP', { size: 12 }),
+            F.annot(S.x(4.8), S.y(0.8), 'ΔQ', { size: 12, anchor: 'middle' }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 13. 공급의 가격탄력성 결정요인 (p.16) ════════════════ -->
+<section class="s-numbered">
+  <h2>공급의 가격탄력성 결정요인</h2>
+  <div class="body">
+    <ol>
+      <li>생산요소의 공급여부: 시설확장, 투입요소 구입</li>
+      <li>생산되는 상품의 전환 여부</li>
+      <li>고려되는 기간의 길이: 단기 vs. 장기</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 14. 시장의 균형 (p.17) ═══════════════════════════════ -->
+<section>
+  <h2>시장의 균형 (equilibrium)</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">
+      수요와 공급이 맞아떨어져 다른 요인의 변화가 없는 한 어느 쪽으로도 움직일 유인이 없는 상태</p>
+    <svg class="fig fig-solo" id="f-eq" viewBox="-70 0 590 350" role="img"
+         style="margin:6px 0 0 130px">
+      <title>수요곡선과 공급곡선이 만나는 균형점 E, 초과공급과 초과수요</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 290, x1: 388, y1: 26 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        // 눈금으로 표시할 점을 곡선이 그대로 지나게 잡는다
+        const D = S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]);
+        const SS = S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]);
+        const y20 = S.y(20), y10 = S.y(10), x30 = S.x(30), x58 = S.x(58);
+        F.draw('#f-eq', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.curve(D, { variant: 'demand' }),
+            F.curve(SS, { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+            F.guide(...S.p([58, 20]), { ytick: '20', xtick: '58' }),
+            F.guide(...S.p([30, 20]), { xtick: '30', only: 'x' }),
+            F.guide(...S.p([43, 15]), { ytick: '15', xtick: '43' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${y10} L${x58},${y10}"/>`),
+            F.annot(F.BOX.x0 - 8, y10 + 4, '10', { anchor: 'end', size: 12 }),
+            F.raw(`<path d="M${x30},${y20 - 7} L${x30},${y20 - 16} L${x58},${y20 - 16} L${x58},${y20 - 7}" fill="none" stroke="#FF0000" stroke-width="1"/>`),
+            F.annot((x30 + x58) / 2, y20 - 24, '초과공급', { tone: 'red', anchor: 'middle', size: 14 }),
+            F.raw(`<path d="M${x30},${y10 + 7} L${x30},${y10 + 16} L${x58},${y10 + 16} L${x58},${y10 + 7}" fill="none" stroke="#0328C3" stroke-width="1"/>`),
+            F.annot((x30 + x58) / 2, y10 + 34, '초과수요', { tone: 'blue', anchor: 'middle', size: 14 }),
+            F.annot(S.x(45.5), S.y(14), 'E: 균형점', { size: 14 }),
+            F.annot(F.BOX.x0 - 34, S.y(15) + 4, '균형가격', { anchor: 'end', size: 14 }),
+            F.annot(S.x(43), F.BOX.y0 + 38, '균형거래량', { anchor: 'middle', size: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 15. 균형의 변화 (p.18) ═══════════════════════════════ -->
+<section>
+  <h2>균형의 변화</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">
+      가격 변화 이외의 요인 변동, 즉 곡선의 이동이 있을 경우 새로운 균형점을 찾아 이동</p>
+    <!-- 그래프를 오른쪽으로 밀어 세로축 이름과 이 라벨이 겹치지 않게 한다 -->
+    <p class="t-red" style="position:absolute;left:0;top:104px;margin:0;font-weight:700;font-size:var(--fs-emph)">
+      예. 소득이 증가하는 경우</p>
+    <svg class="fig fig-solo" id="f-eqshift" viewBox="0 0 540 350" role="img"
+         style="margin:6px 0 0 200px">
+      <title>수요곡선이 오른쪽으로 이동해 균형점이 E에서 E`로 옮겨가는 그림</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 290, x1: 388, y1: 26 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        const Dd = [[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]];
+        const Ss = [[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]];
+        const D2 = Dd.map(([q, p]) => [q + 28, p]);   // 오른쪽으로 이동 → E`가 (58,20)
+        F.draw('#f-eqshift', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.curve(S.curve(Dd), { variant: 'demand' }),
+            F.curve(S.curve(D2), { variant: 'demand' }),
+            F.curve(S.curve(Ss), { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(71), S.y(5.4), 'D', { size: 15 }),
+            F.annot(S.x(93), S.y(11.5), 'D`', { size: 15 }),
+            F.guide(...S.p([58, 20]), { ytick: '20', xtick: '58' }),
+            F.guide(...S.p([30, 20]), { xtick: '30', only: 'x' }),
+            F.guide(...S.p([43, 15]), { ytick: '15', xtick: '43' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(10)} L${S.x(58)},${S.y(10)}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(10) + 4, '10', { anchor: 'end', size: 12 }),
+            // E·E`는 두 곡선이 실제로 만나는 점이다 — D는 (43,15), D`는 (58,20)에서
+            // S와 만난다. 라벨은 그 점 바로 오른쪽, 두 곡선이 벌어지는 쐐기 안에 둔다.
+            F.annot(S.x(45.5), S.y(14.4) + 4, 'E', { size: 14 }),
+            F.annot(S.x(59.5), S.y(19) + 4, 'E`: 새로운 균형점', { size: 14 }),
+            // 이동 화살표는 D와 D` 사이에. p=12.5에서 D는 q=50.5, D`는 q=78.5이므로
+            // 그 안쪽(61→76)에 놓으면 어느 곡선도 가로지르지 않는다.
+            F.arrow(S.x(61), S.y(12.5), S.x(76), S.y(12.5)),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 16. 균형의 변화 — 발문 (p.19) ════════════════════════ -->
+<section>
+  <h2>균형의 변화</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">
+      Q) 원유가격이 폭등한다면 균형점은 어떻게 변할 것인가?</p>
+    <svg class="fig fig-solo" id="f-eqq" viewBox="0 0 520 350" role="img"
+         style="margin:6px 0 0 150px">
+      <title>원유가격 폭등이 균형에 미치는 영향을 묻는 수요·공급 그림</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 290, x1: 388, y1: 26 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        F.draw('#f-eqq', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.curve(S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]), { variant: 'demand' }),
+            F.curve(S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]), { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+            F.guide(...S.p([58, 20]), { ytick: '20', xtick: '58' }),
+            F.guide(...S.p([30, 20]), { xtick: '30', only: 'x' }),
+            F.guide(...S.p([43, 15]), { ytick: '15', xtick: '43' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(10)} L${S.x(58)},${S.y(10)}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(10) + 4, '10', { anchor: 'end', size: 12 }),
+            F.annot(S.x(45.5), S.y(14), 'E', { size: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 17. 가격규제의 효과 — 상한가격 (p.20) ════════════════ -->
+<section>
+  <h2>가격규제의 효과</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">
+      Q) 균형가격보다 낮은 가격에 상품을 팔도록 제한하면 무슨 일이 발생하는가?</p>
+    <svg class="fig fig-solo" id="f-cap" viewBox="0 0 620 350" role="img"
+         style="margin:6px 0 0 110px">
+      <title>균형가격보다 낮은 상한가격을 두었을 때의 수요·공급 그림</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 290, x1: 380, y1: 26 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        const D = S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]);
+        const SS = S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]);
+        const yCap = S.y(13);
+        // 상한선이 각 곡선과 만나는 자리는 곡선에서 구한다 — 손으로 찍지 않는다
+        const onS = Fig.at(SS, { y: yCap }), onD = Fig.at(D, { y: yCap });
+        F.draw('#f-cap', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.curve(D, { variant: 'demand' }),
+            F.curve(SS, { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+            F.guide(...S.p([43, 15]), { ytick: '15', xtick: '43' }),
+            F.line(F.BOX.x0, yCap, 448, yCap, { variant: 'cap' }),
+            F.raw(`<path class="guide" d="M${onS[0]},${yCap} L${onS[0]},${F.BOX.y0}"/>`),
+            F.raw(`<path class="guide" d="M${onD[0]},${yCap} L${onD[0]},${F.BOX.y0}"/>`),
+            F.annot(onS[0], F.BOX.y0 + 17, '23', { anchor: 'middle', size: 12 }),
+            F.annot(onD[0], F.BOX.y0 + 17, '49', { anchor: 'middle', size: 12 }),
+            F.annot(F.BOX.x0 - 8, yCap + 4, '13', { anchor: 'end', size: 12 }),
+            F.annot(S.x(45.5), S.y(14), 'E', { size: 14 }),
+            F.annot(456, yCap + 5, '정부에서 규제한 상한가격', { size: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 18. 가격규제의 효과 — 최저임금 (p.21) ════════════════ -->
+<section>
+  <h2>가격규제의 효과</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">
+      Q) 균형가격 이상에서 최저임금을 도입할 경우 발생하는 효과는?</p>
+    <svg class="fig fig-solo" id="f-floor" viewBox="0 0 620 350" role="img"
+         style="margin:6px 0 0 110px">
+      <title>균형임금 위에 최저임금을 두었을 때의 노동 수요·공급 그림</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 290, x1: 380, y1: 26 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        F.draw('#f-floor', {
+          axes: { x: '노동공급량', y: '임금' },
+          parts: [
+            F.curve(S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]), { variant: 'demand' }),
+            F.curve(S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]), { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+            F.line(F.BOX.x0, S.y(19), 448, S.y(19), { variant: 'cap' }),
+            F.guide(...S.p([43, 15]), { ytick: 'We', xtick: 'Qe' }),
+            F.annot(S.x(45.5), S.y(14), 'E', { size: 14 }),
+            F.annot(456, S.y(19) + 5, '정부에서 규제한 하한가격', { size: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 19. 소비자잉여 (p.22) ════════════════════════════════ -->
+<section>
+  <h2>소비자잉여 (consumer surplus)</h2>
+  <div class="body stack">
+    <p class="lead t-define">소비자가 교환으로부터 얻는 이득</p>
+    <div style="display:flex;gap:24px;margin-top:18px">
+      <svg class="fig fig-half" id="f-cs1" viewBox="0 0 500 320" role="img">
+        <title>볼펜 1~6개의 한계편익 막대와 수요곡선</title>
+      </svg>
+      <svg class="fig fig-half" id="f-cs2" viewBox="0 0 500 320" role="img">
+        <title>수요곡선 아래·가격선 위 삼각형으로 나타낸 소비자잉여</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 52, y0: 252, x1: 372, y1: 20 });
+        const S = F.scale({ x: [0, 11], y: [0, 1900] });
+
+        // 왼쪽 — 한계편익 막대 + 수요곡선
+        const BARS = [1700, 1520, 1360, 1160, 980, 800];
+        const B1 = F.bars(S, BARS);
+        // 막대 꼭대기의 가로 중앙 두 점을 지나는 직선 (design.md §6.7)
+        const D1 = S.curve([[0, 1790], [9.6, 62]]);
+        F.draw('#f-cs1', {
+          axes: { x: '볼펜의 양(개)', y: '가격(원)' },
+          parts: [
+            F.raw(B1.svg),
+            F.curve(D1, { variant: 'demand' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(800)} L${S.x(6)},${S.y(800)}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(1700) + 4, '1,700', { anchor: 'end', size: 12 }),
+            F.annot(F.BOX.x0 - 8, S.y(800) + 4, '800', { anchor: 'end', size: 12 }),
+            ...B1.labels,
+            F.annot(S.x(3.5), S.y(1700), '마지막 단위 볼펜을 사기 위해', { size: 11 }),
+            F.annot(S.x(3.5), S.y(1600), '지불할 용의가 있는 금액', { size: 11 }),
+            F.annot(S.x(3.5), S.y(1460), '→ 한계편익(marginal benefit)', { tone: 'blue', size: 13 }),
+            F.annot(S.x(4.3), S.y(1330), '= 800원', { tone: 'blue', size: 13 }),
+            F.annot(S.x(8.6), S.y(380), 'D', { size: 15 }),
+          ],
+        });
+
+        // 오른쪽 — 잉여 삼각형 + 지불비용 사각형. B는 반드시 곡선 위에서 구한다.
+        const D2 = S.curve([[0, 1800], [9.6, 100]]);
+        const yP = S.y(900);
+        const B = Fig.at(D2, { y: yP });
+        F.draw('#f-cs2', {
+          axes: { x: '볼펜의 양(개)', y: '가격(원)' },
+          parts: [
+            F.raw('<defs><pattern id="hatch-cs" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+                  '<line x1="0" y1="0" x2="0" y2="7" stroke="#4472C4" stroke-width="1.2"/></pattern></defs>'),
+            F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${S.y(1800)} ${F.BOX.x0},${yP} ${B[0]},${yP}"/>`),
+            F.raw(`<rect fill="url(#hatch-cs)" stroke="#4472C4" stroke-width="1" x="${F.BOX.x0}" y="${yP}" width="${B[0] - F.BOX.x0}" height="${F.BOX.y0 - yP}"/>`),
+            F.curve(D2, { variant: 'demand' }),
+            F.annot(F.BOX.x0 + 9, S.y(1800) - 7, 'A', { size: 14 }),
+            F.annot(B[0] + 9, yP - 9, 'B', { size: 14 }),
+            F.annot(F.BOX.x0 - 8, yP + 4, 'P̄', { anchor: 'end', size: 14 }),
+            F.annot(B[0], F.BOX.y0 + 17, 'Q̄', { anchor: 'middle', size: 14 }),
+            F.labelIn([[F.BOX.x0, S.y(1800)], [F.BOX.x0, yP], [B[0], yP]],
+                      '소비자\n잉여', { tone: 'red', size: 15 }),
+            F.annot(S.x(2.3), S.y(600), 'P̄ * Q̄', { size: 12 }),
+            F.annot(S.x(2.3), S.y(470), '= 지불비용', { size: 12 }),
+            F.annot(S.x(8.7), S.y(300), 'D', { size: 15 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 20. 생산자잉여 (p.23) ════════════════════════════════ -->
+<section>
+  <h2>생산자잉여 (producer surplus)</h2>
+  <div class="body stack">
+    <p class="lead t-define">생산자가 교환으로부터 얻는 이득</p>
+    <div style="display:flex;gap:24px;margin-top:18px">
+      <svg class="fig fig-half" id="f-ps1" viewBox="0 0 500 320" role="img">
+        <title>볼펜 1~6개의 한계비용 막대와 공급곡선</title>
+      </svg>
+      <svg class="fig fig-half" id="f-ps2" viewBox="0 0 500 320" role="img">
+        <title>가격선 아래·공급곡선 위 삼각형으로 나타낸 생산자잉여</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 52, y0: 252, x1: 372, y1: 20 });
+        const S = F.scale({ x: [0, 11], y: [0, 1900] });
+
+        const BARS = [180, 300, 420, 550, 670, 800];
+        const B1 = F.bars(S, BARS);
+        // (0.5,180)과 (5.5,800)을 정확히 지나는 직선 = 막대 꼭대기 한가운데
+        const S1 = S.curve([[0, 118], [10.2, 1383]]);
+        F.draw('#f-ps1', {
+          axes: { x: '볼펜의 양(개)', y: '가격(원)' },
+          parts: [
+            F.raw(B1.svg),
+            F.curve(S1, { variant: 'demand' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(800)} L${S.x(6)},${S.y(800)}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(1700) + 4, '1,700', { anchor: 'end', size: 12 }),
+            F.annot(F.BOX.x0 - 8, S.y(800) + 4, '800', { anchor: 'end', size: 12 }),
+            ...B1.labels,
+            F.annot(S.x(6.4), S.y(900), '마지막 단위 볼펜을 생산하기 위해', { size: 11 }),
+            F.annot(S.x(6.4), S.y(800), '반드시 받아야할 금액', { size: 11 }),
+            F.annot(S.x(6.4), S.y(660), '→ 한계비용(marginal cost)', { tone: 'blue', size: 13 }),
+            F.annot(S.x(7.2), S.y(530), '= 800원', { tone: 'blue', size: 13 }),
+            F.annot(S.x(9.0), S.y(1230), 'S', { size: 15 }),
+          ],
+        });
+
+        const S2 = S.curve([[0, 240], [9.6, 1820]]);
+        const yP = S.y(1180);
+        const B = Fig.at(S2, { y: yP });
+        F.draw('#f-ps2', {
+          axes: { x: '볼펜의 양(개)', y: '가격(원)' },
+          parts: [
+            F.raw('<defs><pattern id="hatch-ps" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+                  '<line x1="0" y1="0" x2="0" y2="7" stroke="#4472C4" stroke-width="1.2"/></pattern></defs>'),
+            F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${yP} ${F.BOX.x0},${S.y(240)} ${B[0]},${yP}"/>`),
+            F.raw(`<polygon fill="url(#hatch-ps)" stroke="#4472C4" stroke-width="1" points="${F.BOX.x0},${S.y(240)} ${B[0]},${yP} ${B[0]},${F.BOX.y0} ${F.BOX.x0},${F.BOX.y0}"/>`),
+            F.raw(`<path d="M${F.BOX.x0},${yP} L${B[0]},${yP} L${B[0]},${F.BOX.y0}" fill="none" stroke="#4472C4" stroke-width="1.6"/>`),
+            F.curve(S2, { variant: 'demand' }),
+            F.annot(B[0] + 9, yP - 9, 'B', { size: 14 }),
+            F.annot(F.BOX.x0 - 8, yP + 4, 'P̄', { anchor: 'end', size: 14 }),
+            F.annot(F.BOX.x0 - 8, S.y(240) + 4, 'A', { anchor: 'end', size: 14 }),
+            F.annot(B[0], F.BOX.y0 + 17, 'Q̄', { anchor: 'middle', size: 14 }),
+            F.labelIn([[F.BOX.x0, yP], [F.BOX.x0, S.y(240)], [B[0], yP]],
+                      '생산자\n잉여', { tone: 'red', size: 15 }),
+            F.annot(S.x(7.3), S.y(1720), 'P̄ * Q̄', { size: 12 }),
+            F.annot(S.x(7.3), S.y(1600), '= 판매수익', { size: 12 }),
+            F.annot(S.x(7.5), S.y(700), 'AB Q̄ O', { size: 12 }),
+            F.annot(S.x(7.5), S.y(570), '= 한계비용의 합', { size: 12 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 21. 순사회 편익 (p.24) ═══════════════════════════════ -->
+<section>
+  <h2>순사회 편익 (net social benefit)</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">소비자잉여와 생산자잉여의 합</p>
+    <svg class="fig fig-solo" id="f-nsb" viewBox="0 0 520 350" role="img"
+         style="margin:6px 0 0 150px">
+      <title>균형에서의 소비자잉여와 생산자잉여를 합한 순사회 편익</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 290, x1: 388, y1: 26 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        const D = S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]);
+        const SS = S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]);
+        F.draw('#f-nsb', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.raw(`<polygon class="area-surplus" points="${S.x(20)},${S.y(23.5)} ${S.x(43)},${S.y(15)} ${S.x(20)},${S.y(6)}"/>`),
+            F.curve(D, { variant: 'demand' }),
+            F.curve(SS, { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(15)} L${S.x(43)},${S.y(15)}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(15) + 4, '15', { anchor: 'end', size: 12 }),
+            F.annot(S.x(43), F.BOX.y0 + 17, '43', { anchor: 'middle', size: 12 }),
+            F.annot(S.x(45.5), S.y(14), 'E', { size: 14 }),
+            F.labelIn([S.p([20, 23.5]), S.p([43, 15]), S.p([20, 15])],
+                      '소비자\n잉여', { tone: 'red', size: 14, lh: 17 }),
+            F.labelIn([S.p([20, 15]), S.p([43, 15]), S.p([20, 6])],
+                      '생산자\n잉여', { tone: 'red', size: 14, lh: 17 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 22. 가격상한제의 효과 (p.25) ═════════════════════════ -->
+<section>
+  <h2>가격상한제의 효과</h2>
+  <div class="body stack">
+    <svg class="fig fig-solo" id="f-dwl" viewBox="0 0 620 380" role="img"
+         style="margin:22px 0 0 110px">
+      <title>상한가격 아래에서 줄어든 잉여와 후생손실 삼각형</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 55, y0: 320, x1: 380, y1: 56 });
+        const S = F.scale({ x: [0, 80], y: [0, 26] });
+        const D = S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]);
+        const SS = S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]);
+        const yCap = S.y(13);
+        const onS = Fig.at(SS, { y: yCap });      // 거래가 멈추는 수량
+        const dTop = Fig.at(D, { x: onS[0] });    // 같은 수량에서의 수요곡선 위 점
+        F.draw('#f-dwl', {
+          axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+          parts: [
+            F.raw(`<polygon class="area-surplus" points="${S.x(20)},${S.y(23.5)} ${dTop[0]},${dTop[1]} ${onS[0]},${yCap} ${S.x(20)},${S.y(6)}"/>`),
+            F.raw(`<polygon class="area-loss" points="${dTop[0]},${dTop[1]} ${S.x(43)},${S.y(15)} ${onS[0]},${yCap}"/>`),
+            F.curve(D, { variant: 'demand' }),
+            F.curve(SS, { variant: 'supply' }),
+            F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+            F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+            F.line(F.BOX.x0, yCap, 448, yCap, { variant: 'cap' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(15)} L${S.x(43)},${S.y(15)}"/>`),
+            F.raw(`<path class="guide" d="M${onS[0]},${yCap} L${onS[0]},${F.BOX.y0}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(15) + 4, '15', { anchor: 'end', size: 12 }),
+            F.annot(F.BOX.x0 - 8, yCap + 4, '13', { anchor: 'end', size: 12 }),
+            F.annot(onS[0], F.BOX.y0 + 17, '23', { anchor: 'middle', size: 12 }),
+            F.annot(S.x(43), F.BOX.y0 + 17, '43', { anchor: 'middle', size: 12 }),
+            F.annot(S.x(45.5), S.y(14), 'E', { size: 14 }),
+            F.labelIn([S.p([20, 23.5]), [dTop[0], dTop[1]], [onS[0], yCap], [S.x(20), yCap]],
+                      '소비자\n잉여', { tone: 'red', size: 14, lh: 17 }),
+            F.labelIn([[S.x(20), yCap], [onS[0], yCap], S.p([20, 6])],
+                      '생산자\n잉여', { tone: 'red', size: 14, lh: 17 }),
+            F.raw(`<path d="M${dTop[0] + 4},${dTop[1] - 6} Q${dTop[0] + 16},${dTop[1] - 26} ${dTop[0] + 24},${dTop[1] - 42}" fill="none" stroke="#4472C4" stroke-width="1"/>`),
+            F.annot(dTop[0] + 26, dTop[1] - 64, '후생손실', { tone: 'red', anchor: 'middle', size: 15 }),
+            F.annot(dTop[0] + 26, dTop[1] - 46, '(deadweight loss)', { tone: 'red', anchor: 'middle', size: 15 }),
+            F.annot(456, yCap + 5, '정부에서 규제한 상한가격', { size: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 23. Q & A (p.26) ═════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

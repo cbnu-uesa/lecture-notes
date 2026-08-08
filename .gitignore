@@ -1,0 +1,24 @@
+# macOS / Google Drive Desktop 부산물
+.DS_Store
+desktop.ini
+.tmp.drivedownload/
+.tmp.driveupload/
+
+# 비공개 — 시험지·성적·문제은행은 어떤 경우에도 버전관리하지 않는다.
+# 저장소가 공개로 바뀌거나 원격에 올라가는 순간 사고가 된다. (CLAUDE.md 참조)
+*/private/
+
+# 원본 바이너리는 버전관리하지 않는다.
+# Google Drive가 이미 source/의 동기화와 버전 이력을 제공하며,
+# pptx를 커밋하면 수정할 때마다 통째로 쌓여 저장소가 빠르게 비대해진다.
+# 9강 HTML 변환이 끝나면 참조용으로만 남는다.
+*/source/
+
+# 빌드 산출물 — _scripts/build-pdf.sh 로 언제든 다시 만든다.
+# 배포본에는 들어가야 하지만(다운로드 버튼이 가리킨다) git에 둘 필요는 없다.
+# 배포 시 GitHub Actions나 build-site.sh 가 생성한다.
+*/pdf/
+dist/
+
+# 임시
+*.log

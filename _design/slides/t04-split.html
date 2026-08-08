@@ -1,0 +1,41 @@
+<!-- @dsCard group="슬라이드 유형" -->
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>T4 개념 + 그래프 2단</title>
+<link rel="stylesheet" href="../theme/tokens.css">
+<link rel="stylesheet" href="../theme/cbnu.css">
+<link rel="stylesheet" href="../theme/components.css">
+<link rel="stylesheet" href="../theme/preview.css">
+<script src="../js/charts.js"></script><script>window.addEventListener('DOMContentLoaded',function(){
+  const S = Fig.scale({x:[0,34], y:[0,29]});
+  const DATA = [[8,25],[12,20],[16,15],[22,10],[29,5]];
+  Fig.draw('#f1', { axes:{x:'수요량(통/월)', y:'가격(천원)'}, parts:[
+    Fig.curve(S.curve(DATA)),
+    Fig.guide(...S.p([8,25]), {xtick:'8', ytick:'25'}),
+    Fig.guide(...S.p([12,20]), {xtick:'12', ytick:'20'}),
+    Fig.guide(...S.p([29,5]), {xtick:'29', ytick:'5'}),
+    Fig.dot(...S.p([12,20])),
+    Fig.annot(S.x(14), S.y(27), '마지막 단위 아이스크림을 사기 위해\n지불할 용의가 있는 금액', {size:11, lh:14}),
+    Fig.annot(S.x(14), S.y(23), '→ 한계편익(marginal benefit)', {tone:'blue', size:14}),
+  ]});});</script></head><body>
+<div class="stage"><div class="reveal"><div class="slides">
+<section class="s-split wide-fig">
+  <h2>수요곡선의 도출</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red">수요의 법칙</p>
+      <p style="font-weight:700;margin-bottom:14px">어떤 상품의 가격이 떨어짐에 따라 소비자가 더 많은 양을 수요하는 현상</p>
+      <p class="lead t-blue" style="margin-bottom:22px">→ 우하향하는 수요곡선</p>
+      <p class="caption-blue">아이스크림의 가격에 따른 소비량</p>
+      <table>
+        <thead><tr><th>가격(천원)</th><th>수요량(통/월)</th></tr></thead>
+        <tbody><tr><td>25</td><td>8</td></tr><tr><td>20</td><td>12</td></tr>
+        <tr><td>15</td><td>16</td></tr><tr><td>10</td><td>22</td></tr>
+        <tr><td>5</td><td>29</td></tr></tbody>
+      </table>
+    </div>
+    <div class="col-r" style="position:relative">
+      <div style="position:absolute;left:-38px;top:150px;font-size:34px;line-height:1">→</div>
+      <svg class="fig" id="f1" viewBox="0 0 520 320" role="img"><title>수요곡선</title></svg>
+    </div>
+  </div>
+  <div class="deck-footer"><span class="ft-text">Introduction to Urban Economics / Spring 2026 / KWON</span><span class="ft-num">5</span></div></section></div></div></div></body></html>

@@ -1,0 +1,64 @@
+/* 강의노트 디자인 토큰 — design.md §2, §3
+   값은 기존 PPT 원본(960×540pt)에서 실측한 것이다. 임의로 바꾸지 않는다. */
+
+@font-face {
+  font-family: 'Pretendard';
+  src: url('../fonts/Pretendard-Regular.woff2') format('woff2');
+  font-weight: 400; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('../fonts/Pretendard-Medium.woff2') format('woff2');
+  font-weight: 500; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Pretendard';
+  src: url('../fonts/Pretendard-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: block;
+}
+
+:root {
+  /* ---- 색 (design.md §3) ---- */
+  --brand-crimson:  #892B3C;  /* 푸터바 배경 전용 */
+  --define-crimson: #A82424;  /* 정의문·발문 */
+  --accent-red:     #C00000;  /* 소제목·핵심 라벨 */
+  --point-red:      #FF0000;  /* 그래프 좌표점 — 도형 전용 */
+  --accent-blue:    #0328C3;  /* 캡션·도출 결과 */
+  --chart-blue:     #4472C4;  /* 표 헤더·예산선 */
+  --chart-orange:   #ED7D31;  /* 대비 곡선 — 도형 전용 */
+  --accent-green:   #00B050;  /* 3계열 — 도형 전용 */
+  --guide:          #B4C7E7;  /* 점선 보조선 */
+  --ink:            #1A1A1A;
+  --ink-cover:      #262626;
+  --muted:          #767676;
+  --rule:           #000000;
+  --bg:             #FFFFFF;
+
+  --table-row-a:    #D9E2F3;
+  --table-row-b:    #E9EDF7;
+
+  /* ---- 타이포 (design.md §2.3) ---- */
+  --fs-cover:        40px;
+  --fs-cover-label:  24px;
+  --fs-title:        28px;
+  --fs-lead:         24px;
+  --fs-sub:          20px;
+  --fs-emph:         18px;
+  --fs-body:         14px;
+  --fs-caption:      12px;
+  --fs-footer:       10px;
+  --fs-pagenum:      11px;
+
+  --lh-body:  1.55;
+  --lh-title: 1.2;
+
+  /* ---- 레이아웃 (design.md §4) ---- */
+  --gutter-l:      36px;   /* 좌측 기준선 */
+  --gutter-r:      36px;
+  --title-top:     23px;
+  --content-top:   72px;
+  --content-bot:   512px;
+  --footer-y:    524.4px;
+  --footer-h:     15.6px;
+  --rule-w:      927.2px;  /* 표지 구분선 폭 — 오른쪽이 열려 있다 */
+}

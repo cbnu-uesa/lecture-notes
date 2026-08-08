@@ -1,0 +1,75 @@
+/* 디자인 시스템 미리보기 전용 무대
+ *
+ * 실제 강의노트는 Reveal.js가 .slides > section을 배치하지만, 여기서는
+ * Reveal 없이 카드로 보여주므로 같은 960×540 무대를 최소한으로 재현한다.
+ * cbnu.css / components.css 는 손대지 않는다 — 그래야 카탈로그와 실물이 어긋나지 않는다.
+ */
+
+html, body { margin: 0; padding: 0; background: #FFF; }
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ink);
+}
+
+/* 슬라이드 무대 — 실제 좌표계와 동일 */
+.stage {
+  position: relative;
+  width: 960px; height: 540px;
+  overflow: hidden;
+  background: var(--bg);
+  outline: 1px solid #E8E8E8;
+}
+.stage .slides { position: absolute; inset: 0; }
+.stage .slides > section {
+  position: absolute; left: 0; top: 0;
+  width: 960px; height: 540px;
+  display: block;
+}
+/* 누적 공개 단계는 카탈로그에서 전부 보이게 */
+.stage .fragment { opacity: 1 !important; }
+
+/* 문서형 카드 (색·타이포·레이아웃 설명) */
+.doc { width: 960px; padding: 28px 36px 36px; box-sizing: border-box; }
+.doc h1 {
+  margin: 0 0 4px; font-size: 24px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--ink);
+}
+.doc .lede { margin: 0 0 22px; font-size: 13px; color: var(--muted); }
+.doc h2 {
+  margin: 24px 0 10px; font-size: 13px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.doc table { border-collapse: collapse; width: 100%; font-size: 13px; }
+.doc th {
+  text-align: left; font-weight: 700; color: var(--muted);
+  border-bottom: 1px solid #DDD; padding: 7px 10px 7px 0; font-size: 12px;
+}
+.doc td { padding: 8px 10px 8px 0; border-bottom: 1px solid #F0F0F0; vertical-align: middle; }
+.doc code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px; color: var(--ink);
+}
+.sw { display: inline-block; width: 34px; height: 20px; border-radius: 3px; vertical-align: middle; }
+.pass { color: #1B7F3B; font-weight: 700; }
+.fail { color: var(--accent-red); font-weight: 700; }
+.note { font-size: 12px; color: var(--muted); }
+
+/* cbnu.css는 .reveal h2 를 슬라이드 제목으로 절대배치한다.
+   문서형 카드가 .reveal 안에 있을 때(그래프 카드처럼 svg.fig 스타일이 필요할 때)
+   그 규칙에 끌려가지 않도록 되돌린다. */
+.doc h1, .doc h2 {
+  position: static !important;
+  left: auto !important; top: auto !important; right: auto !important;
+}
+.doc h2 {
+  font-size: 13px !important; font-weight: 700 !important;
+  color: var(--muted) !important; letter-spacing: 0.06em;
+}
+.doc table th {
+  background: transparent !important; color: var(--muted) !important;
+  border-bottom: 1px solid #DDD !important; padding: 7px 10px 7px 0 !important;
+}
+.doc table td {
+  background: transparent !important;
+  border-bottom: 1px solid #F0F0F0 !important; padding: 8px 10px 8px 0 !important;
+}

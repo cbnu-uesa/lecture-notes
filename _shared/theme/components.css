@@ -1,0 +1,200 @@
+/* 슬라이드 유형별 컴포넌트 — design.md §5 카탈로그
+   실물 예시는 _templates/slide-patterns.html */
+
+/* ─── 텍스트 역할 (design.md §3.2) ─── */
+
+.lead      { font-size: var(--fs-lead); font-weight: 700; line-height: var(--lh-title); margin: 0 0 12px; }
+.sub       { font-size: var(--fs-sub);  font-weight: 700; margin: 0 0 8px; color: var(--accent-red); }
+.emph      { font-size: var(--fs-emph); font-weight: 500; margin: 0 0 10px; }
+.caption   { font-size: var(--fs-caption); font-weight: 400; color: var(--muted); }
+
+.t-red     { color: var(--accent-red); }      /* 소제목·핵심 라벨 */
+.t-define  { color: var(--define-crimson); }  /* 정의문·발문 */
+.t-blue    { color: var(--accent-blue); }     /* 캡션·도출 결과 */
+
+/* 캡션: 표·그림 위 파란 라벨 (2강 p.2 "아이스크림의 가격에 따른 소비량") */
+.caption-blue {
+  font-size: var(--fs-emph);
+  font-weight: 500;
+  color: var(--accent-blue);
+  margin: 0 0 8px;
+}
+
+/* 도출 결과: "→ 한계편익(marginal benefit)" */
+.derive {
+  font-size: var(--fs-emph);
+  font-weight: 500;
+  color: var(--accent-blue);
+  margin: 6px 0;
+}
+
+/* ─── T2 발문 ─── */
+
+.s-question .body > ul { padding-left: 24px; }
+.s-question .body > ul > li {
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 46px;
+}
+.s-question .body > ul > li::before { left: -22px; color: var(--muted); }
+
+/* ─── T3 정의 ─── */
+
+.s-definition .define {
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  color: var(--define-crimson);
+  line-height: 1.45;
+  margin: 0 0 4px;
+}
+.s-definition .conclusion {
+  font-size: var(--fs-sub);
+  font-weight: 500;
+  margin-top: 18px;
+}
+
+/* ─── T4 2단: 좌 설명·표 / 우 그래프 ─── */
+
+/* 세로 가운데 정렬 — 콘텐츠가 위로 몰려 아래가 휑해지지 않게 한다 (design.md §4.3).
+   누적 공개 요소는 숨겨져도 자리를 차지하므로 단계가 바뀌어도 흔들리지 않는다. */
+.s-split .body { display: flex; gap: 24px; align-items: center; }
+.s-split .col-l { flex: 0 0 45%; }
+.s-split .col-r { flex: 1 1 auto; }
+.s-split.wide-fig .col-l { flex: 0 0 40%; }
+
+/* 제목 아래 한 덩어리로 쌓이는 슬라이드(설명문 + 큰 그래프)를 세로 가운데로 */
+.body.stack {
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+/* ─── T6 3분할 ─── */
+
+.s-triptych .body { display: flex; gap: 16px; align-items: flex-start; }
+.s-triptych .cell { flex: 1 1 0; text-align: center; }
+.s-triptych .cell > .cell-title {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--accent-red);
+  margin: 0 0 10px;
+}
+
+/* ─── T7 수식 ─── */
+
+.s-formula .formula { margin: 12px 0; }
+.reveal mjx-container[display='true'] { margin: 12px 0 !important; }
+
+/* 결론 수식 강조 — design.md §7
+   \color{} 는 쓰지 않는다 (MathJax가 별도 확장 파일을 찾다 실패한다).
+   SVG 출력이 currentColor를 따르므로 바깥에서 색을 주면 그대로 물든다. */
+.reveal .formula-key { color: var(--accent-red); }
+
+/* ─── T8 표 (design.md §5 T8) ─── */
+
+.reveal table {
+  border-collapse: collapse;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  margin: 0;
+}
+.reveal table th {
+  background: var(--chart-blue);
+  color: #FFF;
+  font-weight: 700;
+  text-align: left;
+  padding: 6px 12px;
+  border: none;
+}
+.reveal table td {
+  padding: 6px 12px;
+  border: none;                       /* 세로 괘선 없음 — design.md §11 */
+  color: var(--ink);
+}
+.reveal table tbody tr:nth-child(odd)  td { background: var(--table-row-a); }
+.reveal table tbody tr:nth-child(even) td { background: var(--table-row-b); }
+
+/* ─── 그래프 (design.md §6.2) ─── */
+
+.reveal svg.fig { display: block; overflow: visible; }
+.reveal svg.fig .axis   { stroke: #000; stroke-width: 1; fill: none; }
+.reveal svg.fig .curve  { stroke: #000; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+.reveal svg.fig .curve-alt    { stroke: var(--chart-orange); }
+.reveal svg.fig .curve-budget { stroke: var(--chart-blue); }
+
+/* 수요·공급 도해의 색 약속 (design.md §6.2)
+   도출 과정은 검정 곡선, 균형 도해는 D 파랑 / S 빨강. */
+.reveal svg.fig .curve-demand { stroke: var(--accent-blue); stroke-width: 3; }
+.reveal svg.fig .curve-supply { stroke: var(--point-red);  stroke-width: 3; }
+/* 개별 주체 곡선 D1·D2·D3 / S1·S2·S3 — 시장 합계는 기본 검정 */
+.reveal svg.fig .curve-i1 { stroke: var(--accent-green); }
+.reveal svg.fig .curve-i2 { stroke: var(--chart-orange); }
+.reveal svg.fig .curve-i3 { stroke: var(--chart-blue); }
+/* 정부 규제 상한·하한 가격선 */
+.reveal svg.fig .curve-cap { stroke: #70AD47; stroke-width: 1.6; }
+
+/* 잉여 영역 채움 */
+.reveal svg.fig .area-surplus { fill: var(--chart-orange); fill-opacity: 0.32; stroke: none; }
+.reveal svg.fig .area-loss    { fill: var(--point-red); stroke: none; }
+.reveal svg.fig .area-bar     { fill: var(--chart-orange); fill-opacity: 0.55; stroke: #FFF; stroke-width: 1; }
+.reveal svg.fig .area-hatch   { fill: url(#hatch-blue); stroke: var(--chart-blue); stroke-width: 1; }
+.reveal svg.fig .guide  { stroke: var(--guide); stroke-width: 1; stroke-dasharray: 3 3; fill: none; }
+.reveal svg.fig .dot    { fill: var(--point-red); }
+.reveal svg.fig .dot-open { fill: var(--chart-orange); }
+/* 그래프 안의 글자는 흰 테두리를 두른다 (design.md §6.5).
+   곡선·보조선 위에 글자가 얹혀도 읽힌다. 겹침을 완전히 없애는 게 우선이지만,
+   개념도에서는 붙여 써야 뜻이 통하는 라벨이 있어 마지막 안전장치로 둔다. */
+.reveal svg.fig text {
+  paint-order: stroke fill;
+  stroke: #FFF;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.reveal svg.fig .axis-name { font-size: 12px; font-weight: 700; fill: var(--ink); }
+.reveal svg.fig .tick      { font-size: 12px; font-weight: 400; fill: var(--ink); }
+.reveal svg.fig .annot     { font-size: 12px; font-weight: 500; fill: var(--ink); }
+.reveal svg.fig .annot.red    { fill: var(--accent-red); }
+.reveal svg.fig .annot.blue   { fill: var(--accent-blue); }
+.reveal svg.fig .annot.orange { fill: var(--chart-orange); }
+.reveal svg.fig .annot.muted  { fill: var(--muted); }
+.reveal svg.fig .arrow { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+.reveal svg.fig .arrow.red { stroke: var(--point-red); }
+
+/* ─── T10 마무리 (2강 p.26 "Q & A") ─── */
+
+.s-closing .qa {
+  position: absolute; left: 76px; top: 250px;
+  margin: 0;
+  font-size: 34px; font-weight: 400;
+  color: var(--brand-crimson);
+  letter-spacing: 0.02em;
+}
+.s-closing .qa-rule {
+  position: absolute; left: 0; top: 297px;
+  width: 486px; height: 0;
+  border-top: 1px solid var(--brand-crimson);
+}
+.s-closing .contact {
+  position: absolute; left: 110px; top: 322px;
+  margin: 0; font-size: 15px; font-weight: 700; line-height: 1.45;
+}
+.s-closing .contact .en { font-size: 13px; }
+
+/* ─── 번호 목록 (2강 p.10, p.16 결정요인) ─── */
+
+.s-numbered .body ol {
+  margin: 34px 0 0; padding: 0 0 0 42px;
+  font-size: var(--fs-sub); font-weight: 700; color: var(--accent-red);
+}
+.s-numbered .body ol > li { margin-bottom: 40px; padding-left: 10px; }
+
+/* ─── 우상단 보조 노트 (2강 p.8 "탄력성 > 1 → 탄력적") ─── */
+
+.corner-note {
+  position: absolute; right: var(--gutter-r); top: 24px;
+  margin: 0; text-align: left;
+  font-size: var(--fs-emph); font-weight: 500; line-height: 1.5;
+}
+
+/* ─── 누적 공개 (design.md §8) ─── */
+
+.reveal .fragment.fade-in:not(.visible) { opacity: 0; }

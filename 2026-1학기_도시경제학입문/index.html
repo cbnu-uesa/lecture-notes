@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026-1학기 도시경제학입문 — 강의노트</title>
+<link rel="stylesheet" href="../_shared/theme/tokens.css">
+<style>
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 500 16px/1.6 'Pretendard', -apple-system, sans-serif;
+    letter-spacing: -0.01em;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 64px 24px 96px; }
+  a.back { font-size: 13px; color: var(--muted); text-decoration: none; }
+  a.back:hover { color: var(--accent-red); }
+  .label { margin: 24px 0 0; font-size: 15px; font-weight: 700; color: var(--accent-red); }
+  h1 { margin: 6px 0 0; font-size: 34px; font-weight: 700; letter-spacing: -0.03em; }
+  .en { margin: 4px 0 0; font-size: 14px; font-weight: 400; color: var(--muted); }
+  hr { border: none; border-top: 1px solid var(--rule); margin: 20px 0 0; }
+
+  ul { list-style: none; margin: 8px 0 0; padding: 0; }
+  li { border-bottom: 1px solid #E8E8E8; }
+  .row { display: flex; align-items: baseline; gap: 14px; padding: 15px 2px; }
+  .no { flex: 0 0 42px; font-size: 13px; font-weight: 700; color: var(--accent-red); }
+  .ttl { flex: 1 1 auto; font-size: 16px; font-weight: 500; color: var(--ink); text-decoration: none; }
+  a.ttl:hover { color: var(--accent-blue); }
+  .ttl.pending { color: #AAA; }
+  .date { flex: 0 0 auto; font-size: 13px; font-weight: 400; color: var(--muted); }
+  .pdf {
+    flex: 0 0 auto; font-size: 12px; font-weight: 500;
+    color: #FFF; background: var(--brand-crimson);
+    padding: 4px 9px; border-radius: 3px; text-decoration: none;
+  }
+  .pdf[hidden] { display: none; }
+  .tag {
+    flex: 0 0 auto; font-size: 11px; font-weight: 500;
+    color: var(--muted); border: 1px solid #DDD; padding: 3px 7px; border-radius: 3px;
+  }
+  footer { margin-top: 40px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← 전체 강의</a>
+  <p class="label" id="label"></p>
+  <h1 id="title"></h1>
+  <p class="en" id="en"></p>
+  <hr>
+  <ul id="list"></ul>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(async function () {
+  const c = await (await fetch('course.json')).json();
+  document.getElementById('label').textContent = c.term;
+  document.getElementById('title').textContent = c.title;
+  document.getElementById('en').textContent = c.titleEn + ' / ' + c.termEn;
+  document.title = c.label + ' — 강의노트';
+  document.getElementById('foot').textContent = c.footer;
+
+  const ul = document.getElementById('list');
+  for (const l of c.lectures) {
+    const li = document.createElement('li');
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const no = document.createElement('span');
+    no.className = 'no';
+    no.textContent = l.no + '강';
+
+    const done = l.status === 'done';
+    const ttl = document.createElement(done ? 'a' : 'span');
+    ttl.className = 'ttl' + (done ? '' : ' pending');
+    ttl.textContent = l.title;
+    if (done) ttl.href = 'slides/' + l.file;
+
+    const date = document.createElement('span');
+    date.className = 'date';
+    date.textContent = l.date || '';
+
+    row.append(no, ttl, date);
+
+    if (done) {
+      const pdf = document.createElement('a');
+      pdf.className = 'pdf';
+      pdf.href = 'pdf/' + l.file.replace(/\.html$/, '.pdf');
+      pdf.setAttribute('download', '');
+      pdf.textContent = 'PDF';
+      row.append(pdf);
+      fetch(pdf.href, { method: 'HEAD' })
+        .then((r) => { if (!r.ok) pdf.hidden = true; })
+        .catch(() => { pdf.hidden = true; });
+    } else {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = '준비 중';
+      row.append(tag);
+    }
+
+    li.append(row);
+    ul.append(li);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!-- @dsCard group="슬라이드 유형" -->
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>T5 그래프 단독 + 주석</title>
+<link rel="stylesheet" href="../theme/tokens.css">
+<link rel="stylesheet" href="../theme/cbnu.css">
+<link rel="stylesheet" href="../theme/components.css">
+<link rel="stylesheet" href="../theme/preview.css">
+<script src="../js/charts.js"></script><script>window.addEventListener('DOMContentLoaded',function(){
+  Fig.draw('#f1', { axes:{x:'공급량(만 통/월)', y:'가격(천원)'}, parts:[
+    Fig.line(95,61,365,219,{variant:'demand'}),
+    Fig.line(95,219,365,61,{variant:'supply'}),
+    Fig.annot(372,58,'S',{size:15}), Fig.annot(372,224,'D',{size:15}),
+    Fig.guide(290,105,{ytick:'20',xtick:'58'}),
+    Fig.guide(170,105,{xtick:'30',only:'x'}),
+    Fig.guide(230,140,{ytick:'15',xtick:'43'}),
+    Fig.guide(290,175,{xtick:'58',only:'x'}),
+    Fig.guide(170,175,{ytick:'10',only:'y'}),
+    Fig.raw('<path class="guide" d="M55,175 L290,175"/>'),
+    Fig.raw('<path d="M170,98 L170,90 L290,90 L290,98" fill="none" stroke="#FF0000" stroke-width="1"/>'),
+    Fig.annot(230,80,'초과공급',{tone:'red',anchor:'middle',size:14}),
+    Fig.raw('<path d="M170,182 L170,190 L290,190 L290,182" fill="none" stroke="#0328C3" stroke-width="1"/>'),
+    Fig.annot(230,208,'초과수요',{tone:'blue',anchor:'middle',size:14}),
+    Fig.annot(242,137,'E: 균형점',{size:14}),
+    Fig.annot(26,144,'균형가격',{anchor:'end',size:14}),
+    Fig.annot(230,292,'균형거래량',{anchor:'middle',size:14}),
+  ]});});</script></head><body>
+<div class="stage"><div class="reveal"><div class="slides">
+<section>
+  <h2>시장의 균형 (equilibrium)</h2>
+  <div class="body">
+    <p class="lead t-define" style="font-size:var(--fs-lead)">수요와 공급이 맞아떨어져 다른 요인의 변화가 없는 한 어느 쪽으로도 움직일 유인이 없는 상태</p>
+    <svg class="fig" id="f1" viewBox="-62 0 582 320" role="img" style="width:470px;margin:6px 0 0 110px"><title>균형</title></svg>
+  </div>
+  <div class="deck-footer"><span class="ft-text">Introduction to Urban Economics / Spring 2026 / KWON</span><span class="ft-num">17</span></div></section></div></div></div></body></html>
