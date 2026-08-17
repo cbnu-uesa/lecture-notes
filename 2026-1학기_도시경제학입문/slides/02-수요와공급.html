@@ -34,10 +34,9 @@
 <section class="s-cover">
   <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
   <p class="cover-label" data-course-label>&nbsp;</p>
-  <div class="cover-rule top"></div>
-  <h1>2강. 수요와 공급, 그리고 시장의 균형</h1>
-  <div class="cover-rule bottom"></div>
-  <p class="cover-date">2026. 3. 11.</p>
+  <!-- 46px 표지 제목은 한 줄에 14자 남짓이다. 자동 줄바꿈에 맡기면 "균/형"이 갈라진다. -->
+  <h1>2강. 수요와 공급,<br>그리고 시장의 균형</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
 </section>
 
 <!-- ══ 2. 수요곡선의 도출 (원본 p.2~5를 fragment 4단계로) ══════ -->
@@ -184,7 +183,7 @@
 <section>
   <h2>수요의 탄력성 (elasticity)</h2>
   <p class="corner-note">탄력성 &gt; 1 → 탄력적<br>탄력성 &lt; 1 → 비탄력적</p>
-  <div class="body">
+  <div class="body tight">
     <p class="sub t-red">수요의 가격탄력성</p>
     <p style="font-weight:700;margin-bottom:0">상품 가격의 작은 변화에 따른 수요량의 변화</p>
     <p>(예. 아이스크림 가격 1% 증가에 따른 수요량의 2% 감소 → 아이스크림의 가격탄력성이 2)</p>
@@ -209,7 +208,9 @@
 </section>
 
 <!-- ══ 6. 수요곡선의 형태와 가격탄력성 (p.9) ════════════════ -->
-<section class="s-triptych">
+<!-- .s-triptych 를 쓰지 않는다 — 그 클래스는 .body 자체를 가로 flex 로 만들어
+     아래 두 줄(그림 줄·라벨 줄)까지 옆으로 늘어세운다. 여기서는 안쪽에서 3분할한다. -->
+<section>
   <h2>수요곡선의 형태와 가격탄력성</h2>
   <div class="body">
     <p style="position:absolute;left:0;top:-6px;margin:0;font-size:var(--fs-emph);font-weight:500">
@@ -219,7 +220,7 @@
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;생산자는 가격을 올리는 것이 유리할까 내리는 것이 유리할까?</p>
 
     <div style="display:flex;gap:22px;margin-top:100px">
-      <svg class="fig" viewBox="0 0 300 230" style="width:288px" role="img">
+      <svg class="fig" viewBox="0 0 300 230" style="width:268px" role="img">
         <title>완전비탄력적 수요곡선: 수직선</title>
         <path class="axis" d="M34,14 L34,192 L286,192"/>
         <text class="axis-name" x="28" y="22" text-anchor="end">P</text>
@@ -227,7 +228,7 @@
         <path class="curve" d="M128,26 L128,192"/>
         <text class="annot" x="136" y="30" style="font-size:14px">D</text>
       </svg>
-      <svg class="fig" viewBox="0 0 300 230" style="width:288px" role="img">
+      <svg class="fig" viewBox="0 0 300 230" style="width:268px" role="img">
         <title>완전탄력적 수요곡선: 수평선</title>
         <path class="axis" d="M34,14 L34,192 L286,192"/>
         <text class="axis-name" x="28" y="22" text-anchor="end">P</text>
@@ -235,7 +236,7 @@
         <path class="curve" d="M46,88 L262,88"/>
         <text class="annot" x="270" y="93" style="font-size:14px">D</text>
       </svg>
-      <svg class="fig" id="f-unit" viewBox="0 0 300 230" style="width:288px" role="img">
+      <svg class="fig" id="f-unit" viewBox="0 0 300 230" style="width:268px" role="img">
         <title>단위탄력적 수요곡선: 직각쌍곡선 PQ = k</title>
       </svg>
     </div>
@@ -250,9 +251,9 @@
       })();
     </script>
     <div style="display:flex;gap:22px;margin-top:6px;text-align:center">
-      <div style="width:288px">$(a)\ \varepsilon_p = 0$</div>
-      <div style="width:288px">$(b)\ \varepsilon_p = \infty$</div>
-      <div style="width:288px">$(c)\ \varepsilon_p = 1$</div>
+      <div style="width:268px">$(a)\ \varepsilon_p = 0$</div>
+      <div style="width:268px">$(b)\ \varepsilon_p = \infty$</div>
+      <div style="width:268px">$(c)\ \varepsilon_p = 1$</div>
     </div>
   </div>
 </section>
@@ -421,7 +422,7 @@
 
     <div style="display:flex;gap:70px;margin:20px 0 0 50px">
       <div style="text-align:center">
-        <svg class="fig" viewBox="0 0 320 210" style="width:350px" role="img">
+        <svg class="fig" viewBox="0 0 320 210" style="width:300px" role="img">
           <title>완전비탄력적 공급곡선: 수직선</title>
           <path class="axis" d="M42,12 L42,178 L302,178"/>
           <text class="axis-name" x="36" y="20" text-anchor="end">P</text>
@@ -432,7 +433,7 @@
         <div style="margin-top:-2px">$(a)\ \varepsilon_p = 0$</div>
       </div>
       <div style="text-align:center">
-        <svg class="fig" viewBox="0 0 320 210" style="width:350px" role="img">
+        <svg class="fig" viewBox="0 0 320 210" style="width:300px" role="img">
           <title>완전탄력적 공급곡선: 수평선</title>
           <path class="axis" d="M42,12 L42,178 L302,178"/>
           <text class="axis-name" x="36" y="20" text-anchor="end">P</text>
@@ -525,9 +526,9 @@
             F.guide(...S.p([43, 15]), { ytick: '15', xtick: '43' }),
             F.raw(`<path class="guide" d="M${F.BOX.x0},${y10} L${x58},${y10}"/>`),
             F.annot(F.BOX.x0 - 8, y10 + 4, '10', { anchor: 'end', size: 12 }),
-            F.raw(`<path d="M${x30},${y20 - 7} L${x30},${y20 - 16} L${x58},${y20 - 16} L${x58},${y20 - 7}" fill="none" stroke="#FF0000" stroke-width="1"/>`),
+            F.raw(`<path d="M${x30},${y20 - 7} L${x30},${y20 - 16} L${x58},${y20 - 16} L${x58},${y20 - 7}" fill="none" stroke="var(--point-red)" stroke-width="1"/>`),
             F.annot((x30 + x58) / 2, y20 - 24, '초과공급', { tone: 'red', anchor: 'middle', size: 14 }),
-            F.raw(`<path d="M${x30},${y10 + 7} L${x30},${y10 + 16} L${x58},${y10 + 16} L${x58},${y10 + 7}" fill="none" stroke="#0328C3" stroke-width="1"/>`),
+            F.raw(`<path d="M${x30},${y10 + 7} L${x30},${y10 + 16} L${x58},${y10 + 16} L${x58},${y10 + 7}" fill="none" stroke="var(--chart-blue)" stroke-width="1"/>`),
             F.annot((x30 + x58) / 2, y10 + 34, '초과수요', { tone: 'blue', anchor: 'middle', size: 14 }),
             F.annot(S.x(45.5), S.y(14), 'E: 균형점', { size: 14 }),
             F.annot(F.BOX.x0 - 34, S.y(15) + 4, '균형가격', { anchor: 'end', size: 14 }),
@@ -743,9 +744,9 @@
           axes: { x: '볼펜의 양(개)', y: '가격(원)' },
           parts: [
             F.raw('<defs><pattern id="hatch-cs" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
-                  '<line x1="0" y1="0" x2="0" y2="7" stroke="#4472C4" stroke-width="1.2"/></pattern></defs>'),
+                  '<line x1="0" y1="0" x2="0" y2="7" stroke="var(--chart-blue)" stroke-width="1.2"/></pattern></defs>'),
             F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${S.y(1800)} ${F.BOX.x0},${yP} ${B[0]},${yP}"/>`),
-            F.raw(`<rect fill="url(#hatch-cs)" stroke="#4472C4" stroke-width="1" x="${F.BOX.x0}" y="${yP}" width="${B[0] - F.BOX.x0}" height="${F.BOX.y0 - yP}"/>`),
+            F.raw(`<rect fill="url(#hatch-cs)" stroke="var(--chart-blue)" stroke-width="1" x="${F.BOX.x0}" y="${yP}" width="${B[0] - F.BOX.x0}" height="${F.BOX.y0 - yP}"/>`),
             F.curve(D2, { variant: 'demand' }),
             F.annot(F.BOX.x0 + 9, S.y(1800) - 7, 'A', { size: 14 }),
             F.annot(B[0] + 9, yP - 9, 'B', { size: 14 }),
@@ -809,10 +810,10 @@
           axes: { x: '볼펜의 양(개)', y: '가격(원)' },
           parts: [
             F.raw('<defs><pattern id="hatch-ps" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
-                  '<line x1="0" y1="0" x2="0" y2="7" stroke="#4472C4" stroke-width="1.2"/></pattern></defs>'),
+                  '<line x1="0" y1="0" x2="0" y2="7" stroke="var(--chart-blue)" stroke-width="1.2"/></pattern></defs>'),
             F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${yP} ${F.BOX.x0},${S.y(240)} ${B[0]},${yP}"/>`),
-            F.raw(`<polygon fill="url(#hatch-ps)" stroke="#4472C4" stroke-width="1" points="${F.BOX.x0},${S.y(240)} ${B[0]},${yP} ${B[0]},${F.BOX.y0} ${F.BOX.x0},${F.BOX.y0}"/>`),
-            F.raw(`<path d="M${F.BOX.x0},${yP} L${B[0]},${yP} L${B[0]},${F.BOX.y0}" fill="none" stroke="#4472C4" stroke-width="1.6"/>`),
+            F.raw(`<polygon fill="url(#hatch-ps)" stroke="var(--chart-blue)" stroke-width="1" points="${F.BOX.x0},${S.y(240)} ${B[0]},${yP} ${B[0]},${F.BOX.y0} ${F.BOX.x0},${F.BOX.y0}"/>`),
+            F.raw(`<path d="M${F.BOX.x0},${yP} L${B[0]},${yP} L${B[0]},${F.BOX.y0}" fill="none" stroke="var(--chart-blue)" stroke-width="1.6"/>`),
             F.curve(S2, { variant: 'demand' }),
             F.annot(B[0] + 9, yP - 9, 'B', { size: 14 }),
             F.annot(F.BOX.x0 - 8, yP + 4, 'P̄', { anchor: 'end', size: 14 }),
@@ -907,7 +908,7 @@
                       '소비자\n잉여', { tone: 'red', size: 14, lh: 17 }),
             F.labelIn([[S.x(20), yCap], [onS[0], yCap], S.p([20, 6])],
                       '생산자\n잉여', { tone: 'red', size: 14, lh: 17 }),
-            F.raw(`<path d="M${dTop[0] + 4},${dTop[1] - 6} Q${dTop[0] + 16},${dTop[1] - 26} ${dTop[0] + 24},${dTop[1] - 42}" fill="none" stroke="#4472C4" stroke-width="1"/>`),
+            F.raw(`<path d="M${dTop[0] + 4},${dTop[1] - 6} Q${dTop[0] + 16},${dTop[1] - 26} ${dTop[0] + 24},${dTop[1] - 42}" fill="none" stroke="var(--chart-blue)" stroke-width="1"/>`),
             F.annot(dTop[0] + 26, dTop[1] - 64, '후생손실', { tone: 'red', anchor: 'middle', size: 15 }),
             F.annot(dTop[0] + 26, dTop[1] - 46, '(deadweight loss)', { tone: 'red', anchor: 'middle', size: 15 }),
             F.annot(456, yCap + 5, '정부에서 규제한 상한가격', { size: 14 }),
