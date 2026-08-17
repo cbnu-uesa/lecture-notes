@@ -35,7 +35,9 @@ window.Fig = (function () {
     const isFrag = o.fragment !== undefined && o.fragment !== null;
     const klass = isFrag ? `${cls} fragment fade-in` : cls;
     const idx = isFrag ? ` data-fragment-index="${o.fragment}"` : '';
-    return `class="${klass}"${idx}`;
+    // dash: 점선으로 (이동 전 곡선, 예정선 등). CSS 클래스로 두면 곡선 색 규칙과 엉킨다.
+    const dash = o.dash ? ` stroke-dasharray="${o.dash}"` : '';
+    return `class="${klass}"${idx}${dash}`;
   }
 
   /* ── 곡선 경로 ───────────────────────────────────────────
@@ -101,6 +103,40 @@ window.Fig = (function () {
     return d;
   }
 
+  /* 글자 폭 어림. SVG에 넣기 전에 자리를 판단해야 해서 getBBox 를 쓸 수 없다.
+     한글·전각기호는 한 칸, 영문·숫자·공백은 0.55칸으로 친다. */
+  function textW(str, size = 12) {
+    let n = 0;
+    for (const ch of String(str))
+      n += /[ᄀ-ᇿ　-〿㄰-㆏가-힯＀-￯]/.test(ch) ? 1 : 0.55;
+    return n * size;
+  }
+
+  /* ── 포락선 위에 접하는 U자 ─────────────────────────────
+   * 장기평균비용곡선(LAC)과 단기평균비용곡선(SAC)의 관계를 그릴 때 쓴다.
+   *
+   * SAC 을 눈대중으로 찍고 LAC 을 그 최저점들에 이으면 LAC 이 SAC 을 뚫고 지나간다.
+   * 포물선은 최저점 근처가 평평해서, 기울기가 0이 아닌 선이 최저점을 지나면
+   * 반드시 한쪽에서 위로 새어 나오기 때문이다.
+   *
+   * 그래서 순서를 뒤집는다. LAC 을 먼저 정하고 SAC 을 그 접선 위에 얹는다.
+   *   SAC(x) = L(t) + L'(t)(x−t) − k(x−t)²
+   * 이면  L(x) − SAC(x) = k(x−t)² + (L 의 오목분) ≥ 0 이므로
+   * SAC 은 어디서도 LAC 위로 올라오지 않고 x=t 에서만 닿는다.
+   * L 이 굽은 경우엔 k > |L''|/2 이면 된다.
+   *
+   *   L, dL : LAC 의 값과 기울기 (픽셀 좌표 함수)
+   *   t     : 닿는 지점의 x
+   *   half  : U 의 반폭
+   *   k     : 벌어짐. 클수록 좁고 가파른 U (양 팔의 높이 = k·half²) */
+  function tangentU(L, dL, t, half, k) {
+    const pts = [];
+    const step = Math.max(2, half / 20);
+    for (let d = -half; d <= half + 1e-9; d += step)
+      pts.push([round(t + d), round(L(t) + dL(t) * d - k * d * d)]);
+    return pts;
+  }
+
   /* 점 묶음 평행 이동 — 곡선의 이동 (2강 p.6, p.12) */
   function shift(pts, dx, dy) {
     return pts.map(([x, y]) => [round(x + dx), round(y + (dy || 0))]);
@@ -131,13 +167,47 @@ window.Fig = (function () {
     return [round(best[0]), round(best[1])];
   }
 
+  /* ── 두 곡선이 만나는 점 ─────────────────────────────────
+   * MR = MC, 수요 = 공급처럼 "교차점"은 그림마다 나온다. 눈으로 찍으면 어긋나므로
+   * 두 곡선에서 직접 구한다 (design.md §6.4).
+   * 겹치는 x 구간을 훑어 부호가 바뀌는 곳을 찾고 이분법으로 좁힌다.
+   * 만나지 않으면 null 을 준다 — 부르는 쪽에서 그림을 고쳐야 한다는 신호다. */
+  function cross(p, q) {
+    const lo = Math.max(p[0][0], q[0][0]);
+    const hi = Math.min(p[p.length - 1][0], q[q.length - 1][0]);
+    if (!(hi > lo)) return null;
+    const f = (x) => at(p, { x })[1] - at(q, { x })[1];
+    let a = lo, fa = f(a), b = hi, fb = f(b);
+    if (fa === 0) return [round(a), round(at(p, { x: a })[1])];
+    if (fa * fb > 0) {
+      let found = false;
+      for (let i = 1; i <= 240; i++) {
+        const x = lo + ((hi - lo) * i) / 240, fx = f(x);
+        if (fa * fx <= 0) { b = x; fb = fx; found = true; break; }
+        a = x; fa = fx;
+      }
+      if (!found) return null;
+    }
+    for (let i = 0; i < 50; i++) {
+      const m = (a + b) / 2, fm = f(m);
+      if (fa * fm <= 0) { b = m; } else { a = m; fa = fm; }
+    }
+    const x = (a + b) / 2;
+    return [round(x), round(at(p, { x })[1])];
+  }
+
+  /* 화살촉 색은 .arrow / .arrow.red / .arrow.blue / .arrow.green 의 stroke 와
+     같은 토큰을 쓴다. 색값을 적어 두면 테마를 바꿀 때 선과 촉이 서로 다른 색이 된다.
+     SVG 표현속성에서도 var() 가 풀린다 (Chrome·decktape 확인). */
   const MARKERS = `<defs>
     <marker id="ah-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#1A1A1A"/></marker>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/></marker>
     <marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#FF0000"/></marker>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--point-red)"/></marker>
     <marker id="ah-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#0328C3"/></marker>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--chart-blue)"/></marker>
+    <marker id="ah-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-green)"/></marker>
   </defs>`;
 
   /* ── 라벨을 채움 영역 안으로 밀어넣는다 ────────────────────
@@ -244,7 +314,7 @@ window.Fig = (function () {
     }).filter((s) => s.length);
     if (!samples.length) return;
 
-    svg.querySelectorAll('circle.dot, circle.dot-open').forEach((c) => {
+    svg.querySelectorAll('circle.dot:not([data-free]), circle.dot-open:not([data-free])').forEach((c) => {
       const cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy');
       let min = Infinity;
       for (const s of samples)
@@ -304,6 +374,90 @@ window.Fig = (function () {
       return pts;
     }
 
+    /* 직각쌍곡선 xy = k 의 데이터 점 — 무차별곡선·등량곡선 (design.md §6.8)
+     *
+     * 교과서의 무차별곡선은 두 축에 점근하는 강한 볼록 형태다.
+     * 표 값을 그대로 이으면 앞부분이 직선이 되어 충분히 휘지 않는다.
+     * 곡선을 먼저 정하고 그 위에서 눈금값을 고르는 편이 낫다.
+     *
+     *   Fig.hyper(200, 6.5, 45)   → [[6.5,30.8], … , [45,4.4]]  (데이터 좌표)
+     *   S.curve(Fig.hyper(200, 6.5, 45))
+     *
+     * 어떤 점이 곡선 위에 있는지는 xy = k 로 바로 확인된다 — (8,25)·(10,20)·(20,10)은
+     * 모두 k=200이다. */
+    function hyper(k, x0, x1, o = {}) {
+      const n = o.n ?? 26;
+      const xs = [];
+      // 로그 간격으로 뽑아야 휘는 구간에 점이 촘촘히 놓인다
+      const r = Math.log(x1 / x0);
+      for (let i = 0; i <= n; i++) xs.push(x0 * Math.exp((r * i) / n));
+      // 눈금·좌표점으로 쓸 x는 반드시 표본에 넣는다.
+      // 표본 사이를 스플라인이 잇는 탓에, 빠뜨리면 점이 곡선에서 몇 px 벗어난다.
+      for (const x of o.through || []) if (x > x0 && x < x1) xs.push(x);
+      xs.sort((a, b) => a - b);
+      // 여기서 반올림하지 않는다 — 이건 데이터 좌표다. 픽셀로 바꿀 때(S.curve)
+      // 반올림하면 충분하고, 여기서 자리를 줄이면 1.25가 1.3이 되어 점이 곡선에서 벗어난다.
+      return xs.map((x) => [x, k / x]);
+    }
+
+    /* 우상향하며 기울기가 점점 완만 — 총효용·총생산곡선
+       (체감하는 증가. upward()는 반대로 체증한다) */
+    function concave(o = {}) {
+      const x0 = o.x0 ?? BOX.x0 + 20;
+      const x1 = o.x1 ?? BOX.x1 - 20;
+      const yBot = o.yBot ?? BOX.y0 - 10;
+      const yTop = o.yTop ?? BOX.y1 + 20;
+      const n = o.n ?? 24;
+      const p = o.bend ?? 0.55;      // 작을수록 빨리 눕는다
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        pts.push([
+          round(x0 + (x1 - x0) * t),
+          round(yBot - (yBot - yTop) * Math.pow(t, p)),
+        ]);
+      }
+      return pts;
+    }
+
+    /* 우하향하며 완만해짐 — 한계효용·한계생산곡선 */
+    function decay(o = {}) {
+      const x0 = o.x0 ?? BOX.x0 + 20;
+      const x1 = o.x1 ?? BOX.x1 - 20;
+      const yTop = o.yTop ?? BOX.y1 + 30;
+      const yBot = o.yBot ?? BOX.y0 - 30;
+      const n = o.n ?? 24;
+      const k = o.bow ?? 0.45;
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        pts.push([
+          round(x0 + (x1 - x0) * t),
+          round(yTop + (yBot - yTop) * (t / (t + k)) * (1 + k)),
+        ]);
+      }
+      return pts;
+    }
+
+    /* U자 — 한계비용·평균비용곡선 */
+    function ushape(o = {}) {
+      const x0 = o.x0 ?? BOX.x0 + 30;
+      const x1 = o.x1 ?? BOX.x1 - 30;
+      const yBot = o.yBot ?? BOX.y0 - 60;   // 골짜기
+      const yL = o.yLeft ?? BOX.y1 + 40;
+      const yR = o.yRight ?? BOX.y1 + 10;
+      const m = o.min ?? 0.42;               // 골짜기 위치 (0~1)
+      const n = o.n ?? 28;
+      const pts = [];
+      for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const d = (t - m) / (t < m ? m : 1 - m);
+        const top = t < m ? yL : yR;
+        pts.push([round(x0 + (x1 - x0) * t), round(yBot - (yBot - top) * d * d)]);
+      }
+      return pts;
+    }
+
     /* 우상향, 원점에 오목 — 공급곡선 */
     function upward(o = {}) {
       const x0 = o.x0 ?? BOX.x0 + 30;
@@ -350,12 +504,16 @@ window.Fig = (function () {
       return s + '</g>';
     }
 
-    /* 좌표점. on: 곡선 점묶음을 주면 그 곡선 위로 스냅한다 (design.md §6.4) */
+    /* 좌표점. on: 곡선 점묶음을 주면 그 곡선 위로 스냅한다 (design.md §6.4)
+     *
+     * free: 일부러 곡선 밖에 두는 점 (예. 무차별곡선보다 낮은/높은 효용의 상품묶음,
+     *       예산집합 밖의 점). 자체검사에서 제외한다 — 오류가 아니라 설명 장치다. */
     function dot(x, y, o = {}) {
       if (o.on) [x, y] = at(o.on, { x });
       const cls = 'dot' + (o.open ? ' dot-open' : '');
       let s = `<g ${attrs('g-dot', o)}>`;
-      s += `<circle class="${cls}" cx="${x}" cy="${y}" r="${o.r ?? 4.5}"/>`;
+      s += `<circle class="${cls}" cx="${x}" cy="${y}" r="${o.r ?? 4.5}"` +
+           `${o.free ? ' data-free="1"' : ''}/>`;
       if (o.label)
         s += `<text class="annot" x="${x + (o.lx ?? 7)}" y="${y + (o.ly ?? -7)}">${esc(o.label)}</text>`;
       return s + '</g>';
@@ -440,8 +598,14 @@ window.Fig = (function () {
         const y = Math.max(BOX.y1 - 13, top + 13);
         s += `<text class="axis-name" x="${BOX.x0}" y="${y}" text-anchor="middle">${esc(a.y)}</text>`;
       }
-      if (a.x)
-        s += `<text class="axis-name" x="${BOX.x1 + 14}" y="${BOX.y0 + 5}">${esc(a.x)}</text>`;
+      if (a.x) {
+        // 기본은 축 오른쪽 끝. 좁은 캔버스에서는 그러면 글자가 잘려 나가므로
+        // 축 아래 오른쪽으로 접어 넣는다. 세로축 이름과 같은 취지의 보정이다.
+        const right = vb ? vb[0] + vb[2] : Infinity;
+        s += BOX.x1 + 14 + textW(a.x, 12) <= right - 2
+          ? `<text class="axis-name" x="${BOX.x1 + 14}" y="${BOX.y0 + 5}">${esc(a.x)}</text>`
+          : `<text class="axis-name" x="${BOX.x1 + 10}" y="${BOX.y0 + 32}" text-anchor="end">${esc(a.x)}</text>`;
+      }
       return s + '</g>';
     }
 
@@ -462,7 +626,7 @@ window.Fig = (function () {
 
     return {
       draw, curve, line, guide, dot, annot, arrow, raw, labelIn, bars,
-      convex, upward, path, shift, at, scale, BOX,
+      convex, upward, concave, decay, ushape, hyper, tangentU, path, shift, at, cross, scale, BOX,
       withBox: (b) => make({ ...BOX, ...b }),
     };
   }

@@ -1,0 +1,24 @@
+{
+  "id": "2026-2-urban-regional-econ",
+  "title": "도시 및 지역경제학",
+  "titleEn": "Urban and Regional Economics",
+  "term": "2026-2학기",
+  "termEn": "Fall 2026",
+  "instructor": "KWON",
+  "label": "2026-2학기 도시 및 지역경제학",
+  "footer": "Urban and Regional Economics / Fall 2026 / KWON",
+
+  "_note": "교재: 오설리반의 도시경제학 제9판 (Arthur O'Sullivan 저, 이번송·홍성효·김석영 공역, 박영사 2022). source/ 의 스캔 폴더 하나가 하루 강의다. date 는 개강 9/2 기준 매주 수요일. 5장 이후 스캔이 들어오면 lectures 를 이어서 채운다. 스캔 판독이 안 된 쪽은 private/스캔-재촬영-필요.md 참조.",
+
+  "lectures": [
+    { "no": 1, "title": "서론과 도시경제학의 주요 개념들", "file": "01-서론과주요개념.html",   "date": "2026. 9. 2.",  "status": "done" },
+    { "no": 2, "title": "교역도시와 공장도시",             "file": "02-교역도시와공장도시.html", "date": "2026. 9. 9.",  "status": "done" },
+    { "no": 3, "title": "집적의 경제",                     "file": "03-집적의경제.html",         "date": "2026. 9. 16.", "status": "done" },
+    { "no": 4, "title": "도시들은 어디에서 생성되는가?",   "file": "04-도시는어디에생성되는가.html", "date": "2026. 9. 23.", "status": "done" },
+    { "no": 5, "title": "소비자도시와 중심지",             "file": "05-소비자도시와중심지.html",     "date": "2026. 9. 30.", "status": "done" },
+    { "no": 6, "title": "지역경제에서의 도시들",           "file": "06-지역경제에서의도시들.html",   "date": "2026. 10. 7.", "status": "done" },
+    { "no": 7, "title": "도시노동시장",                   "file": "07-도시노동시장.html",           "date": "2026. 10. 14.", "status": "done" },
+    { "no": 8, "title": "최초의 도시들",                   "file": "08-최초의도시들.html",           "date": "2026. 10. 21.", "status": "done" },
+    { "no": 9, "title": "토지 임대료와 공장용 토지",       "file": "09-토지임대료와공장용토지.html", "date": "2026. 10. 28.", "status": "done" }
+  ]
+}

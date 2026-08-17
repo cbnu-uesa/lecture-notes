@@ -1,0 +1,940 @@
+<!doctype html>
+<!--
+  3강. 집적의 경제
+  교재: 오설리반의 도시경제학 제9판 — 4장 (p.59~82)
+
+  각 <section> 앞 주석의 [p.N] 이 교재 쪽수다.
+  교재 p.80 은 스캔 초점이 나가 판독하지 못했다 — private/스캔-재촬영-필요.md 참조.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3강. 집적의 경제</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 이 강의를 관통하는 숫자 ────────────────────────────────
+  // 표와 그림을 따로 적으면 어긋난다. 여기 한 번만 적는다 (design.md §6.5).
+
+  // 그림 4-2 — 노동풀링 [p.63~65]
+  window.POOL = {
+    wage: 144,        // 고립된 기업의 임금
+    switchCost: 44,   // 전직비용
+    u(w) { return Math.sqrt(w); },              // 효용함수 u(w) = w^(1/2)
+    get lost()  { return this.wage - this.switchCost; },        // 100
+    get uHigh() { return this.u(this.wage); },                  // 12
+    get uLow()  { return this.u(this.lost); },                  // 10
+    get uExp()  { return (this.uHigh + this.uLow) / 2; },       // 11  (해고확률 50%)
+    get certEq(){ return Math.round(this.uExp ** 2); },         // 121 = 확실성 등가
+  };
+
+  // 그림 4-3 — 숙련매칭 [p.66~68]
+  window.MATCH = {
+    trainUnit: 30,                                  // 한 단위 기술격차를 없애는 훈련비용
+    m(n) { return 1 / (2 * (n - 1)); },             // 평균기술불일치
+    cost(n) { return this.trainUnit * this.m(n); }, // 노동자 1명당 훈련비용
+    workers(n) { return Array.from({ length: n }, (_, i) => i / (n - 1)); },
+    firms(n) { return Array.from({ length: n / 2 }, (_, i) => (2 * i + 1) / (2 * (n - 1)) * 2 / 2 + 0); },
+  };
+
+  // 그림 4-4 · 4-5 — 이윤과 군집규모 [p.72~73]
+  // 교재 그림의 x축 눈금은 1 · z^E · z* 뿐이고 숫자는 본문에만 나온다.
+  // a(1, π₁) 과 c(z*, π₁) 이 정확히 같은 높이여야 하므로 정점을 (1+z*)/2 에 둔다.
+  window.CLUSTER = {
+    zStar: 30, p1: 5, pE: 12,
+    get zE() { return (1 + this.zStar) / 2; },
+    get k()  { return (this.pE - this.p1) / (this.zE - 1) ** 2; },
+    profit(z) { return this.pE - this.k * (z - this.zE) ** 2; },
+  };
+</script>
+
+<style>
+  /* 표 4-1 은 한 장에 12줄까지 들어간다. components.css 의 .reveal table td(0,1,2)를
+     이기려면 .reveal 을 붙여 (0,2,1) 로 만들어야 한다. */
+  /* components.css 는 .cols 를 align-items:center 로 둔다 — 그림과 글을 나란히 놓을 때의 설정이다.
+     이 강의의 2단은 전부 글이라 가운데 정렬이면 짧은 칸이 아래로 밀린다. 위로 맞춘다. */
+  .body > .cols { align-items: flex-start; }
+  .tbl-cluster { width: 100%; table-layout: fixed; font-size: 13px; }
+  .tbl-cluster th:first-child, .tbl-cluster td:first-child { width: 190px; }
+  .tbl-cluster td:not(:first-child), .tbl-cluster th:not(:first-child) { text-align: right; }
+  .reveal .tbl-cluster td { padding: 2px 10px; line-height: 1.35; }
+  .reveal .tbl-cluster th { padding: 3px 10px 5px; }
+  .tbl-elast { width: 100%; table-layout: fixed; }
+  .tbl-elast th:nth-child(2), .tbl-elast td:nth-child(2) { width: 92px; text-align: right; }
+  .tbl-elast td { vertical-align: top; }
+  .tbl-num { width: 100%; table-layout: fixed; }
+  .tbl-num td:not(:first-child), .tbl-num th:not(:first-child) { text-align: center; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+  .pending { border: 1.4px dashed var(--rule); border-radius: 12px;
+    padding: 22px 26px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>3강. 집적의 경제</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 발문 (p.59) ═══════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:34px">
+      “근대 대도시는 몹시 붐빈다. 사람들은 서로 꼭대기에 살고 있으며; 그들의 아이디어 또한 마찬가지다.”
+      <span class="who">— 피터 디아맨디스</span></p>
+    <p class="epigraph emph" style="margin-bottom:44px">
+      “사람들은 더 이상 그곳에 가지 않는다. 그곳은 너무 혼잡하다.”
+      <span class="who">— 요기 베라</span></p>
+    <p class="lead t-define">기업들은 왜 서로 붙어서 생산하는가</p>
+  </div>
+</section>
+
+<!-- ══ 3. 집적의 경제 (p.59) ════════════════════════════════ -->
+<section>
+  <h2>집적의 경제 <span class="en">(agglomeration economies)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:34px">한 기업의 활동이
+      <span class="mark">인근 기업들의 생산비용을 감소시킬 때</span> 나타나는
+      규모의 외적인 경제</p>
+    <div class="def-row">
+      <div class="def-tag">지역화경제<br><span class="en">localization</span></div>
+      <div>
+        <p>외적인 효과가 <strong>특정 산업에 속한 기업들에 한정</strong>된다</p>
+        <p class="caption">보다 정확한 명칭은 “산업 내 외적인 경제”일 것이다</p>
+      </div>
+    </div>
+    <div class="def-row" style="margin-top:26px">
+      <div class="def-tag">도시화경제<br><span class="en">urbanization</span></div>
+      <div>
+        <p>외적인 효과가 <strong>산업의 경계를 넘나든다</strong></p>
+        <p class="caption">보다 정확한 명칭은 “산업 간 외적인 경제”일 것이다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. 네 유형 (p.60) ════════════════════════════════════ -->
+<section>
+  <h2>네 유형의 집적의 경제</h2>
+  <div class="body">
+    <ol class="dense">
+      <li>중간재 생산자의 공동이용</li>
+      <li>공동 노동풀(pool)의 이용</li>
+      <li>숙련매칭의 향상</li>
+      <li>지식의 공유</li>
+    </ol>
+    <p class="derive t-red" style="margin-top:20px">→ 각각의 경우에 있어 <strong>생산비용은 단독 입지 기업에 비해
+      군집 내 기업에게 보다 낮다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 5. 중간재의 공유 — 두 조건 (p.60) ════════════════════ -->
+<section>
+  <h2>중간재의 공유</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:12px"><strong>중간재 생산요소</strong>는 하나의 기업이 생산하고
+      두 번째 기업이 생산과정에 생산요소로 쓰는 것이다.
+      단추제조업체는 의류제조 기업들이 쓰는 단추를 생산한다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">1. 규모의 경제</p>
+        <p>중간재 생산이 <strong>하나의 기업에 의한 수요에 비해</strong> 큰 규모의 경제하에 있다.
+          공급업자를 공동이용하면 최종재 생산자들이 규모의 경제를 활용해
+          보다 낮은 평균비용에 얻을 수 있다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">2. 대면시간 <span class="en">face time</span></p>
+        <p>중간재의 디자인과 제작이 공급업자와 최종재 생산업자 간
+          <strong>대면 상호협의</strong>를 필요로 한다.
+          온라인으로 주문할 수 있는 표준화된 생산요소가 아니기 때문이다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:16px">→ 첫 번째 조건은 <strong>공급업체를 공동이용</strong>하는 것을,
+      두 번째 조건은 <strong>공급업체 가까이 입지</strong>하는 것을 의미한다</p>
+  </div>
+</section>
+
+<!-- ══ 6. 그림 4-1 중간재의 평균비용 (p.61) ═════════════════ -->
+<section class="s-split">
+  <h2>중간재의 평균비용</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:24px">중간재 생산에 규모의 경제가 있으면
+        장기평균비용곡선은 <strong>음(−)의 기울기</strong>를 갖는다</p>
+      <p class="sub t-red" style="margin-bottom:2px">점 a — 혼자 쓸 때</p>
+      <p style="margin-bottom:22px">개별 최종재 생산업체가 <strong>z′단위</strong>를 수요하고
+        자신의 공급업체를 이용하면 평균비용은 <strong>c′</strong></p>
+      <p class="sub t-red" style="margin-bottom:2px">점 b — 함께 쓸 때</p>
+      <p>여러 최종재 생산업체가 함께 <strong>z″단위</strong>를 하나의 공급업체에 수요하면
+        평균비용은 <strong>c″</strong>로 c′보다 작다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-lac" viewBox="0 0 460 300" style="width:420px" role="img">
+        <title>중간재를 함께 쓸수록 장기평균비용이 c′에서 c″로 내려가는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 70, y0: 254, x1: 400, y1: 30 });
+          const S = F.scale({ x: [0, 10], y: [0, 10] });
+          // 장기평균비용 — 우하향하며 완만해지는 곡선. 관계식에서 뽑는다
+          const lac = (z) => 1.2 + 30 / (z + 2.2);
+          const pts = [];
+          for (let i = 0; i <= 60; i++) { const z = 0.6 + (9 * i) / 60; pts.push([z, lac(z)]); }
+          const C = S.curve(pts);
+          const zA = 1.6, zB = 6.2;
+          F.draw('#f-lac', {
+            axes: { x: '수량: 중간재 생산요소', y: '$' },
+            parts: [
+              F.curve(C),
+              // 곡선 위쪽의 빈 자리에 둔다 — 곡선 옆에 붙이면 점 b 를 지난다
+              F.annot(S.x(9.4), S.y(6.2), '장기평균비용', { size: 12, anchor: 'end' }),
+              F.guide(...S.p([zA, lac(zA)]), { xtick: 'z′', ytick: 'c′' }),
+              F.guide(...S.p([zB, lac(zB)]), { xtick: 'z″', ytick: 'c″' }),
+              F.dot(...S.p([zA, lac(zA)]), { label: 'a', lx: 8, ly: -8 }),
+              F.dot(...S.p([zB, lac(zB)]), { label: 'b', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. 중간재 공유의 사례 (p.61~62) ══════════════════════ -->
+<section>
+  <h2>중간재를 함께 쓰려고 모인다</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">단추와 의류 <span class="en">(Vernon, 1972)</span></p>
+        <p style="margin-bottom:20px">첨단유행 의류 수요는 유행에 따라 변하므로 의류기업은 소규모로 민첩해야 한다.
+          단추생산에 큰 규모의 경제가 있으면 여러 의류업체가 한 단추업체를 공동이용할 때 평균비용이 낮다.
+          단추는 표준품이 아니어서 <strong>여러 원형을 함께 만들어 보는 협의</strong>가 필요하다</p>
+        <p class="sub t-red" style="margin-bottom:2px">영화산업의 소품상점</p>
+        <p>헐리우드의 제작업체들이 <strong>“소품상점(prop houses)”</strong>을 공동이용한다.
+          책상램프부터 꼬마요정 귀 끝부분까지</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">교역기업의 수리서비스</p>
+        <p style="margin-bottom:20px">누수 선박과 트럭엔진의 수리. 규모의 경제가 기업당 수요에 비해 크면
+          여러 교역기업이 한 수리업체를 공동이용할 때 비용이 낮다.
+          수리는 <strong>원격으로 할 수 없으므로</strong> 군집이 필요하다</p>
+        <p class="sub t-red" style="margin-bottom:2px">산업의 경계를 넘을 때 — 도시화경제</p>
+        <p><strong>은행서비스</strong>의 규모의 경제는 한 기업의 수요보다 크다.
+          상이한 제품의 교역기업·제조업체가 군집한 지역에서 평균비용이 낮다.
+          <strong>보험·회계·법률</strong>도 같다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. 공동 노동풀 (p.62) ════════════════════════════════ -->
+<section>
+  <h2>공동 노동풀의 이용</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:26px">최종재에 대한 <span class="mark">시장수요는 일정</span>하지만
+      <span class="mark">기업당 수요는 기간마다 변하는</span> 산업을 생각하자</p>
+    <p class="emph" style="margin-bottom:30px">TV프로그램 상영가능편수는 거의 일정하지만,
+      매년 일부 기업은 계속 방송되는 <strong>“명작”</strong>을 만들고
+      다른 기업은 조기 종영되는 <strong>“흥작”</strong>을 만든다</p>
+    <p class="derive t-red">→ 성공하지 못한 기업은 노동자를 해고하고 성공한 기업은 채용한다.
+      기업들은 <strong>노동자를 옮기는 비용을 줄이기 위해 군집</strong>한다</p>
+  </div>
+</section>
+
+<!-- ══ 9. 전직비용을 낮추는 두 이유 (p.63) ══════════════════ -->
+<section>
+  <h2>군집은 왜 전직비용을 낮추는가</h2>
+  <div class="body">
+    <div class="cols" style="margin-top:20px">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">1. 탐색비용</p>
+        <p>군집은 <strong>일자리 기회에 관한 정보의 밀도</strong>가 높다.
+          소프트웨어산업에 친구와 동료를 둔 프로그래머에게는 일상의 상호교류가 구인 정보를 만든다.
+          게다가 구직자가 한 고용주에서 다음 고용주로 이동하는 데 보다 적은 시간을 쓴다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">2. 이전비용</p>
+        <p>인근 기업으로 전직하는 노동자는 <strong>거주지를 옮기는 비용</strong>을 피할 수 있다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:36px">→ 고립된 장소는 전직비용(s)이 크므로
+      <strong>상대적으로 높은 임금</strong>을 지불해야 한다</p>
+  </div>
+</section>
+
+<!-- ══ 10. 기대효용 (p.63) ══════════════════════════════════ -->
+<section>
+  <h2>불확실한 직장의 기대효용</h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:24px">노동자는 도시 간에 이동하므로,
+      입지선택에서 내쉬균형을 이루려면 <strong>상이한 근무지에서 동일한 효용수준</strong>을 달성해야 한다</p>
+    <p class="formula-key" style="margin-bottom:24px">
+      $\text{기대효용} = r \cdot u(w) \;+\; (1-r) \cdot u(w-s)$</p>
+    <div class="cols">
+      <div class="col-l">
+        <p><strong>w</strong> 임금<br>
+          <strong>r</strong> 직장을 유지할 확률<br>
+          <strong>(1−r)</strong> 해고되어 전직할 확률</p>
+      </div>
+      <div class="col-r">
+        <p><strong>s</strong> 전직의 비용<br>
+          <span class="caption">두 결과(직장을 유지해 w를 벌거나, 잃고 w−s를 벌거나)의
+            확률 가중평균이다</span></p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:26px">→ 소프트웨어 노동자는 해고 시 전직비용이 크므로
+      <strong>고립된 기업에 더 높은 임금을 요구</strong>한다</p>
+  </div>
+</section>
+
+<!-- ══ 11. 그림 4-2 노동풀링 (p.64) ═════════════════════════ -->
+<section class="s-split">
+  <h2>노동풀링은 임금을 낮춘다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:16px">효용곡선이 <strong>오목</strong>하다 —
+        소득의 한계효용이 감소한다</p>
+      <p class="formula-key" style="margin-bottom:16px">$u(w) = w^{1/2}$</p>
+      <p class="sub t-red" style="margin-bottom:2px">고립된 기업 — 해고 가능성 50%</p>
+      <p id="k-pool" style="margin-bottom:14px"></p>
+      <p class="derive t-red" id="k-exp"></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-pool" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>오목한 효용곡선 위에서 소득 100·121·144가 효용 10·11·12에 대응하는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.POOL;
+          const F = Fig.withBox({ x0: 76, y0: 250, x1: 404, y1: 34 });
+          const S = F.scale({ x: [60, 160], y: [7, 13] });
+          // u(w) = √w 를 촘촘히 샘플링한다 — 세 점이 곡선 위에 정확히 놓인다
+          const pts = [];
+          for (let i = 0; i <= 60; i++) { const w = 62 + (96 * i) / 60; pts.push([w, P.u(w)]); }
+          const U = S.curve(pts);
+          const mark = (w, lb, lx, ly) => [
+            F.guide(...S.p([w, P.u(w)]), { xtick: String(w), ytick: String(P.u(w)) }),
+            F.dot(...S.p([w, P.u(w)]), { label: lb, lx, ly }),
+          ];
+          F.draw('#f-pool', {
+            axes: { x: '소득 ($)', y: '효용\n(유틸)' },
+            parts: [
+              F.curve(U),
+              ...mark(P.lost, 'a', -16, -8),
+              ...mark(P.certEq, 'b', -16, -8),
+              ...mark(P.wage, 'c', 8, -8),
+              // 축 절단 표시 — 원점이 (60, 7) 이라는 뜻
+              F.raw(`<path d="M${F.BOX.x0 - 5},${F.BOX.y0 - 10} l10,-6 M${F.BOX.x0 - 5},${F.BOX.y0 - 4} l10,-6" ` +
+                    `stroke="var(--ink)" stroke-width="1.2" fill="none"/>`),
+              F.arrow(...S.p([P.lost, 7.5]), ...S.p([P.wage, 7.5]), {}),
+              F.annot(S.x((P.lost + P.wage) / 2), S.y(7.5) - 8, '전직비용 ' + P.switchCost,
+                      { anchor: 'middle', size: 12 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const P = window.POOL;
+      document.getElementById('k-pool').innerHTML =
+        `직장을 유지하면 임금 <strong>${P.wage}달러</strong> → 효용 ${P.uHigh}유틸 (점 c)<br>` +
+        `해고되어 전직비용 ${P.switchCost}달러를 쓰면 순 소득 <strong>${P.lost}달러</strong> → 효용 ${P.uLow}유틸 (점 a)`;
+      document.getElementById('k-exp').innerHTML =
+        `→ 기대효용 = (${P.uHigh} + ${P.uLow}) / 2 = <strong>${P.uExp}유틸</strong> (점 b)`;
+    })();
+  </script>
+</section>
+
+<!-- ══ 12. 확실성 등가 (p.64~65) ════════════════════════════ -->
+<section>
+  <h2>확실성 등가와 집적지의 임금</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:24px"><span class="mark">확실성 등가</span>는
+      위험을 감수하는 것과 확실한 금액을 받는 것 사이에 무차별하게 하는 확실한 지불이다</p>
+    <p class="emph" id="k-ce" style="margin-bottom:30px"></p>
+    <p class="sub t-red" style="margin-bottom:2px">집적지에서는</p>
+    <p class="emph" id="k-agg" style="margin-bottom:26px"></p>
+    <p class="derive t-red">→ 보다 낮은 임금은 보다 낮은 생산비용을 뜻한다.
+      <strong>집적지 내 기업은 고립된 지역에서 생산하는 경쟁 기업에 비해 경쟁우위를 갖는다</strong></p>
+  </div>
+  <script>
+    (function () {
+      const P = window.POOL;
+      document.getElementById('k-ce').innerHTML =
+        `이 노동자는 <strong>${P.certEq}달러의 확실한 지불</strong>(${P.uExp}유틸)과, ` +
+        `직장을 유지해 ${P.wage}달러를 벌거나 잃고 ${P.lost}달러를 버는 위험을 감수하는 것 사이에 무차별하다`;
+      document.getElementById('k-agg').innerHTML =
+        `전직비용이 영(0)이라면, 노동시장에서의 내쉬균형은 집적지 임금을 ` +
+        `<strong>${P.certEq}달러</strong>로 만든다 — 고립된 기업의 ${P.wage}달러보다 낮다. ` +
+        `직장을 잃어도 같은 임금의 또 다른 직장을 전직비용 없이 찾기 때문이다`;
+    })();
+  </script>
+</section>
+
+<!-- ══ 13. 헐리우드 (p.65) ══════════════════════════════════ -->
+<section>
+  <h2>헐리우드의 “호의의 경제”</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:14px">영화제작 프로젝트는 잠깐 있다가 없어진다.
+      공예·기술 노동자들은 한 제작업체에서 다른 제작업체로 주기적으로 이동하며,
+      잠재적 일자리 정보를 얻고 전직을 쉽게 하는 개인적 관계 —
+      <strong>“호의의 경제(economy of favor)”</strong> — 에 의존한다.
+      배우·감독·작가에게도 같은 현상이 나타난다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">스턴트맨 협회</p>
+        <p>수백 명의 대역배우와 대역 코디네이터에 관한 검색가능한 자료를 무료로 제공한다.
+          <strong>“공중에 날려지는”</strong>을 입력하면 가압된 공기 장치로 공중에 날려질 수 있는
+          대역배우 명단을 즉시 얻는다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">중개인들</p>
+        <p>대행사, 배역담당 감독, 배우 재능 관리인이 노동 수요자와 공급자를 매치시킨다.
+          전문대학과 4년제 대학의 영화·텔레비전 제작 프로그램도 이 중간 협조체계의 일부다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:14px">→ 이 체계들이 노동시장의 효율성을 개선하고
+      영화−제작 집적의 <strong>경쟁우위를 유지</strong>하는 데 도움을 준다</p>
+  </div>
+</section>
+
+<!-- ══ 14. 숙련매칭 (p.66) ══════════════════════════════════ -->
+<section>
+  <h2>숙련매칭 <span class="en">(skill matching)</span></h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:26px">전통적인 모형은 노동자와 기업이 완전하게 매치됨을 가정한다.
+      <strong>현실세계에서는 이런 것들이 그렇게 깔끔하지 않다</strong></p>
+    <p class="lead t-define" style="margin-bottom:26px"><span class="mark">기술 불일치</span>는
+      노동자와 일자리 간 보다 나은 매치를 위해 <span class="mark">비싼 훈련비용</span>을 필요로 한다</p>
+    <p class="emph" style="margin-bottom:26px">컴퓨터 프로그래머들은 프로그래밍 언어(Java·Javascript·Python·HTML)에 대한 익숙함과
+      업무(그래픽·인공지능·전자상거래) 경험에 따라 <strong>상이한 일련의 기술</strong>을 가지고 있다.
+      중요한 것은 누가 더 생산적인가가 아니라 <strong>서로 다르다</strong>는 점이다</p>
+    <p class="derive t-red">→ 큰 도시는 노동자와 기업 간 매칭을 개선하여 훈련비용과 노동비용을 감소시킨다</p>
+  </div>
+</section>
+
+<!-- ══ 15. 노동매칭 모형의 네 가정 (p.66~67) ════════════════ -->
+<section>
+  <h2>노동매칭 고전모형의 네 가정</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>노동자 기술에 있어서의 차이</strong> — 개별 노동자는 단위 길이의 직선 위의 위치(“주소”)로 표시된 기술을 갖고,
+        동일한 간격으로 분포되어 있다</li>
+      <li><strong>생산에 있어 규모의 경제</strong> — 개별 기업은 한 명보다 많은 노동자를 고용한다.
+        예시에서는 두 명씩 고용한다</li>
+      <li><strong>기업의 기술요구</strong> — 개별 기업은 생산할 제품을 고르고 그에 필요한 기술요구를 선택하며 시장에 진입한다</li>
+      <li><strong>훈련비용</strong> — 기업은 노동자의 기술과 기업의 기술요구 간 <strong>격차를 없애는 비용</strong>을 부담한다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 16. 그림 4-3 노동숙련매칭 (p.67~68) — fragment 2단계 ══ -->
+<section>
+  <h2>도시가 클수록 매칭이 좋아진다</h2>
+  <div class="body">
+    <svg class="fig" id="f-match" viewBox="0 0 720 250" style="width:640px;margin:8px 0 0 100px" role="img">
+      <title>노동자 넷에 기업 둘인 소도시와 노동자 여섯에 기업 셋인 대도시의 기술주소 배치</title></svg>
+    <script>
+      (function () {
+        const M = window.MATCH;
+        const F = Fig;
+        const parts = [];
+        const X0 = 84, X1 = 520;
+        const px = (t) => X0 + t * (X1 - X0);
+        [[4, 88, '네 명의 노동자, 두 개의 기업 — 소도시'],
+         [6, 196, '여섯 명의 노동자, 세 개의 기업 — 대도시']].forEach(([n, y, title], i) => {
+          const frac = (v) => `${Math.round(v * (n - 1) * 2) % 2 === 0
+            ? Math.round(v * (n - 1)) + '/' + (n - 1) : Math.round(v * 2 * (n - 1)) + '/' + 2 * (n - 1)}`;
+          parts.push(F.annot(px(0.5), y - 44, title, { anchor: 'middle', size: 12, fragment: i }));
+          parts.push(F.raw(
+            `<path d="M${X0},${y} L${X1},${y}" stroke="var(--ink)" stroke-width="2" fill="none"/>`,
+            { fragment: i }));
+          // 노동자 — 삼각형, 주소 0, 1/(n−1), …, 1
+          for (let k = 0; k < n; k++) {
+            const t = k / (n - 1), x = px(t);
+            parts.push(F.raw(
+              `<path d="M${x - 7},${y - 15} L${x + 7},${y - 15} L${x},${y - 2} z" fill="var(--ink)"/>`,
+              { fragment: i }));
+            parts.push(F.annot(x, y - 20, 'L', { anchor: 'middle', size: 12, fragment: i }));
+            parts.push(F.annot(x, y + 20, k === 0 ? '0' : k === n - 1 ? '1' : `${k}/${n - 1}`,
+                               { anchor: 'middle', size: 11, fragment: i }));
+          }
+          // 기업 — 원, 노동자 두 명씩의 한가운데
+          for (let k = 0; k < n / 2; k++) {
+            const t = (2 * k + 0.5) / (n - 1) - 0.5 / (n - 1) + 0.5 / (n - 1);
+            const tt = (2 * k) / (n - 1) + 0.5 / (n - 1);
+            const x = px(tt);
+            parts.push(F.raw(
+              `<circle cx="${x}" cy="${y}" r="6" fill="var(--chart-blue)"/>`, { fragment: i }));
+            parts.push(F.annot(x, y - 12, 'F', { anchor: 'middle', size: 12, tone: 'blue', fragment: i }));
+            // 기업은 노동자 두 명의 한가운데에 선다 → 주소는 (4k+1)/2(n−1). 약분해서 적는다
+            const g = (a, b) => (b ? g(b, a % b) : a);
+            const num = 4 * k + 1, den = 2 * (n - 1), d = g(num, den);
+            parts.push(F.annot(x, y + 36, `${num / d}/${den / d}`,
+                               { anchor: 'middle', size: 11, tone: 'blue', fragment: i }));
+          }
+          parts.push(F.annot(X1 + 12, y + 5,
+                             `불일치 ${M.m(n) === 1 / 6 ? '1/6' : '1/10'} → 1명당 ${M.cost(n)}달러`,
+                             { size: 12, tone: 'red', fragment: i }));
+        });
+        F.draw('#f-match', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:6px">→ 소도시에서 대도시로 이전하는 기업은
+      노동자 1명당 훈련비용을 <strong>5달러에서 3달러로</strong> 줄인다.
+      한 단위 격차를 없애는 훈련비용은 30달러다</p>
+  </div>
+</section>
+
+<!-- ══ 17. 평균기술불일치 (p.68) ════════════════════════════ -->
+<section>
+  <h2>노동자가 많을수록 불일치가 줄어든다</h2>
+  <div class="body stack">
+    <p class="formula-key" style="margin-bottom:24px">$m = \dfrac{1}{2(n-1)}$</p>
+    <p class="emph" style="margin-bottom:30px">도시의 노동자 수가 n 일 때의 <strong>평균기술불일치</strong>.
+      n 이 커지면 불일치가 줄어 훈련비용이 줄어든다
+      — <span class="mark">n = 4 이면 m = 1/6, n = 6 이면 m = 1/10</span></p>
+    <p class="sub t-red" style="margin-bottom:2px">노동자가 훈련비용을 부담해도 결론은 같다</p>
+    <p class="emph">노동자들은 보다 큰 도시에서 보다 낮은 훈련비용을 경험해 <strong>임금에 하방 압력</strong>을 받는다.
+      입지적 균형을 위해 개별 도시에서 동일한 효용수준을 달성하므로, 보다 낮은 훈련비용은 보다 낮은 임금을 낳는다.
+      보다 낮은 임금은 기업의 보다 높은 이윤으로 해석된다</p>
+  </div>
+</section>
+
+<!-- ══ 18. 지식의 공유 (p.68~69) ════════════════════════════ -->
+<section>
+  <h2>지식의 공유</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:12px">네 번째 집적의 경제는 보다 미묘하며,
+      <strong>지식을 공유하고 혁신을 촉진하는 편익</strong>을 포함한다.
+      고전적 기술은 알프레드 마샬(1920)에서 유래한다</p>
+    <div class="callout">
+      <p class="emph" style="margin:0">한 산업이 입지를 선정했다면, 그 산업은 그곳에 오래 머물러 있을 것이다.
+        동일한 숙련된 직업에 종사하는 사람들이 가까운 이웃에서부터 상호 간에 얻는 이점이 매우 크다.
+        <strong>직업의 비밀은 더 이상 비밀이 되지 않고, 공기에 속해 있는 것 같이</strong>,
+        또는 아이들이 많은 것을 무의식 중에 배우는 것 같이 자연스럽게 습득할 수 있는 대상이 된다. …
+        만일 한 사람이 새로운 아이디어를 갖게 되면, 이는 다른 사람들에 의해 적용되고 이들 자신의 제안들과 결합된다.
+        따라서 이는 새로운 아이디어들의 원천이 된다.</p>
+    </div>
+    <p class="derive t-red" style="margin-top:12px">→ 일부 지식파급은 한 산업 내에서 발생하지만(<strong>지역화경제</strong>),
+      이러한 파급이 종종 산업의 경계를 넘는다(<strong>도시화경제</strong>)</p>
+  </div>
+</section>
+
+<!-- ══ 19. 도시규모의 다른 편익들 (p.69~70) ═════════════════ -->
+<section>
+  <h2>도시규모의 다른 편익 세 가지</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>공동노동공급</strong> <span class="en">joint labor supply</span> —
+        두 노동자를 가진 가구는 하나의 거주지와 두 근무지를 골라야 한다.
+        1800년대에 (남성을 고용하는) 채광·금속처리 기업이 (여성을 고용하는) 섬유기업 가까이 입지했고,
+        최근에는 <strong>고학력 부부(power couple)</strong>가 거대한 도시에 집중된다</li>
+      <li><strong>학습</strong> — 인적 자본은 <strong>모방에 의한 학습</strong>으로 증가한다.
+        보다 큰 도시는 보다 다양한 역할모델을 제공한다.
+        시골에서 도시로 이주한 노동자는 시간이 지남에 따라 임금상승을 경험한다</li>
+      <li><strong>사회적 상호교류</strong> — 노동기술매칭과 유사한 <strong>취미매칭</strong>.
+        가장 좋아하는 작가에 초점을 맞춘 독서동아리를, 가장 좋아하는 춤의 동아리를 찾을 가능성이 크다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 20. 섹션 — 02 집적의 균형규모 ════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 집적의 균형규모</p>
+  <p class="section-sub">기업들의 전형적인 군집은 얼마나 클 것인가 · 교재 p.70~74</p>
+</section>
+
+<!-- ══ 21. 집적의 불경제 (p.70~71) ══════════════════════════ -->
+<section>
+  <h2>집적의 불경제 <span class="en">(agglomeration diseconomies)</span></h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:12px">기업들의 군집은 총 고용을 증가시켜
+      집적의 경제를 <strong>적어도 부분적으로 상쇄</strong>한다.
+      추가적인 노동자들은 두 방식으로 수용된다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">(a) 밀도에서의 증가 — 위로의 건설</p>
+        <p style="margin-bottom:6px"><strong>추가적인 보강</strong> — 3층에서 6층으로 높이를 두 배로 늘리면
+          벽 보강 때문에 건축비용이 두 배 이상 늘어난다</p>
+        <p><strong>층당 보다 적은 주거공간</strong> — 계단과 승강기가 차지하는 바닥면적의 비율이 커져
+          주거공간은 두 배보다 작게 늘어난다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">(b) 토지에서의 증가 — 옆으로의 건설</p>
+        <p><strong>평균통근거리</strong>가 늘어 직장으로의 통행에 대한
+          금전적 비용과 시간적 비용이 증가한다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:16px">→ 두 경우 모두 기업들은 보다 높은 주택비용·통근비용을 상쇄하는
+      <strong>보다 높은 임금</strong>을 지불한다. 집적지 내 모든 기업에게 보다 높은 생산비용을 뜻한다</p>
+  </div>
+</section>
+
+<!-- ══ 22. 그림 4-4 이윤과 군집규모 (p.72) ══════════════════ -->
+<section class="s-split">
+  <h2>이윤과 군집규모</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:20px">가로축은 집적지 내 <strong>기업의 수</strong>,
+        세로축은 <strong>기업당 이윤</strong>이다</p>
+      <p class="sub t-red" style="margin-bottom:2px">양(+)의 기울기 구간</p>
+      <p style="margin-bottom:18px">기업 수가 늘수록 집적의 경제가 불경제를 능가하여 기업당 이윤이 증가한다</p>
+      <p class="sub t-red" style="margin-bottom:2px">음(−)의 기울기 구간</p>
+      <p style="margin-bottom:18px">기업 수가 늘수록 불경제가 경제를 능가하여 기업당 이윤이 감소한다</p>
+      <p class="derive t-red">→ 점 a 에서 출발해 두 번째 기업이 합류하면 점 b (π₂ &gt; π₁).
+        집적지 이윤이 고립된 기업의 이윤을 넘는 한 기업들은 계속 합류하여 <strong>점 c</strong> 에 이른다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-cluster" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>기업당 이윤이 언덕 모양으로 오르내리다 고립된 기업의 이윤과 같아지는 점 c 에서 멈추는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CLUSTER;
+          const F = Fig.withBox({ x0: 66, y0: 250, x1: 404, y1: 34 });
+          const S = F.scale({ x: [0, C.zStar + 4], y: [0, C.pE * 1.25] });
+          const pts = [];
+          for (let i = 0; i <= 80; i++) {
+            const z = 1 + ((C.zStar + 2.6 - 1) * i) / 80;
+            pts.push([z, C.profit(z)]);
+          }
+          const P = S.curve(pts);
+          F.draw('#f-cluster', {
+            axes: { x: '', y: '$' },
+            parts: [
+              F.line(F.BOX.x0, S.y(C.p1), S.x(C.zStar + 3.4), S.y(C.p1), { variant: 'cap' }),
+              F.annot(S.x(C.zStar * 0.52), S.y(C.p1) + 17, '이윤: 고립된 기업',
+                      { anchor: 'middle', size: 11 }),
+              F.curve(P),
+              F.annot(S.x(C.zStar * 0.72), S.y(C.profit(C.zStar * 0.72)) - 12, '기업당 이윤',
+                      { size: 12 }),
+              F.guide(...S.p([1, C.p1]), { xtick: '1', ytick: 'π₁' }),
+              F.guide(...S.p([2, C.profit(2)]), { xtick: '2', ytick: 'π₂' }),
+              F.guide(...S.p([C.zStar, C.p1]), { xtick: 'z*', only: 'x' }),
+              F.dot(...S.p([1, C.p1]), { label: 'a', lx: -16, ly: 15 }),
+              F.dot(...S.p([2, C.profit(2)]), { label: 'b', lx: 8, ly: -8 }),
+              F.dot(...S.p([C.zStar, C.p1]), { label: 'c', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 23. 그림 4-5 균형 대 효율 (p.73) ═════════════════════ -->
+<section class="s-split">
+  <h2>균형 군집규모 대 효율적 군집규모</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:20px"><span class="mark">균형군집규모는
+        효율적인 규모를 능가한다</span></p>
+      <p style="margin-bottom:20px">기업들이 계속 진입하면 새로운 집적지들이 생기고,
+        개별 군집마다 점 a 에서 점 c 로 이동하는 일이 반복된다</p>
+      <p class="sub t-red" style="margin-bottom:2px">왜 개별 입지결정이 비효율을 낳는가</p>
+      <p style="margin-bottom:18px">개별 기업은 집적의 경제로부터의 <strong>외적인 편익</strong>과
+        불경제로부터의 <strong>외적인 비용</strong>을 간과한다.
+        점 e 를 지나면 외적인 비용이 외적인 편익을 능가한다</p>
+      <p class="derive t-red">→ 기업의 선택은 “너무나 많은” 활동 —
+        <strong>너무나 큰 집적지</strong>를 발생시킨다. 오염을 과다하게 방출하는 것과 같다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-cluster2" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>이윤곡선의 정점 e 가 효율적 군집규모이고 그보다 오른쪽의 점 c 가 균형 군집규모임을 보이는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CLUSTER;
+          const F = Fig.withBox({ x0: 66, y0: 250, x1: 404, y1: 34 });
+          const S = F.scale({ x: [0, C.zStar + 4], y: [0, C.pE * 1.25] });
+          const pts = [];
+          for (let i = 0; i <= 80; i++) {
+            const z = 1 + ((C.zStar + 2.6 - 1) * i) / 80;
+            pts.push([z, C.profit(z)]);
+          }
+          const P = S.curve(pts);
+          F.draw('#f-cluster2', {
+            axes: { x: '', y: '$' },
+            parts: [
+              F.line(F.BOX.x0, S.y(C.p1), S.x(C.zStar + 3.4), S.y(C.p1), { variant: 'cap' }),
+              F.annot(S.x(C.zStar * 0.52), S.y(C.p1) + 17, '이윤: 고립된 기업',
+                      { anchor: 'middle', size: 11 }),
+              F.curve(P),
+              F.annot(S.x(C.zStar * 0.74), S.y(C.profit(C.zStar * 0.74)) - 12, '기업당 이윤',
+                      { size: 12 }),
+              F.guide(...S.p([1, C.p1]), { xtick: '1', ytick: 'π₁' }),
+              F.guide(...S.p([C.zE, C.pE]), { xtick: 'zE', ytick: 'πE' }),
+              F.guide(...S.p([C.zStar, C.p1]), { xtick: 'z*', only: 'x' }),
+              F.dot(...S.p([1, C.p1]), { label: 'a', lx: -16, ly: 15 }),
+              F.dot(...S.p([C.zE, C.pE]), { label: 'e', lx: 8, ly: -8 }),
+              F.dot(...S.p([C.zStar, C.p1]), { label: 'c', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 24. 수치로 본 균형과 효율 (p.73) ═════════════════════ -->
+<section>
+  <h2>수치로 보면</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:8px">한 지역이 <strong>30개의 기업</strong>에 도달하면
+      성장이 멈춘다고 하자. 기업 하나의 이윤이 π₁ = 5달러, 정점의 이윤이 π<sup>E</sup> = 12달러라면</p>
+    <table class="tbl-num">
+      <thead><tr><th></th><th>집적지 수</th><th>집적지당 기업 수</th><th>기업당 이윤</th><th>총 이윤</th></tr></thead>
+      <tbody>
+        <tr><td>균형 (점 c)</td><td>1</td><td>z* = 30</td><td>π₁ = 5달러</td><td>150달러</td></tr>
+        <tr class="hi"><td>효율 (점 e)</td><td>2</td><td>z<sup>E</sup> = 15</td><td>π<sup>E</sup> = 12달러</td><td>360달러</td></tr>
+      </tbody>
+    </table>
+    <p class="caption" style="margin-top:8px">150 = 5 × 30 &nbsp;·&nbsp; 360 = 12 × 15 + 12 × 15</p>
+    <p class="derive t-red" style="margin-top:14px">→ 개별 기업이 외부효과를 간과하기 때문에
+      <strong>집적지가 너무 커지고 총 이윤은 절반에도 못 미친다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 25. 섹션 — 03 경험적 증거와 예시 ═════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 경험적 증거와 예시</p>
+  <p class="section-sub">교재 p.74~82</p>
+</section>
+
+<!-- ══ 26. 경험적 증거 (p.74~75) ════════════════════════════ -->
+<section>
+  <h2>집적의 경제에 대한 경험적 증거</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">지난 수십 년간의 연구는 도시 내 기업들의 군집이
+      <strong>노동생산성을 증가시키고, 새로운 생산설비의 개발을 촉진하며, 고용을 증가시켰다</strong>는
+      충분한 증거를 제공해 오고 있다 <span class="caption">(Combes and Gobillon, 2015)</span></p>
+    <ol class="dense">
+      <li><strong>생산성</strong> — 산업 산출물에 대한 <strong>노동생산성의 탄력성</strong>.
+        노동자 1인당 산출량의 백분율 변화를 산업 산출물의 백분율 변화로 나눈 것</li>
+      <li><strong>새로운 공장들</strong> — 산업 산출량에 대한 <strong>기업 설립의 탄력성</strong>.
+        칼톤의 고전적 연구에서 추정된 탄력성은 <strong>0.43</strong> — 산업 산출물의 10% 증가가
+        신생 기업체 수를 4.3% 증가시킨다 <span class="caption">(Carlton, 1983)</span></li>
+      <li><strong>고용성장</strong> — 소프트웨어 고용을 1,000명 더 가지고 출발하는 우편번호 지역은
+        약 <strong>12개의 더 많은 고용</strong>을 경험한다. 고용 증대는 <strong>1마일당 약 50%의 비율로 감쇠</strong>한다
+        <span class="caption">(Rosenthal and Strange, 2003)</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 27. 백만-달러 공장들 (p.75~76) ═══════════════════════ -->
+<section>
+  <h2>백만−달러 공장들의 경제적 효과</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:12px">거대한 제조공장을 두고 벌어진 카운티 간 경쟁에서,
+      <strong>승리한 카운티</strong>의 경제적 경험을 <strong>패배한 카운티</strong>와 비교한 연구
+      <span class="caption">(Greenstone, Hornbeck &amp; Moretti, 2010)</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">집적의 경제</p>
+        <p style="margin-bottom:6px">기존 제조업 공장의 노동생산성이 <strong>12% 증가</strong>한다.
+          이 이득은 생산기술과 노동자 이동에서 백만달러 공장과 경제적으로 가까운 기업일수록 크다</p>
+        <p class="caption">공장 설립 5년 뒤 연간 카운티 제조업 산출량에서 추가적인 <strong>430백만 달러</strong>를 발생시킨다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">집적의 불경제</p>
+        <p style="margin-bottom:6px">평균 임금이 약 <strong>2.7% 증가</strong>한다.
+          집적의 경제에서 편익을 얻는 기업들에게 이 임금 상승은 생산성 이득의 약 <strong>13%를 상쇄</strong>한다</p>
+        <p class="caption">편익을 얻지 못하는 기업에게는 비용만 늘어난다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:14px">→ 군집으로부터 가장 큰 이득을 얻는 기업들이,
+      <strong>상응하는 생산성 증가 없이 비용을 부담하는 기업들을 밀어낸다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 28. 지식파급의 증거 (p.76~77) ════════════════════════ -->
+<section>
+  <h2>지식파급의 증거 — 특허밀도의 탄력성</h2>
+  <div class="body">
+    <p class="caption" style="margin-bottom:6px">대도시 간 특허 발생건수를 결정하는 요인
+      <span class="en">(Carlino and Hunt, 2009)</span></p>
+    <table class="tbl-elast">
+      <thead><tr><th>변수</th><th>탄력성</th><th>읽는 법</th></tr></thead>
+      <tbody>
+        <tr><td>고용밀도 <span class="en">(평방마일당 일자리)</span></td><td>0.22</td>
+          <td>10% 증가 → 특허밀도 약 2.20% 증가. <strong>평방마일당 약 2,200개</strong>에서 양(+)의 관계가 없어진다</td></tr>
+        <tr><td>총 고용</td><td>0.52</td>
+          <td>10% 증가 → 약 5.2% 증가. <strong>대도시 인구 약 180만명</strong>에서 없어진다</td></tr>
+        <tr><td>인적자본 <span class="en">(대학학위 노동력 비중)</span></td><td>1.05</td>
+          <td>10% 증가 → 10.5% 증가</td></tr>
+        <tr><td>사업체 규모</td><td>−1.4</td>
+          <td>10% 증가 → 14% <strong>감소</strong>. 경쟁적인 환경의 도시에서 노동자가 더 혁신적이라는 증거</td></tr>
+      </tbody>
+    </table>
+    <p class="caption" style="margin-top:8px">평균 특허밀도는 2.0이고 텍사스 맥알렌 0.07부터 캘리포니아 산호세 17까지 분포한다.
+      산호세를 뒤따르는 곳은 로체스터·트렌톤·앤 아버·오스틴·윌밍턴·랄리−더램·보스턴·샌프란시스코다</p>
+  </div>
+</section>
+
+<!-- ══ 29. 단일-산업 집적지들 (p.77~78) ═════════════════════ -->
+<section>
+  <h2>단일−산업 집적지들</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:10px">생산에서 외적인 경제가 특정 산업 내 기업들에 한정될 때,
+      <strong>지역화경제</strong>는 같은 제품을 생산하는 기업들의 거대한 군집을 만든다.
+      달튼의 카펫(41%), 프로비던스의 인조 장신구(55%), 인디애나폴리스의 승강기(20%),
+      로스앤젤레스의 비디오(44%)</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">조지아주 달튼 — 미국의 카펫수도</p>
+        <p>1895년 캐서린 에반스가 결혼선물 침대보에 실의 술을 붙이는 전통 기법을 썼다.
+          인기를 얻어 지역수공예산업이 되었고,
+          터프티드 카펫 기계가 나오자 기업들이 <strong>그 기법에 익숙한 노동자</strong>와
+          <strong>염색·바탕천 가공 공급업체</strong>를 찾아 달튼에 모였다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">중국 다탕시 — 양말</p>
+        <p>세계생산의 약 <strong>35%</strong>에 해당하는 연간 <strong>120억 짝</strong>을 생산한다.
+          노동자 20만명을 고용하는 <strong>1만 개</strong>의 기업이 있어 평균 기업은 20명뿐이다.
+          중소기업들이 중간재 공급업체를 공동이용하고, 공동 노동풀을 쓰고, 지식을 공유하려 군집한다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 30~32. 표 4-1 산업 집적지들 (p.79) ═══════════════════ -->
+<section>
+  <h2>산업 집적지들 <span class="en">(1)</span></h2>
+  <div class="body">
+    <p class="caption" style="margin-bottom:6px"><strong>입지계수</strong>는 그 도시 총 고용에서 이 산업이 차지하는 비율을
+      국가 전체에서 그 산업이 차지하는 비율로 나눈 값이다. 크면 그 도시에 그 산업이 크게 집중되었다는 뜻이다.
+      시애틀의 소프트웨어 일자리 53,800개는 전국 비율대로라면 생겼을 수의 12.3배다 &nbsp;·&nbsp; <span class="en">표 4−1</span></p>
+    <table class="tbl-cluster" id="t-agg-1"></table>
+  </div>
+</section>
+
+<section>
+  <h2>산업 집적지들 <span class="en">(2)</span></h2>
+  <div class="body">
+    <table class="tbl-cluster" id="t-agg-2"></table>
+    <p class="caption" style="margin-top:8px">내쉬빌의 음향제작 집적(1,936명)은 로스앤젤레스·뉴욕보다 작지만
+      <strong>입지계수 19.23</strong>으로 그 도시 경제에서 훨씬 큰 부분을 차지한다</p>
+  </div>
+</section>
+
+<section>
+  <h2>산업 집적지들 <span class="en">(3)</span></h2>
+  <div class="body">
+    <table class="tbl-cluster" id="t-agg-3"></table>
+    <p class="caption" style="margin-top:8px">로스앤젤레스는 영화·보험청구·항공우주·안과 제품에,
+      뉴욕은 음향녹음·영화·투자은행과 증권에 집적지를 가지고 있다</p>
+  </div>
+</section>
+
+<script>
+  (function () {
+    // 표 4-1 [p.79] — 여덟 산업의 집적지. 세 장으로 나눠 싣는다.
+    const DATA = [
+      ['소프트웨어 게시자', [['시애틀', '53,800', '12.3'], ['샌프란시스코', '20,700', '3.9'],
+        ['산호세', '16,900', '6.91'], ['애틀란타', '12,300', '2.16'], ['매디슨', '8,900', '10.17']]],
+      ['영화와 비디오', [['로스앤젤레스', '106,800', '11.74'], ['뉴욕', '35,500', '2.48'],
+        ['뉴올리언즈', '2,900', '3.33'], ['브릿지포트', '2,300', '3.3']]],
+      ['음향녹음', [['뉴욕', '3,076', '2.94'], ['로스앤젤레스', '2,718', '4.09'],
+        ['내쉬빌', '1,936', '19.23']]],
+      ['보험청구', [['로스앤젤레스', '3,257', '1.86'], ['애틀란타', '2,382', '2.43'],
+        ['라스베가스', '1,030', '3.04']]],
+      ['투자은행과 증권', [['뉴욕', '53,888', '5.71'], ['시카고', '8,381', '1.52'],
+        ['브릿지포트', '3,782', '8.42']]],
+      ['선박건조와 보수', [['버지니아 비치', '26,232', '59.61'], ['모빌', '5,645', '49.15']]],
+      ['안과 제품', [['로스앤젤레스', '2,953', '2.82'], ['로체스터', '1,924', '29.63'],
+        ['댈러스', '1,837', '2.28'], ['탬파', '1,355', '6.73']]],
+      ['항공우주 제품', [['시애틀', '91,424', '12.67'], ['로스앤젤레스', '49,934', '2.48'],
+        ['댈러스', '32,121', '2.79'], ['위치타', '28,062', '27.52'], ['세인트 루이스', '16,228', '3.57']]],
+    ];
+    const render = (id, from, to) => {
+      const head = '<thead><tr><th>산업</th><th>대도시지역</th><th>2015 고용</th><th>입지계수</th></tr></thead>';
+      const body = DATA.slice(from, to).map(([ind, rows]) =>
+        rows.map(([city, emp, lq], i) =>
+          `<tr>${i === 0 ? `<td rowspan="${rows.length}"><strong>${ind}</strong></td>` : ''}` +
+          `<td style="text-align:left">${city}</td><td>${emp}</td><td>${lq}</td></tr>`).join('')
+      ).join('');
+      document.getElementById(id).innerHTML = head + '<tbody>' + body + '</tbody>';
+    };
+    render('t-agg-1', 0, 2);
+    render('t-agg-2', 2, 6);
+    render('t-agg-3', 6, 8);
+  })();
+</script>
+
+<!-- ══ 33. 법인기업 본사와 기능적 특화 (p.79~80) ════════════
+     p.80 은 스캔 초점이 나가 판독 불가 — 재촬영 후 채운다 -->
+<section>
+  <h2>법인기업 본사와 기능적 특화</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:14px">법인기업들은 산업의 경계를 넘는 집적의 경제(<strong>도시화경제</strong>)를
+      이용하기 위해 본사를 도시들에 입지시킨다.
+      법인의 의사결정에 필수적인 정보를 제공하는 <strong>회계기업·법률기업</strong>을 공동이용하려 군집한다.
+      군집은 법인기업들이 회계·법률 서비스를 <strong>외부에 위탁</strong>하고
+      중간재 공급에서 규모의 경제를 활용하게 한다</p>
+    <p class="emph" style="margin-bottom:16px">집적지의 법인기업들은 <strong>광고회사</strong> 같은
+      그 밖의 사업서비스업 기업들도 공동이용할 수 있다</p>
+    <p class="pending">이어지는 내용(교재 p.80 — 도시 규모별 관리기능의 특화, 통신 혁신의 영향)은
+      스캔 초점이 나가 판독하지 못했습니다. 재촬영 후 채웁니다.
+      — <span class="en">private/스캔-재촬영-필요.md</span></p>
+  </div>
+</section>
+
+<!-- ══ 34. 보육도시들 (p.81~82) ═════════════════════════════ -->
+<section>
+  <h2>보육도시들 <span class="en">(nursery cities)</span></h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:10px">버논은 뉴욕의 라디오 산업이 왜 결국 떠났는지 설명한다 —
+      기술이 정착되고 생산방식이 표준화되자
+      <strong>경쟁의 관건이 제품디자인에서 운송비용과 노동비용으로</strong> 옮겨 갔다.
+      제품이 <strong>완숙기</strong>에 이르면 생산자들은 다양화된 도시에서 얻을 것이 적어지고,
+      임금이나 토지 임대료가 낮은 곳으로 이전할 수 있다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">다양한 도시는 보육실이 된다</p>
+        <p>다양한 도시들은 새로운 아이디어와 실험을 발전시켜 혁신적인 기업들의 보육실로 작용한다.
+          제품디자인과 생산공정이 확정되면 생산은 <strong>그 산업에 특화된 도시</strong>에서 더 효율적이다</p>
+        <p class="derive t-red" style="margin-top:10px">→ 특화된 도시는 효율적 생산을, 다양한 도시는 혁신을 낳는다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">증거 <span class="en">(Duranton and Puga, 2001)</span></p>
+        <p style="margin-bottom:6px">입지를 바꾼 프랑스 기업 <strong>10곳 중 7곳 이상</strong>이
+          다양한 도시에서 특화된 도시로 이전하였다</p>
+        <p class="caption">연구개발 <strong>93%</strong> · 제약과 화장품 <strong>88%</strong> ·
+          정보기술 <strong>82%</strong><br>
+          반면 가구·식품·음료·의복·가죽 같은 덜 혁신적인 부문에서는 이 빈도가 낮다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 35. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

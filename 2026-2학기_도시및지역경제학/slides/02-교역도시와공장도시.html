@@ -1,0 +1,645 @@
+<!doctype html>
+<!--
+  2강. 교역도시와 공장도시
+  교재: 오설리반의 도시경제학 제9판 — 3장 (p.41~53)
+
+  각 <section> 앞 주석의 [p.N] 이 교재 쪽수다.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2강. 교역도시와 공장도시</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 이 강의를 관통하는 두 벌의 숫자 ─────────────────────────
+  // 표와 그림을 각각 손으로 적으면 반드시 어긋난다. 여기 한 번만 적고
+  // 표 HTML 과 도형 좌표를 모두 이 값에서 만든다 (design.md §6.5).
+
+  // 표 3-1 · 그림 3-1 — 스티치와 스퀴즈의 생산성 [p.43]
+  window.ISLE = {
+    stitch:  { shoes: 12, milk: 2 },   // 시간당 산출량
+    squeeze: { shoes: 1,  milk: 1 },
+    // 기회비용은 산출량에서 유도한다 — 표에 따로 적지 않는다
+    oc(who, good) {
+      const p = this[who];
+      return good === 'shoes' ? p.milk / p.shoes : p.shoes / p.milk;
+    },
+  };
+
+  // 그림 3-2 · 3-3 — 공장 구두의 평균비용과 순가격 [p.49~51]
+  window.FACTORY = {
+    q: 10,            // 공장 노동자의 시간당 구두 산출량
+    wFarm: 1.00,      // 낙농 임금 = 노동의 기회비용 (갤런/시간)
+    wCity: 0.80,      // 도시 거주·통근에 대한 보상 (갤런/시간)
+    rent: 1.2,        // 자본 임대료 (갤런/시간)
+    t: 0.10,          // 왕복 1마일당 통행의 기회비용 (갤런)
+    cHome: 1.00,      // 가내생산 구두의 비용 (갤런)
+    // 유도값은 반올림해서 내보낸다. 1.8/10 은 0.18000000000000002 이라
+    // 그대로 두면 시장구역 반경이 6.999999999999999 로 인쇄된다.
+    r(v, n = 2)  { return Math.round(v * 10 ** n) / 10 ** n; },
+    get wage()   { return this.r(this.wFarm + this.wCity); },   // 1.80
+    get acLabor(){ return this.r(this.wage / this.q); },        // 0.18
+    get acCap()  { return this.r(this.rent / this.q); },        // 0.12
+    get price()  { return this.r(this.acLabor + this.acCap); }, // 0.30
+    get radius() { return this.r((this.cHome - this.price) / this.t, 3); }, // 7
+    net(x)       { return this.r(this.price + this.t * x); },
+  };
+</script>
+
+<style>
+  /* components.css 는 .cols 를 align-items:center 로 둔다 — 그림과 글을 나란히 놓을 때의 설정이다.
+     이 강의의 2단은 전부 글이라 가운데 정렬이면 짧은 칸이 아래로 밀린다. 위로 맞춘다. */
+  .body > .cols { align-items: flex-start; }
+  .tbl-oc { width: 100%; table-layout: fixed; }
+  .tbl-oc th:first-child, .tbl-oc td:first-child { width: 236px; }
+  .tbl-oc th:not(:first-child), .tbl-oc td:not(:first-child) { text-align: center; }
+  .tbl-innov { width: 100%; table-layout: fixed; }
+  .tbl-innov th:first-child, .tbl-innov td:first-child { width: 156px; }
+  .tbl-innov td { vertical-align: top; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>2강. 교역도시와 공장도시</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 이 장이 답할 것 (p.41) ════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:40px">
+      “그 누구도 한 개(dog)가 다른 개와 뼈를 가지고 공정하고 의도적인 교환을 행하는 것을 보지 못했다.”
+      <span class="who">— 아담 스미스</span></p>
+    <p class="lead t-define" style="margin-bottom:14px">도시에 대한 경제적 근거를 다루는 첫 번째 장</p>
+    <p class="emph" style="margin-bottom:8px">생산에서의 <strong>비교우위</strong>와 교환에서의 <strong>규모의 경제</strong>를 경험하는 경제에서
+      → <span class="mark">교역도시</span>가 교역회사 인근에 생성된다</p>
+    <p class="emph">생산에서 <strong>규모의 경제</strong>를 갖는 경제에서
+      → <span class="mark">공장도시</span>가 공장 인근에 생성된다</p>
+  </div>
+</section>
+
+<!-- ══ 3. 가내생산모형의 세 가정 (p.41~42) ══════════════════ -->
+<section>
+  <h2>가내생산모형의 세 가정</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:4px">두 재화(우유와 구두)를 생산하고 소비하는 지역.
+      다음 가정들은 <strong>도시의 가능성을 배제한다</strong></p>
+    <ol class="dense">
+      <li><strong>동일한 생산성</strong> — 모든 토지는 두 재화를 생산함에 있어 동일하게 생산적이고,
+        모든 노동자들은 동일하게 생산적이다</li>
+      <li><strong>교환에 있어 규모에 대한 보수불변</strong> — 얼마나 많은 양이 교환되는가와 상관없이
+        교환의 단위비용(운송비용을 포함한 거래 실행 비용)은 일정하다</li>
+      <li><strong>생산에 있어 규모에 대한 보수불변</strong> — 노동자가 얼마나 많은 구두를 생산하는가와
+        상관없이 시간당 생산되는 구두의 양은 일정하다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 4. 자급자족과 균일한 분포 (p.42) ═════════════════════ -->
+<section>
+  <h2>세 가정의 결론</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">교환이 일어나지 않는다</p>
+        <p style="margin-bottom:24px">모든 노동자가 동일하게 생산적이면(가정 1)
+          생산특화와 교환으로부터의 편익이 없다</p>
+        <p style="margin-bottom:24px">생산이 규모에 대한 보수불변이면(가정 3)
+          개인이 공장 노동자만큼 효율적이므로 공장에서 생산할 편익이 없다</p>
+        <p class="derive t-red">→ 모든 가구는 소비하는 모든 것을 생산하는 <strong>자급자족</strong>을 한다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">인구가 균일하게 분포한다</p>
+        <p style="margin-bottom:24px">인구가 일부 지점에 집중되면 토지에 대한 경쟁이 가격을 높인다.
+          도시에서 사람들은 <strong>아무런 보상 편익 없이</strong> 토지에 더 높은 가격을 지불하게 되고,
+          이는 그들에게 도시를 떠날 유인을 준다</p>
+        <p class="derive t-red">→ <strong>내쉬균형에서 토지의 가격은 모든 위치에서 동일하고,
+          인구밀도 또한 균일하다</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 5. 섹션 — 02 비교우위와 교역도시 ═════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 비교우위와 교역도시</p>
+  <p class="section-sub">가정 1(동일한 생산성)을 걷어낸다 · 교재 p.42~48</p>
+</section>
+
+<!-- ══ 6. 표 3-1 생산과 기회비용 (p.43) ═════════════════════ -->
+<section class="s-split">
+  <h2>비교우위</h2>
+  <div class="body">
+    <div class="col-l" style="flex:0 0 40%">
+      <p class="emph" style="margin-bottom:16px">두 섬 <strong>스티치</strong>와 <strong>스퀴즈</strong>.
+        토양·기후·노동자 숙련도의 차이로 스티치 노동자들이 두 재화 모두에서 더 생산적이다</p>
+      <p class="derive t-red" style="margin-bottom:10px">→ 구두의 기회비용이 더 낮은<br><strong>스티치가 구두에 비교우위</strong></p>
+      <p class="derive t-red">→ 우유의 기회비용이 더 낮은<br><strong>스퀴즈가 우유에 비교우위</strong></p>
+    </div>
+    <div class="col-r">
+      <p class="caption-blue">표 3−1 생산과 기회비용</p>
+      <table class="tbl-oc" id="t-oc">
+        <thead><tr><th></th><th>스티치 <span class="en">Stitch</span></th><th>스퀴즈 <span class="en">Squeeze</span></th></tr></thead>
+        <tbody id="t-oc-body"></tbody>
+      </table>
+      <script>
+        (function () {
+          const I = window.ISLE;
+          const frac = (v) => (v === 1 ? '1' : v < 1 ? `1/${Math.round(1 / v)}` : String(v));
+          const rows = [
+            ['시간당 구두 산출량', I.stitch.shoes, I.squeeze.shoes],
+            ['시간당 우유 산출량(갤런)', I.stitch.milk, I.squeeze.milk],
+            ['기회비용: 구두', `${frac(I.oc('stitch', 'shoes'))}갤런의 우유`,
+                              `${frac(I.oc('squeeze', 'shoes'))}갤런의 우유`],
+            ['기회비용: 우유', `${frac(I.oc('stitch', 'milk'))}켤레의 구두`,
+                              `${frac(I.oc('squeeze', 'milk'))}켤레의 구두`],
+          ];
+          document.getElementById('t-oc-body').innerHTML = rows
+            .map(([a, b, c]) => `<tr><td>${a}</td><td>${b}</td><td>${c}</td></tr>`).join('');
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. 그림 3-1 생산특화로부터의 이득 (p.43~44) — fragment 3단계 ══ -->
+<section>
+  <h2>생산특화로부터의 이득</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">두 섬이 처음에 자급자족이라고 하자.
+      교환비율은 <strong>우유 1갤런당 구두 3켤레</strong></p>
+    <svg class="fig" id="f-gain" viewBox="0 0 700 268" style="width:620px;margin:2px 0 0 108px" role="img">
+      <title>스티치가 구두에, 스퀴즈가 우유에 특화하고 교환해 두 섬 모두 구두를 더 갖게 되는 그림</title></svg>
+    <script>
+      (function () {
+        const I = window.ISLE;
+        // 표 3-1 의 숫자에서 유도한다 — 여기 손으로 적는 수는 하나도 없다
+        const dShoes = I.stitch.shoes;                 // 스티치가 1시간 전환 → 구두 +12
+        const dMilk  = I.stitch.milk;                  //                     우유 −2
+        const sqHours = dMilk / I.squeeze.milk;        // 스퀴즈가 우유 2갤런을 만들 시간 = 2
+        const sqShoes = sqHours * I.squeeze.shoes;     // 그동안 못 만든 구두 = 2
+        const RATE = 3;                                // 우유 1갤런당 구두 3켤레
+        const traded = dMilk * RATE;                   // 스티치가 내주는 구두 = 6
+
+        const STEP = [
+          { title: '생산', st: { shoes: +dShoes, milk: -dMilk }, sq: { shoes: -sqShoes, milk: +dMilk } },
+          { title: '교환', st: { shoes: -traded, milk: +dMilk }, sq: { shoes: +traded, milk: -dMilk } },
+          { title: '이득', st: { shoes: +dShoes - traded, milk: 0 }, sq: { shoes: -sqShoes + traded, milk: 0 } },
+        ];
+        const F = Fig;
+        const parts = [];
+        // 스티치의 −6 라벨과 스퀴즈의 +6 라벨이 부딪히지 않도록 행 간격을 넉넉히 준다
+        const CW = 200, GAP = 22, X0 = 106, MID = 108, ROW = 112, SCALE = 4.0;
+        ['스티치', '스퀴즈'].forEach((who, r) => {
+          parts.push(F.annot(X0 - 14, MID + r * ROW + 5, who, { anchor: 'end', size: 13 }));
+        });
+        STEP.forEach((s, i) => {
+          const ox = X0 + i * (CW + GAP);
+          parts.push(F.annot(ox + CW / 2, 42, s.title, { anchor: 'middle', size: 14, fragment: i }));
+          [['st', 0], ['sq', 1]].forEach(([key, r]) => {
+            const base = MID + r * ROW;
+            parts.push(F.raw(
+              `<path d="M${ox},${base} L${ox + CW},${base}" stroke="var(--rule)" stroke-width="1" fill="none"/>`,
+              { fragment: i }));
+            [['shoes', '구두', 0.28], ['milk', '우유', 0.68]].forEach(([g, name, fx]) => {
+              const v = s[key][g];
+              if (!v) return;
+              const x = ox + CW * fx, h = Math.abs(v) * SCALE;
+              const up = v > 0;
+              parts.push(F.raw(
+                `<rect x="${x - 15}" y="${up ? base - h : base}" width="30" height="${h}" ` +
+                `fill="var(--brand-crimson)" fill-opacity="${r === 0 ? 0.75 : 0.3}" ` +
+                `stroke="var(--brand-crimson)" stroke-width="1"/>`, { fragment: i }));
+              parts.push(F.annot(x, up ? base - h - 6 : base + h + 14,
+                                 `${up ? '+' : '−'}${Math.abs(v)}`,
+                                 { anchor: 'middle', size: 12, fragment: i }));
+              parts.push(F.annot(x, base + (up ? 15 : -6), name,
+                                 { anchor: 'middle', size: 11, fragment: i }));
+            });
+          });
+        });
+        F.draw('#f-gain', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 개별 가구는 특화·교환 이전과 <strong>같은 양의 우유</strong>와
+      <strong>더 많은 구두</strong>를 갖는다. 구두의 총 생산량이 10켤레 늘었다</p>
+  </div>
+</section>
+
+<!-- ══ 8. 거래비용 (p.44) ═══════════════════════════════════ -->
+<section>
+  <h2>거래비용 <span class="en">(transaction cost)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:30px">재화의 교환을 위해 요구되는
+      <span class="mark">시간의 기회비용</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">스티치</p>
+        <p style="margin-bottom:18px">시간당 기회비용이 구두 12켤레.
+          거래가 <strong>1/2시간(구두 6켤레)</strong>보다 적게 걸리는 한 이득이다</p>
+        <p class="sub t-red" style="margin-bottom:2px">스퀴즈</p>
+        <p>시간당 기회비용이 구두 1켤레.
+          거래가 <strong>4시간</strong>보다 적게 걸리는 한 이득이다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">교환시간이 1/4시간이라면</p>
+        <p style="margin-bottom:18px">스티치의 순이득 = <strong>구두 3켤레</strong> (6 − 3)<br>
+          스퀴즈의 순이득 = <strong>구두 3.75켤레</strong> (4 − 0.25)</p>
+        <p class="derive t-red">→ 비교우위를 야기하는 <strong>생산성의 차이가 거래비용에 비해 크다면</strong>
+          교역은 발생한다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. 교환에서의 규모의 경제 (p.45) ═════════════════════ -->
+<section>
+  <h2>교환에서의 규모의 경제</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:4px">규모에 대한 보수불변이면 개별 가구가 교역회사만큼 효율적이므로
+      기업에 돈을 지불할 이유가 없다. <strong>가정 2를 걷어내면</strong> 교역회사가 출현한다</p>
+    <div class="cols" style="margin-top:14px">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">1. 불가분의 생산요소</p>
+        <p><span class="en">indivisible inputs</span><br>
+          산출물을 집하·배송하기 위한 큰 마차와,
+          두 섬 사이를 운송하기 위한 배</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">2. 노동특화</p>
+        <p><strong>지속</strong> — 개별 노동자가 한 작업에서 다른 작업으로 전환하는 데 보다 적은 시간을 쓴다<br>
+          <strong>반복</strong> — 개별 노동자가 특정 작업을 달성하는 가장 효율적인 방법을 터득한다<br>
+          <span class="caption">일부는 마차 운전에, 다른 일부는 배 운항에 특화한다</span></p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:14px">→ 규모의 경제가 거래비용을 낮춘다.
+      교역회사가 개인보다 교역을 효율적으로 실행한다</p>
+  </div>
+</section>
+
+<!-- ══ 10. 교역회사가 있으면 (p.45) ═════════════════════════ -->
+<section>
+  <h2>교역회사가 있으면 얼마나 나아지는가</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:26px">교역회사가 거래당 <span class="mark">구두 0.10켤레</span>만
+      비용으로 청구한다면</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">스티치 가구의 거래당 순이득</p>
+        <p style="margin-bottom:24px">구두 <strong>3켤레 → 5.90켤레</strong> (6 − 0.10)</p>
+        <p class="sub t-red" style="margin-bottom:2px">스퀴즈 가구의 거래당 순이득</p>
+        <p>구두 <strong>3.75켤레 → 3.90켤레</strong> (4 − 0.10)</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">교역회사는 추가적인 특화를 가능하게 한다</p>
+        <p style="margin-bottom:14px">개별 가구는 교역 실행에 보다 적은 시간을 쓰고
+          구두 혹은 우유의 생산에 보다 많은 시간을 쓴다</p>
+        <p class="derive t-red">→ <strong>세 유형의 노동자</strong>가 생긴다 —
+          스티치의 구두 생산자, 스퀴즈의 우유 생산자, 그리고 두 지점의 교역자</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11. 교역도시의 생성 (p.46) ═══════════════════════════ -->
+<section>
+  <h2>교역도시의 생성</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:10px">교환에서의 규모의 경제를 완전히 이용하기 위해
+      교역회사는 <strong>큰 용량의 산출물을 효율적으로 집하·배송할 수 있는 장소</strong>에 입지한다.
+      섬모형에서는 개별 섬에 항만시설을 설치한다</p>
+    <div class="chain">
+      <div class="node">마부<span class="va">농부·구두제조업자에게서 집하</span></div>
+      <div class="link">→</div>
+      <div class="node">부두 노동자<span class="va">카트와 선박 사이에서 옮겨 싣기</span></div>
+      <div class="link">→</div>
+      <div class="node">항해사<span class="va">해협을 가로질러 운송</span></div>
+      <div class="link">→</div>
+      <div class="node">회계사<span class="va">대금 입금과 지불</span></div>
+    </div>
+    <p class="derive t-red" style="margin-top:44px">→ 노동자들이 통근시간을 아끼려 항구 근처 토지를 두고 경쟁한다 →
+      토지가격이 오른다 → 노동자들이 작은 부지를 선택한다 →
+      <strong>상대적으로 높은 인구밀도의 지역 = 교역도시</strong></p>
+  </div>
+</section>
+
+<!-- ══ 12. 도시역사에서의 교역도시들 (p.46~47) ══════════════ -->
+<section>
+  <h2>도시역사에서의 교역도시들</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">교역도시의 노동자들은 재화를 <strong>생산하지 않고</strong>,
+      도시 밖에서 생산된 재화를 수집하고 배분하였다</p>
+    <ol class="dense">
+      <li><strong>페니키아</strong> (기원전 3천년경) — 빠른 상선으로 지중해 해안 전체에서 염료·천연재료·식품·섬유·보석을 교역.
+        지금의 레바논 연안에 교역도시들을 설립</li>
+      <li><strong>아테네</strong> (기원전 약 500년) — 가내수공품과 올리브 제품을 지방의 식품·천연재료와 교환</li>
+      <li><strong>이태리 도시정부들</strong> (11~12세기) — 목재·철·곡물·와인·울 옷감을 약재·염료·아마포·목화·가죽·귀금속과 교환.
+        <span class="mark">베니스·제노바·피사</span>의 성장을 이끈 원동력</li>
+      <li><strong>미국의 목화</strong> — 엘리 휘트니의 조면기(1794) 이후 총 산출량이 15년간 <strong>50배</strong> 증가.
+        강을 따라 뉴올리언즈로 운송되며 강 상류 상업도시들이 함께 성장</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 13. 운송혁신 네 가지 (p.47~48) ═══════════════════════ -->
+<section>
+  <h2>운송혁신이 교역을 늘렸다</h2>
+  <div class="body">
+    <p class="caption" style="margin-bottom:6px">1700년대의 비포장 도로는 느리고, 비가 오거나 눈이 녹으면 미끄러웠다.
+      교역의 양은 그 상태에 묶여 있었다</p>
+    <table class="tbl-innov">
+      <thead><tr><th>혁신</th><th>내용과 효과</th></tr></thead>
+      <tbody>
+        <tr><td>유료고속도로<br><span class="en">turnpikes</span></td>
+          <td>돌과 자갈로 지은 펜실베니아 턴파이크(1792). 운행속도를 시간당 2마일로 높여
+            필라델피아의 <strong>시장구역</strong>과 교역량을 늘렸다</td></tr>
+        <tr><td>운하</td>
+          <td>360마일의 에리 운하(1825). 뉴욕시의 항구를 북·서쪽 농업지역과 연결하고
+            운송비용을 <strong>톤−마일당 20센트에서 1.5센트로</strong> 낮췄다.
+            1850년 뉴욕시 인구는 미국혁명 말기의 약 20배인 오십만. 1845년 미국의 인공수로는 3,300마일 이상</td></tr>
+        <tr><td>증기선</td>
+          <td>1807년 도입 전까지 교통은 강물의 흐름을 따랐고 배는 종착지에서 분해되었다.
+            증기선이 <strong>양방향 통행</strong>을 열었다</td></tr>
+        <tr><td>철도</td>
+          <td>1850~1890년 사이 강 대비 철도운송의 비율이 <strong>0.1에서 2.0으로</strong>,
+            철도운송량은 <strong>240배</strong> 증가. 강가 상업도시는 쇠퇴하고 철도망을 따라 도시가 번성했다</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 14. 섹션 — 03 규모의 경제와 공장도시 ═════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 규모의 경제와 공장도시</p>
+  <p class="section-sub">가정 3(생산의 보수불변)을 걷어낸다 · 교재 p.48~53</p>
+</section>
+
+<!-- ══ 15. 구두생산의 규모의 경제 (p.48) ════════════════════ -->
+<section>
+  <h2>구두를 공장에서 만든다면</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:30px">우유는 규모에 대한 보수불변으로 두고,
+      <span class="mark">구두만 규모에 대해 증가하는 보수</span>로 생산된다고 하자</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">공장 노동자</p>
+        <p style="margin-bottom:8px">시간당 <strong>구두 10켤레</strong><br>
+          구두 한 켤레에 노동과 자본 6분</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">가내 노동자</p>
+        <p>시간당 <strong>구두 1켤레</strong> 혹은 <strong>우유 1갤런</strong></p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:30px">→ 구두생산자들이 불가분의 생산요소와 특화된 노동을 쓰기 때문이다.
+      그렇다면 공장에서 생산된 구두의 <strong>시장가격</strong>은 얼마인가?</p>
+  </div>
+</section>
+
+<!-- ══ 16. 그림 3-2 평균생산비용 (p.49~50) ══════════════════ -->
+<section class="s-split">
+  <h2>공장 구두의 평균생산비용</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">평균노동비용 = w / q</p>
+      <p style="margin-bottom:6px">낙농가는 시간당 우유 1갤런을 번다.
+        공장 인근 토지 경쟁으로 거주·통근 비용이 <strong>0.80갤런</strong> 더 들므로,
+        입지에서의 내쉬균형을 위한 공장임금은 시간당 <strong>1.80갤런</strong></p>
+      <p class="formula-key" id="k-ac-labor" style="margin-bottom:16px"></p>
+      <p class="sub t-red" style="margin-bottom:2px">평균자본비용</p>
+      <p style="margin-bottom:6px">공장 자본의 임대료가 시간당 <strong>1.2갤런</strong></p>
+      <p class="formula-key" id="k-ac-cap" style="margin-bottom:16px"></p>
+      <p class="derive t-red" id="k-price"></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-ac" viewBox="0 0 300 300" style="width:250px" role="img">
+        <title>평균생산비용 0.30갤런이 노동의 기회비용·도시거주비용·자본비용 세 층으로 쌓인 막대</title></svg>
+      <script>
+        (function () {
+          const C = window.FACTORY;
+          const seg = [
+            { v: C.wFarm / C.q, name: '노동의 기회비용', op: 0.85 },
+            { v: C.wCity / C.q, name: '도시거주비용',    op: 0.55 },
+            { v: C.acCap,       name: '자본비용',        op: 0.28 },
+          ];
+          const F = Fig.withBox({ x0: 96, y0: 258, x1: 250, y1: 30 });
+          const S = F.scale({ x: [0, 1], y: [0, 0.36] });
+          const parts = [];
+          let acc = 0;
+          for (const s of seg) {
+            const y0 = S.y(acc), y1 = S.y(acc + s.v);
+            parts.push(F.raw(
+              `<rect x="${S.x(0.18)}" y="${y1}" width="${S.x(0.62) - S.x(0.18)}" ` +
+              `height="${y0 - y1}" fill="var(--brand-crimson)" fill-opacity="${s.op}" ` +
+              `stroke="#FFF" stroke-width="1"/>`));
+            parts.push(F.annot(S.x(0.68), (y0 + y1) / 2 + 4,
+                               `${s.v.toFixed(2)}  ${s.name}`, { size: 11 }));
+            acc += s.v;
+          }
+          parts.push(F.annot(S.x(0.4), S.y(acc) - 10, acc.toFixed(2),
+                             { anchor: 'middle', size: 15, tone: 'red' }));
+          F.draw('#f-ac', { axes: { y: '우유양\n(갤런)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const C = window.FACTORY;
+      document.getElementById('k-ac-labor').innerHTML =
+        `평균노동비용 = ${C.wage.toFixed(2)} / ${C.q} = <strong>${C.acLabor.toFixed(2)}갤런</strong>`;
+      document.getElementById('k-ac-cap').innerHTML =
+        `평균자본비용 = ${C.rent} / ${C.q} = <strong>${C.acCap.toFixed(2)}갤런</strong>`;
+      document.getElementById('k-price').innerHTML =
+        `→ 경쟁시장에서 공장가격 = 평균비용 = ${C.acLabor.toFixed(2)} + ${C.acCap.toFixed(2)} ` +
+        `= <strong>${C.price.toFixed(2)}갤런</strong>`;
+    })();
+  </script>
+</section>
+
+<!-- ══ 17. 그림 3-3 순가격과 시장구역 (p.50~51) ═════════════ -->
+<section class="s-split">
+  <h2>공장의 시장구역</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">가내생산 구두의 비용</p>
+      <p style="margin-bottom:20px">가정에서 구두를 만드는 데 필요한 시간의 기회비용
+        = 그 대신 생산할 수 있는 <strong>우유 1갤런</strong></p>
+      <p class="sub t-red" style="margin-bottom:2px">공장 구두의 순가격</p>
+      <p style="margin-bottom:6px">공장가격 + 공장까지 통행의 기회비용.
+        전형적인 사람은 왕복 1마일당 <strong>1/10시간</strong>이 걸린다</p>
+      <p class="formula-key" id="k-net" style="margin-bottom:18px"></p>
+      <p class="derive t-red" id="k-radius"></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-net" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>공장에서 멀어질수록 오르는 순가격이 가내생산 비용과 만나 시장구역 반경 7마일을 정하는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.FACTORY;
+          const R = C.radius;                       // 7
+          const F = Fig.withBox({ x0: 60, y0: 254, x1: 412, y1: 30 });
+          const S = F.scale({ x: [-R - 1.4, R + 1.4], y: [0, 1.25] });
+          // V자 순가격곡선 — 관계식 p(x) = price + t·|x| 에서 유도한다.
+          // 세 점을 curve() 로 이으면 스플라인이 꼭짓점을 둥글게 깎아 점이 곡선에서 벗어난다
+          // (design.md §6.4). 두 개의 직선으로 그린다.
+          const XE = R + 1;
+          const arm = (x1, x2) =>
+            F.line(...S.p([x1, C.net(Math.abs(x1))]), ...S.p([x2, C.net(Math.abs(x2))]),
+                   { variant: 'demand' });
+          const parts = [
+            F.line(S.x(-R - 1.4), S.y(C.cHome), S.x(R + 1.4), S.y(C.cHome), { variant: 'cap' }),
+            F.annot(S.x(-R - 1.2), S.y(C.cHome) - 9, '비용: 가내생산 구두', { size: 11 }),
+            arm(-XE, 0), arm(0, XE),
+            F.annot(S.x(2.2), S.y(0.52), '순가격: 공장생산 구두', { size: 11, tone: 'blue' }),
+            F.guide(...S.p([0, C.price]), { ytick: C.price.toFixed(2), only: 'y' }),
+            F.guide(...S.p([1, C.net(1)]), { ytick: C.net(1).toFixed(2), only: 'y' }),
+            F.guide(...S.p([1, C.net(1)]), { xtick: '1', only: 'x' }),
+            F.guide(...S.p([R, C.cHome]), { xtick: String(R), only: 'x' }),
+            F.guide(...S.p([-R, C.cHome]), { xtick: String(R), only: 'x' }),
+            F.annot(F.BOX.x0 - 8, S.y(C.cHome) + 4, C.cHome.toFixed(2),
+                    { anchor: 'end', size: 11 }),
+            F.dot(...S.p([0, C.price]), { label: 'a', lx: -16, ly: 14 }),
+            F.dot(...S.p([1, C.net(1)]), { label: 'b', lx: 8, ly: -8 }),
+            F.annot(S.x(0), F.BOX.y0 + 17, '0', { anchor: 'middle', size: 11 }),
+          ];
+          F.draw('#f-net', { axes: { x: '공장으로부터 거리', y: '우유\n(갤런)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const C = window.FACTORY;
+      document.getElementById('k-net').innerHTML =
+        `p(x) = ${C.price.toFixed(2)} + ${C.t.toFixed(2)}x`;
+      document.getElementById('k-radius').innerHTML =
+        `→ p(${C.radius}) = ${C.price.toFixed(2)} + ${C.t.toFixed(2)}×${C.radius} = ` +
+        `${C.cHome.toFixed(2)} 이므로 <strong>시장구역의 반경은 ${C.radius}마일</strong>. ` +
+        `그 밖의 가구들은 자급자족한다`;
+    })();
+  </script>
+</section>
+
+<!-- ══ 18. 공장도시의 생성 (p.52) ═══════════════════════════ -->
+<section>
+  <h2>공장도시의 생성</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:26px">노동자들이 공장 근처에 살아 통행비용을 아끼고,
+      토지 경쟁이 가격을 올려 <span class="mark">인구밀도가 높아진다</span></p>
+    <p class="emph" style="margin-bottom:26px">이 결과가 상대적으로 높은 인구밀도의 지역인
+      <strong>공장 소도시 혹은 도시</strong>다</p>
+    <p class="sub t-red" style="margin-bottom:2px">주의할 것</p>
+    <p class="emph">공장임금과 공장가격에 <strong>보다 높은 토지가격이 이미 반영되어 있다.</strong>
+      노동자들은 자기 시간의 기회비용(1갤런)과 도시 거주의 보다 높은 비용(0.80갤런)을 함께 충당하는
+      시간당 1.8갤런의 임금을 받는다</p>
+  </div>
+</section>
+
+<!-- ══ 19. 산업혁명 (p.52~53) ═══════════════════════════════ -->
+<section>
+  <h2>산업혁명과 공장도시</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">19세기의 산업혁명은 제조업과 교통에서 혁신을 만들어
+      생산을 가정과 작은 가게에서 <strong>산업도시의 큰 공장</strong>으로 옮겼다.
+      교역도시의 노동자와 달리 공장도시의 노동자는 <strong>제품을 생산</strong>하였다</p>
+    <ol class="dense">
+      <li><strong>엘리 휘트니의 상호 교환가능한 부품</strong> (1800년경) — 정교한 기계도구로 동일한 부품을 일괄 생산.
+        비숙련 노동자도 신속히 훈련되어 조립할 수 있게 되면서 거대한 규모의 경제가 생겼다</li>
+      <li><strong>재봉틀</strong> (1846년 특허) — 19세기 초 미국 의류의 약 <strong>4/5</strong>가 가내에서 손수 만들어졌으나,
+        1890년에는 <strong>9/10</strong>이 공장에서 만들어졌다. 새로운 도시들이 의류공장 주위에 생겼다</li>
+      <li><strong>구두제조용 재봉틀</strong> (1858년) — 밑창을 윗부분에 꿰매는 과정을 기계화해
+        큰 구두공장과 그 주위의 도시들을 낳았다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 20. 그림 3-4 산업혁명과 시장구역 (p.53) — fragment 3단계 ══ -->
+<section>
+  <h2>산업혁명이 시장구역을 넓혔다</h2>
+  <div class="body">
+    <svg class="fig" id="f-innov" viewBox="0 0 760 300" style="width:680px;margin:2px 0 0 84px" role="img">
+      <title>생산혁신이 공장가격을 낮추고 운송혁신이 순가격곡선을 눕혀 시장구역이 두 차례 넓어지는 그림</title></svg>
+    <script>
+      (function () {
+        // 관계식에서 유도한다. p(x) = p0 + t·|x|, 가내생산 비용 cH 와 만나는 곳이 시장구역의 끝.
+        const cH = 1.00;
+        const CASE = [
+          { p0: 0.62, t: 0.16, variant: null,     dash: null,   name: '초기',                   pts: ['b', 'a', 'c'], tick: 'p′' },
+          { p0: 0.34, t: 0.16, variant: 'supply', dash: null,   name: '생산에서의 혁신',        pts: ['e', 'd', 'f'], tick: 'p″' },
+          { p0: 0.34, t: 0.075, variant: 'demand', dash: '7 5', name: '생산과 운송에서의 혁신', pts: ['g', 'd', 'h'] },
+        ];
+        const XMAX = 10;
+        // 오른쪽 200px 은 시장구역 이름표 자리로 비워 둔다 (viewBox 760)
+        const F = Fig.withBox({ x0: 70, y0: 214, x1: 556, y1: 26 });
+        const S = F.scale({ x: [-XMAX, XMAX], y: [0, 1.25] });
+        const parts = [
+          F.line(S.x(-XMAX), S.y(cH), S.x(XMAX), S.y(cH), { variant: 'cap' }),
+          F.annot(F.BOX.x0 - 8, S.y(cH) + 4, 'cH', { anchor: 'end', size: 12 }),
+        ];
+        CASE.forEach((c, i) => {
+          const R = (cH - c.p0) / c.t;                       // 시장구역 반경
+          const xe = Math.min(R * 1.12, XMAX);
+          const o = { fragment: i };
+          if (c.variant) o.variant = c.variant;
+          if (c.dash) o.dash = c.dash;
+          // 꼭짓점이 둥글게 깎이지 않도록 두 직선으로 그린다 (design.md §6.4)
+          const py = (x) => c.p0 + c.t * Math.abs(x);
+          parts.push(F.line(...S.p([-xe, py(xe)]), ...S.p([0, c.p0]), o));
+          parts.push(F.line(...S.p([0, c.p0]), ...S.p([xe, py(xe)]), o));
+          // 꼭짓점과 양쪽 끝점
+          if (c.tick) parts.push(F.guide(...S.p([0, c.p0]), { ytick: c.tick, only: 'y', fragment: i }));
+          parts.push(F.dot(...S.p([0, c.p0]),
+                           { label: c.pts[1], lx: -6, ly: 15, fragment: i }));
+          [[-R, c.pts[0], -14], [R, c.pts[2], 8]].forEach(([x, lb, lx]) =>
+            parts.push(F.dot(...S.p([x, cH]), { label: lb, lx, ly: -8, fragment: i })));
+          // 시장구역 화살표
+          const y = F.BOX.y0 + 26 + i * 22;
+          parts.push(F.raw(
+            `<path d="M${S.x(-R)},${y} L${S.x(R)},${y}" stroke="var(--ink-2)" stroke-width="1"` +
+            ` marker-start="url(#ah-ink)" marker-end="url(#ah-ink)" fill="none"/>`, { fragment: i }));
+          parts.push(F.annot(S.x(R) + 10, y + 4, `시장구역: ${c.name}`, { size: 11, fragment: i }));
+        });
+        parts.push(F.annot(S.x(0), F.BOX.y0 + 16, '공장', { anchor: 'middle', size: 11 }));
+        F.draw('#f-innov', { axes: { y: '$' }, parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ <strong>생산에서의 혁신</strong>은 공장가격을 낮추고,
+      <strong>운송에서의 혁신</strong>은 순가격곡선을 편평하게 한다. 둘 다 시장구역을 넓힌다</p>
+  </div>
+</section>
+
+<!-- ══ 21. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

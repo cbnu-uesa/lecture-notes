@@ -1,0 +1,1121 @@
+<!doctype html>
+<!--
+  1강. 서론과 도시경제학의 주요 개념들
+  교재: 오설리반의 도시경제학 제9판 (이번송·홍성효·김석영 역, 박영사 2022)
+        1장 서론 (p.3~11) · 2장 도시경제학의 주요 개념들 (p.13~33)
+
+  각 <section> 앞 주석의 [p.N] 이 교재 쪽수다. 원본 대조의 실마리이므로 지우지 않는다.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1강. 서론과 도시경제학의 주요 개념들</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<style>
+  /* 이 강의에서만 쓰는 미세 조정
+     표에 width 를 주지 않으면 shrink-to-fit 이라 칸이 좁아지고 글이 여러 줄로 접혀
+     표 높이가 두세 배가 된다. 전폭을 쓰게 하고 칸 폭을 못 박는다. */
+  /* components.css 는 .cols 를 align-items:center 로 둔다 — 그림과 글을 나란히 놓을 때의 설정이다.
+     이 강의의 2단은 전부 글이라 가운데 정렬이면 짧은 칸이 아래로 밀린다. 위로 맞춘다. */
+  .body > .cols { align-items: flex-start; }
+  .tbl-def { width: 100%; table-layout: fixed; }
+  .tbl-def th:first-child, .tbl-def td:first-child { width: 168px; }
+  .tbl-def td { vertical-align: top; }
+  .tbl-cost { width: 100%; table-layout: fixed; }
+  .tbl-cost th:first-child, .tbl-cost td:first-child { width: 132px; }
+  .tbl-cost td:last-child, .tbl-cost th:last-child { text-align: right; width: 150px; font-variant-numeric: tabular-nums; }
+  .epigraph { font-style: normal; color: var(--ink-2); }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+  /* 판독이 안 된 교재 쪽을 표시하는 자리 (private/스캔-재촬영-필요.md 참조) */
+  .pending { border: 1.4px dashed var(--rule); border-radius: 12px;
+    padding: 22px 26px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <!-- 46px 표지 제목은 한 줄에 14자 남짓이다. 뜻 단위로 끊는다. -->
+  <h1>1강. 서론과<br>도시경제학의 주요 개념들</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 학습 목표 ═════════════════════════════════════════
+     ※ 문구 미확정 — 확인 후 채운다 -->
+<section>
+  <h2>학습 목표</h2>
+  <div class="body stack">
+    <p class="lead t-define">경제학의 시각으로 도시와 지역을 이해하기 위하여</p>
+    <p class="lead"><span class="mark">도시경제학의 기초개념과 응용이론을 학습</span>하는 것</p>
+  </div>
+</section>
+
+<!-- ══ 3. 주별 강의 내용 ════════════════════════════════════
+     ※ 15주 강의계획서 미확보 — 받는 대로 채운다 -->
+<section>
+  <h2>주별 강의 내용</h2>
+  <div class="body stack">
+    <p class="pending">강의계획서 확정 후 채웁니다.</p>
+  </div>
+</section>
+
+<!-- ══ 4. 평가 방법 ═════════════════════════════════════════
+     ※ 평가 비율 미확보 -->
+<section>
+  <h2>평가 방법</h2>
+  <div class="body stack">
+    <p class="pending">평가 비율 확정 후 채웁니다.</p>
+  </div>
+</section>
+
+<!-- ══ 5. 강의 교재 ═════════════════════════════════════════ -->
+<section>
+  <h2>강의 교재</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">주교재</p>
+    <p class="emph" style="margin-bottom:40px">아서 오설리반(이번송·홍성효·김석영 역), 2022,
+      <span class="mark">오설리반의 도시경제학(제9판)</span>, 박영사.</p>
+    <p class="sub t-red" style="margin-bottom:2px">참고문헌</p>
+    <p class="pending">추후 안내합니다.</p>
+  </div>
+</section>
+
+<!-- ══ 6. 섹션 — PART 01 / CHAPTER 01 ═══════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 01 서론</p>
+  <p class="section-sub">PART 01 서론과 주요 개념들 · 교재 p.3~11</p>
+</section>
+
+<!-- ══ 7. 도시경제학이란 (p.3) ══════════════════════════════ -->
+<section>
+  <h2>도시경제학이란 무엇인가</h2>
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:22px">
+      “도시는 항상 암흑으로 빛과 열을 발사하는 문명의 벽난로이었다.”
+      <span class="who">— 데오도르 파커</span></p>
+    <p class="epigraph emph" style="margin-bottom:34px">
+      “나는 아침에 지구상의 한 도시에서 깨어나기보다는 인적이 없는 벽지에서 깨어나기를 원한다.”
+      <span class="who">— 스티브 맥퀸</span></p>
+    <p class="lead t-define">도시경제학은 <span class="mark">지리학과 경제학의 교차 지점</span>으로 정의된다</p>
+    <p class="emph">경제학과 지리학을 혼합하여, 효용−극대화 가구와 이윤−극대화 기업의 입지선정에 대해 탐구한다</p>
+  </div>
+</section>
+
+<!-- ══ 8. 도시경제학의 네 분야 (p.4) ════════════════════════ -->
+<section>
+  <h2>도시경제학의 네 분야</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>도시생성에 있어서의 시장의 힘</strong> — 도시들이 왜 존재하는가, 어디서 생성되는가,
+        왜 규모와 범주에서 다른가</li>
+      <li><strong>도시 내 토지 이용</strong> — 집중된 도시에서 분산된 도시로의 변화,
+        인종·소득·학력에 따른 거주지 차별, 주택</li>
+      <li><strong>도시교통</strong> — 혼잡문제의 해결책, 도시교통체계에서 대중교통의 역할</li>
+      <li><strong>지방정부, 교육, 그리고 범죄</strong> — 분권화된 지방정부 체계,
+        공립 K−12 교육, 범죄의 통제</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 9. 도시지역의 정의 (p.5) ═════════════════════════════ -->
+<section>
+  <h2>도시지역의 정의</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:8px">도시지역은
+      <span class="mark">상대적으로 작은 지역 내 많은 수의 사람들</span>을 포함하는 지리적 지역</p>
+    <p class="emph" style="margin-bottom:44px">인근 지역의 인구밀도에 비해 상대적으로 높은 밀도를 갖는다</p>
+    <p class="sub t-red" style="margin-bottom:2px">왜 인구밀도로 정의하는가</p>
+    <p class="emph">도시경제의 핵심적인 특성이 <strong>상이한 경제적 행위들 간 빈번한 접촉</strong>인데,
+      기업과 가구가 상대적으로 작은 지역에 집중하는 경우에만 이와 같은 빈번한 접촉이 가능하기 때문이다</p>
+  </div>
+</section>
+
+<!-- ══ 10. 네 개의 핵심 인구통계 정의 (p.5) ═════════════════ -->
+<section>
+  <h2>네 개의 핵심 인구통계 정의</h2>
+  <div class="body">
+    <table class="tbl-def">
+      <thead><tr><th>용어</th><th>정의</th><th>기준</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>도시지역<br><span class="en">urban area</span></td>
+          <td>인구가 밀집하여 살고 있는 지리학적 지역</td>
+          <td>최소 2,500명<br>평방 마일당 500명</td>
+        </tr>
+        <tr>
+          <td>대도시지역<br><span class="en">metropolitan area</span></td>
+          <td>실질적인 인구 핵을 가진 하나의 핵심지역과 이와 경제적으로 통합된 인접 지역공동체들</td>
+          <td>최소 50,000명<br>(2010년 366개)</td>
+        </tr>
+        <tr>
+          <td>소도시지역<br><span class="en">micropolitan area</span></td>
+          <td>보다 작은 형태의 대도시지역</td>
+          <td>10,000 ~ 50,000명<br>(2010년 576개)</td>
+        </tr>
+        <tr>
+          <td>주된 도시<br><span class="en">principal city</span></td>
+          <td>각 대도시·소도시통계지역에서 가장 큰 지방자치시</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 11. 그림 1-1 자리 (p.6) — 스캔 재촬영 대기 ═══════════ -->
+<section>
+  <h2>대도시지역 규모별 인구 분포</h2>
+  <div class="body stack">
+    <p class="pending">교재 p.6 (그림 1−1) 은 스캔 초점이 나가 판독하지 못했습니다.<br>
+      재촬영 후 채웁니다. — <span class="en">private/스캔-재촬영-필요.md</span></p>
+  </div>
+</section>
+
+<!-- ══ 12. 그림 1-2 미국의 도시화 (p.7) ═════════════════════ -->
+<section>
+  <h2>미국 인구의 도시화, 1790 – 2010</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">농촌사회에서 도시사회로의 변화를 이끈 두 가지</p>
+    <p class="caption" style="margin-bottom:4px">① 생산에서의 기술발전이 농업·제조업·서비스업의 노동생산성을 증가시켰다
+      &nbsp;②&nbsp;교통에서의 기술발전이 접근성을 증가시켰다</p>
+    <svg class="fig" id="f-urb-us" viewBox="0 0 700 268" style="width:600px;margin:0 0 0 118px" role="img">
+      <title>1790년 5%에서 2010년 81%까지 꾸준히 올라온 미국 도시인구 비중</title></svg>
+    <p class="caption" style="margin:2px 0 0 118px">자료: 미국 인구조사, 미국 요약: 2010년 인구와 주택수, 2010년 인구주택총조사, 2012
+      &nbsp;·&nbsp;<span class="en">그림 1−2</span></p>
+    <script>
+      (function () {
+        // 교재 그림 1-2 에는 각 점의 수치가 인쇄되어 있지 않다.
+        // 아래 값은 원본 그림에서 눈으로 읽은 근사값이다 (사용자 확인 2026-08-12).
+        // 정확한 수치가 필요하면 미국 인구조사국 원자료로 대체할 것.
+        const DATA = [[1790, 5], [1810, 7], [1830, 9], [1850, 15], [1870, 26], [1890, 35],
+                      [1910, 46], [1930, 56], [1950, 64], [1970, 74], [1990, 75], [2010, 81]];
+        const F = Fig.withBox({ x0: 66, y0: 224, x1: 640, y1: 24 });
+        const S = F.scale({ x: [1790, 2010], y: [0, 90] });
+        F.draw('#f-urb-us', {
+          axes: { x: '연도', y: '도시인구\n비중(%)' },
+          parts: [
+            F.curve(S.curve(DATA), { variant: 'supply' }),
+            ...[0, 22.5, 45, 67.5, 90].map((v) =>
+              F.guide(F.BOX.x0, S.y(v), { ytick: String(v), only: 'y' })),
+            ...DATA.filter((_, i) => i % 2 === 0).map(([yr]) =>
+              F.annot(S.x(yr), F.BOX.y0 + 17, String(yr), { anchor: 'middle', size: 11 })),
+            ...DATA.map(([yr, v]) => F.dot(...S.p([yr, v]), { r: 3.2, on: S.curve(DATA) })),
+            F.annot(S.x(1930), S.y(20), '1930년대와 1970년대에는\n도시화가 거의 정체되었다',
+                    { size: 12, lh: 15, tone: 'red' }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 13. 그림 1-3 세계의 도시화 (p.8) ═════════════════════ -->
+<section>
+  <h2>세계 6대 지역의 도시화, 1950 – 2050</h2>
+  <div class="body">
+    <svg class="fig" id="f-urb-world" viewBox="0 0 720 300" style="width:660px;margin:4px 0 0 92px" role="img">
+      <title>여섯 지역의 도시인구 비율이 모두 상승하며, 2014년 북아메리카 81.5%에서 아프리카 40.0%까지 벌어져 있는 그림</title></svg>
+    <p class="caption" style="margin:2px 0 0 92px">자료: 유엔, 세계도시화전망, 2014, 뉴욕: 유엔, 2016
+      &nbsp;·&nbsp;<span class="en">그림 1−3</span>. 2014년 값만 교재에 인쇄되어 있으며 나머지 궤적은 근사값이다.</p>
+    <script>
+      (function () {
+        // 2014년 값 여섯 개만 교재에 인쇄되어 있다. 1950·2050 끝점은 원본 그림에서
+        // 눈으로 읽은 근사값이다 (사용자 확인 2026-08-12).
+        const R = [
+          { name: '북아메리카',        v: 81.5, y50: 64, y2050: 87, variant: 'supply' },
+          { name: '라틴 아메리카와 캐리비안', v: 79.5, y50: 41, y2050: 86, variant: 'i2' },
+          { name: '유럽',              v: 73.4, y50: 52, y2050: 82, variant: 'demand' },
+          { name: '오세아니아',        v: 70.8, y50: 62, y2050: 74, variant: 'cap' },
+          { name: '아시아',            v: 47.5, y50: 18, y2050: 64, variant: 'i1' },
+          { name: '아프리카',          v: 40.0, y50: 14, y2050: 56, variant: null },
+        ];
+        const F = Fig.withBox({ x0: 62, y0: 244, x1: 470, y1: 22 });
+        const S = F.scale({ x: [1950, 2050], y: [0, 100] });
+        const parts = [];
+        // 절반 기준선
+        parts.push(F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(50)} L${F.BOX.x1},${S.y(50)}"/>`));
+        parts.push(F.raw(`<path class="guide" d="M${S.x(2014)},${F.BOX.y0} L${S.x(2014)},${F.BOX.y1}"/>`));
+        for (const r of R) {
+          r.pts = S.curve([[1950, r.y50], [2014, r.v], [2050, r.y2050]]);
+          parts.push(F.curve(r.pts, r.variant ? { variant: r.variant } : {}));
+        }
+        // 곡선을 색으로만 구분하지 않는다 — 오른쪽에 이름표를 붙인다 (design.md §10).
+        // 2014년 값 81.5·79.5·73.4 가 붙어 있어 그 높이에 그대로 놓으면 글자가 겹친다.
+        // 곡선 끝 높이에서 시작해 최소 간격(17px)만큼 아래로 밀어 낸다.
+        const GAP = 17;
+        let prev = -Infinity;
+        for (const r of R) {
+          let y = S.y(r.y2050) + 4;
+          if (y - prev < GAP) y = prev + GAP;
+          prev = y;
+          const [ex, ey] = r.pts[r.pts.length - 1];
+          parts.push(F.raw(
+            `<path d="M${ex},${ey} L${F.BOX.x1 + 8},${y - 4}" stroke="var(--guide)" ` +
+            `stroke-width="1" fill="none"/>`));
+          parts.push(F.annot(F.BOX.x1 + 12, y, `${r.name}  ${r.v.toFixed(1)}`, { size: 12 }));
+        }
+        [0, 25, 50, 75, 100].forEach((v) =>
+          parts.push(F.guide(F.BOX.x0, S.y(v), { ytick: String(v), only: 'y' })));
+        [1950, 1975, 2000, 2025, 2050].forEach((yr) =>
+          parts.push(F.annot(S.x(yr), F.BOX.y0 + 17, String(yr), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(S.x(2014), F.BOX.y1 - 4, '2014', { anchor: 'middle', size: 11, tone: 'red' }));
+        F.draw('#f-urb-world', { axes: { x: '연도', y: '총 인구의\n비율(%)' }, parts });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 14. 도시인구의 정의 (p.9) ════════════════════════════ -->
+<section>
+  <h2>인구조사는 도시인구를 어떻게 세는가</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 42%">
+        <p class="sub t-red" style="margin-bottom:2px">가장 작은 단위부터</p>
+        <ul>
+          <li><strong>인구조사구역</strong> <span class="en">census block</span><br>
+            수십~수백 명</li>
+          <li><strong>구역집단</strong> <span class="en">block group</span><br>
+            인접한 구역들의 집단</li>
+          <li><strong>인구조사표준지역</strong> <span class="en">census track</span><br>
+            2010년 72,531개, 평균 4,256명<br>
+            약 90%가 1,500~7,500명</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">도시인구 = 두 지역에 사는 모든 사람</p>
+        <table class="tbl-def">
+          <thead><tr><th>구분</th><th>기준</th></tr></thead>
+          <tbody>
+            <tr><td>도시화된 지역<br><span class="en">urbanized area</span></td>
+              <td>핵심 구역집단 1,000명/mi², 주변구역 500명/mi²<br>
+                합계 최소 50,000명 · 2010년 486개</td></tr>
+            <tr><td>도시군집<br><span class="en">urban clusters</span></td>
+              <td>총 인구 2,500 ~ 50,000명<br>2010년 3,087개</td></tr>
+          </tbody>
+        </table>
+        <p class="derive t-red" style="margin-top:10px">→ 2010년 미국 인구의 81%가 도시지역에 거주</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 15. CBSA (p.10~11) ═══════════════════════════════════ -->
+<section>
+  <h2>중심−기반 통계지역 <span class="en">(CBSA)</span></h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">개별 CBSA 는 적어도 10,000명의 인구를 갖는 적어도 하나의 도시지역을 포함하며,
+      대도시지역 혹은 소도시지역으로 지명된다</p>
+    <p class="caption" style="margin-bottom:10px">기초적 구성요소는 <strong>군(county)</strong>이다.
+      중심의 군은 적어도 5,000명 혹은 인구의 50%가 인구 10,000명 이상의 도시지역에 거주하는 곳이다.</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">변두리 군이 포함되는 조건</p>
+        <p>변두리 군 노동자의 <strong>25% 이상</strong>이 중심의 군에서 일하거나,
+          변두리 군 일자리의 <strong>25% 이상</strong>이 중심의 군 주민으로 채워질 것</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">주된 도시와 명칭</p>
+        <p style="margin-bottom:4px">가장 큰 지방자치시가 주된 도시. 인구 25만명 이상이고
+          노동자 10만명 이상이면 추가로 자격을 얻는다</p>
+        <p class="caption">예. 미네아폴리스−세인트 폴−블루밍턴, MN−WI</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:8px">→ CBSA 전체가 국가 인구의 94% (대도시 84% + 소도시 10%).
+      도시지역 81% 를 넘는 것은 군 전체를 포괄하기 때문이다</p>
+  </div>
+</section>
+
+<!-- ══ 16. 섹션 — CHAPTER 02 ════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 02 도시경제학의 주요 개념들</p>
+  <p class="section-sub">교재 p.13~33</p>
+</section>
+
+<!-- ══ 17. 여섯 개념 (p.13) ═════════════════════════════════ -->
+<section>
+  <h2>미시경제학으로부터의 여섯 개념</h2>
+  <div class="body">
+    <p class="epigraph caption" style="margin-bottom:14px">
+      텐트 안에서 두 야영객은 바스락거리는 곰의 소리에 깨어났다. 야영객 A는 조용히 그의 운동화를 신고 스트레칭을 시작한다.<br>
+      B: 너 뭐하니? 너는 굶주린 곰보다 빨리 뛸 수 없어. &nbsp;/&nbsp; A: 곰보다 빨리 뛸 필요는 없어. 단지 너보다 빨리 뛰면 돼.</p>
+    <ol class="dense">
+      <li>기회비용</li>
+      <li>한계의 원리</li>
+      <li>내쉬균형</li>
+      <li>비교정학</li>
+      <li>파레토 효율성</li>
+      <li>자기−강화적 변화들</li>
+    </ol>
+    <p class="derive t-red" style="margin-top:6px">→ 여섯 번째만 도시경제학에 특정되고,
+      앞의 다섯은 경제학의 많은 다른 분야에서도 이용된다</p>
+  </div>
+</section>
+
+<!-- ══ 18. 기회비용 (p.13~14) ═══════════════════════════════ -->
+<section>
+  <h2>기회비용 <span class="en">(opportunity cost)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:8px">자원 이용의 기회비용은
+      <span class="mark">해당 자원의 차선의 이용에서의 가치</span>에 해당한다</p>
+    <p class="emph" style="margin-bottom:44px">무언가의 기회비용은 이것을 얻기 위해 희생해야 하는 것이다</p>
+    <p class="sub t-red" style="margin-bottom:2px">예</p>
+    <p class="emph">이 장을 읽는 것의 기회비용 = 당신의 시간의 차선의 이용에서의 가치<br>
+      군인 한 명의 기회비용 = 과학선생님의 가치<br>
+      탱크 한 대의 기회비용 = <strong>자전거 12,000개</strong> (6백만달러 탱크 대 500달러 자전거)</p>
+  </div>
+</section>
+
+<!-- ══ 19. 고층 건물의 경제적 비용 (p.14~15) ════════════════ -->
+<section>
+  <h2>명시적 비용과 암묵적 비용</h2>
+  <div class="body">
+    <p class="caption" style="margin-bottom:6px">도시에서 고층 건물을 짓는 데 1년이 걸리는 기업</p>
+    <table class="tbl-cost">
+      <thead><tr><th>구분</th><th>항목</th><th>기회비용</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="2">명시적 비용</td>
+          <td>건설노동자 500명 × 60,000달러</td><td>3,000만 달러</td></tr>
+        <tr><td>콘크리트·철강·유리 등 건설자재</td><td>1억 달러</td></tr>
+        <tr><td rowspan="2">암묵적 비용</td>
+          <td>기업가 시간 — 파트너 5명 × 200,000달러</td><td>100만 달러</td></tr>
+        <tr><td>기업가 자금 — 2억 달러 × 연 10%</td><td>2,000만 달러</td></tr>
+      </tbody>
+    </table>
+    <p class="derive t-red" style="margin-top:10px">→ 명시적 비용은 <strong>명시적 금전적 지불</strong>을 수반하고,
+      암묵적 비용은 그렇지 않다. 둘 다 기회비용이다</p>
+  </div>
+</section>
+
+<!-- ══ 20. 한계의 원리 (p.15) ═══════════════════════════════ -->
+<section>
+  <h2>한계의 원리</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:8px">
+      <span class="mark">한계편익이 한계비용과 일치하는 수준</span>의 행위를 선택하라</p>
+    <p class="emph" style="margin-bottom:44px">한계편익이 한계비용을 초과한다면 그 행위를 더 하라</p>
+    <p class="derive t-red">→ 의사결정자는 한계편익이 한계비용과 일치할 때까지 그 행위의 수준을 증가시켜야 한다</p>
+  </div>
+</section>
+
+<!-- ══ 21. 그림 2-1 한계의 원리 (p.16~17) ═══════════════════ -->
+<section class="s-split">
+  <h2>건물을 몇 층으로 지을 것인가</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">한계편익 — 우하향하는 이유</p>
+      <p style="margin-bottom:24px">추가적인 층으로부터 걷히는 임대료.
+        보다 높은 건물이 수직이동(계단과 승강기)에 보다 많은 공간을 쓰므로
+        임대가능 공간이 줄어, 총 임대수입은 <strong>감소하는 비율로</strong> 증가한다</p>
+      <p class="sub t-red" style="margin-bottom:2px">한계비용 — 우상향하는 이유</p>
+      <p style="margin-bottom:24px">추가로 1층을 짓는 건축비용.
+        보다 높은 건물이 보다 집중된 중량을 지지하기 위해 보다 많은 보강을 요구하므로,
+        건축비용은 <strong>증가하는 비율로</strong> 증가한다</p>
+      <p class="derive t-red">→ 21층을 추가하는 비용이 그 층의 임대료 수입을 초과하므로
+        이 기업은 20층에서 멈춘다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-marginal" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>우하향하는 한계편익과 우상향하는 한계비용이 20층에서 만나는 그림</title></svg>
+      <script>
+        (function () {
+          // 관계식에서 유도한다 (design.md §6.4). 손좌표를 쓰지 않는다.
+          //   MB(q) = 11 − 0.25q      → MB(20) = 6
+          //   MC(q) = 2.8 + 0.008q²   → MC(20) = 6
+          const MB = (q) => 11 - 0.25 * q;
+          const MC = (q) => 2.8 + 0.008 * q * q;
+          const F = Fig.withBox({ x0: 62, y0: 254, x1: 408, y1: 26 });
+          const S = F.scale({ x: [0, 30], y: [0, 12] });
+          const samp = (f, a, b) => {
+            const o = [];
+            for (let i = 0; i <= 60; i++) { const q = a + ((b - a) * i) / 60; o.push([q, f(q)]); }
+            return S.curve(o);
+          };
+          const mb = samp(MB, 0, 29), mc = samp(MC, 0, 29);
+          const a = Fig.cross(mb, mc);
+          F.draw('#f-marginal', {
+            axes: { x: '건축물 높이(층)', y: '달러\n(백만)' },
+            parts: [
+              F.curve(mb, { variant: 'demand' }),
+              F.curve(mc, { variant: 'supply' }),
+              F.annot(S.x(24.5), S.y(3.9), '한계편익', { size: 13, tone: 'blue' }),
+              F.annot(S.x(23), S.y(9.4), '한계비용', { size: 13, tone: 'red' }),
+              F.guide(a[0], a[1], { xtick: '20', ytick: '6' }),
+              F.dot(a[0], a[1], { label: 'a', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 22. 한계의 원리는 어디에 쓰이는가 (p.17) ═════════════ -->
+<section>
+  <h2>한계의 원리는 어디에 쓰이는가</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">가구</p>
+        <p style="margin-bottom:26px">거주지 선정 · 지역 선거에서 어떻게 투표할 것인가</p>
+        <p class="sub t-red" style="margin-bottom:2px">기업</p>
+        <p>얼마나 많은 생산물을 생산할 것인가 · 얼마나 많은 노동자를 고용할 것인가
+          · 생산시설을 어디에 위치할 것인가</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">지방정부</p>
+        <p style="margin-bottom:26px">얼마나 많은 교사를 고용할 것인가
+          · 공공안전에 얼마나 많은 자원을 이용할 것인가</p>
+        <p class="sub t-red" style="margin-bottom:2px">도시 교통체계</p>
+        <p>운전자 — 얼마나 빨리 달릴 것인가<br>
+          교통당국 — 얼마나 많은 버스를 운영하고 얼마의 요금을 부과할 것인가</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 23. 내쉬균형 (p.17) ══════════════════════════════════ -->
+<section>
+  <h2>내쉬균형 <span class="en">(Nash equilibrium)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:8px">
+      <span class="mark">일방적인 이탈에 대한 유인이 존재하지 않는다</span></p>
+    <p class="emph" style="margin-bottom:44px">다른 참여자들에 의한 선택이 주어진 상태에서
+      어느 의사결정자도 그 혹은 그녀의 행동을 바꾸고자 하는 유인이 없다면, 내쉬균형을 얻는다</p>
+    <p class="sub t-red" style="margin-bottom:2px">보다 일상적인 용어로</p>
+    <p class="emph">만일 <strong>후회가 존재하지 않는다면</strong> — 다른 참여자들의 선택이 주어진 상태에서
+      어느 한 의사결정자도 그가 다른 선택을 했더라면이라고 바라지 않는다면 — 내쉬균형을 얻는다</p>
+  </div>
+</section>
+
+<!-- ══ 24. 그림 2-2 시장균형 (p.18) ═════════════════════════ -->
+<section class="s-split">
+  <h2>공급과 수요모형에서의 내쉬균형</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:20px">핵심 가정: 소비자와 생산자 모두
+        <span class="mark">가격수용자</span>다</p>
+      <p style="margin-bottom:22px">어느 한 참여자도 선호하는 방향으로 시장가격을 이동시킬 수 없다.
+        기업은 생산을 줄여 가격을 올릴 수 없고, 소비자는 덜 소비해 가격을 낮출 수 없다</p>
+      <p class="sub t-red" style="margin-bottom:2px">개별 기업</p>
+      <p style="margin-bottom:16px">주어진 시장가격에서 자신이 할 수 있는 최선을 하고 있으므로
+        생산량을 일방적으로 바꿀 유인이 없다</p>
+      <p class="sub t-red" style="margin-bottom:2px">개별 소비자</p>
+      <p>마찬가지로 구매량을 일방적으로 바꿀 유인이 없다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-eq" viewBox="0 0 460 300" style="width:420px" role="img">
+        <title>신규 주택의 수요곡선과 공급곡선이 200채·30만달러에서 만나는 그림</title></svg>
+      <script>
+        (function () {
+          // D: P = 500 − Q,  S: P = 100 + Q   → 교차 (200, 300)
+          const F = Fig.withBox({ x0: 66, y0: 254, x1: 400, y1: 26 });
+          const S = F.scale({ x: [0, 400], y: [0, 600] });
+          const D = S.curve([[60, 440], [380, 120]]);
+          const SS = S.curve([[60, 160], [380, 480]]);
+          const e = Fig.cross(D, SS);
+          F.draw('#f-eq', {
+            axes: { x: '주택', y: '1,000달러' },
+            parts: [
+              // design.md §3.3 — 수요는 파랑, 공급은 크림슨
+              F.curve(D, { variant: 'demand' }), F.curve(SS, { variant: 'supply' }),
+              F.annot(S.x(96), S.y(470), '수요', { size: 13, tone: 'blue' }),
+              F.annot(S.x(330), S.y(500), '공급', { size: 13, tone: 'red' }),
+              F.guide(e[0], e[1], { xtick: '200', ytick: '300' }),
+              F.dot(e[0], e[1], { label: 'a', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 25. 그림 2-3 불균형 (p.19) — fragment 2단계 ══════════ -->
+<section class="s-split">
+  <h2>불균형에서는 이탈할 유인이 있다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red fragment fade-in" data-fragment-index="0" style="margin-bottom:2px">초과공급 — 42만달러</p>
+      <p class="fragment fade-in" data-fragment-index="0" style="margin-bottom:26px">
+        수요곡선의 점 b 와 공급곡선의 점 c 의 차이.
+        42만달러에 팔고자 하는 기업들이 소비자를 찾지 못한다.
+        <strong>기업은 가격을 일방적으로 깎을 유인</strong>을 갖는다</p>
+      <p class="sub t-red fragment fade-in" data-fragment-index="1" style="margin-bottom:2px">초과수요 — 21만달러</p>
+      <p class="fragment fade-in" data-fragment-index="1" style="margin-bottom:26px">
+        공급곡선의 점 d 와 수요곡선의 점 e 의 차이.
+        21만달러에 사고자 하는 소비자들이 건설할 기업을 찾지 못한다.
+        <strong>소비자는 보다 높은 가격을 제안할 유인</strong>을 갖는다</p>
+      <p class="derive t-red fragment fade-in" data-fragment-index="1">→ 두 경우 모두 이탈의 유인이 있으므로
+        내쉬균형이 아니다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-diseq" viewBox="0 0 460 300" style="width:420px" role="img">
+        <title>균형가격 위에서는 초과공급, 아래에서는 초과수요가 생기는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 66, y0: 254, x1: 400, y1: 26 });
+          const S = F.scale({ x: [0, 400], y: [0, 600] });
+          const D = S.curve([[60, 440], [380, 120]]);
+          const SS = S.curve([[60, 160], [380, 480]]);
+          const e = Fig.cross(D, SS);
+          // P = 420 → D: Q=80, S: Q=320   /   P = 210 → S: Q=110, D: Q=290
+          const b = Fig.at(D, { y: S.y(420) }), c = Fig.at(SS, { y: S.y(420) });
+          const d = Fig.at(SS, { y: S.y(210) }), f = Fig.at(D, { y: S.y(210) });
+          F.draw('#f-diseq', {
+            axes: { x: '주택', y: '1,000달러' },
+            parts: [
+              F.curve(D, { variant: 'demand' }), F.curve(SS, { variant: 'supply' }),
+              F.annot(S.x(96), S.y(470), '수요', { size: 12, tone: 'blue' }),
+              F.annot(S.x(336), S.y(500), '공급', { size: 12, tone: 'red' }),
+              F.guide(e[0], e[1], { xtick: '200', ytick: '300' }),
+              F.dot(e[0], e[1], { label: 'a', lx: 9, ly: 13 }),
+
+              F.raw(`<path class="guide" d="M${F.BOX.x0},${b[1]} L${c[0]},${b[1]}"/>`, { fragment: 0 }),
+              F.annot(F.BOX.x0 - 8, b[1] + 4, '420', { anchor: 'end', size: 11, fragment: 0 }),
+              F.dot(...b, { label: 'b', lx: -16, ly: -8, fragment: 0 }),
+              F.dot(...c, { label: 'c', lx: 8, ly: -8, fragment: 0 }),
+              F.arrow(b[0] + 5, b[1], c[0] - 5, b[1], { tone: 'red', fragment: 0 }),
+              F.annot((b[0] + c[0]) / 2, b[1] - 10, '초과공급',
+                      { anchor: 'middle', size: 13, tone: 'red', fragment: 0 }),
+
+              F.raw(`<path class="guide" d="M${F.BOX.x0},${d[1]} L${f[0]},${d[1]}"/>`, { fragment: 1 }),
+              F.annot(F.BOX.x0 - 8, d[1] + 4, '210', { anchor: 'end', size: 11, fragment: 1 }),
+              F.dot(...d, { label: 'd', lx: -16, ly: 15, fragment: 1 }),
+              F.dot(...f, { label: 'e', lx: 8, ly: 15, fragment: 1 }),
+              F.arrow(d[0] + 5, d[1], f[0] - 5, d[1], { tone: 'blue', fragment: 1 }),
+              F.annot((d[0] + f[0]) / 2, d[1] + 22, '초과수요',
+                      { anchor: 'middle', size: 13, tone: 'blue', fragment: 1 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 26. 그림 2-4 해변에서의 내쉬균형 (p.20~21) — fragment 3단계 ══ -->
+<section>
+  <h2>해변에서의 내쉬균형</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">11블록 길이의 해변, 블록마다 소비자 한 명.
+      두 노점상 레프티와 라이티. 개별 소비자는 <strong>가장 가까운 노점상</strong>을 애용한다</p>
+    <svg class="fig" id="f-beach" viewBox="0 0 720 258" style="width:640px;margin:6px 0 0 90px" role="img">
+      <title>두 노점상이 각자 중위입지인 블록 6으로 옮겨 가는 세 단계 그림</title></svg>
+    <script>
+      (function () {
+        // 오른쪽 240px 은 단계별 설명 문구 자리로 비워 둔다 (viewBox 720)
+        const F = Fig.withBox({ x0: 56, y0: 236, x1: 462, y1: 20 });
+        const S = F.scale({ x: [0.5, 11.5], y: [0, 3] });
+        const W = S.x(1.5) - S.x(0.5);          // 블록 한 칸의 폭
+        const ROWS = [
+          { y: 2.55, L: 3, R: 9, cut: 6,   note: '초기 — 각자 자기 시장의 중심' },
+          { y: 1.55, L: 6, R: 9, cut: 7.5, note: '레프티가 중위입지로 이동 → 7명 대 4명' },
+          { y: 0.55, L: 6, R: 6, cut: 6,   note: '라이티도 중위입지로 → 내쉬균형' },
+        ];
+        const parts = [];
+        ROWS.forEach((r, i) => {
+          const y = S.y(r.y), h = 17;
+          const x0 = S.x(0.5), x1 = S.x(11.5), xc = S.x(r.cut);
+          // 시장구역: 왼쪽(레프티) 은 잉크, 오른쪽(라이티) 은 파랑
+          parts.push(F.raw(
+            `<rect x="${x0}" y="${y - h}" width="${xc - x0}" height="${h}" fill="var(--ink)" fill-opacity="0.18"/>` +
+            `<rect x="${xc}" y="${y - h}" width="${x1 - xc}" height="${h}" fill="var(--chart-blue)" fill-opacity="0.22"/>` +
+            `<path d="M${x0},${y} L${x1},${y}" stroke="var(--ink)" stroke-width="1" fill="none"/>`,
+            { fragment: i }));
+          // 셋째 단계에서는 둘이 같은 블록에 서므로 이름표를 하나로 합친다
+          if (r.L === r.R) {
+            parts.push(F.annot(S.x(r.L), y - h - 8, '레프티 · 라이티',
+                               { anchor: 'middle', size: 12, tone: 'red', fragment: i }));
+          } else {
+            parts.push(F.annot(S.x(r.L), y - h - 8, '레프티',
+                               { anchor: 'middle', size: 12, fragment: i }));
+            parts.push(F.annot(S.x(r.R), y - h - 8, '라이티',
+                               { anchor: 'middle', size: 12, tone: 'blue', fragment: i }));
+          }
+          parts.push(F.raw(
+            `<path d="M${S.x(r.L)},${y - h - 5} L${S.x(r.L)},${y}" stroke="var(--ink)" stroke-width="2"/>` +
+            `<path d="M${S.x(r.R)},${y - h - 5} L${S.x(r.R)},${y}" stroke="var(--chart-blue)" stroke-width="2"/>`,
+            { fragment: i }));
+          parts.push(F.annot(x1 + 8, y - 5, r.note, { size: 11, fragment: i }));
+        });
+        for (let b = 1; b <= 11; b++)
+          parts.push(F.annot(S.x(b), F.BOX.y0 + 16, String(b), { anchor: 'middle', size: 11 }));
+        parts.push(F.annot(F.BOX.x1 + 10, F.BOX.y0 + 16, '입지', { size: 11 }));
+        F.draw('#f-beach', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:4px">→ 중위입지에서 이탈하는 노점상은
+      다수의 소비자로부터 멀어지고 소수에게 가까워져 손해를 본다. 그래서 둘 다 움직이지 않는다</p>
+  </div>
+</section>
+
+<!-- ══ 27. 내쉬균형과 가격의 공간적 변화 (p.21~22) ══════════ -->
+<section>
+  <h2>내쉬균형과 가격의 공간적 변화</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:14px">가격은 상이한 환경에서
+      <span class="mark">동일한 효용수준</span>을 낳도록 조정된다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">주택시장 — 해변가 대 고속도로 옆</p>
+        <p style="margin-bottom:22px">같은 값이면 둘 다 해변가를 원한다.
+          동전을 던져 정하면 진 사람이 이사할 유인을 가지므로 내쉬균형이 아니다.
+          해변가에 살기 위해 <strong>300달러</strong>를 희생할 용의가 있다면
+          해변가 주택의 균형가격은 300달러 높다</p>
+        <p class="sub t-red" style="margin-bottom:2px">노동시장 — 덜스빌 대 쿨스빌</p>
+        <p>월임금 <strong>500달러</strong> 차이가 사회적 환경의 차이를 완전히 보상한다면,
+          균형임금은 쿨스빌에서 500달러 낮다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">도시 안에서도 같다</p>
+        <p style="margin-bottom:22px">노동자는 통근비용이 높은 곳에서 일할 수 있게 하는
+          <strong>추가적인 임금</strong>을 요구한다</p>
+        <p class="sub t-red" style="margin-bottom:2px">토지시장</p>
+        <p>제조업체 — 항만과 고속도로에 대한 빠른 접근이 운송비용을 줄이므로
+          공업용 토지가격은 그 인근에서 가장 높다<br>
+          사무기업 — 중심 입지가 정보에 대한 빠른 접근을 주므로 더 많이 지불할 용의가 있다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 28. 비교정학 (p.22~23) ═══════════════════════════════ -->
+<section>
+  <h2>비교정학 <span class="en">(comparative statics)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:38px">경제적 상황에서의 변화에 대한
+      의사결정자들과 시장의 반응을 예측한다</p>
+    <div class="def-row">
+      <div class="def-tag">선택변수에<br>대한 비교정학</div>
+      <div>
+        <p>모수 값의 변화가 <strong>선택변수</strong>의 값에 미치는 효과.
+          선택환경에서 모수는 그 값이 주어진 변수다</p>
+        <p class="caption">예. 강철가격(모수)의 증가 → 이윤을 극대화하는 건물의 높이(선택변수)를 감소</p>
+      </div>
+    </div>
+    <div class="def-row" style="margin-top:26px">
+      <div class="def-tag">균형변수에<br>대한 비교정학</div>
+      <div>
+        <p>모수 값의 변화가 <strong>균형변수</strong>의 값에 미치는 효과.
+          시장환경에서 모수는 그 값이 분석대상 시장 밖에서 결정되는 변수다</p>
+        <p class="caption">예. 농약가격(모수)의 증가 → 사과의 균형가격(균형변수)을 증가</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 29. 그림 2-5 선택변수 비교정학 (p.23~24) — fragment ══ -->
+<section class="s-split">
+  <h2>비교정학: 선택변수</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">1. 초기 철강가격</p>
+      <p style="margin-bottom:26px">한계비용곡선이 한계편익곡선을 만나는 점 a 에서
+        한계의 원리가 충족한다. 이윤극대화 높이는 <strong>20층</strong></p>
+      <p class="sub t-red fragment fade-in" data-fragment-index="0" style="margin-bottom:2px">2. 보다 낮은 철강가격</p>
+      <p class="fragment fade-in" data-fragment-index="0" style="margin-bottom:26px">
+        강철가격의 감소는 한계비용을 감소시켜 곡선을 아래로 이동시킨다.
+        점 b 에서 충족하여 이윤극대화 높이는 <strong>24층</strong>으로 증가한다</p>
+      <p class="derive t-red fragment fade-in" data-fragment-index="0">
+        → 강철가격(모수)과 건물높이(선택변수) 사이에 <strong>음(−)의 관계</strong>가 있다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-cs-choice" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>한계비용곡선이 아래로 이동해 이윤극대화 높이가 20층에서 24층으로 늘어나는 그림</title></svg>
+      <script>
+        (function () {
+          // 그림 2-1 과 같은 관계식을 쓴다. MC 만 아래로 옮긴다.
+          //   MB(q)  = 11 − 0.25q            → MB(20)=6, MB(24)=5
+          //   MC1(q) = 2.8  + 0.008q²        → MC1(20)=6
+          //   MC2(q) = 0.392 + 0.008q²       → MC2(24)=5
+          const MB = (q) => 11 - 0.25 * q;
+          const MC1 = (q) => 2.8 + 0.008 * q * q;
+          const MC2 = (q) => 0.392 + 0.008 * q * q;
+          const F = Fig.withBox({ x0: 62, y0: 254, x1: 408, y1: 26 });
+          const S = F.scale({ x: [0, 30], y: [0, 12] });
+          const samp = (f) => {
+            const o = [];
+            for (let i = 0; i <= 60; i++) { const q = (29 * i) / 60; o.push([q, f(q)]); }
+            return S.curve(o);
+          };
+          const mb = samp(MB), mc1 = samp(MC1), mc2 = samp(MC2);
+          const a = Fig.cross(mb, mc1), b = Fig.cross(mb, mc2);
+          F.draw('#f-cs-choice', {
+            axes: { x: '높이(층)', y: '달러\n(백만)' },
+            parts: [
+              F.curve(mb, { variant: 'demand' }),
+              F.curve(mc1, { variant: 'supply' }),
+              // 곡선 셋이 오른쪽 위에 모이므로 라벨 자리를 미리 갈라 놓는다
+              F.annot(S.x(10), S.y(7.4), '한계편익', { size: 12, tone: 'blue', anchor: 'end' }),
+              F.annot(S.x(29), S.y(10.6), '초기 한계비용', { size: 12, tone: 'red', anchor: 'end' }),
+              F.guide(a[0], a[1], { xtick: '20', ytick: '6' }),
+              F.dot(a[0], a[1], { label: 'a', lx: -16, ly: -8 }),
+
+              // 이동 후 곡선은 같은 색의 파선으로 둔다 — 같은 뜻의 곡선이기 때문이다
+              F.curve(mc2, { variant: 'supply', dash: '7 5', fragment: 0 }),
+              F.annot(S.x(29), S.y(8.4), '새로운 한계비용',
+                      { size: 12, tone: 'red', anchor: 'end', fragment: 0 }),
+              F.guide(b[0], b[1], { xtick: '24', ytick: '5', fragment: 0 }),
+              F.dot(b[0], b[1], { label: 'b', lx: 8, ly: -8, fragment: 0 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 30. 그림 2-6 공급의 변화 (p.25) ══════════════════════ -->
+<section class="s-split">
+  <h2>비교정학: 공급에서의 변화</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:24px">목수 임금(모수)의 증가가
+        신규주택의 균형가격(균형변수)에 미치는 효과</p>
+      <p class="sub t-red" style="margin-bottom:2px">1. 초기 균형: 점 a</p>
+      <p style="margin-bottom:26px">임금이 상대적으로 낮고, <strong>300,000달러</strong>의 균형주택가격을 창출한다</p>
+      <p class="sub t-red" style="margin-bottom:2px">2. 새로운 균형: 점 b</p>
+      <p style="margin-bottom:26px">목수 임금의 증가는 주택 생산비용을 증가시켜 공급곡선을 위로 이동시킨다.
+        균형가격은 <strong>340,000달러</strong>로 오르고 균형수량은 200에서 150으로 줄어든다</p>
+      <p class="derive t-red">→ 목수 임금과 주택가격 사이에 <strong>정(+)의 관계</strong>가 있다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-cs-supply" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>공급곡선이 위로 이동해 균형가격이 30만에서 34만달러로 오르는 그림</title></svg>
+      <script>
+        (function () {
+          // D: P = 460 − 0.8Q   S1: P = 100 + Q   S2: P = 190 + Q
+          //   D∩S1 = (200, 300)   D∩S2 = (150, 340)
+          const F = Fig.withBox({ x0: 66, y0: 254, x1: 404, y1: 26 });
+          const S = F.scale({ x: [0, 400], y: [0, 600] });
+          const D = S.curve([[40, 428], [390, 148]]);
+          const S1 = S.curve([[40, 140], [390, 490]]);
+          const S2 = S.curve([[20, 210], [340, 530]]);
+          const a = Fig.cross(D, S1), b = Fig.cross(D, S2);
+          F.draw('#f-cs-supply', {
+            axes: { x: '주택', y: '천달러' },
+            parts: [
+              F.curve(D, { variant: 'demand' }),
+              F.curve(S1, { variant: 'supply' }),
+              F.curve(S2, { variant: 'supply', dash: '7 5' }),
+              F.annot(S.x(78), S.y(455), '수요', { size: 12, tone: 'blue' }),
+              F.annot(S.x(392), S.y(482), '초기 공급', { size: 12, tone: 'red', anchor: 'end' }),
+              F.annot(S.x(336), S.y(566), '공급: 보다 높은 임금',
+                      { size: 12, tone: 'red', anchor: 'end' }),
+              F.guide(a[0], a[1], { xtick: '200', ytick: '300' }),
+              F.guide(b[0], b[1], { xtick: '150', ytick: '340' }),
+              F.dot(a[0], a[1], { label: 'a', lx: 8, ly: 14 }),
+              F.dot(b[0], b[1], { label: 'b', lx: -16, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 31. 그림 2-7 수요의 변화 (p.26) ══════════════════════ -->
+<section class="s-split">
+  <h2>비교정학: 수요의 변화</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:24px">도시의 인구 증가(모수)가
+        신규주택의 균형가격(균형변수)에 미치는 효과</p>
+      <p class="sub t-red" style="margin-bottom:2px">1. 초기 균형: 점 a</p>
+      <p style="margin-bottom:26px">균형가격은 <strong>300,000달러</strong>이고 균형수량은 주택 <strong>200채</strong>다</p>
+      <p class="sub t-red" style="margin-bottom:2px">2. 새로운 균형: 점 b</p>
+      <p style="margin-bottom:26px">인구 증가는 신규주택 수요를 증가시켜 수요곡선을 우측으로 이동시킨다.
+        균형가격은 <strong>340,000달러</strong>로, 균형수량은 <strong>250채</strong>로 늘어난다</p>
+      <p class="derive t-red">→ 도시 인구와 주택가격 사이에 <strong>정(+)의 관계</strong>가 있다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-cs-demand" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>수요곡선이 오른쪽으로 이동해 균형가격과 균형수량이 함께 오르는 그림</title></svg>
+      <script>
+        (function () {
+          // S: P = 140 + 0.8Q   D1: P = 500 − Q   D2: P = 590 − Q
+          //   S∩D1 = (200, 300)   S∩D2 = (250, 340)
+          const F = Fig.withBox({ x0: 66, y0: 254, x1: 404, y1: 26 });
+          const S = F.scale({ x: [0, 400], y: [0, 600] });
+          const SS = S.curve([[40, 172], [390, 452]]);
+          const D1 = S.curve([[40, 460], [390, 110]]);
+          const D2 = S.curve([[100, 490], [400, 190]]);
+          const a = Fig.cross(SS, D1), b = Fig.cross(SS, D2);
+          F.draw('#f-cs-demand', {
+            axes: { x: '주택', y: '천달러' },
+            parts: [
+              F.curve(SS, { variant: 'supply' }),
+              F.curve(D1, { variant: 'demand' }),
+              F.curve(D2, { variant: 'demand', dash: '7 5' }),
+              F.annot(S.x(392), S.y(470), '공급', { size: 12, tone: 'red', anchor: 'end' }),
+              F.annot(S.x(44), S.y(492), '초기수요', { size: 12, tone: 'blue' }),
+              F.annot(S.x(126), S.y(566), '수요: 인구 증가', { size: 12, tone: 'blue' }),
+              F.guide(a[0], a[1], { xtick: '200', ytick: '300' }),
+              F.guide(b[0], b[1], { xtick: '250', ytick: '340' }),
+              F.dot(a[0], a[1], { label: 'a', lx: -16, ly: 14 }),
+              F.dot(b[0], b[1], { label: 'b', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 32. 파레토 효율성 (p.27) ═════════════════════════════ -->
+<section>
+  <h2>파레토 효율성 <span class="en">(Pareto efficiency)</span></h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:30px">간단한 사고실험에 기초한다 —
+      자원의 초기 배분에서 출발해, 보다 더 나아질 수 있는가?</p>
+    <p class="lead t-define" style="margin-bottom:34px">파레토 개선:
+      <span class="mark">어느 한 사람에 대해서도 이전에 비해 악화시킴이 없이
+      적어도 한 사람을 개선시키는 자원의 재분배</span></p>
+    <p class="emph" style="margin-bottom:6px">만일 파레토 개선이 <strong>존재하면</strong> 배분은 파레토 <strong>비효율적</strong>이다</p>
+    <p class="emph">만일 파레토 개선이 <strong>존재하지 않으면</strong> 배분은 파레토 <strong>효율적</strong>이다</p>
+  </div>
+</section>
+
+<!-- ══ 33. 그림 2-8 섬경제 (p.27) ═══════════════════════════ -->
+<section>
+  <h2>교환경제에서의 파레토 효율성</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:4px">섬경제는 두 사람 에이브와 비 사이에 나눌 <strong>코코넛 12개</strong>를 가지고 있다.
+      어떠한 재분배도 다른 사람의 비용으로 한 사람을 부유하게 만든다</p>
+    <svg class="fig" id="f-island" viewBox="0 0 660 172" style="width:620px;margin:16px 0 0 108px" role="img">
+      <title>코코넛 12개를 에이브와 비가 나누는 네 배분이 모두 파레토 효율적임을 보이는 수직선</title></svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 70, y0: 78, x1: 520, y1: 40 });
+        const S = F.scale({ x: [0, 12], y: [0, 1] });
+        const P = [
+          { q: 0,  n: 'b' }, { q: 3,  n: 'c' },
+          { q: 6,  n: 'm' }, { q: 12, n: 'a' },
+        ];
+        const y = F.BOX.y0;
+        const parts = [
+          F.raw(`<path d="M${S.x(0)},${y} L${S.x(12)},${y}" stroke="var(--ink)" stroke-width="2.4" fill="none"/>`),
+        ];
+        for (const { q, n } of P) {
+          parts.push(F.dot(S.x(q), y, { free: true, r: 5 }));
+          parts.push(F.annot(S.x(q), y - 14, n, { anchor: 'middle', size: 14 }));
+          parts.push(F.annot(S.x(q), y + 22, String(q), { anchor: 'middle', size: 13 }));
+          parts.push(F.annot(S.x(q), y + 44, String(12 - q), { anchor: 'middle', size: 13 }));
+        }
+        parts.push(F.annot(S.x(12) + 22, y + 22, '에이브가 가진 코코넛', { size: 13 }));
+        parts.push(F.annot(S.x(12) + 22, y + 44, '비가 가진 코코넛', { size: 13 }));
+        F.draw('#f-island', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:8px">→ 점 c 에서 에이브가 3개에서 4개로 가려면
+      비가 9개에서 8개로 가야 한다. 어떤 변화도 누군가에게 해를 끼치므로
+      <strong>모든 배분이 파레토 효율적</strong>이다</p>
+  </div>
+</section>
+
+<!-- ══ 34. 효율성과 형평성, 그리고 바나나 (p.28) ════════════ -->
+<section>
+  <h2>효율성은 형평성이 아니다</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">코코넛의 50 대 50 분할은 공정성의 이유에서 매력적이겠지만,
+      <span class="mark">균등배분은 많은 효율적 배분들 가운데 하나</span>일 뿐이다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">두 번째 재화를 더하면</p>
+        <p style="margin-bottom:12px">비가 코코넛 12개를, 에이브가 바나나 12개를 갖고 시작한다.
+          둘 다 소비에서의 다양성을 선호한다면 <strong>파레토 개선이 존재한다</strong></p>
+        <p class="caption">에이브: 코코넛 1개를 위해 바나나 3개까지 지불할 용의<br>
+          비: 코코넛 1개를 내주고 바나나 1개를 받을 용의<br>
+          → 차이를 절반씩 절충해 <strong>바나나 2개와 코코넛 1개</strong>를 교환</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">둘 다 나아진다</p>
+        <p style="margin-bottom:20px">에이브 — 3개까지 낼 용의였는데 2개만 냈다<br>
+          비 — 1개만 받아도 됐는데 2개를 받았다</p>
+        <p class="derive t-red">→ 상호 이로운 모든 교역이 실행될 때까지 교환은 계속되고,
+          그 시점의 배분은 파레토 효율적이다.
+          <strong>시장은 일반적으로 파레토 효율성을 촉진한다</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 35. 시장균형이 파레토 효율적일 네 조건 (p.29) ════════ -->
+<section>
+  <h2>시장균형이 파레토 효율적일 네 조건</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>가격−수용 기업</strong> — 독점·과점, 그리고 한 기업이 시장가격에 영향을 미칠 만큼 큰 시장을 배제한다</li>
+      <li><strong>외부비용 부재</strong> — 공기오염·수질오염을 발생시키는 생산과 혼잡한 고속도로에서의 통행을 배제한다</li>
+      <li><strong>소비와 생산에 있어 외부편익 부재</strong> — 불꽃놀이·공원·아동교육 같은 공공재를 배제하고,
+        인근 생산자들이 얻는 <span class="mark">집적의 경제</span>를 배제한다</li>
+      <li><strong>소비자와 생산자를 위한 완전한 정보</strong> — 중고차, 그리고 보험 같은 서비스를 배제한다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 36. 도시경제에서의 파레토 비효율 (p.30) ══════════════ -->
+<section>
+  <h2>도시경제에서의 파레토 비효율</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:10px">두 번째 조건(외부비용 부재)이 위반되면 배분은 비효율적이다.
+      비효율을 보이려면 <strong>파레토 개선을 하나 찾으면 된다</strong></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">공기 오염</p>
+        <p style="margin-bottom:6px">이산화황 1톤이 건강관리비용을 <strong>500달러</strong> 증가시키고,
+          기업은 톤당 <strong>100달러</strong>로 오염을 줄일 수 있다</p>
+        <p class="caption">희생자들이 <strong>300달러</strong>를 지불하면
+          → 희생자 200달러 이득 (500 − 300)<br>
+          → 기업 200달러 이득 (300 − 100)</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">혼잡</p>
+        <p style="margin-bottom:6px">추가 운전자 한 명이 다른 100명에게 각각 <strong>0.07달러</strong>를 부담시킨다.
+          그에게 통행의 가치는 <strong>2달러</strong></p>
+        <p class="caption">100명이 각각 <strong>0.03달러</strong>를 지불하면
+          → 포기하는 운전자 1달러 이득 (3 − 2)<br>
+          → 남은 운전자 각 0.04달러 이득 (0.07 − 0.03)</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:8px">→ 세 번째 조건(외부편익 부재)의 위반은
+      소비자와 기업이 도시에 <strong>군집</strong>할 유인을 준다. 군집은 외부편익에 부응하는 파레토 개선이다</p>
+  </div>
+</section>
+
+<!-- ══ 37. 자기-강화적 변화 (p.31) ══════════════════════════ -->
+<section>
+  <h2>자기−강화적 변화</h2>
+  <div class="body stack">
+    <div class="def-row">
+      <div class="def-tag">자기−제한적<br>변화</div>
+      <div>
+        <p>한 방향의 변화가 <strong>반대 방향</strong>의 변화를 야기한다</p>
+        <p class="caption">수요 증가 → 초과수요 → 가격 상승 → 초과수요 제거. 미시경제학의 전형적인 시장분석</p>
+      </div>
+    </div>
+    <div class="def-row" style="margin-top:34px">
+      <div class="def-tag">자기−강화적<br>변화</div>
+      <div>
+        <p>반대 방향보다는 <strong>동일한 방향</strong>으로 추가적인 변화를 유도한다</p>
+        <p class="caption">이 과정은 극단적인 결과 — 도시 내 경제적 행위들의 거대한 집중 — 를 유도할 수 있다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:30px">→ 초기에 균등분포인 행위에서 출발해
+      작은 변화의 효과를 본다. 그 변화가 자기−강화적이라면 균등분포는 <strong>군집</strong>으로 대체된다</p>
+  </div>
+</section>
+
+<!-- ══ 38. 그림 2-9 자동차딜러의 거리 (p.31~32) — fragment 4단계 ══ -->
+<section>
+  <h2>자기−강화적 변화: 자동차딜러의 거리</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">네 판매상이 초기에 도시 전체에 균일하게 분포하고 동일한 이윤을 얻는다.
+      한 판매상이 다른 판매상 옆으로 옮기면 어떤 일이 생기는가?</p>
+    <svg class="fig" id="f-dealer" viewBox="0 0 700 300" style="width:600px;margin:2px 0 0 118px" role="img">
+      <title>자동차 판매상이 하나씩 입지 1로 모여 기업당 이윤이 커지는 네 단계 그림</title></svg>
+    <script>
+      (function () {
+        // 축이 없는 도해라 좌표를 viewBox 에 직접 잡는다 — withBox 가 필요 없다
+        const F = Fig;
+        // 직사각형 하나 = 기업 하나. 높이 = 기업당 이윤 (군집이 클수록 크다).
+        // 네 단계를 세로로 쌓으면 4개 군집(110px)이 위 칸을 침범하므로 2×2 로 놓는다.
+        const PANEL = [
+          { tag: 'A', note: '균등분포 · 이윤 동일',      at: [[1, 1], [4, 1], [7, 1], [10, 1]] },
+          { tag: 'B', note: '둘이 모이니 이윤이 커진다',  at: [[1, 2], [7, 1], [10, 1]] },
+          { tag: 'C', note: '세 번째가 합류한다',        at: [[1, 3], [10, 1]] },
+          { tag: 'D', note: '넷이 모두 한 곳에',         at: [[1, 4]] },
+        ];
+        // 4개 군집이 90px 이므로 위 칸의 설명줄과 부딪히지 않는다 (viewBox 높이 300)
+        const H  = { 1: 10, 2: 14, 3: 18, 4: 21 };      // 기업당 이윤의 높이
+        const OP = { 1: 0.35, 2: 0.52, 3: 0.70, 4: 0.90 };
+        const PW = 300, GAP = 40, RW = 17;
+        const parts = [];
+        PANEL.forEach((p, i) => {
+          const ox = 44 + (i % 2) * (PW + GAP);
+          const oy = 118 + Math.floor(i / 2) * 136;      // 기준선
+          const px = (loc) => ox + ((loc - 1) / 9) * (PW - 30) + 15;
+          parts.push(F.raw(
+            `<path d="M${ox},${oy} L${ox + PW},${oy}" stroke="var(--ink)" stroke-width="1" fill="none"/>`,
+            { fragment: i }));
+          parts.push(F.annot(ox - 8, oy + 5, p.tag, { anchor: 'end', size: 14, fragment: i }));
+          for (const [loc, n] of p.at) {
+            for (let k = 0; k < n; k++) {
+              parts.push(F.raw(
+                `<rect x="${px(loc) - RW / 2}" y="${oy - (k + 1) * H[n] - k * 2}" ` +
+                `width="${RW}" height="${H[n]}" fill="var(--brand-crimson)" ` +
+                `fill-opacity="${OP[n]}" stroke="#FFF" stroke-width="1"/>`,
+                { fragment: i }));
+            }
+          }
+          [1, 4, 7, 10].forEach((loc) =>
+            parts.push(F.annot(px(loc), oy + 16, String(loc),
+                               { anchor: 'middle', size: 11, fragment: i })));
+          parts.push(F.annot(ox + PW, oy + 16, '입지 (km)',
+                             { anchor: 'end', size: 11, fragment: i }));
+          parts.push(F.annot(ox, oy + 34, p.note, { size: 11, tone: 'red', fragment: i }));
+        });
+        F.draw('#f-dealer', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 비교구매가 가능해져 구매자 수가 비례적 증가를 넘어 급진적으로 늘고,
+      기업당 이윤이 커진다. 경쟁하는 기업들이 오히려 서로 가깝게 입지한다</p>
+  </div>
+</section>
+
+<!-- ══ 39. 자기-강화적 효과는 어디에 나타나는가 (p.32~33) ═══ -->
+<section>
+  <h2>자기−강화적 효과는 어디에 나타나는가</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:16px">예술가와 창조적 노동자가 한 지역의 12개 도시에 균등하게 퍼져 있다가,
+      우연히 한 도시가 유입을 경험하면 — 아이디어와 제작기법에 더 노출되고
+      스튜디오·인쇄소·공구 공급업체를 공유하게 되어 창조적 환경이 개선된다.
+      그 군집이 다른 예술가들을 다시 끌어들인다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">생산에서</p>
+        <p style="margin-bottom:22px">도시 내 <strong>고용의 거대한 군집</strong>을 발생시킨다</p>
+        <p class="sub t-red" style="margin-bottom:2px">소비에서</p>
+        <p>거대한 도시들에서 <strong>소비자 행위의 거대한 군집</strong>을 발생시킨다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">주거환경에서</p>
+        <p style="margin-bottom:22px">소득·교육·인종에 대해 <strong>실질적인 분리</strong>를 발생시킨다</p>
+        <p class="derive t-red">→ 자기−강화적 효과는 많은 도시 현상들의 중심에 있다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 40. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
