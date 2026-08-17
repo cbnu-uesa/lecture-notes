@@ -1,5 +1,6 @@
 /* 강의노트 디자인 토큰 — design.md §2, §3
-   값은 기존 PPT 원본(960×540pt)에서 실측한 것이다. 임의로 바꾸지 않는다. */
+   2026-08 전면 개편(지면 테마)의 값이다. 그 전까지는 원본 PPT 실측값이 규범이었으나
+   1~9강이 모두 HTML 로 옮겨진 뒤 맞출 PPT 가 없어졌다. 지금 규범은 읽히는 지면이다. */
 
 @font-face {
   font-family: 'Pretendard';
@@ -16,49 +17,65 @@
   src: url('../fonts/Pretendard-Bold.woff2') format('woff2');
   font-weight: 700; font-style: normal; font-display: block;
 }
+/* 제목용 세리프. 원본 PPT 가 쓰던 KoPub돋움의 짝인 명조 계열을 골랐다.
+   본문에는 쓰지 않는다 — 프로젝터에서 얇은 획이 날아간다. */
+@font-face {
+  font-family: 'BookkMyungjo';
+  src: url('../fonts/BookkMyungjo-Bold.woff2') format('woff2');
+  font-weight: 700; font-style: normal; font-display: block;
+}
 
 :root {
-  /* ---- 색 (design.md §3) ---- */
-  --brand-crimson:  #892B3C;  /* 푸터바 배경 전용 */
-  --define-crimson: #A82424;  /* 정의문·발문 */
-  --accent-red:     #C00000;  /* 소제목·핵심 라벨 */
-  --point-red:      #FF0000;  /* 그래프 좌표점 — 도형 전용 */
-  --accent-blue:    #0328C3;  /* 캡션·도출 결과 */
-  --chart-blue:     #4472C4;  /* 표 헤더·예산선 */
-  --chart-orange:   #ED7D31;  /* 대비 곡선 — 도형 전용 */
-  --accent-green:   #00B050;  /* 3계열 — 도형 전용 */
-  --guide:          #B4C7E7;  /* 점선 보조선 */
-  --ink:            #1A1A1A;
-  --ink-cover:      #262626;
-  --muted:          #767676;
-  --rule:           #000000;
+  /* ---- 색 (design.md §3) — 크림슨 하나 + 잉크 + 회색.
+          다계열 그래프에만 흙빛 보조색을 쓴다. ---- */
+  --ink:            #16181C;
+  --ink-cover:      #16181C;
+  --ink-2:          #4A4741;   /* 본문 글자 — 제목보다 한 단 여린 잉크 */
+  --muted:          #8A867E;
+  --rule:           #E2DED7;   /* 헤어라인 (푸터선·표 괘선·섹션선) */
+  --guide:          #C9C5BE;   /* 그래프 보조선 — 1px 저대비를 피한다 */
   --bg:             #FFFFFF;
 
-  --table-row-a:    #D9E2F3;
-  --table-row-b:    #E9EDF7;
+  /* 메인색. 충북대 마크색(PANTONE 7425 C = #B72654, 색상각 341°)은 화면에서
+     자홍 기가 강해, 기존에 쓰던 #892B3C(349°)와의 중간값을 쓴다.
+     흰 배경 대비 7.2:1 로 본문에도 쓸 수 있다.
+     크림슨 계열 넷을 하나로 합쳤다 — 옛 이름은 슬라이드가 아직 쓰고 있어 남긴다. */
+  --brand-crimson:  #A02948;
+  --define-crimson: #A02948;
+  --accent-red:     #A02948;
+  --point-red:      #A02948;
+
+  /* 계열색: 뜻이 다른 곡선은 색이 분명히 갈려야 한다.
+     채도를 낮추면 화면은 차분해지지만 강의실 뒷자리에서 두 곡선이 붙어 보인다.
+     그래서 브랜드색만 빼고 나머지도 충분히 살려 둔다 (모두 흰 배경 3:1 이상). */
+  --accent-blue:    #1F5C8B;   /* 수요곡선·캡션   7.1:1 */
+  --chart-blue:     #1F5C8B;   /* 예산선·3계열    7.1:1 */
+  --accent-green:   #2E7D4F;   /* 평균비용·SAC   5.1:1 */
+  --chart-orange:   #B07A1E;   /* 대비 곡선      3.7:1 */
+
+  /* 표에는 줄무늬를 쓰지 않는다 (design.md §11). 색면 대신 괘선으로 가른다. */
+  --table-row-a:    transparent;
+  --table-row-b:    transparent;
 
   /* ---- 타이포 (design.md §2.3) ---- */
-  --fs-cover:        40px;
-  --fs-cover-label:  24px;
-  --fs-title:        28px;
-  --fs-lead:         24px;
-  --fs-sub:          20px;
-  --fs-emph:         18px;
-  --fs-body:         14px;
+  --fs-cover:        46px;
+  --fs-cover-label:  12px;
+  --fs-title:        31px;
+  --fs-lead:         20px;
+  --fs-sub:          16px;
+  --fs-emph:         16px;
+  --fs-body:         15px;
   --fs-caption:      12px;
   --fs-footer:       10px;
-  --fs-pagenum:      11px;
+  --fs-pagenum:      10px;
 
-  --lh-body:  1.55;
-  --lh-title: 1.2;
+  --lh-body:  1.62;
 
   /* ---- 레이아웃 (design.md §4) ---- */
-  --gutter-l:      36px;   /* 좌측 기준선 */
-  --gutter-r:      36px;
-  --title-top:     23px;
-  --content-top:   72px;
-  --content-bot:   512px;
-  --footer-y:    524.4px;
-  --footer-h:     15.6px;
-  --rule-w:      927.2px;  /* 표지 구분선 폭 — 오른쪽이 열려 있다 */
+  --gutter-l:      56px;   /* 좌측 기준선 */
+  --gutter-r:      56px;
+  --title-top:     62px;   /* kicker 와 사이를 벌린 자리 */
+  --content-top:  134px;
+  --content-bot:  500px;
+  --footer-y:     510px;
 }

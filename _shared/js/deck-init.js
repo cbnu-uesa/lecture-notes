@@ -29,6 +29,33 @@
     if (course.label) el.textContent = course.label;
   });
 
+  // ── 표지 날짜 ──────────────────────────────────────────────
+  // 파일명 앞 두 자리(NN-…)로 course.json 의 lectures 에서 자기 강의를 찾는다.
+  // 날짜를 HTML 에 적어 두면 강의계획서가 바뀔 때 두 곳을 고쳐야 한다.
+  const dateEl = document.querySelector('[data-course-date]');
+  if (dateEl) {
+    const no = +(location.pathname.split('/').pop() || '').slice(0, 2);
+    const me = (course.lectures || []).find((l) => l.no === no);
+    if (me && me.date) dateEl.textContent = me.date;
+  }
+
+  // ── kicker 주입 ────────────────────────────────────────────
+  // "03. 집적의 경제" 처럼 강 번호와 제목을 본문 슬라이드 머리에 얹는다.
+  // 장마다 마크업을 일일이 넣지 않도록 여기서 만든다.
+  {
+    const no = +(location.pathname.split('/').pop() || '').slice(0, 2);
+    const me2 = (course.lectures || []).find((l) => l.no === no);
+    const kick = `${String(no).padStart(2, '0')}. ${me2 ? me2.title : (course.title || '')}`;
+    sections.forEach((sec) => {
+      if (sec.matches('.s-cover, .s-closing, .s-section')) return;
+      if (!sec.querySelector('h2')) return;
+      const k = document.createElement('p');
+      k.className = 'kicker';
+      k.textContent = kick;
+      sec.insertBefore(k, sec.firstChild);
+    });
+  }
+
   // ── 푸터바 주입 ────────────────────────────────────────────
   // 표지(.s-cover)에는 넣지 않는다.
   const footerText = course.footer || '';

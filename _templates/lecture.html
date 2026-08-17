@@ -5,7 +5,8 @@
 
   · 슬라이드 유형과 색·치수는 design.md 를 따른다.
   · 과목명·학기·푸터 문구는 여기 쓰지 않는다. ../course.json 에서 자동으로 들어온다.
-  · 실물 예시는 _templates/slide-patterns.html 참조.
+  · 유형별 실물 카드는 _design/slides/t01-cover.html ~ t11-numbered.html 참조.
+    실사용 예로는 2026-1학기_도시경제학입문/slides/06-시장실패정부실패.html 이 가장 정갈하다.
 -->
 <html lang="ko">
 <head>
@@ -30,10 +31,9 @@
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <div class="cover-rule top"></div>
     <h1>N강. 제목</h1>
-    <div class="cover-rule bottom"></div>
-    <p class="cover-date">2026. 0. 0.</p>
+    <!-- 날짜를 적지 않는다. 파일명 앞 두 자리로 course.json 의 lectures 에서 찾아 채운다 -->
+    <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
   <!-- T4 개념 + 그래프 2단 -->

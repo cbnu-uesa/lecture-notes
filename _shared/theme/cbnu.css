@@ -23,9 +23,17 @@
 }
 .reveal .slides section:focus-visible { outline: none; }
 
-/* ─────────── 본문 슬라이드 ─────────── */
+/* ─────────── 제목 블록 ───────────
+   kicker(작은 크림슨 라벨) → 제목(세리프) → 84px 짧은 룰.
+   전폭 룰을 쓰지 않는 것이 이 디자인의 핵심이다.
+   kicker 는 deck-init.js 가 넣는다 — 슬라이드마다 적지 않는다. */
 
-/* 슬라이드 제목: x=36, y=23, 28px/700 */
+.reveal .kicker {
+  position: absolute; left: var(--gutter-l); top: 28px; margin: 0;
+  font-size: 11px; font-weight: 700; letter-spacing: .14em;
+  color: var(--brand-crimson);
+}
+
 .reveal h2,
 .reveal .slide-title {
   position: absolute;
@@ -33,25 +41,35 @@
   top: var(--title-top);
   right: var(--gutter-r);
   margin: 0;
+  font-family: 'BookkMyungjo', serif;
   font-size: var(--fs-title);
   font-weight: 700;
-  line-height: var(--lh-title);
+  line-height: 1.18;
   color: var(--ink);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.035em;
   text-transform: none;
 }
+.reveal .slides > section > h2::after {
+  content: ''; position: absolute; left: 0; top: calc(100% + 13px);
+  width: 84px; height: 2px; background: var(--brand-crimson);
+}
 
-/* 콘텐츠 영역: y=72 … 512 */
+/* 콘텐츠 영역 */
 .reveal .body {
   position: absolute;
   left: var(--gutter-l);
   right: var(--gutter-r);
   top: var(--content-top);
   bottom: calc(540px - var(--content-bot));
+  color: var(--ink-2);
 }
 
-.reveal p  { margin: 0 0 10px; }
-.reveal ul { margin: 0 0 10px; padding-left: 20px; list-style: none; }
+/* 기본 여백. :where() 로 가중치를 요소 수준까지 낮춘다 —
+   그러지 않으면 .lead·.derive 같은 컴포넌트 클래스의 margin 을 이 규칙이 덮어버린다. */
+:where(.reveal) p  { margin: 0 0 10px; }
+:where(.reveal) ul { margin: 0 0 10px; padding-left: 20px; list-style: none; }
+/* 본문 글자는 제목보다 한 단 여린 잉크로 둔다 */
+:where(.reveal) p, :where(.reveal) li { color: var(--ink-2); }
 .reveal ul > li { position: relative; margin-bottom: 8px; }
 .reveal ul > li::before {
   content: '·';
@@ -61,67 +79,69 @@
 .reveal strong { font-weight: 700; }
 .reveal em     { font-style: normal; color: var(--accent-red); font-weight: 700; }
 
-/* ─────────── 푸터바 (표지 제외) ─────────── */
+/* ─────────── 푸터 (표지 제외) ───────────
+   크림슨 밴드를 버리고 헤어라인 한 줄로 둔다. */
 
 .reveal .deck-footer {
   position: absolute;
-  left: 0; right: 0;
+  left: var(--gutter-l); right: var(--gutter-r);
   top: var(--footer-y);
-  height: var(--footer-h);
-  background: var(--brand-crimson);
-  color: #FFF;
+  height: auto;
+  background: none;
+  color: var(--muted);
   font-size: var(--fs-footer);
   font-weight: 400;
-  line-height: var(--footer-h);
-  letter-spacing: 0;
+  line-height: 1.4;
+  letter-spacing: .04em;
+  border-top: 1px solid var(--rule);
+  padding-top: 7px;
   z-index: 5;
   pointer-events: none;
 }
-.reveal .deck-footer .ft-text { position: absolute; left: 8px; }
+.reveal .deck-footer .ft-text { position: static; }
 .reveal .deck-footer .ft-num  {
-  position: absolute; right: 12px;
+  position: absolute; right: 0; top: 7px;
   font-size: var(--fs-pagenum);
+  font-variant-numeric: tabular-nums;
 }
-/* 표지와 마무리 슬라이드에는 푸터바가 없다 (원본과 동일) */
+/* 표지와 마무리 슬라이드에는 푸터가 없다 */
 section.s-cover .deck-footer,
 section.s-closing .deck-footer { display: none; }
 
 /* ─────────── 표지 (design.md §4.2) ─────────── */
 
 section.s-cover .cover-logo {
-  position: absolute; left: 848px; top: 11px;
-  width: 83px; height: 84px;
+  position: absolute; left: 828px; top: 40px;
+  width: 60px; height: 61px;
 }
 section.s-cover .cover-label {
-  position: absolute; left: var(--gutter-l); top: 84px;
+  position: absolute; left: var(--gutter-l); top: 196px;
   margin: 0;
   font-size: var(--fs-cover-label);
   font-weight: 700;
-  color: var(--accent-red);
+  letter-spacing: .16em;
+  color: var(--brand-crimson);
 }
-section.s-cover .cover-rule {
-  position: absolute; left: 0;
-  width: var(--rule-w); height: 0;
-  border-top: 0.8px solid var(--rule);
-}
-section.s-cover .cover-rule.top    { top: 122.9px; }
-section.s-cover .cover-rule.bottom { top: 222.9px; }
-
 section.s-cover h1 {
-  position: absolute; left: var(--gutter-l); top: 152px;
-  right: var(--gutter-r);
+  position: absolute; left: 54px; top: 218px; right: 240px;
   margin: 0;
+  font-family: 'BookkMyungjo', serif;
   font-size: var(--fs-cover);
   font-weight: 700;
-  line-height: var(--lh-title);
-  letter-spacing: -0.025em;
+  line-height: 1.16;
+  letter-spacing: -0.045em;
   color: var(--ink-cover);
   text-transform: none;
 }
+/* 표지에도 전폭 룰 대신 짧은 룰을 쓴다 */
+section.s-cover h1::after {
+  content: ''; position: absolute; left: 2px; top: calc(100% + 16px);
+  width: 84px; height: 3px; background: var(--brand-crimson);
+}
 section.s-cover .cover-date {
-  position: absolute; left: 0; right: 0; top: 291px;
-  margin: 0; text-align: center;
-  font-size: var(--fs-emph);
+  position: absolute; left: var(--gutter-l); right: auto; top: 352px;
+  margin: 0; text-align: left;
+  font-size: 13px;
   font-weight: 400;
   color: var(--muted);
 }

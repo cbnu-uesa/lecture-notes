@@ -83,6 +83,56 @@ for (const url of urls) {
         }
       }
     }
+    // ── 본문이 푸터를 넘었는가 ────────────────────────────────
+    // 표·그림이 푸터선과 겹치면 강의실에서도 PDF 에서도 잘려 보인다.
+    // 눈으로는 50쪽을 다 못 보므로 여기서 기계로 잡는다.
+    document.querySelectorAll('.reveal .slides > section').forEach((sec, i) => {
+      const foot = sec.querySelector('.deck-footer');
+      if (!foot) return;                       // 표지·마무리에는 푸터가 없다
+      const sr = sec.getBoundingClientRect();
+      if (!sr.height) return;
+      const scale = sr.height / 540;           // reveal 이 확대해 놓은 배율
+      const limit = foot.getBoundingClientRect().top - sr.top;
+      const body = sec.querySelector('.body');
+      if (!body) return;
+      const seen = new Set();
+      body.querySelectorAll('table, svg.fig, img, ul, ol, p, div').forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (!r.height) return;
+        const over = (r.bottom - sr.top) - limit;
+        if (over <= 2 * scale) return;
+        const tag = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '');
+        if (seen.has(tag)) return;
+        seen.add(tag);
+        out.push(`${i + 1}번 슬라이드: ${tag} 가 푸터를 ${Math.round(over / scale)}px 넘었습니다`);
+      });
+    });
+
+    // ── 한 그림 안에서 뜻이 다른 곡선이 같은 색인가 ──────────
+    // design.md §3.3 의 기계 판정판. variant 가 달라도 토큰 값이 같아지면
+    // (예: --accent-blue 와 --chart-blue 는 같은 #1F5C8B) 두 곡선이 겹쳐 보인다.
+    // 같은 variant 의 다발(예산선 3개, 이동 전/후 파선)은 class 가 같아서 걸리지 않는다.
+    {
+      const secs = [...document.querySelectorAll('.reveal .slides > section')];
+      document.querySelectorAll('svg.fig').forEach((svg) => {
+        const no = secs.indexOf(svg.closest('section')) + 1;
+        const byColor = new Map();
+        svg.querySelectorAll('[class*="curve"]').forEach((el) => {
+          const cls = [...el.classList].filter((c) => c.startsWith('curve')).join('.');
+          if (!cls) return;
+          const col = getComputedStyle(el).stroke;
+          if (!byColor.has(col)) byColor.set(col, new Set());
+          byColor.get(col).add(cls);
+        });
+        for (const [col, set] of byColor) {
+          if (set.size > 1) {
+            out.push(`${no}번 슬라이드: ${svg.id ? 'svg#' + svg.id : 'svg'} — ` +
+                     `${[...set].join(' / ')} 가 같은 색 ${col} 입니다`);
+          }
+        }
+      });
+    }
+
     return out;
   });
 

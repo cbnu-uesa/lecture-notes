@@ -8,20 +8,21 @@
 </head><body>
 <div class="doc">
 <h1>레이아웃 좌표계</h1>
-<p class="lede">원본 PPT가 12192000 × 6858000 EMU = <b>960 × 540 pt</b>다.
-Reveal을 <code>width:960, height:540</code>으로 두면 PPT의 pt와 CSS px가 1:1로 맞는다.
-그래서 모든 치수는 px이고, <code>%</code>·<code>vw</code>·<code>rem</code>을 쓰지 않는다.</p>
-<table><thead><tr><th>요소</th><th>값</th><th>원본 근거</th></tr></thead><tbody>
-<tr><td>좌측 기준선</td><td><code>36px</code></td><td class="note">제목 상자 x=25.8 + 내부 여백 7.2</td></tr>
-<tr><td>제목 영역</td><td><code>y 23 ~ 58</code>, 28px/700</td><td class="note">레이아웃 title 상자 y=23.2 h=34.7</td></tr>
-<tr><td>콘텐츠 영역</td><td><code>y 72 ~ 512</code></td><td class="note">콘텐츠 상자 y=71.6</td></tr>
-<tr><td>푸터바</td><td><code>y 524.4</code>, 높이 <code>15.6</code>, 폭 전체</td><td class="note">레이아웃 직사각형 1, #892B3C</td></tr>
-<tr><td>푸터 문구</td><td>좌 8px, 10px 흰색</td><td class="note">course.json에서 자동으로 채운다</td></tr>
-<tr><td>페이지 번호</td><td>우 12px, 11px 흰색</td><td class="note">누적 공개 <b>단계</b>를 센다</td></tr>
-<tr><td>표지 구분선</td><td><code>y 122.9 / 222.9</code>, 폭 <code>927.2</code></td><td class="note">오른쪽이 열려 있다 — 960으로 늘리지 않는다</td></tr>
-<tr><td>표지 로고</td><td><code>x 848, y 11, 83×84</code></td><td class="note">표지에만</td></tr>
+<p class="lede">화면은 <b>960 × 540 px</b>이다. Reveal을 <code>width:960, height:540</code>으로 두고
+모든 치수를 px로 적는다 — <code>%</code>·<code>vw</code>·<code>rem</code>은 쓰지 않는다.
+치수는 <code>tokens.css</code>의 토큰이 원천이고, 이 표는 그 값을 옮겨 적은 것이다.</p>
+<table><thead><tr><th>요소</th><th>값</th><th>토큰</th></tr></thead><tbody>
+<tr><td>좌우 기준선</td><td><code>56px</code></td><td class="note"><code>--gutter-l</code> · <code>--gutter-r</code> — 지면 개편에서 36 → 56으로 넓혔다</td></tr>
+<tr><td>kicker</td><td><code>y 28</code>, 11px/700 크림슨</td><td class="note">마크업 없이 <code>deck-init.js</code>가 넣는다</td></tr>
+<tr><td>제목</td><td><code>y 62</code>, 31px/700 명조</td><td class="note"><code>--title-top</code> · <code>--fs-title</code>, 아래 84×2px 크림슨 룰</td></tr>
+<tr><td>콘텐츠 영역</td><td><code>y 134 ~ 500</code></td><td class="note"><code>--content-top</code> · <code>--content-bot</code></td></tr>
+<tr><td>푸터</td><td><code>y 510</code>, 헤어라인 위 10px 회색</td><td class="note"><code>--footer-y</code> — 크림슨 밴드를 버리고 <code>--rule</code> 한 줄만 남겼다</td></tr>
+<tr><td>푸터 문구 · 쪽번호</td><td>좌우 기준선에 맞춤</td><td class="note">문구는 <code>course.json</code>에서, 번호는 누적 공개 <b>단계</b>를 센다</td></tr>
+<tr><td>표지 제목</td><td><code>x 54, y 218</code>, 46px 명조</td><td class="note"><code>--fs-cover</code>, 아래 84×3px 크림슨 룰</td></tr>
+<tr><td>표지 로고</td><td><code>x 828, y 40, 60×61</code></td><td class="note">표지에만</td></tr>
 </tbody></table>
 <h2>하지 않는 것</h2>
-<p style="font-size:13px;margin:0">그라데이션 배경 · 그림자 · 둥근 모서리 카드 · 이모지 불릿 · 슬라이드 전환 효과 ·
-한 슬라이드 8줄 초과 · 색 4종 초과 · 외부 CDN · 표의 세로 괘선.</p>
+<p style="font-size:13px;margin:0">전폭 룰 · 크림슨 푸터바 · 표의 줄무늬와 세로 괘선 ·
+그라데이션 배경 · 그림자 · 둥근 모서리 카드 · 이모지 불릿 · 슬라이드 전환 효과 ·
+한 슬라이드 8줄 초과 · 색 4종 초과 · 외부 CDN.</p>
 </div></body></html>
