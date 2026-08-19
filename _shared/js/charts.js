@@ -210,6 +210,53 @@ window.Fig = (function () {
       <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-green)"/></marker>
   </defs>`;
 
+  /* ── 산점도 표본 (이변량 정규) ───────────────────────────
+   * 산점도의 점을 손으로 찍지 않기 위한 생성기다 (design.md §6.4).
+   * 씨앗이 같으면 언제나 같은 점이 나오므로 PDF를 다시 뽑아도 그림이 바뀌지 않는다.
+   *
+   *   Fig.scatter({ n: 50, mx: 3, my: 3, sx: 1, sy: 1, r: 0.8, seed: 4 })
+   *
+   * 뽑은 표본을 표준화하고 z2에서 z1 성분을 걷어낸 뒤
+   *   x = mx + sx·z1,  y = my + sy·(r·z1 + √(1−r²)·z2)
+   * 로 합성하므로 **표본평균·표본표준편차·표본상관계수가 지정한 값과 정확히 일치한다.**
+   * "평균과 표준편차는 같은데 상관계수만 다른 두 산포도"처럼
+   * 슬라이드의 설명이 그림에서도 참이어야 하는 자리에서 이 성질이 필요하다.
+   * 표준편차는 표본표준편차(n−1)다 — 강의에서 쓰는 정의와 같다. */
+  function scatter(o = {}) {
+    const n = o.n ?? 50;
+    const r = o.r ?? 0;
+    const mx = o.mx ?? 0, my = o.my ?? 0;
+    const sx = o.sx ?? 1, sy = o.sy ?? 1;
+
+    let s = (o.seed ?? 1) >>> 0;
+    const rnd = () => {                                   // mulberry32
+      s = (s + 0x6D2B79F5) >>> 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+    const gauss = () =>                                   // Box–Muller
+      Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(2 * Math.PI * rnd());
+
+    const mean = (v) => v.reduce((p, q) => p + q, 0) / v.length;
+    const unit = (v) => {
+      const m = mean(v);
+      const sd = Math.sqrt(v.reduce((p, q) => p + (q - m) ** 2, 0) / (v.length - 1)) || 1;
+      return v.map((q) => (q - m) / sd);
+    };
+
+    const a = [], b = [];
+    for (let i = 0; i < n; i++) { a.push(gauss()); b.push(gauss()); }
+
+    const z1 = unit(a);
+    let z2 = unit(b);
+    const c12 = z1.reduce((p, q, i) => p + q * z2[i], 0) / (n - 1);
+    z2 = unit(z2.map((q, i) => q - c12 * z1[i]));         // z1 ⟂ z2 라야 상관계수가 정확히 r
+
+    const k = Math.sqrt(Math.max(0, 1 - r * r));
+    return z1.map((q, i) => [mx + sx * q, my + sy * (r * q + k * z2[i])]);
+  }
+
   /* ── 라벨을 채움 영역 안으로 밀어넣는다 ────────────────────
    * labelIn()은 다각형 무게중심에 라벨을 놓지만, 두 줄짜리 라벨은
    * 삼각형 빗변을 넘어 삐져나오기 쉽다. 글자 상자를 실제로 재서
@@ -355,6 +402,43 @@ window.Fig = (function () {
         p: ([x, y]) => [px(x), py(y)],
         curve: (data) => data.map(([x, y]) => [px(x), py(y)]),
       };
+    }
+
+    /* 정규분포의 확률밀도 — 데이터 좌표 [x, f(x)] (design.md §6.4)
+     *
+     *   const S = F.scale({ x: [-3.6, 3.6], y: [0, 0.42] });
+     *   F.curve(S.curve(F.normal(0, 1, -3.6, 3.6)), { variant: 'demand' })
+     *
+     * 종모양을 손으로 찍지 않는다. 곡선·채움(확률)·눈금이 같은 함수에서 나오므로
+     * "면적 = 확률"이 그림에서 저절로 맞는다.
+     *
+     * 굽는 구간이 많아 표본을 촘촘히 뽑는다(기본 96). 성기게 뽑으면 at() 의
+     * 선형보간이 curve() 의 스플라인과 어긋나 점이 곡선을 벗어난다.
+     * 눈금·좌표점으로 쓸 x 는 through 로 표본에 반드시 넣는다. */
+    function normal(mu, sigma, x0, x1, o = {}) {
+      const n = o.n ?? 96;
+      const k = 1 / (sigma * Math.sqrt(2 * Math.PI));
+      const xs = [];
+      for (let i = 0; i <= n; i++) xs.push(x0 + ((x1 - x0) * i) / n);
+      for (const x of o.through || []) if (x > x0 && x < x1) xs.push(x);
+      xs.sort((a, b) => a - b);
+      // 데이터 좌표이므로 여기서 반올림하지 않는다 (hyper() 와 같은 이유)
+      return xs.map((x) => [x, k * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2))]);
+    }
+
+    /* 곡선 아래를 밑변까지 닫아 칠한다 — 확률분포에서 "구간의 면적 = 확률"
+     *
+     *   F.under(S.curve(F.normal(0, 1, -3.6, -1.5)), { cls: 'area-loss' })
+     *
+     * 픽셀 점묶음을 받아 곡선과 같은 스플라인으로 윤곽을 그리므로 칠한 자리가
+     * 곡선과 어긋나지 않는다. 곡선에 넘긴 것과 같은 점을 잘라서 넘기면 된다.
+     * baseY 기본값은 플롯의 가로축(BOX.y0). */
+    function under(pxPts, o = {}) {
+      if (pxPts.length < 2) return '';
+      const baseY = o.baseY ?? BOX.y0;
+      const a = pxPts[0], z = pxPts[pxPts.length - 1];
+      return `<path ${attrs(o.cls || 'area-surplus', o)} ` +
+             `d="${path(pxPts)} L${z[0]},${baseY} L${a[0]},${baseY} Z"/>`;
     }
 
     /* 원점에 볼록, 우하향 — 수요곡선·무차별곡선 */
@@ -519,6 +603,20 @@ window.Fig = (function () {
       return s + '</g>';
     }
 
+    /* 산점도의 점들. Fig.scatter()가 만든 데이터 좌표를 S.curve()로 픽셀로 옮겨 넘긴다.
+     *
+     *   Fig.dots(S.curve(Fig.scatter({ n: 50, mx: 3, my: 3, r: .8, seed: 4 })))
+     *
+     * 좌표점(.dot)과 클래스를 나눈 이유: .dot 은 "곡선 위에 있어야 하는 점"이라
+     * checkDots 의 검사 대상이지만, 산점도의 점은 자료 그 자체라 곡선 밖이 정상이다. */
+    function dots(pts, o = {}) {
+      const cls = 'pt' + (o.variant ? ' pt-' + o.variant : '');
+      const rr = o.r ?? 2.4;
+      return `<g ${attrs('g-pt', o)}>` +
+        pts.map(([x, y]) => `<circle class="${cls}" cx="${round(x)}" cy="${round(y)}" r="${rr}"/>`).join('') +
+        '</g>';
+    }
+
     /* 주석. tone: 'red' | 'blue' | 없으면 검정. 줄바꿈은 \n */
     function annot(x, y, text, o = {}) {
       const cls = 'annot' + (o.tone ? ' ' + o.tone : '');
@@ -625,8 +723,9 @@ window.Fig = (function () {
     }
 
     return {
-      draw, curve, line, guide, dot, annot, arrow, raw, labelIn, bars,
-      convex, upward, concave, decay, ushape, hyper, tangentU, path, shift, at, cross, scale, BOX,
+      draw, curve, line, guide, dot, dots, annot, arrow, raw, labelIn, bars,
+      under, convex, upward, concave, decay, ushape, hyper, normal,
+      tangentU, path, shift, at, cross, scatter, scale, BOX,
       withBox: (b) => make({ ...BOX, ...b }),
     };
   }

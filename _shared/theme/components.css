@@ -187,6 +187,10 @@
 .reveal svg.fig .guide  { stroke: var(--guide); stroke-width: 1.2; stroke-dasharray: 3 3; fill: none; }
 .reveal svg.fig .dot    { fill: var(--brand-crimson); }
 .reveal svg.fig .dot-open { fill: #FFF; stroke: var(--ink-2); stroke-width: 1.4; }
+/* 산점도의 점 (Fig.dots). 좌표점(.dot)이 "곡선 위의 한 점"이라 크림슨으로 도드라진다면
+   산점도의 점은 자료 뭉치라 작고 파랗게 깔린다. 크림슨은 이탈값처럼 뜻이 있을 때만. */
+.reveal svg.fig .pt     { fill: var(--accent-blue); }
+.reveal svg.fig .pt-red { fill: var(--brand-crimson); }
 /* 그래프 안의 글자는 흰 테두리를 두른다 (design.md §6.5).
    곡선·보조선 위에 글자가 얹혀도 읽힌다. 겹침을 완전히 없애는 게 우선이지만,
    개념도에서는 붙여 써야 뜻이 통하는 라벨이 있어 마지막 안전장치로 둔다. */
@@ -196,6 +200,10 @@
   stroke-width: 3px;
   stroke-linejoin: round;
 }
+/* 크림슨·회색 면 위에 얹는 흰 글자는 흰 테두리를 끈다. 위 규칙은 곡선 위 글자를
+   읽히게 하려는 안전장치인데, 어두운 면 위 흰 글자에는 자간을 메워 역효과가 난다.
+   두 학기 8개 강의가 각자 이걸 껐다 — 그래서 이름을 하나 준다. */
+.reveal svg.fig text.on-dark { stroke: none; }
 .reveal svg.fig .axis-name { font-size: 11px; font-weight: 700; fill: var(--ink-2); }
 .reveal svg.fig .tick      { font-size: 11px; font-weight: 400; fill: var(--ink-2); }
 .reveal svg.fig .annot     { font-size: 12px; font-weight: 500; fill: var(--ink); }
@@ -377,6 +385,11 @@ ol.bc > li:last-child { margin-bottom: 0; }
 .body.lede { display: flex; flex-direction: column; }
 .body.lede > .lead { margin: 6px 0 0; }
 .lede-main { margin: auto 0; }
+
+/* 밑줄 없는 크림슨 강조. .mark 는 밑줄을 긋는데 원본의 붉은 강조에는 밑줄이 없는 경우가
+   많다. 표 안에서도 쓰이므로 .reveal 을 붙여 .reveal table td(0,1,2)를 이기게 한다 —
+   (0,1,0) 으로 두면 표 셀에서 색이 먹지 않는다. */
+.reveal .hl { color: var(--brand-crimson); font-weight: 700; }
 
 /* 크림슨 밑줄 강조 */
 .mark { color: var(--brand-crimson); font-weight: 700;
