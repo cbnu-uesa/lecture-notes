@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>8강. 확률이론 (1)</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols.top { align-items: flex-start; }
+  /* 왼쪽 칸이 넓어야 하는 2단 */
+  .body > .cols.wide-l > .col-l { flex: 0 0 66%; }
+  ul.slim > li { margin-bottom: 3px; }
+  ol.dense { margin: 0 0 0 2px; padding-left: 20px; }
+  ol.dense > li { margin-bottom: 4px; }
+  /* 왼쪽 라벨 + 오른쪽 그림 한 줄 */
+  .row-fig { display: flex; align-items: center; gap: 22px; }
+  .row-fig > .lab { flex: 0 0 110px; }
+  /* 그림 옆에 붙는 작은 주석 묶음 */
+  .fig-note { display: flex; align-items: flex-start; gap: 12px; }
+  .fig-note p { font-size: 11px; line-height: 1.42; margin: 0 0 2px; }
+  .fig-note .ind { margin-left: 12px; }
+  .panel-head { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0 0 2px; text-align: center; }
+</style>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   8강 전용 도형 도구.
+
+   확률 슬라이드의 그림은 전부 "몇 장인가 / 몇 칸인가"에서 나온다.
+   상자 그림의 카드 수, 주사위 판의 눈, 표본공간 칸의 너비를 손으로 찍지 않고
+   아래 함수에 개수를 넘겨 그린다 — 그래야 본문의 확률과 그림이 어긋나지 않는다
+   (design.md §6.4·§6.5). 세 슬라이드가 같은 상자를 쓰므로 함수는 한 곳에만 둔다.
+   ───────────────────────────────────────────────────────────── */
+window.L8 = (function () {
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+  /* 글자 한 줄 */
+  function txt(x, y, s, o = {}) {
+    const a = o.anchor ? ` text-anchor="${o.anchor}"` : '';
+    const st = o.stroke ? `stroke:${o.stroke};` : '';
+    return `<text x="${x}" y="${y}"${a} style="font-size:${o.size ?? 12}px;` +
+           `font-weight:${o.weight ?? 400};${st}fill:${o.fill ?? 'var(--ink-2)'}">${esc(s)}</text>`;
+  }
+
+  /* 한 줄 안에서 색이 갈리는 글자 — segs = [[글, 색], …] */
+  function rich(x, y, segs, o = {}) {
+    const a = o.anchor ? ` text-anchor="${o.anchor}"` : '';
+    const inner = segs.map(([s, c]) =>
+      `<tspan style="fill:${c || 'var(--ink-2)'}">${esc(s)}</tspan>`).join('');
+    return `<text x="${x}" y="${y}"${a} style="font-size:${o.size ?? 12}px;` +
+           `font-weight:${o.weight ?? 400}">${inner}</text>`;
+  }
+
+  /* 여러 줄 */
+  function lines(x, y, arr, o = {}) {
+    const lh = o.lh ?? 14;
+    return arr.map((s, i) => txt(x, y + i * lh, s, o)).join('');
+  }
+
+  /* mulberry32 — 씨앗이 같으면 언제나 같은 그림이 나온다 */
+  function rng(seed) {
+    let s = seed >>> 0;
+    return () => {
+      s = (s + 0x6D2B79F5) >>> 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* 카드 상자 — 붉은 카드 R 장, 푸른 카드 B 장.
+     장수만 넘기면 카드가 그만큼 그려진다. 3/2 든 30/20 이든 같은 함수다. */
+  function cardBox(x, y, w, h, R, B, seed) {
+    let s = `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" ` +
+            `fill="var(--rule)" stroke="var(--ink-2)" stroke-width="1.6"/>`;
+    const N = R + B;
+    const card = (cx, cy, cw, ch, red) =>
+      `<rect x="${cx.toFixed(1)}" y="${cy.toFixed(1)}" width="${cw}" height="${ch}" ` +
+      `fill="${red ? 'var(--brand-crimson)' : 'var(--accent-blue)'}"/>`;
+
+    if (N <= 6) {
+      // 적은 장수는 가지런히 — 위 줄에 푸른 카드, 아래 줄에 붉은 카드
+      const cw = 17, ch = 23;
+      const row = (n, cy, red) => {
+        let o = '';
+        for (let i = 0; i < n; i++) {
+          const cx = x + (w * (i + 1)) / (n + 1) - cw / 2;
+          o += card(cx, cy, cw, ch, red);
+        }
+        return o;
+      };
+      s += row(B, y + h * 0.17, false);
+      s += row(R, y + h * 0.55, true);
+    } else {
+      // 많은 장수는 상자 안에 흩어 놓는다
+      const cw = 8, ch = 11, pad = 5;
+      const r = rng(seed ?? 3);
+      const deck = [];
+      for (let i = 0; i < R; i++) deck.push(true);
+      for (let i = 0; i < B; i++) deck.push(false);
+      for (let i = deck.length - 1; i > 0; i--) {              // 색을 섞는다
+        const j = Math.floor(r() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+      const cols = Math.ceil(Math.sqrt(N * (w / h)));
+      const rows = Math.ceil(N / cols);
+      deck.forEach((red, i) => {
+        const c = i % cols, rw = Math.floor(i / cols);
+        const gx = x + pad + ((w - 2 * pad - cw) * c) / Math.max(1, cols - 1);
+        const gy = y + pad + ((h - 2 * pad - ch) * rw) / Math.max(1, rows - 1);
+        s += card(gx + (r() - 0.5) * 6, gy + (r() - 0.5) * 5, cw, ch, red);
+      });
+    }
+    return s;
+  }
+
+  /* 주사위 한 개 — 눈의 자리는 n 에서 나온다 */
+  function die(x, y, d, n, gray) {
+    const face = gray ? 'var(--muted)' : '#FFF';
+    const pip = gray ? '#FFF' : 'var(--ink)';
+    let s = `<rect x="${x}" y="${y}" width="${d}" height="${d}" rx="2" ` +
+            `fill="${face}" stroke="${gray ? 'none' : 'var(--ink)'}" stroke-width="1.1"/>`;
+    const a = 0.27, b = 0.5, c = 0.73;
+    const P = {
+      1: [[b, b]],
+      2: [[a, a], [c, c]],
+      3: [[a, a], [b, b], [c, c]],
+      4: [[a, a], [c, a], [a, c], [c, c]],
+      5: [[a, a], [c, a], [b, b], [a, c], [c, c]],
+      6: [[a, a], [c, a], [a, b], [c, b], [a, c], [c, c]],
+    }[n];
+    for (const [u, v] of P)
+      s += `<circle cx="${(x + u * d).toFixed(1)}" cy="${(y + v * d).toFixed(1)}" ` +
+           `r="${(d * 0.095).toFixed(2)}" fill="${pip}"/>`;
+    return s;
+  }
+
+  /* 분수 — 가운데 x 에 분자/분모를 쌓고 가로줄을 긋는다 */
+  function frac(cx, cy, num, den, o = {}) {
+    const size = o.size ?? 11;
+    const w = o.w ?? Math.max(num.length, den.length) * size * 0.62;
+    return txt(cx, cy - 5, num, { size, anchor: 'middle', fill: o.fill }) +
+           `<path d="M${(cx - w / 2).toFixed(1)},${cy} L${(cx + w / 2).toFixed(1)},${cy}" ` +
+           `stroke="${o.fill ?? 'var(--ink-2)'}" stroke-width="1"/>` +
+           txt(cx, cy + size + 3, den, { size, anchor: 'middle', fill: o.fill });
+  }
+
+  /* P(R) = 붉은 카드의 수 / 전체 카드의 수 = R / N
+     R 과 N 만 넘기면 오른쪽 분수가 따라온다 — 상자 그림과 같은 수에서 나온다. */
+  function probExpr(x, cy, R, N, o = {}) {
+    const size = o.size ?? 11;
+    let s = txt(x, cy + 4, 'P(R) =', { size: size + 1 });
+    s += frac(x + 84, cy, '붉은 카드의 수', '전체 카드의 수', { size, w: 84 });
+    s += txt(x + 132, cy + 4, '=', { size: size + 1 });
+    s += frac(x + 156, cy, String(R), String(N), { size: size + 2, w: 20 });
+    return s;
+  }
+
+  /* 표본공간 상자. regions = [{ w: 칸의 무게, top: [윗줄…], items: [사건…] }]
+     칸의 너비는 그 칸에 든 사건의 수에 비례한다 — 폭이 곧 확률이다. */
+  function spaceBox(x, y, w, h, regions, o = {}) {
+    const gap = 22;                                   // 왼쪽 위 'S' 자리
+    let s = `<path d="M${x + 12 + gap},${y} L${x + w},${y} L${x + w},${y + h} ` +
+            `L${x},${y + h} L${x},${y} L${x + 12},${y}" ` +
+            `fill="none" stroke="var(--ink-2)" stroke-width="1.3"/>`;
+    s += txt(x + 12 + gap / 2, y + 5, 'S', { size: 13, anchor: 'middle', fill: 'var(--ink)' });
+
+    const tot = regions.reduce((p, q) => p + q.w, 0);
+    let cx = x;
+    regions.forEach((rg, i) => {
+      const rw = (w * rg.w) / tot;
+      if (i > 0)
+        s += `<path d="M${cx.toFixed(1)},${y} L${cx.toFixed(1)},${y + h}" ` +
+             `stroke="var(--chart-blue)" stroke-width="1.1"/>`;
+      (rg.top || []).forEach((t, k) =>
+        s += txt(cx + rw / 2, y + 22 + k * 13, t, { size: 11, anchor: 'middle' }));
+      (rg.items || []).forEach((t, k) =>
+        s += txt(cx + (rw * (k + 1)) / (rg.items.length + 1), y + h - 14, t,
+                 { size: o.itemSize ?? 14, anchor: 'middle', fill: 'var(--ink)' }));
+      cx += rw;
+    });
+    return s;
+  }
+
+  /* 두 상자. 여기 적은 장수가 그림·확률·나무그림에 모두 쓰인다 —
+     상자 그림의 카드 수와 P(R) 의 분수가 어긋날 수 없다. */
+  const A = { R: 3,  B: 2,  N: 5,  name: '상자 A' };
+  const B = { R: 30, B: 20, N: 50, name: '상자 B' };
+
+  /* 상자 A·B 를 나란히 (viewBox 400 × 150) */
+  function boxPair() {
+    const W = 180, H = 104;
+    const one = (x, bx, seed) =>
+      cardBox(x, 4, W, H, bx.R, bx.B, seed) +
+      txt(x + W / 2, 126, bx.name, { size: 12, weight: 700, anchor: 'middle', fill: 'var(--ink)' }) +
+      txt(x + W / 2, 143, `(붉은 카드 ${bx.R}장, 푸른 카드 ${bx.B}장)`,
+          { size: 11, anchor: 'middle' });
+    return one(6, A, 11) + one(212, B, 27);
+  }
+
+  /* 비복원추출 나무그림 (viewBox 580 × 140).
+     두 갈래의 분수는 첫 시행에서 무엇을 뽑았는지에 따라 R·N 에서 그대로 계산된다. */
+  function tree(bx) {
+    const CRIM = 'var(--brand-crimson)';
+    let s = txt(6, 20, '첫번째 시행', { size: 10.5, weight: 700, fill: CRIM });
+    s += probExpr(6, 72, bx.R, bx.N);
+    s += `<path d="M196,68 L300,40" stroke="var(--chart-blue)" stroke-width="1.3" ` +
+         `marker-end="url(#ah-blue)" fill="none"/>`;
+    s += `<path d="M196,78 L300,106" stroke="var(--chart-blue)" stroke-width="1.3" ` +
+         `marker-end="url(#ah-blue)" fill="none"/>`;
+    s += probExpr(310, 36, bx.R - 1, bx.N - 1);        // 붉은 카드를 꺼냈을 경우
+    s += probExpr(310, 108, bx.R, bx.N - 1);           // 파란 카드를 꺼냈을 경우
+    s += lines(486, 26, ['첫번째 시행에서', '붉은 카드를', '꺼냈을 경우'],
+               { size: 10, weight: 700, fill: CRIM, lh: 12 });
+    s += lines(486, 96, ['첫번째 시행에서', '파란 카드를', '꺼냈을 경우'],
+               { size: 10, weight: 700, fill: CRIM, lh: 12 });
+    return s;
+  }
+
+  /* 표준정규 확률밀도 — 아래 세 슬라이드의 그림이 모두 이 함수 하나에서 나온다 */
+  const phi = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+
+  /* 이산변수의 히스토그램 — 0.5 간격의 막대(선)와 그 끝의 빈 점 */
+  function pmfPlot(sel) {
+    const F = Fig.withBox({ x0: 44, y0: 166, x1: 288, y1: 18 });
+    const S = F.scale({ x: [-3.3, 3.3], y: [0, 0.44] });
+    let s = `<path class="axis" d="M44,10 L44,166 L292,166"/>`;
+    for (let k = -3; k <= 3; k++)
+      s += txt(S.x(k), 181, String(k), { size: 9, anchor: 'middle' });
+    for (const v of [0, 0.1, 0.2, 0.3, 0.4])
+      s += txt(38, S.y(v) + 3, v.toFixed(1), { size: 9, anchor: 'end' });
+    for (let k = -6; k <= 6; k++) {                    // x = −3, −2.5, …, 3
+      const x = k / 2, h = phi(x);
+      s += `<path d="M${S.x(x)},${S.y(0)} L${S.x(x)},${S.y(h)}" ` +
+           `stroke="var(--ink)" stroke-width="1.2"/>`;
+      s += `<circle class="dot-open" cx="${S.x(x)}" cy="${S.y(h)}" r="2.6"/>`;
+    }
+    s += txt(S.x(0), 195, 'x', { size: 10, anchor: 'middle' });
+    s += txt(14, 14, 'f(x)', { size: 10 });
+    Fig.draw(sel, { parts: [Fig.raw(s)] });
+  }
+
+  /* 연속변수의 히스토그램 — 폭 0.5 의 구간, 높이는 그 구간 중앙의 밀도.
+     막대 꼭대기 한가운데를 곡선이 지나므로 "높이 = 밀도"가 그림에서 성립한다. */
+  function pdfPlot(sel, o = {}) {
+    const F = Fig.withBox({ x0: 44, y0: 166, x1: 288, y1: 18 });
+    const S = F.scale({ x: [-3.3, 3.3], y: [0, 0.44] });
+    let s = `<path class="axis" d="M44,10 L44,166 L292,166"/>`;
+    for (let k = -3; k <= 3; k++)
+      s += txt(S.x(k), 181, String(k), { size: 9, anchor: 'middle' });
+    for (const v of [0, 0.1, 0.2, 0.3, 0.4])
+      s += txt(38, S.y(v) + 3, v.toFixed(1), { size: 9, anchor: 'end' });
+    if (o.bars !== false) {
+      for (let k = 0; k < 12; k++) {
+        const a = -3 + k * 0.5, m = a + 0.25, hgt = phi(m);
+        s += `<rect x="${S.x(a)}" y="${S.y(hgt)}" width="${S.x(a + 0.5) - S.x(a)}" ` +
+             `height="${S.y(0) - S.y(hgt)}" fill="var(--chart-blue)" fill-opacity="0.30" ` +
+             `stroke="#FFF" stroke-width="1"/>`;
+      }
+    }
+    const pts = [];
+    for (let i = 0; i <= 96; i++) { const x = -3.2 + (6.4 * i) / 96; pts.push([x, phi(x)]); }
+    s += F.curve(S.curve(pts));
+    s += txt(S.x(0), 195, 'x', { size: 10, anchor: 'middle' });
+    s += txt(14, 14, 'f(x)', { size: 10 });
+    Fig.draw(sel, { parts: [Fig.raw(s)] });
+  }
+
+  return { txt, rich, lines, rng, cardBox, die, frac, probExpr, spaceBox, phi,
+           pmfPlot, pdfPlot, A, B, boxPair, tree };
+})();
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- T1 표지 (원본 p.10) -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>8강. 확률이론 (1)</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- 원본 p.11 -->
+  <section>
+    <h2>자료(표본)요약의 중요성과 확률의 필요성</h2>
+    <div class="body">
+      <svg class="fig" id="f-map" viewBox="0 0 848 396"
+           style="width:100%;max-height:366px;margin:0 auto" role="img">
+        <title>모집단에서 표본을 뽑고(표본추출) 표본의 통계량으로 모수를 추론하는 관계도.
+          모집단 쪽에는 모수와 모집단 분포가, 표본 쪽에는 통계량과 표본의 분포가 놓이고
+          가운데에 "모수추정량은 모수와 얼마만큼 비슷할까? → 확률 개념이 필요"가 적혀 있다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        const T = L8.txt, R = L8.rich;
+        const CRIM = 'var(--brand-crimson)', INK = 'var(--ink)', INK2 = 'var(--ink-2)';
+        let s = '';
+
+        /* 상자 두 종류 — 모집단·모수는 크림슨, 표본·통계량은 잉크 */
+        const box = (x, y, w, h, ko, en, crimson) =>
+          `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${crimson ? CRIM : INK2}"/>` +
+          T(x + w / 2, y + 16, ko, { size: 13.5, weight: 700, anchor: 'middle', fill: '#FFF', stroke: 'none' }) +
+          T(x + w / 2, y + 33, en, { size: 11, anchor: 'middle', fill: '#FFF', stroke: 'none' });
+
+        const tag = (x, y, w, s2, tint) =>
+          `<rect x="${x}" y="${y}" width="${w}" height="18" fill="${tint ? CRIM : 'none'}" ` +
+          `fill-opacity="${tint ? 0.1 : 0}" stroke="var(--ink-2)" stroke-width="1"/>` +
+          T(x + w / 2, y + 13, s2, { size: 10.5, weight: 700, anchor: 'middle', fill: INK });
+
+        /* ── 모집단 쪽 ── */
+        s += box(6, 2, 140, 38, '모집단', '(population)', true);
+        s += T(76, 55, '관심의 대상이 되는 전체', { size: 11.5, weight: 700, anchor: 'middle', fill: INK });
+        s += tag(30, 61, 92, '모집단 분포', true);
+
+        const FN = Fig.withBox({ x0: 20, y0: 142, x1: 132, y1: 92 });
+        const SN = FN.scale({ x: [-3.4, 3.4], y: [0, 0.44] });
+        s += `<path class="axis" d="M20,142 L132,142"/>`;
+        s += FN.curve(SN.curve(FN.normal(0, 1, -3.4, 3.4)), { variant: 'demand' });
+        s += `<path class="axis" d="M${SN.x(0)},142 L${SN.x(0)},${SN.y(0.415)}"/>`;
+        s += T(SN.x(0), 156, 'X', { size: 11, anchor: 'middle', fill: INK });
+
+        // 모수 → 모집단 (모집단 분포를 규정하는 것이 모수다)
+        s += `<path d="M152,196 L152,85" stroke="${INK2}" stroke-width="1.3" marker-end="url(#ah-ink)"/>`;
+
+        s += box(6, 198, 140, 38, '모수', '(parameter)', true);
+        s += T(76, 252, '모집단의 특성(모분포의 요약)', { size: 11, weight: 700, anchor: 'middle', fill: INK });
+        s += tag(6, 258, 70, '1개 특성');
+        s += tag(6, 348, 90, '2개 이상 특성');
+
+        const bullets = (x, y, arr) => arr.map((t, i) =>
+          `<circle cx="${x}" cy="${y + i * 17 - 4}" r="1.7" fill="${INK2}"/>` +
+          T(x + 10, y + i * 17, t, { size: 11 })).join('');
+
+        s += bullets(92, 268, ['(모)평균', '(모)분산(표준편차)', '왜도', '첨도',
+                               '기타: 중앙값, 최빈값, 분위수 등']);
+        s += bullets(92, 358, ['공분산 → 상관계수', '회귀계수']);
+
+        /* ── 가운데: 표본추출 ── */
+        ['표본추출', '(sampling)', ': 모집단 분포에 따른', '확률로 추출'].forEach((t, i) =>
+          s += T(316, 14 + i * 13.5, t, { size: 11.5, weight: i < 2 ? 700 : 400, anchor: 'middle', fill: CRIM }));
+        s += `<path d="M176,88 Q330,54 484,80" fill="none" stroke="${INK2}" ` +
+             `stroke-width="1.3" marker-end="url(#ah-ink)"/>`;
+
+        s += R(200, 104, [['→ ', INK2], ['관심대상의 확률변수화에', CRIM], [' 방식에 따라', INK2]], { size: 11 });
+        s += T(212, 119, '이미 알려진 분포로 표현 가능', { size: 11 });
+        s += T(200, 137, '→ 모집단 분포를 이미 알려진 분포로 표현하기 위해서는', { size: 11 });
+        s += R(212, 152, [['반드시 알아야 할 필요한 ', INK2], ['모수가 있음', CRIM]], { size: 11 });
+        s += T(212, 167, '예. 정규분포(μ, σ)', { size: 11 });
+
+        /* ── 표본 쪽 ── */
+        s += box(512, 0, 140, 38, '표본', '(sample)', false);
+        s += T(512, 54, '모집단의 관측된 일부', { size: 11.5, weight: 700, fill: INK });
+        s += tag(512, 60, 88, '표본의 분포');
+        s += bullets(516, 94, ['요약정리: 히스토그램', '수학적 근사: 확률질량(밀도)함수']);
+        s += T(512, 140, '→ 표본은 모집단의 분포를 따름', { size: 11 });
+
+        // 표본의 히스토그램 — 표준정규에서 뽑은 240개의 표본을 12개 구간으로 묶은 것
+        const FH = Fig.withBox({ x0: 726, y0: 138, x1: 838, y1: 88 });
+        const SH = FH.scale({ x: [-3.2, 3.2], y: [0, 0.50] });
+        const xs = Fig.scatter({ n: 240, mx: 0, my: 0, sx: 1, sy: 1, r: 0, seed: 8 }).map((p) => p[0]);
+        const LO = -3, BW = 0.5, NB = 12, cnt = new Array(NB).fill(0);
+        xs.forEach((v) => { const k = Math.floor((v - LO) / BW); if (k >= 0 && k < NB) cnt[k]++; });
+        cnt.forEach((c, k) => {
+          const a = LO + k * BW, d = c / xs.length / BW;
+          s += `<rect x="${SH.x(a)}" y="${SH.y(d)}" width="${SH.x(a + BW) - SH.x(a)}" ` +
+               `height="${SH.y(0) - SH.y(d)}" fill="var(--muted)" fill-opacity="0.55" ` +
+               `stroke="#FFF" stroke-width="0.8"/>`;
+        });
+        const np = [];
+        for (let i = 0; i <= 96; i++) { const x = -3.2 + (6.4 * i) / 96; np.push([x, L8.phi(x)]); }
+        s += FH.curve(SH.curve(np), { variant: 'demand' });
+        s += `<path class="axis" d="M726,138 L838,138"/>`;
+        s += T(782, 152, 'X', { size: 11, anchor: 'middle', fill: INK });
+
+        // 표본 → 통계량
+        s += `<path d="M582,158 L582,196" stroke="${INK2}" stroke-width="1.3" marker-end="url(#ah-ink)"/>`;
+
+        s += box(512, 198, 140, 38, '통계량', '(statistics)', false);
+        s += T(700, 252, '표본의 특성(표본분포의 요약)', { size: 11, weight: 700, anchor: 'middle', fill: INK });
+        s += tag(588, 258, 70, '1개 특성');
+        s += tag(588, 348, 90, '2개 이상 특성');
+        s += bullets(672, 268, ['(표본)평균', '(표본)분산(표준편차)', '왜도', '첨도',
+                                '기타: 중앙값, 최빈값, 분위수 등']);
+        s += bullets(672, 358, ['공분산 → 상관계수', '회귀계수']);
+
+        /* ── 가운데 아래: 추론 ── */
+        [['추론', 13, 700], ['(inference)', 12, 400],
+         [': 모수추정량은 모수와', 11.5, 400], ['얼마만큼 비슷할까?', 11.5, 400]]
+          .forEach(([t, sz, w], i) =>
+            s += T(365, 248 + i * 14.5, t, { size: sz, weight: w, anchor: 'middle', fill: CRIM }));
+        s += T(365, 308, '↓', { size: 12, anchor: 'middle', fill: INK2 });
+        s += T(365, 330, '확률 개념이 필요', { size: 16, weight: 700, anchor: 'middle', fill: CRIM });
+
+        s += `<path d="M500,278 L446,278" stroke="${INK2}" stroke-width="1.3" marker-end="url(#ah-ink)"/>`;
+        s += T(568, 282, '모수추정량', { size: 11.5, weight: 700, anchor: 'end', fill: CRIM });
+        s += `<path d="M582,258 C576,258 576,262 576,270 C576,275 574,278 571,278 ` +
+             `C574,278 576,281 576,286 C576,354 576,360 582,360" ` +
+             `fill="none" stroke="var(--guide)" stroke-width="1.2"/>`;
+
+        // 2개 이상 특성끼리도 같은 관계로 이어진다
+        s += `<path d="M196,382 Q420,398 630,378" fill="none" stroke="var(--guide)" ` +
+             `stroke-width="1.3" marker-end="url(#ah-ink)"/>`;
+
+        Fig.draw('#f-map', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.12 -->
+  <section>
+    <h2>확률(probability)이란?</h2>
+    <div class="body">
+      <p class="sub">어떤 사건이 일어날 가능성</p>
+      <ul style="margin-top:24px">
+        <li><span class="sub" style="display:inline">주관적 견해 (subjective view)</span>
+          <p style="margin:6px 0 0 12px">그 사건에 대한 주관적 확신의 정도</p></li>
+        <li style="margin-top:26px"><span class="sub" style="display:inline">도수이론 (frequency theory)</span>
+          <p style="margin:6px 0 0 12px">한 시행을 동일한 조건에서 독립적으로 반복했을 때,<br>
+            전체 시행횟수에서 그 사건이 일어난 횟수의 비율(상대도수)</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.13 -->
+  <section>
+    <h2>확률의 범위</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-range" viewBox="0 0 700 190" style="width:700px;margin:0 auto" role="img">
+        <title>절대로 일어날 수 없는 사건의 확률 0과 반드시 일어나는 사건의 확률 1을
+          중괄호로 묶어 "확률은 0 ~ 1 사이의 값을 가진다"로 잇는 그림</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        const CRIM = 'var(--brand-crimson)';
+        let s = '';
+        s += `<circle cx="8" cy="30" r="2.4" fill="${CRIM}"/>`;
+        s += L8.txt(22, 35, '절대로 일어날 수 없는 사건의 확률 = 0', { size: 17, weight: 700, fill: CRIM });
+        s += `<circle cx="8" cy="160" r="2.4" fill="${CRIM}"/>`;
+        s += L8.txt(22, 165, '반드시 일어나는 사건의 확률 = 1', { size: 17, weight: 700, fill: CRIM });
+        // 두 줄을 하나로 묶는 중괄호
+        s += `<path d="M352,30 C368,30 360,40 360,88 C360,92 364,95 370,95 ` +
+             `C364,95 360,98 360,102 C360,150 368,160 352,160" ` +
+             `fill="none" stroke="var(--ink-2)" stroke-width="1.2"/>`;
+        s += L8.txt(392, 101, '확률은 0 ~ 1 사이의 값을 가진다', { size: 17, weight: 700, fill: CRIM });
+        Fig.draw('#f-range', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.14 -->
+  <section>
+    <h2>확률의 표현</h2>
+    <div class="body tight">
+      <div class="cols top wide-l">
+        <div class="col-l">
+          <ul class="slim">
+            <li>어떤 사건: $A$</li>
+            <li>$A$ 사건이 일어날 확률: $P(A)$</li>
+            <li>$A$ 사건이 일어나지 않을 확률: $P(A^c) = 1 - P(A)$</li>
+            <li>$A$ 사건의 여사건($A$가 일어나지 않는 사건): $A^c$</li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <p class="sub">관심을 갖는 사건을 잘 정의하는 것이 중요!</p>
+        </div>
+      </div>
+      <p style="text-align:left;margin:2px 0 4px 40px;color:var(--brand-crimson);font-size:20px">↓</p>
+      <ul class="slim">
+        <li>어떤 사건 $A$ : 동전의 앞면이 나오는 것</li>
+        <li>$A$ 사건이 일어날 확률 $P(A)$: 동전의 앞면이 나올 확률 = ½</li>
+        <li>$A$ 사건이 일어나지 않을 확률 $P(A^c) = 1 - P(A)$: 동전의 앞면이 나오지 않을 확률
+          = 동전의 뒷면이 나올 확률 = 1/2</li>
+        <li>$A$ 사건의 여사건 $A^c$: 동전의 뒷면이 나오는 것</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.15 -->
+  <section>
+    <h2>확률의 계산: 도수이론 기반</h2>
+    <div class="body stack">
+      <ul style="margin:0">
+        <li><span class="sub" style="display:inline">무한 반복시행해서 전체 시행횟수 대비
+          사건이 발생하는 횟수의 비율을 구함</span></li>
+        <li style="margin-top:44px"><span class="sub" style="display:inline">사건의 특성을 보고
+          가능한 경우를 생각(나열)해서 확률을 계산</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.16 -->
+  <section>
+    <h2>확률의 계산</h2>
+    <div class="body tight">
+      <div class="cols top">
+        <div class="col-l">
+          <img src="../assets/tb-hong-gildong.jpg" style="width:100%;max-width:352px"
+               alt="예능 프로그램 〈홍길동전 — 운명 극복 수련기〉 포스터. 도포를 입은 출연자 여섯 명이 한옥 골목을 배경으로 서 있다">
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li><span class="sub" style="display:inline">무한 반복시행</span>
+              <p style="margin:4px 0 0 8px">(F, B, F, F, F, B, B …, F, F, B, B)<br>
+                앞면 횟수: 31239801254801258021850218501회<br>
+                뒷면 횟수: 31239801254801258021850218201회<br>
+                동전에서 앞면이 나올 확률: ?</p></li>
+            <li style="margin-top:14px"><span class="sub" style="display:inline">사건의 특성을 보고
+              가능한 경우를 생각(나열)</span>
+              <p style="margin:4px 0 0 8px">동전에서 나올 수 있는 모든 경우의 수: 앞면, 뒷면 (2개)<br>
+                동전에서 앞면이 나오는 경우의 수: 앞면 (1개)<br>
+                동전에서 앞면이 나올 확률: 앞면이 나오는 경우 / 모든 경우 = 1/2</p></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.17 -->
+  <section>
+    <h2>확률의 계산</h2>
+    <div class="body tight">
+      <div class="cols top">
+        <div class="col-l">
+          <p class="sub">두 개의 주사위를 던져 9가 나올 확률은?</p>
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>모든 경우의 수: 36개</li>
+            <li>9가 나오는 경우의 수: 4개 (6, 3), (3, 6), (4, 5), (5, 4)</li>
+            <li>9가 나올 확률: 4/36 = 1/9</li>
+          </ul>
+        </div>
+      </div>
+      <svg class="fig" id="f-dice" viewBox="0 0 360 270"
+           style="width:360px;display:block;margin:2px auto 0" role="img">
+        <title>두 주사위의 눈을 가로세로로 늘어놓은 36칸의 표. 두 눈의 합이 9가 되는
+          네 칸 (3,6), (4,5), (5,4), (6,3)에 붉은 타원이 쳐져 있다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        /* 판의 크기도 동그라미의 자리도 "주사위 6면 × 2개, 합 9" 하나에서 나온다.
+           TARGET 을 바꾸면 표시되는 칸이 저절로 따라 움직인다. */
+        const FACES = 6, TARGET = 9;
+        const D = 22, PAIR = 3, COLP = 52, ROWP = 39;
+        const GX = 44, GY = 36;                       // 격자의 왼쪽 위
+        let s = '';
+
+        // 머리글: 위쪽에 회색 주사위, 왼쪽에 흰 주사위
+        for (let c = 1; c <= FACES; c++)
+          s += L8.die(GX + (c - 1) * COLP + D + PAIR, 4, D, c, true);
+        for (let r = 1; r <= FACES; r++)
+          s += L8.die(8, GY + (r - 1) * ROWP, D, r, false);
+        s += `<path class="axis" d="M36,2 L36,${GY + FACES * ROWP - 10}"/>`;
+        s += `<path class="axis" d="M36,30 L${GX + FACES * COLP - 5},30"/>`;
+
+        for (let r = 1; r <= FACES; r++) {
+          for (let c = 1; c <= FACES; c++) {
+            const x = GX + (c - 1) * COLP, y = GY + (r - 1) * ROWP;
+            s += L8.die(x, y, D, r, false);
+            s += L8.die(x + D + PAIR, y, D, c, true);
+            if (r + c === TARGET)
+              s += `<ellipse cx="${x + D + PAIR / 2}" cy="${y + D / 2}" rx="29" ry="16" ` +
+                   `fill="none" stroke="var(--brand-crimson)" stroke-width="1.8"/>`;
+          }
+        }
+        Fig.draw('#f-dice', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.18 -->
+  <section>
+    <h2>확률의 계산</h2>
+    <div class="body tight">
+      <div class="cols top">
+        <div class="col-l">
+          <p style="margin:0 0 4px">상자 A와 B에서 <em>한 장의 카드를 꺼낼 때</em><br>
+            붉은 카드를 꺼낼 확률 P(R)은<br>
+            A와 B에서 서로 다른가?</p>
+          <ul class="slim" style="margin-top:14px">
+            <li>꺼낸 카드가 붉은 색이라는 사건: R</li>
+            <li>R이 발생할 확률: P(R)</li>
+            <li>꺼낸 카드가 붉은 색이 아닐 확률: 1−P(R)</li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <svg class="fig" id="f-box1" viewBox="0 0 400 150" style="width:390px" role="img">
+            <title>상자 A에는 붉은 카드 3장과 푸른 카드 2장이, 상자 B에는 붉은 카드 30장과
+              푸른 카드 20장이 들어 있는 그림</title>
+          </svg>
+        </div>
+      </div>
+      <p style="text-align:center;margin:6px 0 0">
+        $$P(R) = \frac{\text{붉은 카드의 수}}{\text{전체 카드의 수}} = \frac{3}{5}$$</p>
+    </div>
+    <script>
+      (function () {
+        Fig.draw('#f-box1', { parts: [Fig.raw(L8.boxPair())] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.19 -->
+  <section>
+    <h2>복원추출과 비복원추출</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:20px">두 장의 카드를 순서대로 꺼내는 경우</p>
+      <div class="row-fig">
+        <p class="sub lab" style="margin:0">첫 번째 추출</p>
+        <svg class="fig" id="f-draw1" viewBox="0 0 400 110" style="width:400px" role="img">
+          <title>카드 1, 2, 3이 놓인 통에서 카드 3을 집어 밖으로 꺼내는 그림</title>
+        </svg>
+      </div>
+      <div class="row-fig" style="margin-top:14px">
+        <p class="sub lab" style="margin:0">두 번째 추출</p>
+        <svg class="fig" id="f-draw2" viewBox="0 0 480 120" style="width:480px" role="img">
+          <title>복원추출에서는 통에 카드 1, 2, 3이 그대로 있고 비복원추출에서는 카드 1, 2만
+            남아 있는 두 통을 나란히 놓은 그림</title>
+        </svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const INK = 'var(--ink)', INK2 = 'var(--ink-2)';
+        const CW = 52, CH = 50;
+
+        /* 카드가 든 통 — 넣은 카드의 목록에서 칸의 수와 통의 폭이 나온다 */
+        function tray(x, y, cards, slots) {
+          const n = slots ?? cards.length;
+          const w = n * CW;
+          let s = `<path d="M${x - 6},${y - 4} L${x - 6},${y + CH + 8} L${x + w + 6},${y + CH + 8} ` +
+                  `L${x + w + 6},${y - 4}" fill="none" stroke="${INK}" stroke-width="1.4"/>`;
+          cards.forEach((c, i) => {
+            s += `<rect x="${x + i * CW}" y="${y}" width="${CW}" height="${CH}" ` +
+                 `fill="#FFF" stroke="${INK}" stroke-width="1.2"/>`;
+            s += L8.txt(x + i * CW + 10, y + CH / 2 + 5, String(c), { size: 14, fill: INK });
+          });
+          return s;
+        }
+
+        // 첫 번째 추출 — 통에서 3번 카드를 집어 낸다
+        let a = tray(60, 18, [1, 2], 2);
+        a += `<rect x="240" y="42" width="${CW}" height="${CH}" fill="#FFF" ` +
+             `stroke="${INK}" stroke-width="1.2"/>`;
+        a += L8.txt(250, 72, '3', { size: 14, fill: INK });
+        // 화살촉은 곡선 끝의 기울기에서 구한다 — 표준 화살촉은 선 굵기를 따라 커진다
+        a += `<path d="M176,34 Q216,6 252,32" fill="none" stroke="var(--chart-orange)" ` +
+             `stroke-width="2.6"/>`;
+        {
+          const dx = 252 - 216, dy = 32 - 6, L = Math.hypot(dx, dy);
+          const ux = dx / L, uy = dy / L, px = -uy, py = ux;
+          const tx = 256, ty = 35, b = 11, hw = 4.6;
+          a += `<path d="M${tx},${ty} L${(tx - b * ux + hw * px).toFixed(1)},` +
+               `${(ty - b * uy + hw * py).toFixed(1)} L${(tx - b * ux - hw * px).toFixed(1)},` +
+               `${(ty - b * uy - hw * py).toFixed(1)} Z" fill="var(--chart-orange)"/>`;
+        }
+        Fig.draw('#f-draw1', { parts: [Fig.raw(a)] });
+
+        // 두 번째 추출 — 복원이면 3장, 비복원이면 2장이 남는다
+        const ALL = [1, 2, 3];
+        let b = tray(20, 10, ALL, 3);
+        b += L8.txt(20 + (3 * CW) / 2, 96, '복원 추출', { size: 13, anchor: 'middle', fill: INK });
+        b += tray(270, 10, ALL.slice(0, 2), 3);
+        b += L8.txt(270 + (3 * CW) / 2, 96, '비복원 추출', { size: 13, anchor: 'middle', fill: INK });
+        Fig.draw('#f-draw2', { parts: [Fig.raw(b)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.20 -->
+  <section>
+    <h2>복원추출과 비복원추출</h2>
+    <div class="body tighter">
+      <div class="cols top">
+        <div class="col-l">
+          <p style="margin:0">상자 A와 B에서 <em>두 장의 카드를 차례로 꺼내는 경우</em><br>
+            두 번째에서 붉은 카드를 꺼낼 확률 P(R)은<br>
+            A와 B에서 서로 다른가?</p>
+        </div>
+        <div class="col-r">
+          <svg class="fig" id="f-box2" viewBox="0 0 400 150" style="width:250px" role="img">
+            <title>상자 A에는 붉은 카드 3장과 푸른 카드 2장이, 상자 B에는 붉은 카드 30장과
+              푸른 카드 20장이 들어 있는 그림</title>
+          </svg>
+        </div>
+      </div>
+      <ul class="slim" style="margin-top:6px">
+        <li>복원추출
+          <p style="margin:2px 0 0 10px">= 시행에 따라 전체카드의 수와 붉은 카드의 수가 변하지 않음</p></li>
+      </ul>
+      <svg class="fig" id="f-repl-a" viewBox="0 0 260 42" style="width:230px;margin-left:34px" role="img">
+        <title>복원추출에서 붉은 카드를 꺼낼 확률은 5분의 3으로 그대로라는 식</title>
+      </svg>
+      <ul class="slim" style="margin-top:2px">
+        <li>비복원추출 = 시행에 따라 전체 카드의 수와 붉은 카드의 수가 변함</li>
+      </ul>
+      <p style="margin:0 0 0 34px;font-weight:700;color:var(--ink)">〈상자 A〉</p>
+      <svg class="fig" id="f-tree-a" viewBox="0 0 580 128"
+           style="width:500px;margin-left:16px" role="img">
+        <title>상자 A의 비복원추출 나무그림. 첫번째 시행의 확률 5분의 3에서 갈라져,
+          붉은 카드를 꺼냈으면 4분의 2, 파란 카드를 꺼냈으면 4분의 3이 된다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        Fig.draw('#f-box2', { parts: [Fig.raw(L8.boxPair())] });
+        Fig.draw('#f-repl-a', { parts: [Fig.raw(L8.probExpr(6, 21, L8.A.R, L8.A.N)) ] });
+        Fig.draw('#f-tree-a', { parts: [Fig.raw(L8.tree(L8.A))] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.21 -->
+  <section>
+    <h2>복원추출과 비복원추출</h2>
+    <div class="body tighter">
+      <div class="cols top">
+        <div class="col-l">
+          <p style="margin:0">상자 A와 B에서 <em>두 장의 카드를 차례로 꺼내는 경우</em><br>
+            두 번째에서 붉은 카드를 꺼낼 확률 P(R)은<br>
+            A와 B에서 서로 다른가?</p>
+        </div>
+        <div class="col-r">
+          <svg class="fig" id="f-box3" viewBox="0 0 400 150" style="width:250px" role="img">
+            <title>상자 A에는 붉은 카드 3장과 푸른 카드 2장이, 상자 B에는 붉은 카드 30장과
+              푸른 카드 20장이 들어 있는 그림</title>
+          </svg>
+        </div>
+      </div>
+      <ul class="slim" style="margin-top:6px">
+        <li>복원추출
+          <p style="margin:2px 0 0 10px">= 시행에 따라 전체카드의 수와 붉은 카드의 수가 변하지 않음</p></li>
+      </ul>
+      <svg class="fig" id="f-repl-b" viewBox="0 0 260 42" style="width:230px;margin-left:34px" role="img">
+        <title>복원추출에서 붉은 카드를 꺼낼 확률은 5분의 3으로 그대로라는 식</title>
+      </svg>
+      <ul class="slim" style="margin-top:2px">
+        <li>비복원추출 = 시행에 따라 전체 카드의 수와 붉은 카드의 수가 변함</li>
+      </ul>
+      <p style="margin:0 0 0 34px;font-weight:700;color:var(--ink)">〈상자 B〉</p>
+      <svg class="fig" id="f-tree-b" viewBox="0 0 580 128"
+           style="width:500px;margin-left:16px" role="img">
+        <title>상자 B의 비복원추출 나무그림. 첫번째 시행의 확률 5분의 3에서 갈라져,
+          붉은 카드를 꺼냈으면 49분의 29, 파란 카드를 꺼냈으면 49분의 30이 된다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        Fig.draw('#f-box3', { parts: [Fig.raw(L8.boxPair())] });
+        Fig.draw('#f-repl-b', { parts: [Fig.raw(L8.probExpr(6, 21, L8.A.R, L8.A.N))] });
+        Fig.draw('#f-tree-b', { parts: [Fig.raw(L8.tree(L8.B))] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.22 -->
+  <section>
+    <h2>표본공간과 사건</h2>
+    <div class="body stack">
+      <ul style="margin:0">
+        <li><span class="sub" style="display:inline">사건 (event)</span>
+          <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 결과, 표본공간의 부분 집합</p></li>
+        <li style="margin-top:22px"><span class="sub" style="display:inline">표본공간 (sample space)</span>
+          <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 모든 사건의 집합</p></li>
+        <li style="margin-top:22px"><span class="sub" style="display:inline">확률 (probability)</span>
+          <p style="margin:6px 0 0 12px">사건 A의 확률은 표본공간에서 사건 A가 나타나는 경우가
+            모든 사건의 경우의 수에서 차지하는 비중</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.23 -->
+  <section>
+    <h2>표본공간과 사건</h2>
+    <div class="body">
+      <div class="cols top">
+        <div class="col-l">
+          <ul class="slim">
+            <li>동전 2회 던지기라는 시행</li>
+            <li>표본공간 S = {HH, HT, TH, TT}</li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>주사위 던지기라는 시행</li>
+            <li>표본공간 S = {1,2,3,4,5,6}</li>
+          </ul>
+        </div>
+      </div>
+      <svg class="fig" id="f-space" viewBox="0 0 848 150"
+           style="width:100%;margin-top:34px" role="img">
+        <title>표본공간 S를 나타낸 두 상자. 왼쪽에는 동전 2회 던지기의 HH, HT, TH, TT가,
+          오른쪽에는 주사위 던지기의 홀수 1,3,5와 짝수 2,4,6이 들어 있다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        let s = L8.spaceBox(0, 10, 390, 130, [{ w: 4, items: ['HH', 'HT', 'TH', 'TT'] }]);
+        s += L8.spaceBox(440, 10, 390, 130, [{ w: 1, items: ['1,3,5', '2,4,6'] }]);
+        Fig.draw('#f-space', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.24 -->
+  <section>
+    <h2>확률변수 (random variable)</h2>
+    <div class="body tight">
+      <p class="sub">표본공간에서 정의되는 각 사건들에 대응하는 실수 값 → 우리가 관심을 갖는 형태로 구성</p>
+      <div class="cols top">
+        <div class="col-l">
+          <ul class="slim">
+            <li>동전 2회 던지기라는 시행</li>
+            <li>표본공간 S = {HH, HT, TH, TT}</li>
+            <li><span class="sub" style="display:inline">각 사건을 앞면이 나오는 횟수로 변환한 확률변수</span><br>
+              HH = 2, HT = 1, TH = 1, TT = 0<br>X = {0, 1, 2}</li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>동전 2회 던지기라는 시행</li>
+            <li>표본공간 S = {HH, HT, TH, TT}</li>
+            <li><span class="sub" style="display:inline">각 사건을 두 면이 동일한 경우로 변환한 확률변수</span><br>
+              HH = 1, HT = 0, TH = 0, TT = 1<br>X = {0, 1}</li>
+          </ul>
+        </div>
+      </div>
+      <svg class="fig" id="f-rv" viewBox="0 0 848 110" style="width:100%;margin-top:8px" role="img">
+        <title>확률변수로 나눈 표본공간. 왼쪽 상자는 X=2(HH), X=1(HT, TH), X=0(TT)의
+          세 칸으로, 오른쪽 상자는 X=1(HH, TT), X=0(HT, TH)의 두 칸으로 갈려 있다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        /* 칸의 폭은 그 칸에 든 사건의 수에 비례한다 — 폭이 곧 확률이다 */
+        let s = L8.spaceBox(0, 12, 390, 94, [
+          { w: 1, top: ['X=2'], items: ['HH'] },
+          { w: 2, top: ['X=1'], items: ['HT', 'TH'] },
+          { w: 1, top: ['X=0'], items: ['TT'] },
+        ]);
+        s += L8.spaceBox(440, 12, 390, 94, [
+          { w: 2, top: ['X=1'], items: ['HH', 'TT'] },
+          { w: 2, top: ['X=0'], items: ['HT', 'TH'] },
+        ]);
+        Fig.draw('#f-rv', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.25 -->
+  <section>
+    <h2>확률분포 (probability distribution)</h2>
+    <div class="body tight">
+      <p class="sub">확률변수가 출현할 가능성, 즉 사건이 발생할 가능성에 대한 분포</p>
+      <div class="cols top">
+        <div class="col-l">
+          <ul class="slim">
+            <li>동전 2회 던지기라는 시행</li>
+            <li>표본공간 S = {HH, HT, TH, TT}</li>
+            <li>각 사건을 앞면이 나오는 횟수로 변환한 확률변수<br>
+              HH = 2, HT = 1, TH = 1, TT = 0<br>X = {0, 1, 2}</li>
+            <li><span class="sub" style="display:inline">각 확률변수가 발생할 가능성: P(X)</span></li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>주사위 던지기라는 시행</li>
+            <li>표본공간 S = {1,2,3,4,5,6}</li>
+            <li>각 사건을 홀수와 짝수로 변환한 확률변수<br>
+              1 = 1, 2 =0, 3 = 1, 4 = 0, 5 = 1, 6 = 0<br>X = {0, 1}</li>
+            <li><span class="sub" style="display:inline">각 확률변수가 발생할 가능성: P(X)</span></li>
+          </ul>
+        </div>
+      </div>
+      <svg class="fig" id="f-dist" viewBox="0 0 848 108" style="width:100%;margin-top:4px" role="img">
+        <title>확률분포를 얹은 표본공간. 왼쪽 상자는 P(X=2)=1/4, P(X=1)=1/2, P(X=0)=1/4,
+          오른쪽 상자는 P(X=1)=1/2, P(X=0)=1/2로 칸의 폭이 확률과 같다</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        /* 확률은 칸에 든 사건의 수 / 표본공간의 크기에서 그대로 나온다 */
+        const coin = [
+          { top: ['X=2'], items: ['HH'] },
+          { top: ['X=1'], items: ['HT', 'TH'] },
+          { top: ['X=0'], items: ['TT'] },
+        ];
+        const nCoin = coin.reduce((p, q) => p + q.items.length, 0);
+        const coinR = coin.map((r) => ({
+          w: r.items.length,
+          top: [r.top[0], `P(${r.top[0]})`, `=1/${nCoin / r.items.length}`],
+          items: r.items,
+        }));
+
+        const dice = [
+          { top: 'X=1', items: ['1,3,5'], n: 3 },
+          { top: 'X=0', items: ['2,4,6'], n: 3 },
+        ];
+        const nDice = dice.reduce((p, q) => p + q.n, 0);
+        const diceR = dice.map((r) => ({
+          w: r.n,
+          top: [r.top, `P(${r.top}) = 1/${nDice / r.n}`],
+          items: r.items,
+        }));
+
+        let s = L8.spaceBox(0, 12, 390, 94, coinR);
+        s += L8.spaceBox(440, 12, 390, 94, diceR);
+        Fig.draw('#f-dist', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.26 -->
+  <section>
+    <h2>이산변수와 연속변수의 확률</h2>
+    <div class="body tight">
+      <ul class="slim">
+        <li><span class="sub" style="display:inline">이산변수</span>
+          <p style="margin:4px 0 0 12px">주사위를 2개 던져서 나온 눈의 합이라는 사건<br>
+            동전을 던져서 앞면이 나올 사건</p>
+          <p style="margin:4px 0 0 12px">→ 특정 값에 대한 사건의 확률 계산 가능
+            (∵ 경우의 수가 유한하므로)</p></li>
+        <li style="margin-top:18px"><span class="sub" style="display:inline">연속변수</span>
+          <p style="margin:4px 0 0 12px">1~10 사이의 실수 중에서 하나의 수를 뽑는 사건</p>
+          <p style="margin:4px 0 0 12px">→ 특정 값에 대한 사건의 확률은 모두 0에 수렴
+            (∵ 경우의 수가 무한하므로)</p>
+          <p style="margin:4px 0 0 12px">→ 연속사건의 경우 특정 값에 대한 확률이 아닌
+            특정 구간에 속할 확률을 계산</p></li>
+      </ul>
+      <p class="derive" style="text-align:right;margin-top:18px">
+        이산변수와 연속변수의 확률을<br>그래프와 수식으로 나타내면?</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.27 -->
+  <section>
+    <h2>히스토그램, 확률질량함수, 확률밀도함수</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:2px">히스토그램(histogram): 사건확률을 그래프로 나타낸 것</p>
+      <p style="margin:0 0 8px 12px">어떤 자료를 계급으로 나눈 도수분포표의 상대도수를
+        밀도화하여 그래프로 표현한 것</p>
+      <div class="cols top">
+        <div class="col-l">
+          <p class="panel-head">이산변수의 히스토그램</p>
+          <div class="fig-note">
+            <svg class="fig" id="f-pmf1" viewBox="0 0 300 200" style="width:206px" role="img">
+              <title>이산변수의 히스토그램 — 0.5 간격의 값마다 세로 막대가 서 있고
+                그 끝이 종모양을 이룬다</title>
+            </svg>
+            <div>
+              <p>특정 값의 상대빈도 계산 o</p>
+              <p>→ 특정 값의 상대빈도 계산</p>
+              <p style="margin-top:10px">f(x) = 높이 = 밀도</p>
+              <p class="ind">= 상대도수 / 구간길이</p>
+              <p class="ind">= 상대도수 / 1</p>
+              <p class="ind">= 개별 값의 확률</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-r">
+          <p class="panel-head">연속변수의 히스토그램</p>
+          <div class="fig-note">
+            <svg class="fig" id="f-pdf1" viewBox="0 0 300 200" style="width:206px" role="img">
+              <title>연속변수의 히스토그램 — 폭 0.5의 구간 막대 위로 종모양의 곡선이 지난다</title>
+            </svg>
+            <div>
+              <p>특정 값의 상대빈도 계산 x</p>
+              <p>→ 구간의 상대빈도 계산</p>
+              <p style="margin-top:10px">f(x) = 높이 = 밀도</p>
+              <p class="ind">= 상대도수 / 구간길이</p>
+              <p class="ind">= 구간에 속한 개별 값의 확률</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="caption" style="margin-top:2px">이미지 출처: Continuous and discrete statistical
+        distributions (wasyresearch.com)</p>
+    </div>
+    <script>
+      L8.pmfPlot('#f-pmf1');
+      L8.pdfPlot('#f-pdf1');
+    </script>
+  </section>
+
+  <!-- 원본 p.28 -->
+  <section>
+    <h2>히스토그램, 확률질량함수, 확률밀도함수</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:2px">히스토그램(histogram): 사건확률을 그래프로 나타낸 것</p>
+      <p style="margin:0 0 6px 12px">어떤 자료를 계급으로 나눈 도수분포표의 상대도수를
+        밀도화하여 그래프로 표현한 것</p>
+      <div class="cols top">
+        <div class="col-l">
+          <p class="panel-head">이산변수의 히스토그램</p>
+          <div class="fig-note">
+            <svg class="fig" id="f-pmf2" viewBox="0 0 300 200" style="width:200px" role="img">
+              <title>이산변수의 히스토그램 — 0.5 간격의 값마다 세로 막대가 서 있고
+                그 끝이 종모양을 이룬다</title>
+            </svg>
+            <div>
+              <p>f(x) = 높이 = 밀도</p>
+              <p class="ind">= 상대도수 / 구간길이</p>
+              <p class="ind">= 상대도수 / 1</p>
+              <p class="ind" style="color:var(--brand-crimson);font-weight:700">= 개별 값의 확률</p>
+              <p style="text-align:center;color:var(--chart-blue);margin-top:2px">↓</p>
+              <p style="text-align:center;color:var(--brand-crimson);font-weight:700">확률질량함수</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-r">
+          <p class="panel-head">연속변수의 히스토그램</p>
+          <div class="fig-note">
+            <svg class="fig" id="f-pdf2" viewBox="0 0 300 200" style="width:200px" role="img">
+              <title>연속변수의 확률밀도 — 종모양의 곡선만 남은 그림</title>
+            </svg>
+            <div>
+              <p>f(x) = 높이 = 밀도</p>
+              <p class="ind">= 상대도수 / 구간길이</p>
+              <p class="ind" style="color:var(--brand-crimson);font-weight:700">
+                = 구간에 속한 개별 값의 확률</p>
+              <p style="text-align:center;color:var(--chart-blue);margin-top:2px">↓</p>
+              <p style="text-align:center;color:var(--brand-crimson);font-weight:700">확률밀도함수</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="caption" style="margin:0">이미지 출처: Continuous and discrete statistical
+        distributions (wasyresearch.com)</p>
+      <p class="sub" style="font-size:17px;margin-top:6px">→ 히스토그램을 밀도로 표현하는 이유:
+        확률질량함수와 확률밀도함수 모두에 대응하기 위해서!</p>
+    </div>
+    <script>
+      L8.pmfPlot('#f-pmf2');
+      L8.pdfPlot('#f-pdf2', { bars: false });
+    </script>
+  </section>
+
+  <!-- 원본 p.29 -->
+  <section>
+    <h2>확률질량함수와 확률밀도함수</h2>
+    <div class="body tight">
+      <div class="cols top">
+        <div class="col-l">
+          <svg class="fig" id="f-pmf3" viewBox="0 0 300 200"
+               style="width:232px;margin:0 auto" role="img">
+            <title>이산확률변수의 확률질량함수 — 0.5 간격의 값마다 세로 막대가 서 있고
+              그 끝이 종모양을 이룬다</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <svg class="fig" id="f-pdf3" viewBox="0 0 300 200"
+               style="width:232px;margin:0 auto" role="img">
+            <title>연속확률변수의 확률밀도함수 — 종모양의 곡선</title>
+          </svg>
+        </div>
+      </div>
+      <p class="caption" style="margin:2px 0 10px">이미지 출처: Continuous and discrete statistical
+        distributions (wasyresearch.com)</p>
+      <ul class="slim">
+        <li><span class="sub" style="display:inline">확률질량함수(probability mass function)</span>
+          <p style="margin:4px 0 0 12px">이산확률변수의 밀도분포를 나타내는 함수로서
+            특정 확률변수의 함수값 그 자체를 확률로 갖는 함수</p></li>
+        <li style="margin-top:12px"><span class="sub" style="display:inline">확률밀도함수(probability density function)</span>
+          <p style="margin:4px 0 0 12px">연속확률변수의 밀도분포를 나타내는 함수로서
+            특정 확률변수 구간의 면적을 확률로 갖는 함수</p></li>
+      </ul>
+    </div>
+    <script>
+      L8.pmfPlot('#f-pmf3');
+      L8.pdfPlot('#f-pdf3', { bars: false });
+    </script>
+  </section>
+
+  <!-- 원본 p.30 -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>자료의 요약 통계량이 동일 모집단의 다른 표본에서도 유사할지를 판단하기 위해
+          확률개념이 필요하다.</li>
+        <li>확률이란 어떤 사건이 일어날 가능성을 의미한다.</li>
+        <li>확률은 어떤 사건 발생 가능성에 대한 주관적 확신의 정도나, 한 시행을 동일한 조건에서
+          독립적으로 반복했을 때 전체 시행횟수에서 그 사건이 일어난 횟수의 비율로 나타낸다.</li>
+        <li>확률은 0~1 사이의 값을 가지며, 각 사건의 확률은 시행을 무한 반복하거나 사건의 특성을
+          보고 개념적으로 계산할 수 있다.</li>
+        <li>사건이란 특정 시행이나 실험에서 관찰가능한 결과를 의미하며, 표본공간은 발생 가능한
+          모든 사건의 집합을 의미한다.</li>
+        <li>표본공간에서 발생하는 각 사건들에 대응한 실수 값을 확률변수라하며, 각 확률변수가
+          나타날 가능성에 대한 분포가 바로 확률분포이다.</li>
+        <li>이산확률변수에 대한 확률분포함수를 확률질량함수, 연속확률변수에 대한 확률분포함수를
+          확률밀도함수라 한다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.31 -->
+  <section>
+    <h2>몬티홀 문제</h2>
+    <div class="body tight">
+      <p style="margin:0">Q) 세 개의 문 중 <em>하나에는 자동차</em>가, 나머지 <em>두 개에는 염소</em>가 있다.</p>
+      <p style="margin:0">당신이 <em>문 하나를 선택</em>하면 사회자가 나머지
+        <em>두 개의 문 중에 염소가 있는 문 하나를 연다</em>.</p>
+      <p style="margin:0">그리고 열리지 않은 문을 두고 <em>다시 한번 선택할 수 있는 기회</em>를 준다.</p>
+      <p style="margin:0">선택을 <em>바꿀 것인가, 바꾸지 않을 것인가</em>?</p>
+      <img src="../assets/tb-monty-hall.png"
+           style="display:block;margin:16px auto 0;width:430px"
+           alt="1, 2, 3번이 붙은 붉은 문 세 개. 1번과 2번은 닫혀 있고 3번은 열려 있어 그 안에 염소가 서 있다">
+    </div>
+  </section>
+
+  <!-- T10 마무리 (원본 p.32) -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

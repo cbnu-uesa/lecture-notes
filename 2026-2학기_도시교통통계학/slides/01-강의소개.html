@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1강. 도시교통통계학 강의 소개</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 실거래가 145건을 원본과 같이 6열로 늘어놓는다. 숫자 자체가 "정리되지 않은
+     자료"라는 메시지이므로 줄이거나 요약하지 않는다. */
+  .prices { display: flex; gap: 14px; font-size: 10px; line-height: 1.32;
+            font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .pricecol { flex: 0 0 auto; }
+  .qa-side { flex: 1 1 auto; padding-left: 18px; }
+  .qa-side .step { margin-bottom: 18px; }
+  .qa-side .q { font-size: 17px; font-weight: 700; color: var(--brand-crimson); margin: 0 0 4px; }
+  .qa-side .a { font-size: 14px; margin: 0 0 0 14px; }
+  .big-say { font-size: 26px; font-weight: 700; color: var(--brand-crimson);
+             text-align: center; margin: 40px 0 0; }
+  .flow { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 46px; }
+  .flow .node { width: 168px; padding: 18px 6px; text-align: center;
+                background: var(--brand-crimson); color: #FFF; font-weight: 700;
+                font-size: var(--fs-body); line-height: 1.35; }
+  .flow .arr { flex: 0 0 86px; text-align: center; position: relative; }
+  .flow .arr::after { content: ''; position: absolute; left: 8px; right: 8px; top: 50%;
+                      border-top: 1.4px solid #7C7C7C; }
+  .vvv { display: flex; gap: 40px; align-items: center; margin-top: 24px; }
+  .vvv .tags { flex: 0 0 240px; }
+  .vvv .tag { background: var(--brand-crimson); color: #FFF; font-weight: 700;
+              padding: 14px 10px; text-align: center; margin-bottom: 18px; font-size: 17px; }
+  .vvv .sum { flex: 1 1 auto; text-align: center; font-size: 22px; font-weight: 700;
+              color: var(--brand-crimson); line-height: 1.55; }
+  .link-tree { display: flex; gap: 20px; margin-top: 30px; }
+  .link-tree .cell { flex: 1 1 0; }
+  .link-tree .tag { background: var(--brand-crimson); color: #FFF; font-weight: 700;
+                    text-align: center; padding: 12px 8px; font-size: var(--fs-body); line-height: 1.35; }
+  .link-tree p { margin: 8px 0 0; font-size: 13px; text-align: center; }
+  .yr { text-align: center; font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+  /* 교재 표지 4종이 목록 아래에 들어가야 한다. 공용 .text-covers(300px)로는 푸터를 넘는다 */
+  .covers.text-covers { gap: 30px; margin: 14px 0 0 20px; }
+  .covers.text-covers img { height: 150px; }
+  /* 히스토그램 막대는 면 채움이 아니라 데이터라 진하게 둔다 */
+  #f-hist .area-bar { fill-opacity: .55; }
+  .photo2 { display: flex; gap: 22px; }
+  .photo2 img { height: 176px; width: auto; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- T1 표지 -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>1강. 도시교통통계학<br>강의 소개</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- 원본 p.2~5 — 같은 자료에 오른쪽 설명만 쌓인다. 한 장의 4단계로 합쳤다 -->
+  <section>
+    <h2>통계학이 필요한 이유</h2>
+    <div class="body tight">
+      <p class="sub">강남구 아파트 실거래가(만원) (2022년 6월~8월 / 145건)</p>
+      <div class="prices">
+      <div class="pricecol">195,000<br>303,000<br>360,000<br>214,000<br>210,000<br>373,000<br>119,000<br>111,500<br>108,000<br>95,000<br>150,000<br>130,500<br>192,000<br>219,000<br>40,500<br>40,300<br>41,500<br>40,500<br>39,500<br>38,500<br>38,000<br>38,500<br>38,500<br>38,500<br>99,500</div>
+      <div class="pricecol">246,000<br>106,000<br>102,000<br>110,000<br>20,500<br>22,000<br>22,300<br>21,500<br>20,500<br>137,000<br>310,000<br>34,000<br>380,000<br>246,000<br>530,000<br>260,000<br>279,000<br>240,000<br>248,000<br>257,000<br>85,000<br>42,300<br>42,500<br>383,000<br>387,000</div>
+      <div class="pricecol">380,000<br>380,000<br>38,000<br>300,000<br>29,900<br>290,000<br>310,000<br>160,000<br>550,000<br>315,000<br>299,000<br>423,000<br>315,000<br>86,000<br>243,000<br>275,000<br>370,000<br>435,000<br>425,000<br>480,000<br>480,000<br>340,000<br>395,000<br>46,000<br>47,000</div>
+      <div class="pricecol">50,000<br>45,000<br>47,000<br>500,000<br>37,500<br>37,500<br>32,000<br>30,000<br>35,000<br>305,000<br>175,500<br>218,000<br>445,000<br>126,000<br>345,000<br>545,000<br>500,000<br>440,000<br>450,000<br>300,000<br>295,000<br>135,000<br>102,000<br>165,000<br>188,500</div>
+      <div class="pricecol">97,000<br>129,500<br>142,000<br>142,000<br>317,500<br>307,000<br>440,000<br>476,500<br>800,000<br>550,000<br>390,000<br>270,000<br>335,000<br>32,000<br>33,000<br>31,900<br>95,000<br>360,000<br>84,900<br>84,500<br>84,000<br>279,500<br>203,500<br>200,000<br>230,000</div>
+      <div class="pricecol">20,500<br>17,700<br>18,400<br>280,000<br>42,000<br>33,700<br>150,000<br>189,000<br>103,000<br>110,000<br>112,000<br>113,000<br>495,000<br>282,000<br>285,000<br>315,000<br>430,000<br>117,562<br>160,000<br>355,000</div>
+        <div class="qa-side">
+          <div class="step">
+            <p class="q">Q) 이 숫자를 보고 뭘 알 수 있나?</p>
+          </div>
+          <div class="step fragment">
+            <p class="q">좋은 데이터도 요약하거나 정리하지 않으면 의미가 없다.</p>
+          </div>
+          <div class="step fragment">
+            <p class="q">1. 대표할 수 있는 값이 없을까?</p>
+            <p class="a">평균 거래가격: 210,414만원</p>
+            <p class="q" style="margin-top:10px">2. 대표값은 충분히 대표가 가능할까?</p>
+            <p class="a">표준편차: 160,379만원</p>
+            <p class="q" style="margin-top:10px">3. 다른 영향요인을 제거할 수는 없을까?</p>
+            <p class="a">평당 평균 거래가격: 7,635만원/평</p>
+            <p class="a">표준편차: 3,264만원/평</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.5 의 히스토그램만 따로. 실측 자료라 인쇄된 빈도를 그대로 쓴다 -->
+  <section>
+    <h2>통계학이 필요한 이유</h2>
+    <div class="body stack">
+      <p class="sub">4. 시각화하면 어떨까?</p>
+      <svg class="fig" id="f-hist" viewBox="0 0 620 300" style="width:620px" role="img"
+           aria-label="강남구 아파트 실거래가 히스토그램"></svg>
+      <p class="caption">구간은 원본과 같이 8개, 막대 위 숫자는 인쇄된 빈도다.</p>
+    </div>
+    <script>
+      (function () {
+        const bins = [
+          ['17,700~115,488', 57], ['115,488~213,275', 22], ['213,275~311,063', 28],
+          ['311,063~408,850', 19], ['408,850~506,638', 14], ['506,638~604,425', 4],
+          ['604,425~702,213', 0], ['702,213~800,000', 1],
+        ];
+        const X0 = 66, Y0 = 232, W = 520, H = 196, MAX = 60;
+        const bw = W / bins.length;
+        const y = (v) => Y0 - (v / MAX) * H;
+        let s = '';
+        for (let g = 0; g <= 6; g++) {
+          const v = g * 10;
+          s += `<path class="guide" d="M${X0},${y(v)} L${X0 + W},${y(v)}"/>`;
+          s += `<text class="tick" x="${X0 - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+        }
+        bins.forEach((b, i) => {
+          const x = X0 + i * bw + 5, w = bw - 10, top = y(b[1]);
+          if (b[1] > 0) s += `<rect class="area-bar" x="${x}" y="${top}" width="${w}" height="${Y0 - top}"/>`;
+          s += `<text class="annot" x="${x + w / 2}" y="${top - 6}" text-anchor="middle">${b[1]}</text>`;
+          s += `<text class="tick" x="${x + w / 2}" y="${Y0 + 14}" text-anchor="end"
+                  transform="rotate(-38 ${x + w / 2} ${Y0 + 14})">${b[0]}</text>`;
+        });
+        s += `<path class="axis" d="M${X0},${Y0} L${X0 + W},${Y0}"/>`;
+        s += `<text class="axis-name" x="${X0 - 8}" y="${y(MAX) - 10}" text-anchor="end">건수</text>`;
+        document.getElementById('f-hist').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- 원본 p.6 -->
+  <section>
+    <h2>통계학과 선거</h2>
+    <div class="body stack">
+      <p class="sub">조사대상: 73,297명 (총 투표자 수 34,067,853명의 0.22%)</p>
+      <img src="../assets/tb-yna-2022-exit-poll.jpeg" alt="2022 대선 여론조사·출구조사·득표율 비교"
+           style="display:block;height:290px;width:auto;margin:6px auto 0">
+      <p class="caption" style="text-align:center">
+        김토일, 원형민 기자 20220310 · [그래픽] 20대 대선 여론조사·출구조사·대선 득표율 비교 | 연합뉴스</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.7~8 -->
+  <section class="s-split wide-left">
+    <h2>다이제스트사 vs. 갤럽</h2>
+    <div class="body">
+      <div class="col-l">
+        <p class="sub">1936년 미국 대통령 선거결과 예측</p>
+        <ul>
+          <li>다이제스트사: 240만명 여론조사</li>
+          <li>갤럽: 5만명 여론조사</li>
+        </ul>
+        <table style="margin-top:10px">
+          <thead><tr><th></th><th>루즈벨트 득표율(%)</th></tr></thead>
+          <tbody>
+            <tr><td>실제 선거결과</td><td>62</td></tr>
+            <tr><td>다이제스트사 예측</td><td>43</td></tr>
+            <tr><td>다이제스트사에 대한 갤럽의 예측</td><td>44</td></tr>
+            <tr><td>갤럽의 예측</td><td>56</td></tr>
+          </tbody>
+        </table>
+        <div class="fragment" style="margin-top:12px">
+          <p class="sub">다이제스트 사의 표본추출방식</p>
+          <p class="emph">전화번호부 혹은 클럽회원 명단에서 우편물을 보내 여론조사 실시</p>
+        </div>
+      </div>
+      <div class="col-r" style="text-align:center">
+        <img src="../assets/tb-roosevelt.jpeg" alt="프랭클린 D. 루즈벨트"
+             style="height:250px;width:auto">
+        <p class="sub" style="margin:8px 0 0">프랭클린 D. 루즈벨트</p>
+        <p class="caption">(대통령 임기: 1933 ~ 1945년)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.9~11 -->
+  <section>
+    <h2>월드시리즈 챔피언과 미 대통령 당선 정당과의 관계</h2>
+    <div class="body tight">
+      <p class="sub">2016년 제58대 미국 대선 결과는?</p>
+      <div class="photo2 fragment">
+        <img src="../assets/tb-trump-2016.png" alt="도널드 트럼프">
+        <img src="../assets/tb-clinton-2016.png" alt="힐러리 클린턴">
+      </div>
+      <table style="margin-top:10px">
+        <thead><tr><th>연도</th><th>챔피언팀이 속한 리그</th><th>대통령이 된 후보의 정당</th></tr></thead>
+        <tbody>
+          <tr><td>2000</td><td>아메리칸리그(뉴욕양키스)</td><td>공화당(조지부시)</td></tr>
+          <tr><td>2004</td><td>아메리칸리그(보스턴레드삭스)</td><td>공화당(조지부시)</td></tr>
+          <tr><td>2008</td><td>내셔널리그(필라델피아 필리스)</td><td>민주당(버락오바마)</td></tr>
+          <tr><td>2012</td><td>내셔널리그(샌프란시스코 자이언츠)</td><td>민주당(버락오바마)</td></tr>
+          <tr><td>2016</td><td>내셔널리그(시카고 컵스)</td><td>공화당(도널드트럼프)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 원본 p.12 -->
+  <section>
+    <h2>통계학이 필요한 이유</h2>
+    <div class="body">
+      <p class="lead t-define">자료를 정리, 분석, 추론하여 유용한 정보를 이끌어냄으로써
+        효과적ㆍ효율적인 의사결정 지원</p>
+      <div class="flow">
+        <div class="node">자료<br>(Data)</div>
+        <div class="arr"></div>
+        <div class="node">통계학<br>(Statistics)</div>
+        <div class="arr"></div>
+        <div class="node">정보<br>(Information)</div>
+      </div>
+      <p class="big-say">숫자는 스스로 말하지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.13 -->
+  <section>
+    <h2>빅데이터 (big data) 시대에는?</h2>
+    <div class="body">
+      <p class="lead t-define">더 많은 자료가 더 빠른 속도로 축적될 때
+        어떻게 유용한 정보를 끌어낼 것인가?</p>
+      <div class="vvv">
+        <div class="tags">
+          <div class="tag">Volume</div>
+          <div class="tag">Velocity</div>
+          <div class="tag">Variety</div>
+        </div>
+        <div class="sum">통계이론<br>+<br>프로그래밍 능력<br>+<br>통찰력</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.14 -->
+  <section>
+    <h2>학습 목표</h2>
+    <div class="body stack">
+      <p class="define-big">다양한 도시현상을 데이터를 통해 분석하기 위한<br>
+        기초적인 통계이론의 개념과 그 원리를 이해하는 것</p>
+      <p class="ask" style="margin-top:44px">수식에 매몰되거나 통계 프로그램(SPSS, STATA, R 등)의
+        활용만을 강조하기 보다</p>
+      <p class="ask"><span class="mark">통계이론의 원리 이해</span>에 초점</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.15 — 날짜는 2026-2학기 학사일정에 맞춰 다시 적었다 -->
+  <section>
+    <h2>주별 강의 내용</h2>
+    <div class="body">
+      <div class="schedule" style="margin-left:70px">
+        <div class="row"><span class="d">(9/2)</span><span>1주차. 강의 소개</span></div>
+        <div class="row"><span class="d">(9/9)</span><span>2주차. 통계학과 자료의 정리: 히스토그램, 평균, 표준편차</span></div>
+        <div class="row"><span class="d">(9/16)</span><span>3주차. 정규분포와 정규분포로의 근사</span></div>
+        <div class="row"><span class="d">(9/23)</span><span>4주차. 상관관계</span></div>
+        <div class="row"><span class="d">(9/30, 10/7)</span><span>5-6주차. 회귀분석 (1), (2)</span></div>
+        <div class="row exam"><span class="d">(10/14)</span><span>7주차. 중간고사</span></div>
+        <div class="row"><span class="d">(10/21, 10/28)</span><span>8-9주차. 확률이론 (1), (2)</span></div>
+        <div class="row"><span class="d">(11/4)</span><span>10주차. 대수의 법칙과 중심극한정리</span></div>
+        <div class="row"><span class="d">(11/11)</span><span>11주차. 표본추출과 모수추정</span></div>
+        <div class="row"><span class="d">(11/18, 11/25)</span><span>12-13주차. 가설검정 (1), (2)</span></div>
+        <div class="row"><span class="d">(12/2)</span><span>14주차. 도시교통통계학 요약강의 (영상)</span></div>
+        <div class="row exam"><span class="d">(12/9)</span><span>15주차. 기말고사</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.16 -->
+  <section>
+    <h2>강의 교재</h2>
+    <div class="body">
+      <p class="sub">주교재</p>
+      <p class="emph">류근관, 2013, 『통계학』 (제3판), 법문사.</p>
+      <p class="sub" style="margin-top:14px">참고문헌</p>
+      <ol class="books">
+        <li>고지마 히로유키, 2009, 『세상에서 가장 쉬운 통계학 입문』, 지상사.</li>
+        <li>이희연, 노승철, 2013, 『고급통계분석론: 이론과 실습』 (제2판), 문우사.</li>
+        <li>황성동, 2023, 『누구나 할 수 있는 jamovi 통계분석』(2판), 학지사.</li>
+      </ol>
+      <div class="covers text-covers" style="margin-top:16px">
+        <img src="../assets/tb-text-ryu-stats.jpeg" alt="류근관, 통계학">
+        <img src="../assets/tb-text-easiest-stats.jpeg" alt="세상에서 가장 쉬운 통계학 입문">
+        <img src="../assets/tb-text-advanced-stats.jpeg" alt="고급통계분석론">
+        <img src="../assets/tb-text-jamovi.jpeg" alt="jamovi 통계분석">
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.17 -->
+  <section>
+    <h2>jamovi</h2>
+    <div class="body stack">
+      <p class="lead t-define">R 기반의 GUI 오픈소스 통계 소프트웨어</p>
+      <div style="display:flex;gap:24px;align-items:center;justify-content:center;margin-top:10px">
+        <img src="../assets/tb-jamovi-logo.png" alt="jamovi 로고" style="height:70px;width:auto">
+        <img src="../assets/tb-jamovi-screen-2.png" alt="jamovi 화면" style="height:230px;width:auto">
+      </div>
+      <p class="link" style="text-align:center;margin-top:10px">
+        jamovi — open statistical software for the desktop and cloud</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.18 -->
+  <section>
+    <h2>과목 간 연계</h2>
+    <div class="body">
+      <div class="link-tree">
+        <div class="cell">
+          <div class="tag">도시교통통계학<br><span class="en">(Introduction to Urban and Transport Statistics)</span></div>
+          <p>기초통계이론의 학습</p>
+          <p class="yr">1학년</p>
+        </div>
+        <div class="cell">
+          <div class="tag">데이터사이언스<br><span class="en">(Data Science)</span></div>
+          <p>데이터 추출 기법 및<br>프로그램 학습</p>
+        </div>
+        <div class="cell">
+          <div class="tag">GIS 기초 및 실습<br><span class="en">(Introduction to GIS)</span></div>
+          <p>GIS 이론 및<br>프로그램 활용법 학습</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.19 -->
+  <section>
+    <h2>평가 방법</h2>
+    <div class="body stack">
+      <div class="grade-bar">
+        <div class="seg s1" style="flex:0 0 10%">출석<br>(10%)</div>
+        <div class="seg s2" style="flex:0 0 30%">중간고사<br>(30%)</div>
+        <div class="seg s3" style="flex:0 0 40%">기말고사<br>(40%)</div>
+        <div class="seg s4" style="flex:0 0 20%">퀴즈<br>(20%)</div>
+      </div>
+      <p class="emph" style="text-align:center;margin-top:28px">
+        중간·기말고사는 핵심 개념의 이해도 + 활용도를 평가한다.</p>
+      <p class="emph" style="text-align:center">퀴즈는 별도 예고 없이 2번 시행한다.</p>
+    </div>
+  </section>
+
+  <!-- T10 마무리 -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

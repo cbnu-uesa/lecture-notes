@@ -1,0 +1,953 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>9강. 확률이론 (2)</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols.top { align-items: flex-start; }
+  /* 이 강의에서 쓰는 좌우 비율들 */
+  .body > .cols.w38 > .col-l { flex: 0 0 38%; }
+  .body > .cols.w56 > .col-l { flex: 0 0 56%; }
+  .body > .cols.w64 > .col-l { flex: 0 0 64%; }
+  .body > .cols.w70 > .col-l { flex: 0 0 70%; }
+  ul.slim > li { margin-bottom: 3px; }
+  ol.dense { margin: 0 0 0 2px; padding-left: 20px; }
+  ol.dense > li { margin-bottom: 6px; }
+  /* 원본이 수식 옆에 붙여 둔 작은 회색 각주 */
+  .side-note { font-size: 11px; line-height: 1.45; color: var(--muted); margin: 0; }
+  /* 두 갈래 예시의 머리말 (상호배반 / 상호배반이 아님) */
+  .case-title { font-size: var(--fs-emph); font-weight: 700; color: var(--brand-crimson);
+                text-align: center; margin: 0 0 4px; }
+  .vsub { font-size: 14px; color: var(--ink-2); text-align: center; margin: 0 0 6px; }
+  /* 몬티홀 계산 슬라이드는 원본이 가장 빽빽하다 — 이 장에서만 더 조인다 */
+  #s-monty ol.dense { font-size: 12px; }
+  #s-monty ol.dense > li { margin-bottom: 3px; }
+  #s-monty .side-note { font-size: 10.5px; line-height: 1.4; }
+</style>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   이 강의의 그림은 전부 집합·확률에서 유도한다 (design.md §6.4~6.5).
+   주사위 예시의 원 안 숫자·원 밖 숫자·아래 확률식이 모두 아래 집합
+   하나에서 나오므로 그림과 식이 어긋날 수 없다.
+   ───────────────────────────────────────────────────────────── */
+(function () {
+  const S = [1, 2, 3, 4, 5, 6];
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+  const red = (n, d) => { const g = gcd(n, d) || 1; return [n / g, d / g]; };
+  const slash = (n, d) => { if (n === 0) return '0'; const [p, q] = red(n, d); return q === 1 ? String(p) : `${p}/${q}`; };
+  const frac  = (n, d) => { if (n === 0) return '0'; const [p, q] = red(n, d); return q === 1 ? String(p) : `\\frac{${p}}{${q}}`; };
+
+  function mk(A, B) {
+    const inter  = A.filter((x) => B.includes(x));
+    const aOnly  = A.filter((x) => !B.includes(x));
+    const bOnly  = B.filter((x) => !A.includes(x));
+    const out    = S.filter((x) => !A.includes(x) && !B.includes(x));
+    const n = S.length;
+    const union = A.length + B.length - inter.length;
+    return {
+      aOnly: aOnly.join(','), bOnly: bOnly.join(','),
+      inter: inter.join(','), out: out.join(','),
+      overlap: inter.length > 0,
+      tex: [
+        `P(A) = ${slash(A.length, n)}`,
+        `P(B) = ${slash(B.length, n)}`,
+        `P(A \\cap B) = ${slash(inter.length, n)}`,
+        `P(A \\cup B) = ${frac(A.length, n)} + ${frac(B.length, n)} - ${frac(inter.length, n)}` +
+          (inter.length ? ` = ${frac(union, n)}` : ''),
+      ],
+    };
+  }
+
+  /* 벤 다이어그램 한 판. viewBox 는 언제나 0 0 300 168 이다. */
+  const BOXV = { x: 6, y: 26, w: 288, h: 132 };
+  const CY = 96, R = 45;
+
+  function frame() {
+    return `<rect x="${BOXV.x}" y="${BOXV.y}" width="${BOXV.w}" height="${BOXV.h}" ` +
+           `fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+  }
+  function circ(cx, tone) {
+    const c = tone === 'b' ? 'var(--chart-orange)' : 'var(--accent-blue)';
+    const op = tone === 'b' ? 0.20 : 0.18;
+    return `<circle cx="${cx}" cy="${CY}" r="${R}" fill="${c}" fill-opacity="${op}" ` +
+           `stroke="${c}" stroke-width="1.6"/>`;
+  }
+  function lab(x, y, t, o) {
+    o = o || {};
+    return `<text x="${x}" y="${y}" text-anchor="${o.anchor || 'middle'}" ` +
+           `style="font-size:${o.size || 13}px;font-style:${o.italic ? 'italic' : 'normal'};` +
+           `font-weight:${o.bold ? 700 : 500}" fill="${o.fill || 'var(--ink)'}">${t}</text>`;
+  }
+
+  /* 두 사건의 벤 다이어그램 */
+  function vennTwo(d) {
+    const ax = d.overlap ? 112 : 86;
+    const bx = d.overlap ? 188 : 214;
+    let s = frame() + circ(ax, 'a') + circ(bx, 'b');
+    s += lab(ax, BOXV.y + 21, 'A', { italic: true });
+    s += lab(bx, BOXV.y + 21, 'B', { italic: true });
+    if (d.overlap) {
+      s += lab(ax - 16, CY + 5, d.aOnly);
+      s += lab(150, CY + 5, d.inter);
+      s += lab(bx + 16, CY + 5, d.bOnly);
+    } else {
+      s += lab(ax, CY + 5, d.aOnly);
+      s += lab(bx, CY + 5, d.bOnly);
+    }
+    if (d.out) s += lab(150, BOXV.y + 21, d.out, { fill: 'var(--ink-2)' });
+    return s;
+  }
+
+  /* 한 사건과 그 여사건 */
+  function vennOne(inside, outside) {
+    const ax = 92;
+    let s = frame() + circ(ax, 'a');
+    s += lab(ax, BOXV.y + 21, 'A', { italic: true });
+    s += `<text x="216" y="${BOXV.y + 21}" text-anchor="middle" ` +
+         `style="font-size:13px;font-style:italic;font-weight:500" fill="var(--ink)">` +
+         `A<tspan dy="-5" style="font-size:9px">c</tspan></text>`;
+    if (inside)  s += lab(ax, CY + 5, inside);
+    if (outside) s += lab(216, CY + 5, outside, { fill: 'var(--ink-2)' });
+    return s;
+  }
+
+  function fill(sel, svg) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const t = el.querySelector('title');
+    el.innerHTML = (t ? t.outerHTML : '') + svg;
+  }
+
+  function texRows(sel, tex, gap) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.innerHTML = tex.map((t) => `<p style="margin:0 0 ${gap || 2}px">$${t}$</p>`).join('');
+  }
+
+  /* 채우기는 문서 아래쪽 스크립트가 파싱 도중에 부른다.
+     MathJax 는 Reveal 초기화 때 한 번 훑으므로 그 전에 DOM 에 들어가 있어야 한다. */
+  window.VENN = { mk: mk, vennOne: vennOne, vennTwo: vennTwo, fill: fill, texRows: texRows };
+
+  /* 몬티홀 — 사회자가 C를 열 조건부확률에서 P(A|D)를 유도한다.
+     원본 p.30 이 나열한 P(D|A)=1/2, P(D|B)=1, P(D|C)=0 이 그대로 들어간다. */
+  window.MONTY = (function () {
+    const P = { A: 1 / 3, B: 1 / 3, C: 1 / 3 };
+    const D = { A: 1 / 2, B: 1, C: 0 };
+    const den = P.A * D.A + P.B * D.B + P.C * D.C;
+    const post = (P.A * D.A) / den;
+    return { P, D, post, postTex: slash(Math.round(post * 12), 12) };
+  })();
+})();
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- T1 표지 (원본 p.1) -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>9강. 확률이론 (2)</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- 원본 p.2 -->
+  <section>
+    <h2>지난 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>자료의 요약 통계량이 동일 모집단의 다른 표본에서도 유사할지를 판단하기 위해
+          확률개념이 필요하다.</li>
+        <li>확률이란 어떤 사건이 일어날 가능성을 의미한다.</li>
+        <li>확률은 어떤 사건 발생 가능성에 대한 주관적 확신의 정도나, 한 시행을 동일한 조건에서
+          독립적으로 반복했을 때 전체 시행횟수에서 그 사건이 일어난 횟수의 비율로 나타낸다.</li>
+        <li>확률은 0~1 사이의 값을 가지며, 각 사건의 확률은 시행을 무한 반복하거나
+          사건의 특성을 보고 개념적으로 계산할 수 있다.</li>
+        <li>사건이란 특정 시행이나 실험에서 관찰가능한 결과를 의미하며,
+          표본공간은 발생 가능한 모든 사건의 집합을 의미한다.</li>
+        <li>표본공간에서 발생하는 각 사건들에 대응한 실수 값을 확률변수라 하며,
+          각 확률변수가 나타날 가능성에 대한 분포가 바로 확률분포이다.</li>
+        <li>이산확률변수에 대한 확률분포함수를 확률질량함수, 연속확률변수에 대한 확률분포함수를
+          확률밀도함수라 한다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.3 — 도입부의 몬티홀 문제 -->
+  <section>
+    <h2>몬티홀 문제</h2>
+    <div class="body tight">
+      <p class="emph" style="margin-bottom:2px">Q) 세 개의 문 중 하나에는 자동차가,
+        나머지 두 개에는 염소가 있다.</p>
+      <p class="emph" style="margin-bottom:2px">당신이 문 하나를 선택하면 사회자가
+        나머지 두 개의 문 중에 염소가 있는 문 하나를 연다.</p>
+      <p class="emph" style="margin-bottom:2px">그리고 열리지 않은 문을 두고
+        다시 한번 선택할 수 있는 기회를 준다.</p>
+      <p class="sub" style="margin-top:8px">선택을 바꿀 것인가, 바꾸지 않을 것인가?</p>
+      <img src="../assets/tb-monty-hall.png"
+           style="display:block;margin:10px auto 4px;width:320px"
+           alt="문 세 개가 나란히 있고 1번과 2번은 닫혀 있으며 3번 문은 열려 그 안에 염소가 서 있는 그림">
+      <p class="source" style="text-align:center">https://youtu.be/AXB6r-hjsig</p>
+    </div>
+  </section>
+
+  <!-- T12 섹션 구분 (원본 p.4) -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">집합을 이용한 확률의 이해</p>
+    <p class="section-sub">벤 다이어그램 · 상호배반 · 덧셈법칙 · 조건부확률과 곱셈법칙 · 베이즈 정리</p>
+  </section>
+
+  <!-- 원본 p.5 -->
+  <section>
+    <h2>벤 다이어그램 (Venn diagram)</h2>
+    <div class="body">
+      <p class="sub">전체 집합과 여러 사건 집합 간의 관계를 하나의 직사각형과
+        그 안의 원으로 나타낸 것</p>
+      <p class="caption-blue" style="margin-top:14px;text-align:center">벤 다이어그램의 예시</p>
+      <svg class="fig" id="f-venn-ex" viewBox="0 0 640 250" style="width:560px;margin:0 auto" role="img">
+        <title>두 원이 겹치지 않는 벤 다이어그램과 두 원이 겹치는 벤 다이어그램을 나란히 놓은 그림</title>
+        <rect x="10" y="40" width="290" height="160" fill="none" stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="100" cy="130" r="52" fill="var(--accent-blue)" fill-opacity="0.18"
+                stroke="var(--accent-blue)" stroke-width="1.6"/>
+        <circle cx="210" cy="130" r="52" fill="var(--chart-orange)" fill-opacity="0.20"
+                stroke="var(--chart-orange)" stroke-width="1.6"/>
+        <text x="100" y="68" text-anchor="middle" style="font-size:14px;font-style:italic;font-weight:500">A</text>
+        <text x="210" y="68" text-anchor="middle" style="font-size:14px;font-style:italic;font-weight:500">B</text>
+        <text x="155" y="228" text-anchor="middle" style="font-size:14px" fill="var(--ink-2)">두 원이 겹치지 않음</text>
+
+        <rect x="340" y="40" width="290" height="160" fill="none" stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="445" cy="130" r="52" fill="var(--accent-blue)" fill-opacity="0.18"
+                stroke="var(--accent-blue)" stroke-width="1.6"/>
+        <circle cx="525" cy="130" r="52" fill="var(--chart-orange)" fill-opacity="0.20"
+                stroke="var(--chart-orange)" stroke-width="1.6"/>
+        <text x="445" y="68" text-anchor="middle" style="font-size:14px;font-style:italic;font-weight:500">A</text>
+        <text x="525" y="68" text-anchor="middle" style="font-size:14px;font-style:italic;font-weight:500">B</text>
+        <text x="485" y="228" text-anchor="middle" style="font-size:14px" fill="var(--ink-2)">두 원이 겹치고 있음</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 원본 p.6 -->
+  <section>
+    <h2>상호배반 (mutually exclusive) 사건</h2>
+    <div class="body tight">
+      <p class="sub">한 사건이 발생할 때 다른 사건이 일어날 수 없는 경우 두 사건 간의 관계</p>
+      <div class="cols top w38" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-venn-c" viewBox="0 0 300 168" style="width:270px" role="img">
+            <title>직사각형 안에 원 A가 하나 있고 원 바깥이 A의 여사건인 벤 다이어그램</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="emph" style="margin-top:10px">Q) 사건 A의 상호배반 사건은?
+            <span class="t-red" style="font-weight:700">A의 여사건</span></p>
+        </div>
+      </div>
+      <div class="cols top" style="margin-top:4px">
+        <div class="col-l">
+          <ul class="slim"><li>동전의 앞면과 뒷면</li></ul>
+          <svg class="fig" id="f-venn-coin" viewBox="0 0 300 168" style="width:266px" role="img">
+            <title>직사각형 안의 원에 앞면, 원 바깥에 뒷면을 적은 벤 다이어그램</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <ul class="slim"><li>주사위의 홀수가 나오는 사건과 6이 나오는 사건</li></ul>
+          <svg class="fig" id="f-venn-dice" viewBox="0 0 300 168" style="width:266px" role="img">
+            <title>직사각형 안에 겹치지 않는 두 원이 있고 왼쪽 원에 1,3,5 오른쪽 원에 6, 바깥에 2,4를 적은 벤 다이어그램</title>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.7~8 — 같은 두 판에 확률식만 얹힌다. 한 장의 2단계로 합쳤다 -->
+  <section>
+    <h2>상호배반이 아닌 경우</h2>
+    <div class="body tight">
+      <p class="sub">상호 배반(mutually exclusive) 사건: 한 사건이 발생할 때
+        다른 사건이 일어날 수 없는 경우 두 사건 간의 관계</p>
+      <div class="cols top" style="margin-top:6px">
+        <div class="col-l">
+          <p class="case-title">상호배반</p>
+          <p class="vsub">주사위의 홀수가 나오는 사건과 6이 나오는 사건</p>
+          <svg class="fig" id="f-me" viewBox="0 0 300 168" style="width:300px" role="img">
+            <title>겹치지 않는 두 원. 왼쪽 원 안에 1,3,5 오른쪽 원 안에 6, 직사각형 안 바깥에 2,4</title>
+          </svg>
+          <div id="eq-me" class="fragment" data-fragment-index="0" style="margin-top:2px"></div>
+        </div>
+        <div class="col-r">
+          <p class="case-title">상호배반이 아님</p>
+          <p class="vsub">주사위의 홀수가 나오는 사건과 3의 배수가 나오는 사건</p>
+          <svg class="fig" id="f-nme" viewBox="0 0 300 168" style="width:300px" role="img">
+            <title>겹치는 두 원. 왼쪽에 1,5 겹치는 부분에 3 오른쪽에 6, 직사각형 안 바깥에 2,4</title>
+          </svg>
+          <div id="eq-nme" class="fragment" data-fragment-index="0" style="margin-top:2px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.9 -->
+  <section>
+    <h2>확률의 덧셈법칙</h2>
+    <div class="body">
+      <p class="formula-key" style="text-align:center">
+        $$P(A \cup B) = P(A) + P(B) - P(A \cap B)$$</p>
+      <ul style="margin-top:26px">
+        <li><span class="sub" style="display:inline">$P(A), P(B)$</span>:
+          A가 발생할 확률, B가 발생할 확률
+          <p class="derive" style="margin:2px 0 0 12px">→ 주변확률/비조건부확률 (marginal probability)</p></li>
+        <li style="margin-top:16px"><span class="sub" style="display:inline">$P(A \cap B)$</span>:
+          A와 B가 동시에 발생할 확률 (A <u>그리고</u> B가 함께 일어날 확률)
+          <p class="derive" style="margin:2px 0 0 12px">→ 결합확률 (joint probability)</p></li>
+        <li style="margin-top:16px"><span class="sub" style="display:inline">$P(A \cup B)$</span>:
+          A와 B 중 적어도 하나의 사건이 일어날 확률 (A <u>또는</u> B가 일어날 확률)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.10 -->
+  <section>
+    <h2>확률의 덧셈법칙</h2>
+    <div class="body">
+      <p class="formula-key" style="text-align:center">
+        $$P(A \cup B) = P(A) + P(B) - P(A \cap B)$$</p>
+      <div style="margin-top:34px">
+        <p class="derive">둘 중 하나의 사건이 발생할 확률은</p>
+        <p class="derive" style="margin-top:22px">두 사건이 각각 발생할 확률의 합과</p>
+        <p class="derive">두 사건이 동시에 발생할 확률의 차</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.11 -->
+  <section>
+    <h2>조건부확률 (conditional probability)</h2>
+    <div class="body">
+      <p class="sub">한 사건이 발생했다는 조건 하에서 다른 사건이 발생할 확률</p>
+      <p class="emph" style="margin-top:22px">Q) 다음의 상자에서 두 장의 카드를 비복원추출로 뽑을 때</p>
+      <p class="derive">→ 첫 번째 카드가 2라는 조건 하에서 두번째 카드가 4일 확률은?</p>
+      <svg class="fig" id="f-cards" viewBox="0 0 420 112" style="width:380px;margin:18px auto 0" role="img">
+        <title>1, 2, 3, 4가 적힌 카드 네 장이 담긴 상자</title>
+        <path d="M6,10 L6,102 L414,102 L414,10" fill="none" stroke="var(--ink)" stroke-width="2"/>
+        <g fill="none" stroke="var(--ink)" stroke-width="1.6">
+          <rect x="26"  y="24" width="72" height="62"/>
+          <rect x="122" y="24" width="72" height="62"/>
+          <rect x="218" y="24" width="72" height="62"/>
+          <rect x="314" y="24" width="72" height="62"/>
+        </g>
+        <g text-anchor="middle" style="font-size:26px" fill="var(--ink)">
+          <text x="62"  y="66">1</text>
+          <text x="158" y="66">2</text>
+          <text x="254" y="66">3</text>
+          <text x="350" y="66">4</text>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 원본 p.12 -->
+  <section>
+    <h2>조건부확률</h2>
+    <div class="body tight">
+      <p class="sub">P(A|B) = B가 일어났다는 것을 알고 있을 때 A가 일어날 확률</p>
+      <div class="cols top w56" style="margin-top:8px">
+        <div class="col-l">
+          <svg class="fig" id="f-cp-split" viewBox="0 0 440 118" style="width:440px" role="img">
+            <title>B가 칠해진 벤 다이어그램은 A 그리고 B가 칠해진 판과 A의 여사건 그리고 B가 칠해진 판의 합과 같다</title>
+          </svg>
+          <svg class="fig" id="f-cp-lens" viewBox="0 0 424 136" style="width:424px;margin-top:4px" role="img">
+            <title>조건부확률을 볼록렌즈 모양의 넓이를 오른쪽 원의 넓이로 나눈 값, 곧 볼록렌즈를 볼록렌즈와 초승달의 합으로 나눈 값으로 나타낸 그림</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <ol class="dense" style="margin-top:8px">
+            <li>B가 일어났다는 것을 알았을 때 A가 일어날 확률은</li>
+            <li style="margin-top:14px">B가 일어날 확률에서</li>
+            <li style="margin-top:14px">B가 일어났을 때 A가 일어날 확률이 차지하는 비중</li>
+          </ol>
+          <p class="formula-key" style="text-align:center;margin-top:16px">
+            $$P(A|B) = \frac{P(A \cap B)}{P(B)}$$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.13 -->
+  <section>
+    <h2>확률의 곱셈법칙</h2>
+    <div class="body">
+      <p class="formula-key" style="text-align:center">
+        $$P(A \cap B) = P(A) \times P(B|A) = P(B) \times P(A|B)$$</p>
+      <ul style="margin-top:26px">
+        <li><span class="sub" style="display:inline">$P(A), P(B)$</span>:
+          A가 발생할 확률, B가 발생할 확률
+          <p class="derive" style="margin:2px 0 0 12px">→ 주변확률/비조건부확률 (marginal probability)</p></li>
+        <li style="margin-top:16px"><span class="sub" style="display:inline">$P(A \cap B)$</span>:
+          A와 B가 동시에 발생할 확률 (A 그리고 B가 함께 일어날 확률)
+          <p class="derive" style="margin:2px 0 0 12px">→ 결합확률 (joint probability)</p></li>
+        <li style="margin-top:16px"><span class="sub" style="display:inline">$P(A|B)$</span>:
+          B가 발생했다는 조건 하에서 A가 발생할 확률
+          <p class="derive" style="margin:2px 0 0 12px">→ 조건부확률 (conditional probability)</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.14 -->
+  <section>
+    <h2>확률의 곱셈법칙</h2>
+    <div class="body">
+      <p class="formula-key" style="text-align:center">
+        $$P(A \cap B) = P(A) \times P(B|A) = P(B) \times P(A|B)$$</p>
+      <div style="margin-top:34px">
+        <p class="derive">두 사건이 모두 일어날 확률은</p>
+        <p class="derive" style="margin-top:22px">하나의 사건이 일어날 확률과</p>
+        <p class="derive">그 사건이 일어났다는 조건 하에서 다른 하나의 사건이 일어날 조건부확률의 곱</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.15 -->
+  <section>
+    <h2>조건부확률과 독립</h2>
+    <div class="body">
+      <img src="../assets/tb-conditional-pitcher-cartoon.jpg"
+           style="display:block;margin:0 auto;height:326px;width:auto"
+           alt="세 칸 만화. A는 안타, B는 주자만루. 왼쪽부터 P(A|B) < P(A)인 대범한 투수, P(A|B) > P(A)인 소심한 투수, P(A|B) = P(A)인 무덤덤한 투수를 그렸다">
+    </div>
+  </section>
+
+  <!-- 원본 p.16~17 — 아래쪽 유도가 얹히는 누적. 한 장의 2단계로 합쳤다 -->
+  <section>
+    <h2>독립 (independent)과 종속 (dependent) 사건</h2>
+    <div class="body tight">
+      <ul>
+        <li>독립 (independent) : 한 사건이 발생할 때
+          <span class="sub" style="display:inline">다른 사건이 일어날 확률이 변하지 않는 경우</span>
+          두 사건 간의 관계</li>
+        <li>종속 (dependent) : 한 사건이 발생할 때
+          <span class="sub" style="display:inline">다른 사건이 일어날 확률이 바뀌는 경우</span>
+          두 사건 간의 관계</li>
+      </ul>
+      <div class="cols top w56 fragment" data-fragment-index="0" style="margin-top:20px">
+        <div class="col-l">
+          <p class="sub" style="margin-bottom:2px">두 사건이 독립일 경우</p>
+          <p style="margin:0 0 14px">$P(B|A) = P(B),\ P(A|B) = P(A)$</p>
+          <p class="sub" style="margin-bottom:2px">따라서 두 사건이 모두 일어날 확률은</p>
+          <p style="margin:0 0 12px">$P(A \cap B) = P(A) \times P(B|A) = P(A) \times P(B)$</p>
+          <p class="derive">→ 복원추출은 매 추출이 독립, 비복원추출은 종속</p>
+        </div>
+        <div class="col-r" style="margin-top:14px">
+          <p class="sub" style="margin-bottom:4px">만약 두 사건이 종속이라면</p>
+          <p class="derive" style="margin:0">두 사건의 결합확률을 계산하기 위해서</p>
+          <p class="derive" style="margin:0">반드시 두 사건의 조건부확률을 알아야 한다!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.18 -->
+  <section>
+    <h2>상호배반과 독립의 구분</h2>
+    <div class="body">
+      <ul style="margin-top:20px">
+        <li><span class="sub" style="display:inline">상호배반 (mutually exclusive)</span>:
+          한 사건이 발생하면 다른 사건이 발생하지 못하는 경우
+          <p class="derive" style="margin:6px 0 0 12px">→ $P(A \cap B) = 0$인 경우</p>
+          <p class="derive" style="margin:4px 0 0 12px">→ 상호배반인 두 사건은 서로 종속관계
+            (∵ A가 일어나면 다른 사건의 확률이 0으로 변경되므로)</p></li>
+        <li style="margin-top:40px"><span class="sub" style="display:inline">독립 (independent)</span>:
+          한 사건이 발생해도 다른 사건의 (비조건부) 확률이 바뀌지 않는 경우
+          <p class="derive" style="margin:6px 0 0 12px">→ $P(B|A) = P(B)$이고 $P(A|B) = P(A)$ 인 경우</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.19 -->
+  <section>
+    <h2>덧셈법칙과 곱셈법칙</h2>
+    <div class="body">
+      <ul style="margin-top:16px">
+        <li><span class="sub" style="display:inline">덧셈법칙</span>:
+          두 사건 중 적어도 하나의 사건이 일어날 확률과 관련
+          <p style="text-align:center;margin:4px 0 0">$$P(A \cup B) = P(A) + P(B) - P(A \cap B)$$</p>
+          <p class="derive" style="margin:0 0 0 12px">→ 두 사건이 상호배반일 경우 $P(A \cap B) = 0$</p></li>
+        <li style="margin-top:36px"><span class="sub" style="display:inline">곱셈법칙</span>:
+          두 사건이 함께 일어날 확률과 관련
+          <p style="text-align:center;margin:4px 0 0">$$P(A \cap B) = P(A) \times P(B|A)$$</p>
+          <p class="derive" style="margin:0 0 0 12px">→ 두 사건이 독립일 경우 $P(B|A) = P(B)$</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.20 -->
+  <section>
+    <h2>조건부확률의 심화</h2>
+    <div class="body tight">
+      <p class="sub">P(A|B) = B가 일어났다는 것을 알고 있을 때 A가 일어날 확률</p>
+      <div class="cols top w56" style="margin-top:8px">
+        <div class="col-l">
+          <svg class="fig" id="f-cp-split2" viewBox="0 0 440 118" style="width:440px" role="img">
+            <title>B가 칠해진 벤 다이어그램은 A 그리고 B가 칠해진 판과 A의 여사건 그리고 B가 칠해진 판의 합과 같다</title>
+          </svg>
+          <svg class="fig" id="f-cp-lens2" viewBox="0 0 424 136" style="width:424px;margin-top:4px" role="img">
+            <title>조건부확률을 볼록렌즈 모양의 넓이를 볼록렌즈와 초승달 모양의 합으로 나눈 값으로 나타낸 그림</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <ol class="dense" style="margin-top:8px">
+            <li>B가 일어났다는 것을 알았을 때 A가 일어날 확률은</li>
+            <li style="margin-top:10px">B가 일어났을 때 A가 일어날 확률과<br>
+              B가 일어났을 때 A가 일어나지 않을 확률의 합에서</li>
+            <li style="margin-top:10px">B가 일어났을 때 A가 일어날 확률이 차지하는 비중</li>
+          </ol>
+          <p class="formula-key" style="text-align:center;margin-top:12px">
+            $$P(A|B) = \frac{P(A \cap B)}{P(B)}
+            = \frac{P(A \cap B)}{P(A \cap B) + P(A^c \cap B)}$$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.21 -->
+  <section>
+    <h2>조건부확률의 심화</h2>
+    <div class="body tight">
+      <p class="sub">B가 일어났다는 것을 알고 있을 때 A가 일어날 확률</p>
+      <div class="cols top w70" style="margin-top:10px">
+        <div class="col-l">
+          <p style="text-align:center;margin:0">
+            $$P(A|B) = \frac{P(A \cap B)}{P(B)}
+            = \frac{P(A \cap B)}{P(A \cap B) + P(A^c \cap B)}$$</p>
+          <p style="text-align:center;margin:0">
+            $$= \frac{P(B)P(A|B)}{P(B)P(A|B) + P(B)P(A^c|B)}$$</p>
+          <p style="text-align:center;margin:0">
+            $$= \frac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}$$</p>
+          <p class="derive" style="font-size:13px;text-align:center;margin-top:2px">
+            A의 발생에 대한 사전 확률이 있다면?!</p>
+        </div>
+        <div class="col-r" style="margin-top:22px">
+          <p class="derive" style="margin:0 0 22px">확률의 곱셈법칙</p>
+          <p class="side-note" style="margin:0 0 22px">(동어반복적 상황)</p>
+          <p class="derive" style="margin:0">확률의 곱셈법칙</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.22 -->
+  <section>
+    <h2>베이즈 정리 (Bayes’ theorem)</h2>
+    <div class="body tighter">
+      <p class="sub">사전에 설정한 (주관적 견해의) 확률을 새롭게 주어진 정보를 활용해서
+        업데이트 시켜 미지의 세계를 추론하는 것</p>
+      <p class="formula-key" style="text-align:center;margin:0">
+        $$P(A|B) = \frac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}$$</p>
+      <p class="emph" style="margin:6px 0 4px">Q) 사지선다로 낸 회귀분석 문제를 맞췄을 때(B)
+        알고 풀었을(A) 확률은?</p>
+      <ul class="slim">
+        <li>회귀분석을 알았다는 사건: A</li>
+        <li>회귀분석 문제를 맞췄다는 사건: B</li>
+        <li><span class="t-red" style="font-weight:700">회귀분석을 알 확률: P(A)</span>
+          → 시험을 보기 전에는 모름 → 교수의
+          <span class="t-red" style="font-weight:700">주관적 견해</span>로 확률을 매김 →
+          <span class="t-red" style="font-weight:700">사전확률 (prior probability)</span></li>
+        <li><span class="t-red" style="font-weight:700">문제를 맞췄다는 것을 알았을 때
+          회귀분석을 알 확률: P(A|B)</span> → B라는 새로운 정보를 가지고 P(A)를 업데이트한 확률
+          <p class="derive" style="margin:2px 0 0 12px">→ 사후확률 (posterior probability)</p></li>
+      </ul>
+      <div class="cols top w38" style="margin-top:2px">
+        <div class="col-l">
+          <p style="margin:0;font-size:14px">$P(A) = 1/2$</p>
+          <p style="margin:0;font-size:14px">$P(B|A) = 1$</p>
+          <p style="margin:0;font-size:14px">$P(A^c) = 1 - P(A) = 1/2$</p>
+          <p style="margin:0;font-size:14px">$P(B|A^c) = 1/4$
+            <span class="side-note" style="display:inline">(∵ 사지선다)</span></p>
+        </div>
+        <div class="col-r">
+          <p style="margin:0;font-size:13px">
+            $P(A|B) = \dfrac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}
+            = \dfrac{0.5 * 1}{0.5 * 1 + 0.5 * 0.25} = 0.75$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.23 -->
+  <section>
+    <h2>분할 (partition)</h2>
+    <div class="body">
+      <p class="sub">상호배반(mutually exclusive)이면서 그 합이 전체를 포괄(collectively
+        exhaustive)하는 사건들의 집합</p>
+      <p class="caption-blue" style="margin-top:26px;text-align:center">전체의 분할과 B의 분할</p>
+      <svg class="fig" id="f-part" viewBox="0 0 460 140" style="width:460px;margin:0 auto" role="img">
+        <title>전체 집합 S를 칠한 정사각형은 A를 칠한 판과 A의 여사건을 칠한 판의 합과 같다는 그림</title>
+        <rect x="8" y="22" width="104" height="104" fill="var(--accent-blue)" fill-opacity="0.20"
+              stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="16" y="38" style="font-size:13px;font-style:italic" fill="var(--ink)">S</text>
+
+        <text x="132" y="80" text-anchor="middle" style="font-size:18px" fill="var(--ink-2)">=</text>
+
+        <rect x="152" y="22" width="104" height="104" fill="none" stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="204" cy="74" r="36" fill="var(--accent-blue)" fill-opacity="0.20"
+                stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="204" y="50" text-anchor="middle" style="font-size:13px;font-style:italic" fill="var(--ink)">A</text>
+
+        <text x="276" y="80" text-anchor="middle" style="font-size:18px" fill="var(--ink-2)">+</text>
+
+        <path d="M296,22 H400 V126 H296 Z M240,74 m0,0" fill="none"/>
+        <path d="M296,22 H400 V126 H296 Z" fill="var(--accent-blue)" fill-opacity="0.20"
+              stroke="var(--ink)" stroke-width="1.2"/>
+        <circle cx="348" cy="74" r="36" fill="#FFFFFF" stroke="var(--ink)" stroke-width="1.2"/>
+        <text x="306" y="38" style="font-size:13px;font-style:italic" fill="var(--ink)">A<tspan dy="-4" style="font-size:9px">c</tspan></text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 원본 p.24 -->
+  <section>
+    <h2>베이즈 정리 (Bayes’ theorem)의 일반화</h2>
+    <div class="body tight">
+      <p class="emph" style="font-weight:700;margin-bottom:2px">m개의 사건이 표본공간 S를 분할할 때</p>
+      <p class="emph" style="font-weight:700">즉, 임의의
+        $A_i \cap A_j = \emptyset\,(i \neq j)$이고
+        $S = \{A_1 \cup A_2 \cup \cdots \cup A_m\}$ 일 때</p>
+      <div class="cols top w38" style="margin-top:6px">
+        <div class="col-l">
+          <img src="../assets/tb-partition-general.jpg" style="width:100%;max-width:300px"
+               alt="표본공간을 A1부터 Am까지의 사건이 빈틈없이 나누고 있고 그 위에 사건 B가 걸쳐 있는 그림">
+        </div>
+        <div class="col-r">
+          <p class="emph" style="margin:0">B가 발생했다는 정보를 얻었다면</p>
+          <p class="emph">즉, $P(B) > 0$ 이라면</p>
+          <p class="emph" style="margin-top:14px">$A_1$이 발생할 확률은</p>
+          <p class="formula-key" style="text-align:center;margin-top:6px">
+            $$P(A_1|B) = \frac{P(A_1)P(B|A_1)}{P(A_1)P(B|A_1) + \cdots + P(A_m)P(B|A_m)}$$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.25~27 — 같은 문제에 물음 한 줄이 얹힌다. 영상 주소(p.27)도 여기 붙였다 -->
+  <section>
+    <h2>몬티홀 문제</h2>
+    <div class="body tight">
+      <p class="emph" style="margin-bottom:2px">Q) 세 개의 문 중 하나에는 자동차가,
+        나머지 두 개에는 염소가 있다.</p>
+      <p class="emph" style="margin-bottom:2px">당신이 문 하나를 선택하면 사회자가
+        나머지 두 개의 문 중에 염소가 있는 문 하나를 연다.</p>
+      <p class="emph" style="margin-bottom:2px">그리고 열리지 않은 문을 두고
+        다시 한번 선택할 수 있는 기회를 준다.</p>
+      <p class="sub" style="margin-top:8px">선택을 바꿀 것인가, 바꾸지 않을 것인가?</p>
+      <p class="derive fragment" data-fragment-index="0" style="margin-top:2px">→ 사회자가 문을 열었다는
+        조건 하에서 내가 선택한 문에 자동차가 있을 확률은?</p>
+      <img src="../assets/tb-monty-hall.png"
+           style="display:block;margin:8px auto 4px;width:296px"
+           alt="문 세 개가 나란히 있고 1번과 2번은 닫혀 있으며 3번 문은 열려 그 안에 염소가 서 있는 그림">
+      <p class="source" style="text-align:center">https://youtu.be/Rvz4Cq55990</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.28 -->
+  <section>
+    <h2>몬티홀 문제 – 베이즈 정리의 응용</h2>
+    <div class="body tighter">
+      <div class="cols top w64">
+        <div class="col-l">
+          <p class="sub" style="margin-bottom:2px">1. 사건은 무엇인가?</p>
+          <ul class="slim" style="font-size:14px">
+            <li>1번에 자동차(A), 2번에 자동차(B), 3번에 자동차(C)가 있는 사건</li>
+            <li>나의 선택 후 사회자가 자동차가 없는 문을 하나 여는 사건(D)</li>
+          </ul>
+          <p class="sub" style="margin:12px 0 2px">2. 사건의 가능성은 무엇인가?</p>
+          <ul class="slim" style="font-size:14px">
+            <li>1번에 자동차, 2번에 자동차, 3번에 자동차가 있는 사건 → 각 확률은 1/3</li>
+            <li>사회자가 문을 하나 여는 사건 → 나의 선택에 영향을 받는 종속관계</li>
+          </ul>
+          <p class="sub" style="margin:12px 0 2px">3. 알고 싶은 확률은 무엇인가?</p>
+          <p class="emph" style="font-size:14px;margin:0 0 2px 10px">나는 처음 A를 선택 →
+            1/3의 확률로 A에 자동차가 있을 것이라고 생각</p>
+          <p class="emph" style="font-size:14px;margin:0 0 0 10px">사회자가 C를 열었을 때(사건 D)
+            A에 자동차가 있을 확률이 어떻게 변하는가? P(A|D)</p>
+        </div>
+        <div class="col-r">
+          <img src="../assets/tb-monty-hall.png" style="display:block;width:100%;max-width:212px"
+               alt="문 세 개가 나란히 있고 3번 문만 열려 염소가 보이는 그림">
+          <svg class="fig" id="f-monty" viewBox="0 0 320 178" style="width:100%;margin-top:12px" role="img">
+            <title>표본공간 S를 A, B, C 세 칸으로 나누고 그 아래를 가로지르는 타원이 사건 D인 그림</title>
+          </svg>
+        </div>
+      </div>
+      <p class="formula-key" style="text-align:center;margin:2px 0 0">
+        $$P(\mathrm{A|D}) = \frac{P(\mathrm{A})P(\mathrm{D|A})}
+        {P(\mathrm{A})P(\mathrm{D|A}) + P(\mathrm{B})P(\mathrm{D|B}) + P(\mathrm{C})P(\mathrm{D|C})}$$</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.29~30 — p.29 는 p.30 의 첫 단계다. 한 장의 2단계로 합쳤다 -->
+  <section id="s-monty">
+    <h2>몬티홀 문제 – 베이즈 정리의 응용</h2>
+    <div class="body tighter">
+      <p class="sub" style="margin-bottom:2px">3. 알고 싶은 확률은 무엇인가?</p>
+      <div class="cols top w70" style="margin-top:4px">
+        <div class="col-l fragment" data-fragment-index="0">
+          <p class="emph" style="font-size:13px;margin:0 0 2px 10px">사회자가 C를 열었을 때(사건 D)
+            A에 자동차가 있을 확률: P(A|D)</p>
+          <p id="eq-monty" style="text-align:center;margin:0;font-size:12px"></p>
+          <ol class="dense" style="margin-top:2px">
+            <li>$P(\mathrm{A}), P(\mathrm{B}), P(\mathrm{C}) = 1/3$
+              <p class="side-note" style="margin-left:2px">A, B, C 각각에 자동차가 있을 확률</p></li>
+            <li>$P(\mathrm{D|A}) = 1/2$
+              <p class="side-note" style="margin-left:2px">A에 자동차가 있을 때 C를 열 확률</p>
+              <p class="side-note" style="margin-left:2px">사회자는 B, C 중 <u>아무거나</u> 열어도 됨
+                (* 이 조건이 중요함)</p></li>
+            <li>$P(\mathrm{D|B}) = 1$
+              <p class="side-note" style="margin-left:2px">B에 자동차가 있을 때 C를 열 확률</p>
+              <p class="side-note" style="margin-left:2px">내가 A를 선택하고 B에 자동차가 있다면
+                사회자는 무조건 C를 열어야 함</p></li>
+            <li>$P(\mathrm{D|C}) = 0$
+              <p class="side-note" style="margin-left:2px">C에 자동차가 있을 때 C를 열 확률</p>
+              <p class="side-note" style="margin-left:2px">내가 A를 선택하고 C에 자동차가 있다면
+                사회자는 C를 열 수 없음</p></li>
+          </ol>
+        </div>
+        <div class="col-r">
+          <img src="../assets/tb-monty-hall.png" style="display:block;width:100%;max-width:168px"
+               alt="문 세 개가 나란히 있고 3번 문만 열려 염소가 보이는 그림">
+          <svg class="fig" id="f-monty2" viewBox="0 0 320 178" style="width:100%;max-width:196px;margin-top:8px" role="img">
+            <title>표본공간 S를 A, B, C 세 칸으로 나누고 그 아래를 가로지르는 타원이 사건 D인 그림</title>
+          </svg>
+          <div class="fragment" data-fragment-index="1" style="margin-top:6px">
+            <p class="sub" style="font-size:13px;margin:0">사회자가 문을 열었음에도
+              A에 자동차가 있을 확률은 1/3</p>
+            <p class="side-note" style="margin:0 0 3px">→ 새로운 정보가 들어왔음에도 확률은 그대로</p>
+            <p class="sub" style="font-size:13px;margin:0">사회자가 문을 열었을 때
+              A에 자동차가 없을 확률은 2/3</p>
+            <p class="sub" style="font-size:14px;margin:3px 0 0"><u>따라서 확률적으로는 선택을 바꿔야 함</u></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.31 -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>한 사건이 발생할 때 다른 사건이 일어날 수 없는 경우 두 사건 간 관계를
+          상호배반(mutually exclusive)이라 한다.</li>
+        <li>둘 중 하나의 사건이 발생할 확률을 두 사건이 각각 발생할 확률의 합과
+          두 사건이 동시에 발생할 확률의 차로 나타내는 것을 확률의 덧셈법칙이라 한다.</li>
+        <li>한 사건이 발생했다는 조건 하에서 다른 사건이 발생할 확률을 조건부확률이라 한다.</li>
+        <li>두 사건이 모두 일어날 확률을 하나의 사건이 일어날 확률과 그 사건이 일어났다는
+          조건 하에서 다른 하나의 사건이 일어날 조건부확률의 곱으로 나타낸 것을
+          확률의 곱셈법칙이라 한다.</li>
+        <li>한 사건이 발생할 때 다른 사건이 일어날 확률이 변하지 않는 경우 두 사건 간의 관계를
+          독립(independent)이라 하며, 두 사건 간 관계가 독립일 경우 확률의 곱셉법칙은
+          두 사건이 각각 일어날 확률의 곱으로 나타낼 수 있다.</li>
+        <li>조건부확률을 확률의 곱셈법칙에 따라 변환하면 사전에 설정한 (주관적 견해의) 확률을
+          새롭게 주어진 정보를 활용해 업데이트 시킬 수 있는 베이즈 정리를 도출할 수 있다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- T10 마무리 (원본 p.32) -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+  <!-- 원본 p.33 — pptx 에 숨김 처리돼 배포 PDF 에는 없던 장이다.
+       내용이 아까워 Q&A 뒤에 살려 두었다 (private/확인-필요-사항.md B-3 방침). -->
+  <section>
+    <h2>[부록] 베이즈 정리 (Bayes’ theorem)</h2>
+    <div class="body tight">
+      <p class="sub">사전에 설정한 (주관적 견해의) 확률을 새롭게 주어진 정보를 활용해서
+        업데이트 시켜 미지의 세계를 추론하는 것</p>
+      <p class="formula-key" style="text-align:center;margin:0">
+        $$P(A|B) = \frac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}$$</p>
+      <p class="emph" style="margin:8px 0 4px">Q) 비행기가 세계무역센터에 충돌했을 때
+        그 일이 테러리스트에 의해 벌어질 확률은?</p>
+      <ul class="slim">
+        <li>테러리스트가 뉴욕을 공격할 사건: A</li>
+        <li>비행기가 세계무역센터에 충돌한 사건: B</li>
+        <li>$P(A) = 0.005\%$</li>
+        <li>$P(B|A)$ : 테러리스트가 뉴욕을 공격했다는 조건 하에서
+          비행기가 세계무역센터에 충돌했을 확률: 100%</li>
+        <li>$P(B|A^c)$ : 테러리스트가 뉴욕을 공격하지 않았다는 조건 하에서
+          비행기가 세계무역센터에 충돌했을 확률: 0.008%</li>
+      </ul>
+      <p class="derive" style="margin-top:6px">→ 비행기가 세계무역센터에 충돌한 사건(B)가 발생했을 때
+        테러리스트가 뉴욕을 공격했다고 판단할 확률은?</p>
+      <p style="text-align:center;margin:0;font-size:14px">
+        $0.005 * 100 \,/\, \{(0.005 * 100) + (1 - 0.005) * 0.008\} = 38\%$</p>
+    </div>
+  </section>
+
+</div></div>
+
+<script>
+/* ── 조건부확률 도해 · 몬티홀 표본공간 ─────────────────────────
+   두 원의 반지름과 중심거리를 한 곳에서만 정하고, 세 판의 칠한 자리와
+   아래의 볼록렌즈·초승달을 전부 그 값에서 잘라 낸다 (design.md §6.5). */
+(function () {
+  const R = 27, D = 34;          /* 원 반지름 · 두 원의 중심거리 */
+  let uid = 0;
+
+  /* 한 판: 직사각형 + 두 원. what: 'B' | 'AB' | 'AcB' */
+  function panel(x, y, w, h, what, head) {
+    const cx = x + w / 2, cy = y + h / 2 + 4;
+    const ax = cx - D / 2, bx = cx + D / 2;
+    const k = 'p' + (uid++);
+    let s = `<defs>
+        <clipPath id="cA-${k}"><circle cx="${ax}" cy="${cy}" r="${R}"/></clipPath>
+        <mask id="mA-${k}">
+          <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>
+          <circle cx="${ax}" cy="${cy}" r="${R}" fill="#000"/>
+        </mask>
+      </defs>`;
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    const F = `fill="var(--accent-blue)" fill-opacity="0.30" stroke="none"`;
+    if (what === 'B')   s += `<circle cx="${bx}" cy="${cy}" r="${R}" ${F}/>`;
+    if (what === 'AB')  s += `<circle cx="${bx}" cy="${cy}" r="${R}" ${F} clip-path="url(#cA-${k})"/>`;
+    if (what === 'AcB') s += `<circle cx="${bx}" cy="${cy}" r="${R}" ${F} mask="url(#mA-${k})"/>`;
+    s += `<circle cx="${ax}" cy="${cy}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    s += `<circle cx="${bx}" cy="${cy}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    s += `<text x="${ax - 6}" y="${cy - R + 12}" text-anchor="middle" style="font-size:11px;font-style:italic" fill="var(--ink)">A</text>`;
+    s += `<text x="${bx + 6}" y="${cy - R + 12}" text-anchor="middle" style="font-size:11px;font-style:italic" fill="var(--ink)">B</text>`;
+    if (head) s += `<text x="${cx}" y="${y - 5}" text-anchor="middle" style="font-size:11px" fill="var(--ink-2)">${head}</text>`;
+    return s;
+  }
+
+  function splitSvg() {
+    const W = 112, H = 84, Y = 26;
+    let s = panel(6, Y, W, H, 'B', '');
+    s += `<text x="140" y="${Y + H / 2 + 6}" text-anchor="middle" style="font-size:16px" fill="var(--ink-2)">=</text>`;
+    s += panel(166, Y, W, H, 'AB', 'A 그리고 B');
+    s += `<text x="298" y="${Y + H / 2 + 6}" text-anchor="middle" style="font-size:16px" fill="var(--ink-2)">+</text>`;
+    s += panel(322, Y, W, H, 'AcB', 'Aᶜ 그리고 B');
+    return s;
+  }
+
+  /* 볼록렌즈(교집합) · 원 · 초승달을 같은 R·D 에서 잘라 낸다.
+     셋 다 보이는 부분의 가운데가 cx 에 오도록 맞춰 두어야 분수의 위아래가 맞는다. */
+  const LR = 25, LD = 32;
+  function shape(cx, cy, kind) {
+    const k = 's' + (uid++);
+    const F = `fill="var(--accent-blue)" fill-opacity="0.30" stroke="var(--ink)" stroke-width="1"`;
+    if (kind === 'circle') return `<circle cx="${cx}" cy="${cy}" r="${LR}" ${F}/>`;
+    if (kind === 'lens') {
+      const ax = cx - LD / 2, bx = cx + LD / 2;
+      return `<defs><clipPath id="cl-${k}"><circle cx="${ax}" cy="${cy}" r="${LR}"/></clipPath></defs>` +
+             `<g clip-path="url(#cl-${k})"><circle cx="${bx}" cy="${cy}" r="${LR}" ${F}/></g>` +
+             `<g clip-path="url(#cl-${k})"><circle cx="${bx}" cy="${cy}" r="${LR}" fill="none" stroke="var(--ink)" stroke-width="1"/></g>`;
+    }
+    /* 초승달: B 에서 A 를 뺀 부분. 보이는 부분은 bx-7 … bx+LR 이므로 그 가운데를 cx 에 둔다 */
+    const bx = cx - (LR - 7) / 2, ax = bx - LD;
+    return `<defs><mask id="mk-${k}">` +
+           `<rect x="${bx - LR - 4}" y="${cy - LR - 4}" width="${2 * LR + 8}" height="${2 * LR + 8}" fill="#fff"/>` +
+           `<circle cx="${ax}" cy="${cy}" r="${LR}" fill="#000"/></mask></defs>` +
+           `<g mask="url(#mk-${k})"><circle cx="${bx}" cy="${cy}" r="${LR}" ${F}/></g>`;
+  }
+
+  /* 원본 p.12·p.20 의 "P(A|B) = 볼록렌즈/오른쪽의 원 = 렌즈/원 = 렌즈/(렌즈+초승달)" */
+  function lensSvg() {
+    const TOP = 38, BOT = 102, BAR = 70;
+    const eq = (x) => `<text x="${x}" y="${BAR + 5}" text-anchor="middle" style="font-size:15px" fill="var(--ink-2)">=</text>`;
+    const bar = (x1, x2) => `<line x1="${x1}" y1="${BAR}" x2="${x2}" y2="${BAR}" stroke="var(--ink)" stroke-width="1.2"/>`;
+    let s = `<text x="2" y="${BAR + 5}" style="font-size:14px;font-style:italic" fill="var(--ink)">P(A|B)</text>`;
+    s += eq(58);
+    /* 낱말 분수 */
+    s += `<text x="108" y="${BAR - 8}" text-anchor="middle" style="font-size:12px" fill="var(--ink-2)">볼록렌즈</text>`;
+    s += bar(70, 146);
+    s += `<text x="108" y="${BAR + 19}" text-anchor="middle" style="font-size:12px" fill="var(--ink-2)">오른쪽의 원</text>`;
+    s += eq(158);
+    /* 렌즈 / 원 */
+    s += shape(196, TOP, 'lens');
+    s += bar(170, 222);
+    s += shape(196, BOT, 'circle');
+    s += eq(234);
+    /* 렌즈 / (렌즈 + 초승달) */
+    s += shape(330, TOP, 'lens');
+    s += bar(248, 412);
+    s += shape(292, BOT, 'lens');
+    s += `<text x="320" y="${BOT + 5}" text-anchor="middle" style="font-size:15px" fill="var(--ink-2)">+</text>`;
+    s += shape(356, BOT, 'crescent');
+    return s;
+  }
+
+  /* 몬티홀 표본공간 — A|B|C 세 칸과 그 위를 가로지르는 사건 D */
+  function montySvg() {
+    let s = `<text x="4" y="16" style="font-size:13px;font-style:italic" fill="var(--ink)">S</text>`;
+    s += `<rect x="8" y="22" width="304" height="146" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    s += `<line x1="109" y1="22" x2="109" y2="168" stroke="var(--accent-blue)" stroke-width="1"/>`;
+    s += `<line x1="211" y1="22" x2="211" y2="168" stroke="var(--accent-blue)" stroke-width="1"/>`;
+    s += `<text x="58"  y="54" text-anchor="middle" style="font-size:14px;font-style:italic" fill="var(--ink)">A</text>`;
+    s += `<text x="160" y="54" text-anchor="middle" style="font-size:14px;font-style:italic" fill="var(--ink)">B</text>`;
+    s += `<text x="261" y="54" text-anchor="middle" style="font-size:14px;font-style:italic" fill="var(--ink)">C</text>`;
+    s += `<ellipse cx="160" cy="120" rx="124" ry="32" fill="var(--accent-blue)" fill-opacity="0.85" stroke="none"/>`;
+    s += `<text x="160" y="126" text-anchor="middle" style="font-size:14px;font-style:italic;stroke:none" fill="#FFFFFF">D</text>`;
+    return s;
+  }
+
+  function fill(sel, svg) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const t = el.querySelector('title');
+    el.innerHTML = (t ? t.outerHTML : '') + svg;
+  }
+
+  (function () {
+    const V = window.VENN;
+    const ME  = V.mk([1, 3, 5], [6]);      /* 홀수 · 6         → 상호배반      */
+    const NME = V.mk([1, 3, 5], [3, 6]);   /* 홀수 · 3의 배수  → 상호배반 아님 */
+    V.fill('#f-venn-c',    V.vennOne('', ''));
+    V.fill('#f-venn-coin', V.vennOne('앞면', '뒷면'));
+    V.fill('#f-venn-dice', V.vennTwo(ME));
+    V.fill('#f-me',        V.vennTwo(ME));
+    V.fill('#f-nme',       V.vennTwo(NME));
+    V.texRows('#eq-me',  ME.tex, 3);
+    V.texRows('#eq-nme', NME.tex, 3);
+
+    fill('#f-cp-split',  splitSvg());
+    fill('#f-cp-split2', splitSvg());
+    fill('#f-cp-lens',   lensSvg());
+    fill('#f-cp-lens2',  lensSvg());
+    fill('#f-monty',     montySvg());
+    fill('#f-monty2',    montySvg());
+
+    /* 사후확률은 위에서 선언한 P·P(D|·) 에서 계산한다 */
+    const M = window.MONTY;
+    const eq = document.getElementById('eq-monty');
+    if (eq && M) {
+      eq.innerHTML =
+        '$P(\\mathrm{A|D}) = \\dfrac{P(\\mathrm{A})P(\\mathrm{D|A})}' +
+        '{P(\\mathrm{A})P(\\mathrm{D|A}) + P(\\mathrm{B})P(\\mathrm{D|B}) + P(\\mathrm{C})P(\\mathrm{D|C})}' +
+        ' = ' + M.postTex + '$';
+    }
+  })();
+})();
+</script>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
