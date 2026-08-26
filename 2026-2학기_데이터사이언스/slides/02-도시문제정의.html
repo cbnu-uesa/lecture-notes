@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2강. AI와 함께 도시 문제 정의하기</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  figure.shot { margin: 0; }
+  figure.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
+  figure.shot figcaption { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .steps { counter-reset: st; margin: 14px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 11px; font-size: var(--fs-body); line-height: 1.6; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .src { font-size: 13px; line-height: 1.72; color: var(--ink-2); margin: 4px 0 0; }
+  .src li { margin-bottom: 8px; }
+  .src .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>2강. AI와 함께<br>도시 문제 정의하기</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>당신이 바꾸고 싶은 도시의 문제는 무엇인가?</h2>
+    <div class="body">
+      <ul>
+        <li>지난주에 세 개로 좁혀 왔다</li>
+        <li>그중 하나를 오늘 <span class="mark">분석할 수 있는 문제</span>로 바꾼다</li>
+        <li>혼자 하지 않는다 — 클로드와 같이 한다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 주장의 구조 ═══════════════════════════════════ -->
+  <section>
+    <h2>주장에는 세 부분이 있다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-claim" viewBox="0 0 840 240" style="width:790px" role="img"
+           aria-label="주장, 증거, 논거 세 상자가 삼각형으로 놓이고 증거와 논거가 주장을 떠받치는 도식">
+        <title>주장 · 증거 · 논거의 관계</title>
+        <rect x="300" y="18" width="240" height="62" fill="#A02948"/>
+        <text class="on-dark" x="420" y="47" text-anchor="middle" font-size="19" font-weight="700" fill="#FFF">주장</text>
+        <text class="on-dark" x="420" y="68" text-anchor="middle" font-size="12.5" fill="#FFF">"이렇게 해야 한다"</text>
+
+        <rect x="70"  y="150" width="240" height="62" fill="#EDE9E3"/>
+        <text x="190" y="179" text-anchor="middle" font-size="19" font-weight="700" fill="#16181C">증거</text>
+        <text x="190" y="200" text-anchor="middle" font-size="12.5" fill="#4A4741">분석해서 얻은 결과</text>
+
+        <rect x="530" y="150" width="240" height="62" fill="#EDE9E3"/>
+        <text x="650" y="179" text-anchor="middle" font-size="19" font-weight="700" fill="#16181C">논거</text>
+        <text x="650" y="200" text-anchor="middle" font-size="12.5" fill="#4A4741">증거가 주장을 받치는 이유</text>
+
+        <path class="axis" d="M190,150 L370,84" stroke-width="1.4"/>
+        <path d="M373,82 L361,83 L365,92 Z" fill="#16181C"/>
+        <path class="axis" d="M650,150 L470,84" stroke-width="1.4"/>
+        <path d="M467,82 L479,83 L475,92 Z" fill="#16181C"/>
+      </svg>
+      <p class="emph" style="text-align:center;margin-top:14px">
+        셋 중 하나라도 비면 설득이 안 된다.
+        <span class="hl">문제 정의는 이 셋을 미리 정해 두는 일이다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 카파시 ════════════════════════════════════════ -->
+  <section class="s-split">
+    <h2>정리해서 말하려다 아무 말도 못 한다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>머릿속이 정리되지 않았을 때 우리는 AI에게 묻기를 미룬다.
+          <span class="hl">먼저 정리해야 한다고 여기기 때문이다.</span></p>
+        <p style="margin-top:10px">안드레이 카파시는 반대로 한다. 정리하지 않은 채
+          <span class="hl">음성으로 10분쯤 두서없이 쏟아내고</span>, 그것을 조리 있게
+          다시 정리해 달라고 맡긴다. 직접 정리해 전달하는 것보다 결과가 낫고
+          이어지는 대화도 매끄럽다고 말한다.</p>
+        <p class="caption" style="margin-top:10px">
+          카파시의 X 게시물 (2026. 7. 21.) — 주소는 마지막 장에</p>
+      </div>
+      <div class="col-r" style="text-align:center">
+        <figure class="shot" style="width:190px;margin:0 auto">
+          <img src="../assets/cc-karpathy.png" alt="안드레이 카파시">
+          <figcaption style="text-align:center">안드레이 카파시<br>
+            Gladwin Analytics, 2019<br>Wikimedia Commons · CC BY 3.0</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5. 왜 그게 되는가 ════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>왜 두서없이 말하는 편이 나은가</h2>
+    <div class="body">
+      <p class="define">스스로 정리하는 동안 <span class="t-red">버려지는 것</span>이 있다 —<br>
+        확신이 서지 않아 뺀 관찰, 사소해 보여 지운 사례,<br>
+        말이 안 될까 봐 접어 둔 짐작</p>
+      <p class="conclusion">→ 문제 정의 단계에서는 그것들이 오히려 <span class="t-red">재료</span>다.<br>
+        &nbsp;&nbsp;&nbsp;정리는 AI가 대신할 수 있지만, 버린 재료는 되살릴 수 없다</p>
+    </div>
+  </section>
+
+  <!-- ══ 6. 실습 절차 도식 ════════════════════════════════ -->
+  <section>
+    <h2>오늘 밟을 여섯 단계</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-six" viewBox="0 0 840 250" style="width:800px" role="img"
+           aria-label="램블링에서 재구성, 원하는 것, 필요한 증거, 제시 방식, 데이터와 분석법으로 이어지는 여섯 단계 도식">
+        <title>문제 정의 실습의 여섯 단계</title>
+        <g font-size="13.5" text-anchor="middle">
+          <rect x="20"  y="60" width="122" height="58" fill="#6E6A63"/>
+          <text class="on-dark" x="81"  y="85" fill="#FFF" font-weight="700">① 램블링</text>
+          <text class="on-dark" x="81"  y="105" fill="#FFF" font-size="11.5">두서없이 쏟는다</text>
+
+          <rect x="158" y="60" width="122" height="58" fill="#6E6A63"/>
+          <text class="on-dark" x="219" y="85" fill="#FFF" font-weight="700">② 재구성</text>
+          <text class="on-dark" x="219" y="105" fill="#FFF" font-size="11.5">AI가 정리한다</text>
+
+          <rect x="296" y="60" width="122" height="58" fill="#A02948"/>
+          <text class="on-dark" x="357" y="85" fill="#FFF" font-weight="700">③ 원하는 것</text>
+          <text class="on-dark" x="357" y="105" fill="#FFF" font-size="11.5">주장을 확정한다</text>
+
+          <rect x="434" y="60" width="122" height="58" fill="#A02948"/>
+          <text class="on-dark" x="495" y="85" fill="#FFF" font-weight="700">④ 필요한 증거</text>
+          <text class="on-dark" x="495" y="105" fill="#FFF" font-size="11.5">무엇을 보여야 하나</text>
+
+          <rect x="572" y="60" width="122" height="58" fill="#A02948"/>
+          <text class="on-dark" x="633" y="85" fill="#FFF" font-weight="700">⑤ 제시 방식</text>
+          <text class="on-dark" x="633" y="105" fill="#FFF" font-size="11.5">표·그래프·지도</text>
+
+          <rect x="710" y="60" width="122" height="58" fill="#A02948"/>
+          <text class="on-dark" x="771" y="85" fill="#FFF" font-weight="700">⑥ 데이터·분석</text>
+          <text class="on-dark" x="771" y="105" fill="#FFF" font-size="11.5">무엇을 어떻게</text>
+        </g>
+        <g stroke="#7C7C7C" stroke-width="1.3">
+          <path d="M146,89 L154,89"/><path d="M284,89 L292,89"/><path d="M422,89 L430,89"/>
+          <path d="M560,89 L568,89"/><path d="M698,89 L706,89"/>
+        </g>
+        <path class="guide" d="M20,140 L280,140"/>
+        <text x="150" y="162" text-anchor="middle" font-size="12.5" fill="#4A4741">AI가 앞장선다</text>
+        <path class="guide" d="M296,140 L832,140"/>
+        <text x="564" y="162" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A02948">사람이 결정한다</text>
+        <text x="420" y="204" text-anchor="middle" font-size="13.5" fill="#4A4741">
+          ③부터는 AI에게 물어보되 <tspan font-weight="700" fill="#A02948">고르는 것은 나다</tspan></text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ 7. 잘 쓰인 문제정의 실물 ═════════════════════════ -->
+  <section>
+    <h2>잘 쓰인 문제 정의는 이렇게 생겼다</h2>
+    <div class="body tight">
+      <p class="sub">COMPAS 공모전 과제는 네 부분으로 되어 있다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:22%">항목</th><th>무엇을 적나</th></tr></thead>
+        <tbody>
+          <tr><td>분석배경</td><td>왜 지금 이 문제인가 — 무엇이 달라졌고 무엇이 부족한가</td></tr>
+          <tr><td>분석목적</td><td>이 분석으로 무엇을 밝히려 하는가</td></tr>
+          <tr><td>해결내용</td><td>구체적으로 무엇을 도출할 것인가 (필수/선택을 나눠 적는다)</td></tr>
+          <tr><td>필수 고려사항</td><td>어떤 함정을 피해야 하는가, 무엇은 하면 안 되는가</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        읽어 보면 <span class="hl">판단이 필요한 자리가 전부 문장으로 드러나 있다.</span>
+        오늘 만들 문제정의서의 목표 형태다.</p>
+      <p class="caption" style="margin-top:8px">
+        예: 폭염 대응 우선관리지역 도출 (2026) — "단순히 지표면 온도만 고려하지 말 것",
+        "선정 기준과 근거를 반드시 제시할 것" 같은 단서가 붙어 있다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. 증거의 형식 ═══════════════════════════════════ -->
+  <section>
+    <h2>주장마다 어울리는 증거가 다르다</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:30%">주장의 꼴</th><th style="width:26%">어울리는 증거</th><th>제시 방식</th></tr></thead>
+        <tbody>
+          <tr><td>"심각하다"</td><td>수준과 규모</td><td>수치 한 줄 · 다른 도시와 비교</td></tr>
+          <tr><td>"나빠지고 있다"</td><td>시간에 따른 변화</td><td>추이 그래프</td></tr>
+          <tr><td>"특정 지역이 불리하다"</td><td>지역 간 차이</td><td>지도 · 순위표</td></tr>
+          <tr><td>"이것 때문이다"</td><td>관계와 통제</td><td>산점도 · 회귀 결과</td></tr>
+          <tr><td>"이 대안이 낫다"</td><td>대안 간 비교</td><td>시나리오 표 · 비용편익</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:14px">
+        마지막 두 줄은 9주차 이후에 배운다. 오늘은 <span class="hl">내 주장이 어느 줄인지</span>만 정하면 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 9. 산출물 규격 ═══════════════════════════════════ -->
+  <section>
+    <h2>문제정의서 — 한 쪽짜리</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:24%">칸</th><th>쓰는 법</th></tr></thead>
+        <tbody>
+          <tr><td>문제</td><td>누가 어떻게 곤란한가. 한 문장</td></tr>
+          <tr><td>주장</td><td>"…해야 한다" 로 끝나는 한 문장</td></tr>
+          <tr><td>필요한 증거</td><td>주장을 받치려면 무엇을 보여야 하나. 2~3개</td></tr>
+          <tr><td>제시 방식</td><td>증거마다 표·그래프·지도 중 무엇으로</td></tr>
+          <tr><td>데이터</td><td>어떤 자료가 있어야 하나 (3주차에 실제로 찾는다)</td></tr>
+          <tr><td>분석 방법</td><td>기술적·진단적·예측적·처방적 중 어디에 해당하나</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:12px">
+        이 한 쪽이 <span class="hl">학기 끝까지 따라간다.</span> 3주차에 데이터를 찾고,
+        14주차에 증거 패키지로 완성한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 10. 실습 구분 ════════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">문제정의서 만들기 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 11. 실습 ① 준비 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 준비</h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="hl">claude.ai</span> 계정을 만든다. 실습은 Pro 구독 기준이다
+          <span class="t">10분</span></li>
+        <li><span class="hl">compas.lh.or.kr</span> 회원가입 — 3주차부터 데이터를 받는다
+          <span class="t">5분</span></li>
+        <li>음성 입력을 켜 둔다. 손으로 치면 저절로 정리하게 되어 램블링이 안 된다
+          <span class="t">5분</span></li>
+      </ol>
+      <p class="caption" style="margin-top:16px">
+        클로드 코드(터미널)는 4주차에 설치한다. 오늘은 웹 화면이면 충분하다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 12. 실습 ② 램블링 ═══════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 10분 동안 두서없이 말한다</h2>
+    <div class="body tight">
+      <p class="sub">정리하려 하지 말 것. 틀려도 되고 앞뒤가 안 맞아도 된다</p>
+      <div class="prompt-box">
+        <p class="who">시작 프롬프트</p>
+        <p>"지금부터 정리되지 않은 이야기를 10분쯤 할 거야. 앞뒤가 안 맞거나
+          틀린 말이 섞일 수 있어. 끊지 말고 다 들은 뒤에, 내가 무슨 문제를
+          말하고 있는지 <span class="mark">조리 있게 다시 정리해 줘.</span>
+          내가 확신 없이 말한 부분은 따로 표시해 줘."</p>
+      </div>
+      <p class="sub" style="margin-top:14px">무엇을 말하나 — 떠오르는 대로</p>
+      <ul>
+        <li>지난주에 좁혀 온 문제 후보 중 하나</li>
+        <li>언제 어디서 그게 불편했는지, 누가 곤란해 보였는지</li>
+        <li>왜 그런 것 같은지 — 짐작이어도 말한다</li>
+        <li>이미 뭔가 하고 있는 것 같은데 왜 안 되는 것 같은지</li>
+      </ul>
+      <p class="emph" style="margin-top:12px"><span class="hl">10분을 채운다.</span>
+        3분에서 멈추면 재료가 모자란다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 실습 ③ 구조화 ═══════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 여섯 단계로 좁힌다</h2>
+    <div class="body tight">
+      <p class="sub">재구성된 글을 읽고, 아래를 차례로 물어 확정한다</p>
+      <div class="prompt-box">
+        <p class="who">이어지는 프롬프트</p>
+        <p><b>③</b> "정리해 준 것 중에서 내가 진짜 주장하고 싶은 건 ○○야.
+          이걸 '…해야 한다' 는 한 문장으로 다듬어 줘."</p>
+        <p><b>④</b> "이 주장을 받치려면 어떤 증거가 필요할까?
+          <span class="mark">각각 왜 필요한지도 같이 적어 줘.</span> 3개 이내로."</p>
+        <p><b>⑤</b> "증거마다 표·그래프·지도 중 무엇으로 보여 주는 게 설득력 있을까?"</p>
+        <p><b>⑥</b> "그러려면 어떤 데이터가 있어야 하고, 어떤 분석이 필요할까?
+          <span class="mark">구할 수 없을 것 같은 데이터는 그렇게 말해 줘.</span>"</p>
+      </div>
+      <p class="emph" style="margin-top:12px">
+        답을 그대로 받아쓰지 않는다. <span class="hl">고르고 자르는 것은 나다</span> —
+        증거가 다섯 개로 늘어나면 문제가 아직 넓다는 뜻이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 14. 실습 ④ 제출 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ④ — 한 쪽으로 옮긴다</h2>
+    <div class="body">
+      <ol class="steps">
+        <li>앞의 여섯 칸 표를 채운다. <span class="hl">대화 로그를 그대로 내지 않는다</span>
+          <span class="t">20분</span></li>
+        <li>다 쓴 뒤 클로드에게 마지막으로 묻는다 —
+          "이 문제정의서에서 <span class="mark">가장 약한 고리</span>가 어디야?"
+          <span class="t">10분</span></li>
+        <li>지적받은 곳을 고치거나, 고치지 않기로 했다면 그 이유를 아래에 적는다
+          <span class="t">10분</span></li>
+      </ol>
+      <p class="emph" style="margin-top:20px">
+        제출: <span class="t-red">문제정의서 1쪽</span> (과제 반영)</p>
+      <p class="caption" style="margin-top:6px">
+        다음 주에는 여기 적은 데이터를 실제로 찾아 받는다. 구할 수 없는 데이터를 적어 두면
+        3주차에 막힌다 — 그것도 배움이니 그대로 가져와도 좋다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 출처 ═════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src">
+        <li>램블링 방식 — 안드레이 카파시의 X 게시물 (2026. 7. 21.)<br>
+          <span class="u">x.com/karpathy/status/2079610838143623371</span></li>
+        <li>카파시 사진 (4쪽) — Gladwin Analytics, 2019 · <span class="hl">CC BY 3.0</span><br>
+          <span class="u">commons.wikimedia.org</span> · File:Andrej Karpathy, OpenAI (cropped).png</li>
+        <li>문제 정의의 네 부분 (7쪽) — COMPAS 공모전 과제 개요의 구성<br>
+          <span class="u">compas.lh.or.kr</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 16. 마무리 ═══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

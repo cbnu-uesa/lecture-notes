@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4강. 클로드 코드 Ⅰ — 설치와 첫 분석</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .term { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+  .term .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+               color: var(--ink-2); letter-spacing: .04em; border-bottom: 1px solid var(--rule); }
+  .term pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+              font-size: 11.5px; line-height: 1.72; color: #4A4741; white-space: pre-wrap; }
+  .term .p { color: var(--brand-crimson); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>4강. 클로드 코드 Ⅰ<br>설치와 첫 분석</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>채팅창과 무엇이 다른가?</h2>
+    <div class="body">
+      <ul>
+        <li>지난주에 받은 CSV 를 채팅창에 올릴 수도 있다</li>
+        <li>그런데 <span class="mark">파일이 열 개면?</span> 결과를 저장하려면?</li>
+        <li>같은 분석을 다음 달에 또 해야 한다면?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 무엇인가 ══════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>클로드 코드</h2>
+    <div class="body">
+      <p class="define">터미널에서 <span class="t-red">내 폴더의 파일을 직접 읽고, 쓰고,<br>
+        프로그램을 실행하는</span> 클로드</p>
+      <p class="conclusion">→ 파일을 올리고 내려받는 왕복이 없다.<br>
+        &nbsp;&nbsp;&nbsp;"저 폴더의 CSV 를 분석해서 결과를 저장해 줘" 가 한 문장으로 끝난다</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 대화창 vs 클로드 코드 ═════════════════════════ -->
+  <section>
+    <h2>같은 일을 시키면 이렇게 갈린다</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:26%"></th><th style="width:37%">웹 대화창</th><th>클로드 코드</th></tr></thead>
+        <tbody>
+          <tr><td>파일 주기</td><td>하나씩 올린다</td><td>폴더를 가리키면 알아서 읽는다</td></tr>
+          <tr><td>결과 받기</td><td>화면에서 복사한다</td><td class="hl">파일로 저장된다</td></tr>
+          <tr><td>중간 산출물</td><td>남지 않는다</td><td>폴더에 쌓인다</td></tr>
+          <tr><td>다시 하기</td><td>처음부터 다시 설명</td><td class="hl">규칙을 적어 두면 재현된다</td></tr>
+          <tr><td>안전</td><td>할 게 없다</td><td>무엇을 허용할지 <span class="hl">내가 정한다</span></td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:14px">
+        마지막 두 줄이 5·6주차의 주제다. 오늘은 위 세 줄까지만 한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 5. 권한 모델 ═════════════════════════════════════ -->
+  <section>
+    <h2>내 컴퓨터를 만지게 하는 일이다</h2>
+    <div class="body tight">
+      <p class="sub">그래서 물어본다 — 승인은 내가 한다</p>
+      <div class="term">
+        <div class="bar">터미널</div>
+        <pre><span class="p">&gt;</span> cheongju-apt.csv 를 읽고 동별 평균을 내 줘
+
+  파일을 읽겠습니다: cheongju-apt.csv
+  <span class="p">허용하시겠습니까? (y/n)</span></pre>
+      </div>
+      <ul style="margin-top:12px">
+        <li><span class="hl">읽기</span>는 대체로 안전하다</li>
+        <li><span class="hl">쓰기·삭제·실행</span>은 무엇을 지우는지 보고 승인한다</li>
+        <li>승인하기 전에 <span class="mark">무엇을 하려는지 한 줄 읽는 습관</span>을 들인다</li>
+      </ul>
+      <p class="caption" style="margin-top:12px">
+        실습용 폴더를 따로 만들어 쓰면 사고가 나도 그 폴더 안에서 끝난다.
+        <span class="hl">중요한 파일이 있는 폴더에서 시작하지 않는다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 6. 핵심 습관 ═════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>이 수업의 습관 — 코드 말고 로직부터</h2>
+    <div class="body">
+      <p class="define">"코드는 아직 쓰지 말고,<br>
+        <span class="t-red">어떤 자료를 어떻게 걸러 무엇을 계산할지</span> 먼저 알려 줘"</p>
+      <p class="conclusion">→ 1강에서 말한 원칙을 실제로 부르는 문장이다.<br>
+        &nbsp;&nbsp;&nbsp;여기서 판단을 확인하지 않으면 결과가 나온 뒤에는 확인할 수 없다</p>
+    </div>
+  </section>
+
+  <!-- ══ 7. 왜 로직부터인가 ═══════════════════════════════ -->
+  <section>
+    <h2>바로 시키면 무엇을 놓치나</h2>
+    <div class="body tight">
+      <p class="sub">"동별 평균 가격을 내 줘" 라고만 하면, AI 가 대신 정해 버리는 것들</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:34%">몰래 정해지는 것</th><th>왜 문제인가</th></tr></thead>
+        <tbody>
+          <tr><td>어떤 거래를 포함할지</td><td>소형·초고가를 넣고 빼는 것만으로 순위가 바뀐다</td></tr>
+          <tr><td>평균이냐 중앙값이냐</td><td>거래 몇 건이 평균을 통째로 끌고 간다</td></tr>
+          <tr><td>가격이냐 ㎡당 가격이냐</td><td>면적이 다르면 가격 비교는 뜻이 없다</td></tr>
+          <tr><td>거래가 적은 동을 어찌할지</td><td>3건짜리 동이 1위가 되어도 그건 우연이다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        전부 <span class="hl">도시를 아는 사람이 정해야 하는 것</span>이다.
+        AI 는 물어보지 않으면 그냥 정한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. 실습 구분 ═════════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">설치하고, 로직을 먼저 받아 보기 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 9. 실습 ① 설치 ══════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 설치 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>터미널을 연다 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
+        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 따른다.
+          <span class="hl">버전마다 달라지므로 화면에 적힌 대로 한다</span></li>
+        <li>로그인한다 — 2주차에 만든 계정</li>
+        <li>실습 폴더를 만들고 그 안에서 클로드 코드를 실행한다<br>
+          <span class="code">ds2026/</span> 안에 3주차 <span class="code">cheongju-apt.csv</span> 와
+          출처 문서를 넣어 둔다</li>
+        <li>첫 인사 — "이 폴더에 뭐가 있어?" 라고 물어본다</li>
+      </ol>
+      <p class="caption" style="margin-top:12px">
+        막히면 오류 메시지를 <span class="hl">그대로</span> 클로드에게 붙여 넣는다.
+        설치 문제 해결도 오늘 배우는 것 중 하나다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 10. 실습 ② 로직 요구 ════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 로직만 요구한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"이 폴더의 <b>cheongju-apt.csv</b> 로 청주 상당구의
+          <b>동별 ㎡당 가격</b>을 비교하고 싶어.</p>
+        <p><span class="mark">코드는 아직 쓰지 마.</span> 어떤 자료를 어떻게 걸러
+          무엇을 계산할지 <span class="mark">로직을 문서로</span> 먼저 보여 줘.</p>
+        <p><span class="mark">판단이 필요한 자리는 선택지를 같이 적어 줘</span> —
+          네가 정하지 말고 내가 고르게."</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        마지막 문장이 없으면 AI 가 알아서 정해 버린다.
+        <span class="hl">"네가 정하지 말고" 를 반드시 넣는다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 11. 실습 ③ 검토 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 로직을 검토한다 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <div class="body tight">
+      <p class="sub">받은 로직 문서를 읽고 아래를 하나씩 정한다. <span class="hl">정한 것과 이유를 적어 둔다</span></p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:32%">정할 것</th><th>물어볼 말</th></tr></thead>
+        <tbody>
+          <tr><td>전용면적 하한</td><td>소형은 임대 목적이 섞이나? 뺄 것인가 둘 것인가</td></tr>
+          <tr><td>이상 거래</td><td>직거래·취소분이 섞였나? 어떻게 알아보나</td></tr>
+          <tr><td>대표값</td><td>평균과 중앙값 중 무엇을. 왜</td></tr>
+          <tr><td>거래 적은 동</td><td>몇 건 미만이면 표에서 뺄 것인가</td></tr>
+          <tr><td>기간</td><td>12개월 전체를 한 덩어리로 볼 것인가</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        <span class="t-red">여기서 정한 것을 꼭 메모한다.</span>
+        다음 주에 이것을 CLAUDE.md 로 옮긴다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 12. 실습 ④ 실행 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ④ — 그다음에 실행시킨다 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>"정한 대로 하고, 결과를 표와 그래프로 저장해 줘" 라고 시킨다</li>
+        <li>결과가 나오면 <span class="hl">로직 문서와 대조한다</span> —
+          걸러진 건수가 말한 대로인가, 단위가 맞나</li>
+        <li>어긋나면 그 자리를 짚어 다시 시킨다. <span class="mark">"왜 이렇게 됐어?" 라고 묻는다</span></li>
+        <li>결과를 보고 한 문장을 만들어 본다 —
+          "상당구에서 ㎡당 가격이 가장 높은 동은 ○○이고, 가장 낮은 △△의 □배다"</li>
+      </ol>
+      <p class="emph" style="margin-top:16px">
+        제출: <span class="t-red">로직 문서 + 동별 요약표</span>.
+        로직 문서에 <span class="hl">내가 판단한 자리를 표시</span>해 둔다.</p>
+      <p class="caption" style="margin-top:6px">
+        가정 과제: 자기 문제정의서의 데이터로도 같은 것을 해 본다. 로직만 받아 와도 좋다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 마무리 ═══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

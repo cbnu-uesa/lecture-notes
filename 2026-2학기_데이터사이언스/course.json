@@ -21,35 +21,35 @@
       "title": "AI와 함께 도시 문제 정의하기",
       "file": "02-도시문제정의.html",
       "date": "2026. 9. 14.",
-      "status": "planned"
+      "status": "done"
     },
     {
       "no": 3,
       "title": "도시 데이터는 어디에 있는가",
       "file": "03-도시데이터소스.html",
       "date": "2026. 9. 21.",
-      "status": "planned"
+      "status": "done"
     },
     {
       "no": 4,
       "title": "클로드 코드 Ⅰ — 설치와 첫 분석",
       "file": "04-클로드코드1.html",
       "date": "2026. 9. 28.",
-      "status": "planned"
+      "status": "done"
     },
     {
       "no": 5,
       "title": "클로드 코드 Ⅱ — CLAUDE.md와 컨텍스트",
       "file": "05-클로드코드2.html",
       "date": "2026. 10. 5.",
-      "status": "planned"
+      "status": "done"
     },
     {
       "no": 6,
       "title": "클로드 코드 Ⅲ — MCP와 에이전트",
       "file": "06-클로드코드3.html",
       "date": "2026. 10. 12.",
-      "status": "planned"
+      "status": "done"
     },
     {
       "no": 7,
