@@ -70,7 +70,9 @@
     no.className = 'no';
     no.textContent = l.no + '강';
 
-    const done = l.status === 'done';
+    // file 이 없으면 링크를 걸 수 없다. 예전에 이 자리에서 TypeError 가 나
+    // 목록이 통째로 비었다 — 한 강의의 결손이 페이지 전체를 죽이지 않게 한다.
+    const done = l.status === 'done' && !!l.file;
     const ttl = document.createElement(done ? 'a' : 'span');
     ttl.className = 'ttl' + (done ? '' : ' pending');
     ttl.textContent = l.title;
