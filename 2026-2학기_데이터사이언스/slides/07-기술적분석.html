@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>7강. 기술적 분석 — 무슨 일이 일어났는가</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  /* 방법 표지 — kicker 와 같은 줄의 오른쪽 끝에 둔다.
+     보통 흐름에 두면 deck-init 이 절대배치로 넣는 kicker 보다 위로 올라간다. */
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em;
+         color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>7강. 기술적 분석<br>무슨 일이 일어났는가</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>세종시 집값에 무슨 일이 있었나?</h2>
+    <div class="body">
+      <ul>
+        <li>거래 <span class="num">15,486</span>건의 숫자가 있다</li>
+        <li>이걸 그대로 보여 주면 아무도 못 읽는다</li>
+        <li><span class="mark">무엇으로 줄여야</span> 뜻이 생기는가</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 정의 ══════════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>기술적 분석 <span class="en" style="font-size:20px">descriptive</span></h2>
+    <div class="body">
+      <p class="define">있는 그대로를 <span class="t-red">줄여서 보여 주는</span> 일.<br>
+        왜 그런지, 앞으로 어떻게 될지는 아직 묻지 않는다</p>
+      <p class="conclusion">→ 모든 분석의 첫 단계다.
+        여기서 잘못 줄이면 뒤의 진단·예측이 전부 어긋난다</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 오늘의 세 방법 ════════════════════════════════ -->
+  <section>
+    <h2>오늘 배울 세 가지</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:22%">방법</th><th style="width:30%">답하는 질문</th><th>줄이는 방식</th></tr></thead>
+        <tbody>
+          <tr><td>① 대표값과 산포</td><td>대체로 얼마인가</td><td>수천 개를 <span class="hl">숫자 두세 개</span>로</td></tr>
+          <tr><td>② 분포</td><td>어떻게 퍼져 있나</td><td>수천 개를 <span class="hl">하나의 모양</span>으로</td></tr>
+          <tr><td>③ 비교</td><td>어디가·언제가 다른가</td><td>수천 개를 <span class="hl">몇 개의 덩어리</span>로</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:16px">
+        셋 다 "줄이는" 일이다. 줄이면 반드시 <span class="hl">무언가 사라진다</span> —
+        무엇이 사라지는지 아는 것이 이 강의의 핵심이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 5. ① 원리 — 대표값 ══════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  대표값과 산포</p>
+    <h2>가운데를 가리키는 두 가지 방법</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-mm" viewBox="0 0 620 300" style="width:600px" role="img"
+           aria-label="오른쪽으로 꼬리가 긴 분포에서 중앙값보다 평균이 오른쪽에 놓이는 그림"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        꼬리가 한쪽으로 길면 <span class="hl">평균이 그 꼬리 쪽으로 끌려간다.</span>
+        중앙값은 순서만 보므로 끌리지 않는다.</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 60, y0: 240, x1: 560, y1: 40 });
+        const S = F.scale({ x: [0, 10], y: [0, 1] });
+        // 오른쪽 꼬리가 긴 분포 (로그정규 비슷하게 손으로 정의한 개념도)
+        const f = (x) => x <= 0 ? 0 : Math.exp(-Math.pow(Math.log(x) - 0.85, 2) / 0.42) / x * 1.35;
+        const pts = [];
+        for (let x = 0.15; x <= 10; x += 0.1) pts.push([x, f(x)]);
+        const med = 2.34, mean = 3.05;
+        F.draw('#f-mm', {
+          axes: { x: '값', y: '빈도' },
+          parts: [
+            F.raw(`<path class="area-bar" d="${Fig.path(S.curve(pts))} L${S.x(10)},${S.y(0)} L${S.x(0.15)},${S.y(0)} Z" fill-opacity=".28"/>`),
+            F.curve(S.curve(pts)),
+            F.line(S.x(med), S.y(0), S.x(med), S.y(f(med) + 0.03), { variant: 'demand' }),
+            F.line(S.x(mean), S.y(0), S.x(mean), S.y(f(mean) + 0.16), { variant: 'supply' }),
+            F.annot(S.x(med) - 6, S.y(f(med)) - 14, '중앙값', { anchor: 'end', size: 13 }),
+            F.annot(S.x(mean) + 8, S.y(f(mean)) - 30, '평균', { tone: 'red', size: 13 }),
+            F.annot(S.x(7.2), S.y(0.12), '이쪽의 몇 건이\n평균을 끌어당긴다', { size: 12.5, lh: 16 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 6. ① 원리 — 산포 ════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  대표값과 산포</p>
+    <h2>가운데만으로는 모자란다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>평균이 같아도 <span class="hl">퍼진 정도</span>가 다르면 전혀 다른 시장이다.</p>
+        <p style="margin-top:10px">표준편차는 각 값이 평균에서 얼마나 떨어져 있는지를
+          평균 낸 것이다.</p>
+        <p class="formula-key" style="margin-top:10px">
+          $s=\sqrt{\dfrac{\sum (x_i-\bar{x})^2}{n}}$</p>
+        <p style="margin-top:10px">사분위(Q1·Q3)는 순서로 자른다.
+          <span class="hl">이상값에 끌리지 않는다.</span></p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-sd" viewBox="0 0 420 290" style="width:410px" role="img"
+             aria-label="평균은 같고 산포만 다른 두 분포를 겹쳐 그린 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 44, y0: 234, x1: 396, y1: 34 });
+        const S = F.scale({ x: [0, 10], y: [0, 0.45] });
+        F.draw('#f-sd', {
+          axes: { x: '값', y: '빈도' },
+          parts: [
+            F.curve(S.curve(Array.from({length:99},(_,i)=>{const x=0.1*(i+1);
+              return [x, Math.exp(-Math.pow(x-5,2)/2)/Math.sqrt(2*Math.PI)];})), { variant: 'demand' }),
+            F.curve(S.curve(Array.from({length:99},(_,i)=>{const x=0.1*(i+1);
+              return [x, Math.exp(-Math.pow(x-5,2)/(2*4))/(2*Math.sqrt(2*Math.PI))];})), { variant: 'supply' }),
+            F.line(S.x(5), S.y(0), S.x(5), S.y(0.42), { variant: 'cap' }),
+            F.annot(S.x(5), S.y(0.44), '같은 평균', { anchor: 'middle', size: 12.5 }),
+            F.annot(S.x(6.5), S.y(0.33), '산포 작다', { size: 12.5 }),
+            F.annot(S.x(8.6), S.y(0.13), '산포 크다', { tone: 'red', size: 12.5 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 7. ① 언제 쓰나 ══════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  대표값과 산포</p>
+    <h2>어느 것을 쓸 것인가</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:22%">이럴 때</th><th style="width:24%">이것을 쓴다</th><th>도시 데이터의 예</th></tr></thead>
+        <tbody>
+          <tr><td>좌우 대칭이다</td><td>평균 · 표준편차</td><td>통근 시간, 기온</td></tr>
+          <tr><td class="hl">꼬리가 길다</td><td class="hl">중앙값 · 사분위</td><td class="hl">집값, 소득, 상가 매출</td></tr>
+          <tr><td>극단값이 중요하다</td><td>최대·최소도 함께</td><td>미세먼지 농도, 강우량</td></tr>
+          <tr><td>단위가 다른 것을 비교</td><td>비율로 바꾼다</td><td>㎡당 가격, 1인당 면적</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">
+        도시·부동산·소득 자료는 <span class="hl">거의 언제나 꼬리가 길다.</span>
+        기본은 중앙값이고, 평균은 함께 보는 참고값이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. ① 예시 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  대표값과 산포</p>
+    <h2>세종 아파트 실거래가</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <table style="width:100%;table-layout:fixed">
+          <thead><tr><th style="width:52%">거래금액</th><th>만원</th></tr></thead>
+          <tbody>
+            <tr><td>평균</td><td class="num">43,199</td></tr>
+            <tr><td class="hl">중앙값</td><td class="hl num">39,000</td></tr>
+            <tr><td>표준편차</td><td class="num">20,194</td></tr>
+            <tr><td>Q1 (하위 25%)</td><td class="num">29,000</td></tr>
+            <tr><td>Q3 (상위 25%)</td><td class="num">53,400</td></tr>
+            <tr><td>최소 — 최대</td><td class="num">3,800 — 170,000</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:8px">
+          COMPAS 세종 주택시장 · 2017~2020 · 전용 60㎡ 초과 15,486건 (취소 제외)</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">여기서 읽어야 할 것</p>
+        <ul>
+          <li>평균이 중앙값보다 <span class="hl num">4,199만원</span> 높다 —
+            고가 거래가 평균을 끌었다</li>
+          <li>표준편차가 중앙값의 절반이 넘는다 —
+            <span class="hl">"대체로 4억" 이라는 말이 위태롭다</span></li>
+          <li>최대가 최소의 <span class="num">45배</span>다.
+            같은 "아파트" 로 묶어도 되는가</li>
+        </ul>
+        <p class="emph" style="margin-top:12px">
+          숫자 여섯 개가 <span class="hl">15,486건보다 많은 것을 말한다.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 9. ① 주의 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  대표값과 산포</p>
+    <h2>주의 — 평균 하나로 말하지 않는다</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:30%">함정</th><th>무슨 일이 벌어지나</th></tr></thead>
+        <tbody>
+          <tr><td>평균의 함정</td><td>고가 거래 몇 건이 "평균 집값" 을 올린다.
+            대부분의 시민이 겪는 값이 아니다</td></tr>
+          <tr><td>단위를 안 맞춤</td><td>면적이 다른 집의 가격을 그냥 비교한다.
+            ㎡당으로 바꿔야 뜻이 생긴다</td></tr>
+          <tr><td>표본이 적은 집단</td><td>거래 3건인 동의 "중앙값" 은 그냥 가운데 한 건이다</td></tr>
+          <tr><td>기간을 안 나눔</td><td>4년치를 한 덩어리로 요약하면
+            <span class="hl">오른 것도 내린 것도 안 보인다</span></td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        마지막 줄이 다음 방법으로 이어진다 — <span class="hl">한 덩어리로 줄이면 변화가 사라진다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 10. ② 원리 — 히스토그램 ═════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  분포</p>
+    <h2>모양으로 보면 대표값이 못 보여 준 것이 보인다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-hist" viewBox="0 0 660 290" style="width:640px" role="img"
+           aria-label="세종 아파트 거래금액을 억원 구간으로 나눈 히스토그램"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        세종 아파트 거래금액 분포 (2017~2020 · 전용 60㎡ 초과 15,486건) — 막대 위는 건수</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 62, y0: 226, x1: 630, y1: 34 });
+        const data = [
+          ['0~2억', 1241], ['2~3억', 2893], ['3~4억', 3913], ['4~5억', 2742],
+          ['5~6억', 1791], ['6~8억', 1963], ['8억~', 943],
+        ];
+        const S = F.scale({ x: [0, data.length], y: [0, 4400] });
+        const w = S.x(1) - S.x(0);
+        let rects = '';
+        data.forEach((d, i) => {
+          rects += `<rect class="area-bar" x="${S.x(i) + 6}" y="${S.y(d[1])}" ` +
+                   `width="${w - 12}" height="${S.y(0) - S.y(d[1])}"/>`;
+        });
+        F.draw('#f-hist', {
+          axes: { x: '거래금액', y: '건수' },
+          parts: [
+            F.raw(rects),
+            ...data.map((d, i) => F.annot(S.x(i + 0.5), S.y(d[1]) - 8,
+              d[1].toLocaleString(), { anchor: 'middle', size: 12 })),
+            ...data.map((d, i) => F.annot(S.x(i + 0.5), S.y(0) + 18, d[0],
+              { anchor: 'middle', size: 11.5 })),
+            F.line(S.x(2.9), S.y(0), S.x(2.9), S.y(4200), { variant: 'supply' }),
+            F.annot(S.x(3.05), S.y(4260), '중앙값 3.9억', { tone: 'red', size: 12.5 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 11. ② 원리 — 박스플롯 ═══════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ②  분포</p>
+    <h2>박스플롯 — 다섯 숫자로 그린 분포</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>히스토그램은 한 집단의 모양을 잘 보여 주지만
+          <span class="hl">여러 집단을 나란히 놓기</span>는 어렵다.</p>
+        <p style="margin-top:10px">박스플롯은 최소·Q1·중앙값·Q3·최대
+          <span class="hl">다섯 숫자</span>만으로 그린다. 좁아서 여럿을 붙여 놓을 수 있다.</p>
+        <p style="margin-top:10px">상자의 길이가 <span class="mark">가운데 절반</span>이
+          퍼진 정도다. 이것을 사분위범위(IQR)라 한다.</p>
+        <p class="formula-key" style="margin-top:8px">$IQR = Q_3 - Q_1$</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-box" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="최소 Q1 중앙값 Q3 최대와 이상값을 표시한 박스플롯 설명 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 58, y0: 236, x1: 396, y1: 40 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const yc = S.y(6), h = 34;
+        const q1 = S.x(3.2), md = S.x(4.6), q3 = S.x(6.4), lo = S.x(1.2), hi = S.x(8.4);
+        F.draw('#f-box', {
+          parts: [
+            F.raw(`<rect x="${q1}" y="${yc - h/2}" width="${q3 - q1}" height="${h}"
+                     fill="#A02948" fill-opacity=".18" stroke="#A02948" stroke-width="1.6"/>`),
+            F.raw(`<path class="axis" d="M${lo},${yc} L${q1},${yc}"/>
+                   <path class="axis" d="M${q3},${yc} L${hi},${yc}"/>
+                   <path class="axis" d="M${lo},${yc-11} L${lo},${yc+11}"/>
+                   <path class="axis" d="M${hi},${yc-11} L${hi},${yc+11}"/>
+                   <path d="M${md},${yc-h/2} L${md},${yc+h/2}" stroke="#A02948" stroke-width="2.6"/>`),
+            F.raw(`<circle class="pt" cx="${S.x(9.4)}" cy="${yc}" r="4"/>`),
+            F.annot(lo, yc + 42, '최소', { anchor: 'middle', size: 12 }),
+            F.annot(q1, yc + 42, 'Q1', { anchor: 'middle', size: 12 }),
+            F.annot(md, yc - 30, '중앙값', { anchor: 'middle', tone: 'red', size: 12.5 }),
+            F.annot(q3, yc + 42, 'Q3', { anchor: 'middle', size: 12 }),
+            F.annot(hi, yc + 42, '최대', { anchor: 'middle', size: 12 }),
+            F.annot(S.x(9.4), yc - 20, '이상값', { anchor: 'middle', size: 12 }),
+            F.raw(`<path class="guide" d="M${q1},${yc+h/2+6} L${q1},${yc+h/2+16} L${q3},${yc+h/2+16} L${q3},${yc+h/2+6}"/>`),
+            F.annot((q1 + q3) / 2, yc + 76, '가운데 절반 (IQR)', { anchor: 'middle', size: 12 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 12. ② 언제 쓰나 · 주의 ══════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  분포</p>
+    <h2>언제 쓰고, 무엇을 조심하나</h2>
+    <div class="body tight">
+      <p class="sub">이럴 때 분포를 본다</p>
+      <ul>
+        <li>대표값 하나로 설명이 안 될 때 — <span class="hl">봉우리가 둘인지</span> 확인한다</li>
+        <li>이상값이 있는지 봐야 할 때</li>
+        <li>여러 지역·시점을 나란히 견줄 때 (박스플롯)</li>
+      </ul>
+      <p class="sub" style="margin-top:14px">주의</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:32%">함정</th><th>무슨 일이 벌어지나</th></tr></thead>
+        <tbody>
+          <tr><td>구간 폭을 바꾸면<br>모양이 바뀐다</td><td>같은 자료도 구간을 넓게 잡으면 봉우리가 하나로 뭉친다.
+            <span class="hl">폭을 몇 개로 바꿔 보고</span> 결론이 유지되는지 확인한다</td></tr>
+          <tr><td>이상값을 그냥 지운다</td><td>이상값이 오류인지 실제인지 먼저 본다.
+            <span class="mark">진짜 비싼 집은 오류가 아니다</span></td></tr>
+          <tr><td>세로축을 0에서<br>시작하지 않는다</td><td>차이가 실제보다 커 보인다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ 13. ③ 원리 — 시계열 ═════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  비교</p>
+    <h2>시간으로 나누면 변화가 보인다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-tr" viewBox="0 0 640 290" style="width:620px" role="img"
+           aria-label="세종 아파트 거래금액 중앙값이 2017년 3억900만원에서 2020년 5억1천만원으로 오르는 꺾은선그래프"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        세종 아파트 거래금액 <span class="hl">중앙값</span> (전용 60㎡ 초과) — 8쪽의 "39,000만원" 은 이 넷을 뭉친 값이다</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 70, y0: 224, x1: 596, y1: 40 });
+        const d = [[2017, 30900], [2018, 35000], [2019, 42000], [2020, 51000]];
+        const S = F.scale({ x: [2016.6, 2020.4], y: [0, 60000] });
+        F.draw('#f-tr', {
+          axes: { x: '계약연도', y: '만원' },
+          parts: [
+            F.curve(S.curve(d), { variant: 'supply' }),
+            ...d.map(([x, y]) => F.dot(S.x(x), S.y(y))),
+            ...d.map(([x, y]) => F.annot(S.x(x), S.y(y) - 15,
+              y.toLocaleString(), { anchor: 'middle', tone: 'red', size: 12.5 })),
+            ...d.map(([x]) => F.annot(S.x(x), S.y(0) + 18, String(x),
+              { anchor: 'middle', size: 12 })),
+            F.raw(`<path class="guide" d="${Fig.path([[S.x(2016.6), S.y(39000)], [S.x(2020.4), S.y(39000)]])}"/>`),
+            F.annot(S.x(2016.75), S.y(39000) - 9, '전체 중앙값 39,000', { size: 12 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 14. ③ 원리 — 지역 비교 ══════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  비교</p>
+    <h2>공간으로 나누면 격차가 보인다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-dong" viewBox="0 0 700 290" style="width:680px" role="img"
+           aria-label="세종시 동별 ㎡당 가격 중앙값을 상위 다섯 곳과 하위 세 곳으로 나눠 그린 가로 막대그래프"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        동별 ㎡당 가격 중앙값 (거래 100건 이상 17개 동 중 발췌) —
+        최고 대평동 <span class="num">790</span>, 최저 남리 <span class="num">148</span>만원, <span class="hl">5.33배</span></p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 96, y0: 250, x1: 660, y1: 26 });
+        const d = [['대평동',790],['새롬동',741],['다정동',708],['보람동',663],['소담동',641],
+                   ['죽림리',215],['침산리',176],['남리',148]];
+        const S = F.scale({ x: [0, 850], y: [0, d.length] });
+        const bh = (S.y(0) - S.y(1)) * 0.62;
+        let bars = '';
+        d.forEach((v, i) => {
+          const y = S.y(i + 0.5) - bh / 2;
+          const hi = i < 5;
+          bars += `<rect x="${S.x(0)}" y="${y}" width="${S.x(v[1]) - S.x(0)}" height="${bh}"
+                     fill="${hi ? '#A02948' : '#B4B0A9'}" fill-opacity="${hi ? '.85' : '.9'}"/>`;
+        });
+        F.draw('#f-dong', {
+          parts: [
+            F.raw(`<path class="axis" d="M${S.x(0)},${S.y(0)} L${S.x(0)},${S.y(d.length)}"/>`),
+            F.raw(bars),
+            ...d.map((v, i) => F.annot(S.x(0) - 8, S.y(i + 0.5) + 4, v[0],
+              { anchor: 'end', size: 12.5 })),
+            ...d.map((v, i) => F.annot(S.x(v[1]) + 8, S.y(i + 0.5) + 4, String(v[1]),
+              { size: 12.5, tone: i < 5 ? 'red' : undefined })),
+            F.annot(S.x(430), S.y(5.02), '⋯ 사이 9개 동 생략 ⋯', { anchor: 'middle', size: 11.5 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 15. ③ 주의 ══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  비교</p>
+    <h2>주의 — 비교는 기준을 맞춰야 성립한다</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:28%">함정</th><th>세종 자료에서라면</th></tr></thead>
+        <tbody>
+          <tr><td>구성이 다르다</td><td>비싼 동은 새 아파트가 많다.
+            <span class="hl">"위치가 비싼 것" 과 "새것이 비싼 것" 이 섞여 있다</span></td></tr>
+          <tr><td>기간이 겹치지 않는다</td><td>신도시 동은 2019년부터, 편입 지역은 2017년부터 거래가 있다.
+            같은 기간으로 잘라야 한다</td></tr>
+          <tr><td>표본 수가 다르다</td><td>남리 122건과 죽림리 1,145건을 같은 무게로 볼 수 없다</td></tr>
+          <tr><td>축을 자른다</td><td>세로축을 140부터 그리면 5.33배가 20배처럼 보인다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">5.33배는 사실이지만 그 자체로는 아무것도 설명하지 못한다.</span>
+        왜 그런지는 9주차 진단적 분석에서 따진다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 로직 문서 ═══════════════════════════════════ -->
+  <section>
+    <h2>이 숫자들은 어떻게 나왔나</h2>
+    <div class="body tight">
+      <p class="sub">오늘 슬라이드의 모든 수치는 이 판단 위에 있다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:26%">정한 것</th><th style="width:24%">어떻게</th><th>왜</th></tr></thead>
+        <tbody>
+          <tr><td>취소 거래</td><td>뺀다</td><td>성사되지 않은 거래는 시장 가격이 아니다</td></tr>
+          <tr><td>전용면적</td><td class="hl">60㎡ 초과만</td><td>소형은 임대 목적이 섞여 성격이 다르다</td></tr>
+          <tr><td>대표값</td><td class="hl">중앙값 위주</td><td>고가 거래가 평균을 끈다</td></tr>
+          <tr><td>동별 최소 건수</td><td>100건 이상</td><td>적은 거래로 순위가 뒤집히는 것을 막는다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        판단을 바꾸면 숫자가 바뀐다. <span class="hl">그래서 숫자보다 이 표를 먼저 보여 준다.</span></p>
+      <p class="src">전체 로직과 스크립트: <span class="code">analysis/07-세종주택시장-로직.md</span> ·
+        <span class="code">analysis/07-세종주택시장.py</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">세종 주택시장 요약 리포트 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 18. 실습 ① 받기 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 데이터를 받는다 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>COMPAS 에서 <span class="hl">「주택 시장 특성분석」(세종시)</span> 과제를 찾는다</li>
+        <li>데이터 탭에서 전체를 내려받는다. 공개 데이터만 들어 있다</li>
+        <li><span class="code">3.세종시_아파트(매매)_실거래가.csv</span> 를 작업 폴더에 둔다</li>
+        <li>CLAUDE.md 에 이 데이터의 출처·기간·단위를 적는다 (5주차에 만든 것을 이어 쓴다)</li>
+      </ol>
+      <p class="caption" style="margin-top:14px">
+        3~6주차에는 청주 실거래가로 연습했다. <span class="hl">같은 종류의 자료라 규칙이 거의 그대로 옮겨진다</span> —
+        무엇을 고쳐야 하는지 확인해 본다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 19. 실습 ② 로직 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 로직을 먼저 정한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"세종 아파트 실거래가로 <b>기술적 분석 요약 리포트</b>를 만들 거야.
+          담을 것은 ① 대표값과 산포 ② 금액 분포 ③ 연도별 추이 ④ 동별 비교.</p>
+        <p><span class="mark">코드는 아직 쓰지 마.</span> CLAUDE.md 규칙을 적용했을 때
+          각 항목을 어떻게 계산할지 로직으로 먼저 보여 주고,
+          <span class="mark">규칙만으로 정해지지 않는 자리</span>를 짚어 줘."</p>
+      </div>
+      <p class="sub" style="margin-top:14px">정해지지 않을 자리 (미리 생각해 둘 것)</p>
+      <ul>
+        <li>히스토그램 구간을 몇 개로 자를 것인가</li>
+        <li>연도별로 나눌 것인가 분기별로 나눌 것인가</li>
+        <li>동별 비교에서 최소 건수를 몇으로 둘 것인가</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 20. 실습 ③ 실행 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 만들고 대조한다 <span class="en" style="font-size:16px;color:var(--muted)">30분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>정한 대로 실행시켜 표와 그래프 넷을 받는다</li>
+        <li><span class="hl">오늘 슬라이드의 숫자와 맞춰 본다.</span>
+          강의에서 쓴 규칙(60㎡ 초과·취소 제외·100건 이상)을 그대로 쓰면 같아야 한다</li>
+        <li>다르면 어디서 갈렸는지 찾는다 — <span class="mark">이것이 오늘의 진짜 연습이다</span></li>
+        <li>규칙을 하나 바꿔 본다 (예: 하한을 85㎡ 로) 그리고 결과가 얼마나 달라지는지 본다</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        같은 데이터로 다른 그림을 만들 수 있다는 것을 직접 확인한다.
+        <span class="hl">그래서 로직을 적어 두는 것이다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 21. 실습 ④ 제출 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ④ — 한 문단으로 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">15분</span></h2>
+    <div class="body tight">
+      <p class="sub">표와 그래프만 내지 않는다. 읽은 것을 문장으로 옮긴다</p>
+      <div class="prompt-box">
+        <p class="who">이런 꼴로</p>
+        <p>"세종시 아파트 거래금액 중앙값은 2017년 ○○만원에서 2020년 ○○만원으로
+          ○% 올랐다. 다만 동별 격차가 커서 ○○동과 ○○동의 ㎡당 가격은 ○배 차이가 난다.
+          <b>이 차이가 위치 때문인지 건축 연한 때문인지는 이 분석으로 알 수 없다.</b>"</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        마지막 문장이 중요하다. <span class="hl">기술적 분석이 말할 수 없는 것을 함께 적는다</span> —
+        그 자리가 9주차의 출발점이다.</p>
+      <p class="caption" style="margin-top:10px">
+        제출: 요약 리포트(표 + 그래프 4종 + 한 문단) + 로직 문서<br>
+        가정 과제: 자기 문제정의서 데이터로도 기술적 분석을 해 본다</p>
+    </div>
+  </section>
+
+  <!-- ══ 22. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>모든 수치 — COMPAS 「주택 시장 특성분석」(세종시, SBJ_2102_001) 공개 데이터<br>
+          <span class="code">3.세종시_아파트(매매)_실거래가.csv</span> ·
+          2017-01 ~ 2020-12 계약분 · 2026. 8. 26. 내려받음</li>
+        <li>산출 방법 — <span class="code">analysis/07-세종주택시장.py</span>,
+          판단 근거는 <span class="code">analysis/07-세종주택시장-로직.md</span></li>
+        <li>5·6·11쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 23. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
