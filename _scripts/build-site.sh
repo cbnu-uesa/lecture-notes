@@ -42,6 +42,11 @@ if [ "$COURSES" -eq 0 ]; then
   echo "경고: course.json을 가진 학기 폴더를 찾지 못했습니다." >&2
 fi
 
+# ── GitHub Pages 대비 ────────────────────────────────────────
+# Jekyll 은 밑줄로 시작하는 최상위 폴더를 무시한다. _shared/ 가 통째로 빠지면
+# 모든 슬라이드의 CSS·폰트·JS 가 404 가 된다. 빈 .nojekyll 하나로 막는다.
+touch "$OUT/.nojekyll"
+
 # ── 안전 점검 ────────────────────────────────────────────────
 LEAK="$(find "$OUT" \( -name '*.hwp' -o -name '*.xlsx' -o -name '*.pptx' \) -print)"
 if [ -n "$LEAK" ]; then
