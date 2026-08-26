@@ -219,7 +219,15 @@ _scripts/build-pdf.sh 2026-1학기_도시경제학입문/slides/02-수요와공�
 
 # 배포용 정적 사이트 생성 (화이트리스트 복사 → dist/)
 _scripts/build-site.sh
+
+# 링크 검사 — 강의 목록이 가리키는 슬라이드·PDF 가 실제로 열리는지
+_scripts/check-links.sh                                            # 로컬
+_scripts/check-links.sh https://cbnu-uesa.github.io/lecture-notes  # 배포본
 ```
+
+`check-figures.sh` 가 슬라이드 **안**을 본다면 `check-links.sh` 는 슬라이드 **사이**를 본다.
+course.json 의 `file` 결손·오타, 등록하지 않은 슬라이드, 루트 `COURSES` 누락을 잡는다.
+**배포 직후 배포본을 대상으로 한 번 돌린다.**
 
 PDF는 `npx decktape`가 헤드리스 Chrome으로 만든다. 브라우저 인쇄 대화상자에 의존하지 않는다 — 사용자 환경마다 결과가 달라지기 때문이다.
 
@@ -250,6 +258,7 @@ git push --force https://github.com/cbnu-uesa/lecture-notes.git gh-pages
 ```
 
 `pdf/` 는 git 에 없으므로 **배포 전에 `build-pdf.sh` 를 돌려 두어야** 다운로드 버튼이 산다.
+배포가 끝나면 `check-links.sh <사이트주소>` 로 링크를 전수 확인한다.
 
 ### 겪은 것
 
@@ -258,6 +267,11 @@ git push --force https://github.com/cbnu-uesa/lecture-notes.git gh-pages
   `build-site.sh` 가 자동으로 만든다.
 - 한글 폴더명은 Pages 에서 퍼센트 인코딩으로 잘 열린다. 별도 처리가 필요 없었다.
 - Free 계정은 **공개 저장소에서만** Pages 가 된다.
+- **도시교통통계학 목록이 통째로 비어 있었다.** 그 과목 course.json 만 lectures 에
+  `file` 이 없어 과목 index 의 `l.file.replace(...)` 에서 TypeError 가 났고, 렌더링
+  루프가 멈춘 것이다. 슬라이드는 멀쩡했고 직접 주소로는 열려서 배포 후에야 드러났다.
+  데이터를 채우고, index 넷이 `file` 결손에 죽지 않도록 고치고, `check-links.sh` 를
+  만들었다. **한 강의의 결손이 페이지 전체를 죽이게 두지 않는다.**
 
 ### 저작권 — 배포할 때마다 확인할 것
 
