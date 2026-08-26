@@ -227,6 +227,44 @@ PDF는 `npx decktape`가 헤드리스 Chrome으로 만든다. 브라우저 인�
 
 ## 배포
 
-아직 설정하지 않았다. `_scripts/build-site.sh`가 `dist/`를 만드는 데까지만 되어 있다. GitHub Pages로 올리기로 하면 그때 저장소와 워크플로를 붙인다.
+**GitHub Pages 로 배포한다.** https://cbnu-uesa.github.io/lecture-notes/ (2026-08-26 개통)
 
-Drive 폴더 안에서 `git init`을 하면 `.git`이 동기화 충돌을 일으킬 수 있다. 배포를 실제로 진행할 때 별도로 판단한다. **먼저 물어보지 않고 `git init`을 실행하지 않는다.**
+저장소는 `cbnu-uesa/lecture-notes` **공개** 저장소이고 브랜치를 둘로 나눠 쓴다.
+
+| 브랜치 | 내용 | 만드는 법 |
+|---|---|---|
+| `main` | 원본 — 슬라이드 HTML·course.json·문서 | 평소 커밋 |
+| `gh-pages` | 배포본 — `dist/` 를 통째로 | `build-site.sh` 산출물을 푸시 |
+
+`.gitignore` 가 `*/private/`·`*/source/`·`*/pdf/`·`dist/` 를 막는다. **이 네 줄을 지우지 않는다** —
+시험지와 교재 원본이 공개 저장소로 나가는 것을 막는 유일한 장치다.
+
+### 배포 절차
+
+```bash
+_scripts/build-site.sh                    # dist/ 를 시스템 임시 폴더에 만든다
+DIST=/var/folders/.../lecture-site        # 스크립트가 마지막에 경로를 찍어 준다
+cd "$DIST" && rm -rf .git && git init -q -b gh-pages
+git add -A && git commit -q -m "배포 산출물 $(date +%F)"
+git push --force https://github.com/cbnu-uesa/lecture-notes.git gh-pages
+```
+
+`pdf/` 는 git 에 없으므로 **배포 전에 `build-pdf.sh` 를 돌려 두어야** 다운로드 버튼이 산다.
+
+### 겪은 것
+
+- **`.nojekyll` 이 없으면 사이트가 통째로 깨진다.** Jekyll 이 밑줄로 시작하는 최상위 폴더를
+  무시해 `_shared/` 가 빠지고 전 슬라이드의 CSS·폰트·JS 가 404 가 된다.
+  `build-site.sh` 가 자동으로 만든다.
+- 한글 폴더명은 Pages 에서 퍼센트 인코딩으로 잘 열린다. 별도 처리가 필요 없었다.
+- Free 계정은 **공개 저장소에서만** Pages 가 된다.
+
+### 저작권 — 배포할 때마다 확인할 것
+
+공개 사이트이므로 제3자 자료가 그대로 노출된다. 2026-08-26 현재 `assets/tb-*`(교재·신문·위키
+유래)가 **도시교통통계학 40개, 도시및지역경제학 2개**다. 사용자가 이 상태로 전체 공개를
+결정했다(2026-08-26). 새 과목을 배포에 넣을 때는 `ls */assets/tb-*` 로 전수 확인하고
+판단을 받는다.
+
+데이터사이언스의 `assets/cc-*` 는 전부 자유 라이선스이며 표기 의무가 있는 것은
+슬라이드 안에 저작자와 라이선스를 적어 두었다 (`assets/README.md` 참조).
