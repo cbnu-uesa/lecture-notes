@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10강. 진단적 분석 Ⅱ — 회귀와 혼란변수</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>10강. 진단적 분석 Ⅱ<br>회귀와 혼란변수</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>비싼 것은 위치 때문인가, 새것이기 때문인가?</h2>
+    <div class="body">
+      <ul>
+        <li>7주차에 세종 동별 ㎡당 가격이 <span class="num">5.33배</span> 차이 난다고 했다</li>
+        <li>비싼 동은 <span class="mark">새 아파트가 많은 동이기도 하다</span></li>
+        <li>둘이 섞여 있는데 어떻게 떼어 내는가</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 오늘의 세 방법 ════════════════════════════════ -->
+  <section>
+    <h2>오늘 배울 세 가지</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:26%">방법</th><th style="width:34%">하는 일</th><th>얻는 것</th></tr></thead>
+        <tbody>
+          <tr><td>① 단순회귀</td><td>관계를 직선 하나로 요약한다</td><td>"하나 늘면 얼마 변하나"</td></tr>
+          <tr><td>② 다중회귀와 통제</td><td>다른 조건을 같게 맞춘다</td><td class="hl">섞인 것을 떼어 낸다</td></tr>
+          <tr><td>③ 혼란변수·역인과</td><td>남은 함정을 찾는다</td><td>어디까지 말할 수 있는지</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:16px">
+        ②까지 가면 상관보다 훨씬 나아진다. 그래도 <span class="hl">인과는 증명되지 않는다</span> —
+        ③이 그 이유를 다룬다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. ① 원리 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  단순회귀</p>
+    <h2>흩어진 점을 직선 하나로</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>모든 점에서 직선까지의 <span class="hl">세로 거리를 제곱해 더한 값</span>이
+          가장 작아지는 직선을 고른다. 최소제곱법이다.</p>
+        <p class="formula-key" style="margin-top:10px">$\hat{y}=b_0+b_1x$</p>
+        <p style="margin-top:10px">$b_1$ 이 <span class="hl">기울기</span>다.
+          "$x$ 가 1 늘 때 $y$ 가 평균적으로 얼마 변하는가" 를 뜻한다.</p>
+        <p style="margin-top:10px">$R^2$ 은 <span class="hl">이 직선이 설명하는 몫</span>이다.
+          0.32 면 $y$ 가 흩어진 정도의 32%만 설명한다는 뜻이다.</p>
+        <p class="caption" style="margin-top:10px">
+          나머지 68%는 모형 밖에 있다 — 그것을 잊으면 과신하게 된다.</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-ols" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="산점도 위에 회귀직선을 긋고 각 점에서 직선까지의 세로 거리를 표시한 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 52, y0: 232, x1: 394, y1: 40 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const pts = [[1.2,2.4],[2.1,2.2],[2.8,4.1],[3.6,3.4],[4.4,5.6],
+                     [5.1,4.8],[5.9,6.9],[6.7,6.1],[7.5,8.2],[8.4,7.4]];
+        const b0 = 1.35, b1 = 0.78;
+        let res = '';
+        pts.forEach(([x, y]) => {
+          res += `<path class="guide" d="M${S.x(x)},${S.y(y)} L${S.x(x)},${S.y(b0 + b1 * x)}"/>`;
+        });
+        F.draw('#f-ols', {
+          axes: { x: 'x', y: 'y' },
+          parts: [
+            F.raw(res),
+            F.line(S.x(0.6), S.y(b0 + b1 * 0.6), S.x(9), S.y(b0 + b1 * 9), { variant: 'supply' }),
+            F.dots(pts.map(([x, y]) => [S.x(x), S.y(y)])),
+            F.annot(S.x(8.2), S.y(9.2), '$\\hat{y}=b_0+b_1x$', { tone: 'red', size: 13, anchor: 'end' }),
+            F.annot(S.x(4.6), S.y(1.0), '세로 거리(잔차)의\n제곱합을 최소로', { size: 12, lh: 15 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 5. ① 언제 쓰나 ══════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  단순회귀</p>
+    <h2>상관 대신 회귀를 쓰는 이유</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:22%"></th><th style="width:36%">상관계수</th><th>회귀</th></tr></thead>
+        <tbody>
+          <tr><td>말해 주는 것</td><td>함께 움직이는 <span class="hl">정도</span></td><td>얼마나 <span class="hl">변하는지</span></td></tr>
+          <tr><td>단위</td><td>없다 (−1~+1)</td><td>있다 (㎡당 만원 등)</td></tr>
+          <tr><td>방향</td><td>대칭이다 — x와 y를 바꿔도 같다</td><td class="hl">비대칭이다 — 무엇을 설명할지 정한다</td></tr>
+          <tr><td>변수 개수</td><td>둘</td><td class="hl">여럿을 한꺼번에</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">
+        마지막 줄이 오늘의 핵심이다. <span class="hl">변수를 여럿 넣을 수 있다는 것</span>이
+        "다른 조건을 같게 맞추는" 길을 연다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 6. ② 원리 — 통제 ════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  다중회귀와 통제</p>
+    <h2>"다른 조건이 같다면" 을 계산으로 만든다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-ctl" viewBox="0 0 840 250" style="width:800px" role="img"
+           aria-label="신도시 여부와 건물 나이가 모두 가격에 영향을 주고 서로 얽혀 있는 구조를 화살표로 그린 그림"></svg>
+      <p class="caption" style="text-align:center;margin-top:6px">
+        신도시일수록 건물이 새것이고, 새것일수록 비싸다. 그래서
+        <span class="hl">신도시의 효과에 나이의 효과가 섞여 들어온다.</span></p>
+    </div>
+    <script>
+      (function () {
+        const el = document.getElementById('f-ctl');
+        const box = (x, y, w, t, sub, fill) => {
+          const dark = fill === '#A02948';
+          return `<rect x="${x}" y="${y}" width="${w}" height="46" fill="${fill}"/>` +
+            `<text class="${dark ? 'on-dark' : ''}" x="${x + w/2}" y="${y + 22}" text-anchor="middle"
+               font-size="14.5" font-weight="700" fill="${dark ? '#FFF' : '#16181C'}">${t}</text>` +
+            `<text class="${dark ? 'on-dark' : ''}" x="${x + w/2}" y="${y + 39}" text-anchor="middle"
+               font-size="11.5" fill="${dark ? '#FFF' : '#4A4741'}">${sub}</text>`;
+        };
+        let s = box(48, 40, 190, '신도시 여부', '보고 싶은 원인', '#A02948')
+              + box(48, 160, 190, '건물 나이', '섞여 있는 조건', '#D8D3CB')
+              + box(560, 100, 190, '㎡당 가격', '결과', '#EDE9E3');
+        s += `<path class="axis" d="M242,63 L554,112" stroke-width="1.6"/>
+              <path d="M558,113 L546,110 L549,101 Z" fill="#16181C"/>
+              <path class="axis" d="M242,183 L554,134" stroke-width="1.6"/>
+              <path d="M558,133 L549,145 L546,136 Z" fill="#16181C"/>
+              <path class="axis" d="M143,86 L143,156" stroke-width="1.6" stroke-dasharray="5 4"/>
+              <path d="M143,160 L138,148 L148,148 Z" fill="#16181C"/>`;
+        s += `<text class="annot" x="160" y="126" style="font-size:12.5px">신도시는\n새 아파트가 많다</text>`;
+        s += `<text class="annot" x="400" y="76" text-anchor="middle" style="font-size:12.5px" fill="#A02948">알고 싶은 효과</text>`;
+        s += `<text class="annot" x="400" y="176" text-anchor="middle" style="font-size:12.5px">섞여 드는 효과</text>`;
+        el.insertAdjacentHTML('beforeend', s);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 7. ② 원리 — 식 ══════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>통제란 식에 함께 넣는 것이다</h2>
+    <div class="body">
+      <p class="define">$\hat{y}=b_0+b_1(\text{신도시})+b_2(\text{나이})$</p>
+      <p class="conclusion" style="margin-top:14px">
+        → $b_1$ 은 이제 <span class="t-red">"나이가 같은 집끼리 비교했을 때"</span>의
+        신도시 효과다.<br>
+        &nbsp;&nbsp;&nbsp;나이가 설명하는 몫을 $b_2$ 가 가져가고 남은 것이 $b_1$ 이다</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. ② 예시 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  다중회귀와 통제</p>
+    <h2>7주차의 질문에 답한다</h2>
+    <div class="body tight">
+      <p class="sub">세종 아파트 ㎡당 가격 (만원) · 15,486건 · 신도시(동) 12,779 · 편입(리) 2,707</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:30%">모형</th><th style="width:20%">신도시</th>
+          <th style="width:17%">나이</th><th style="width:16%">면적</th><th>R²</th></tr></thead>
+        <tbody>
+          <tr><td>① 신도시만</td><td class="hl num">+310</td><td>—</td><td>—</td><td class="num">0.315</td></tr>
+          <tr><td>② + 건물 나이</td><td class="hl num">+263</td><td class="num">−5.5</td><td>—</td><td class="num">0.321</td></tr>
+          <tr><td>③ + 전용면적</td><td class="num">+277</td><td class="num">−4.8</td><td class="num">+1.03</td><td class="num">0.325</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        나이를 통제하니 신도시 계수가 <span class="hl num">310 → 263</span> 으로
+        <span class="hl">15% 줄었다.</span></p>
+      <p style="margin-top:8px">차이의 일부는 <span class="mark">건물이 새것이어서</span>였다.
+        그러나 <span class="mark">대부분은 남는다</span> — 나이를 같게 맞춰도 신도시가 ㎡당 263만원 비싸다.</p>
+      <p class="caption" style="margin-top:8px">
+        건물나이 중앙값: 신도시 4년 · 편입 12년. 혼란변수가 실재했다는 증거다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 9. ② 그림으로 ═══════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  다중회귀와 통제</p>
+    <h2>통제 전후를 그림으로</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-coef" viewBox="0 0 720 250" style="width:700px" role="img"
+           aria-label="신도시 계수가 통제 전 310에서 통제 후 263으로 줄어드는 막대그래프"></svg>
+      <p class="caption" style="text-align:center;margin-top:4px">
+        줄어든 <span class="num">47</span>만원이 <span class="hl">건물 나이가 설명하던 몫</span>이다.
+        남은 <span class="num">263</span>만원은 아직 설명되지 않았다.</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 100, y0: 200, x1: 660, y1: 34 });
+        const S = F.scale({ x: [0, 2], y: [0, 340] });
+        const bw = (S.x(1) - S.x(0)) * 0.42;
+        const bar = (i, v, fill) =>
+          `<rect x="${S.x(i + 0.5) - bw / 2}" y="${S.y(v)}" width="${bw}" height="${S.y(0) - S.y(v)}" fill="${fill}"/>`;
+        F.draw('#f-coef', {
+          parts: [
+            F.raw(`<path class="axis" d="M${S.x(0)},${S.y(0)} L${S.x(2)},${S.y(0)}"/>`),
+            F.raw(bar(0, 310, '#A02948') + bar(1, 263, '#A02948')),
+            F.raw(`<rect x="${S.x(1.5) - bw / 2}" y="${S.y(310)}" width="${bw}" height="${S.y(263) - S.y(310)}"
+                     fill="#D8D3CB"/>`),
+            F.annot(S.x(0.5), S.y(310) - 10, '+310', { anchor: 'middle', tone: 'red', size: 15 }),
+            // 회색 블록(=나이가 설명한 47) 안에 두면 그 블록의 값처럼 읽힌다.
+            // 크림슨 막대 안쪽에 흰 글자로 넣는다. annot 은 fill 을 받지 않아 raw 로 쓴다.
+            F.raw(`<text class="annot on-dark" x="${S.x(1.5)}" y="${S.y(263) + 26}"
+                     text-anchor="middle" style="font-size:15px" fill="#FFF">+263</text>`),
+            F.annot(S.x(0.5), S.y(0) + 20, '나이를 통제하기 전', { anchor: 'middle', size: 12.5 }),
+            F.annot(S.x(1.5), S.y(0) + 20, '나이를 통제한 뒤', { anchor: 'middle', size: 12.5 }),
+            F.annot(S.x(1.5) + bw / 2 + 12, S.y(286) + 4, '← 나이가 설명한 47', { size: 12.5 }),
+            F.annot(S.x(0), S.y(340) + 4, '신도시 계수 (㎡당 만원)', { size: 12 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 10. ③ 주의 — 남은 혼란변수 ══════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  혼란변수·역인과</p>
+    <h2>주의 — 통제했다고 끝난 것이 아니다</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:30%">아직 남은 것</th><th>왜 문제인가</th></tr></thead>
+        <tbody>
+          <tr><td>넣지 않은 변수</td><td>역과의 거리, 학군, 단지 규모, 층·향.
+            <span class="hl">R²이 0.32 라는 것이 그 증거다</span> — 3분의 2는 모형 밖에 있다</td></tr>
+          <tr><td>시점을 통제하지 않음</td><td>2017~2020 에 가격이 계속 올랐고 신도시 거래가 뒤로 갈수록 많다.
+            그 상승분이 신도시 계수에 섞여 있다</td></tr>
+          <tr><td>묶음으로 들어온 것</td><td>신도시는 새것일 뿐 아니라 계획도시다.
+            도로·학교·상가가 함께 들어왔다 — <span class="hl">"신도시 계수" 는 그 묶음 전체다</span></td></tr>
+          <tr><td>역인과</td><td>비싸질 곳에 좋은 시설이 들어오기도 한다.
+            어느 쪽이 먼저인지 자료만으로는 모른다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        말할 수 있는 것은 <span class="t-red">"건물 나이만으로는 설명되지 않는다"</span> 까지다.
+        <span class="hl">263만원을 "위치의 값" 이라고 부르면 안 된다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 11. ③ 주의 — 심슨의 역설 ════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ③  혼란변수·역인과</p>
+    <h2>나누면 방향이 뒤집히기도 한다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>전체로 보면 <span class="hl">오른쪽 위로</span> 가는데,
+          집단마다 나눠 보면 <span class="hl">전부 오른쪽 아래로</span> 가는 일이 있다.</p>
+        <p style="margin-top:10px">집단이 서로 다른 위치에 놓여 있어서
+          <span class="mark">집단 간 차이가 집단 내 관계를 덮어 버린</span> 것이다.</p>
+        <p style="margin-top:10px">이것을 <span class="hl">심슨의 역설</span>이라 한다.
+          통제해야 할 변수를 빠뜨리면 결론의 <span class="mark">부호까지</span> 바뀐다.</p>
+        <p class="emph" style="margin-top:12px">
+          그래서 <span class="t-red">"나눠 보면 어떤가" 를 항상 묻는다.</span></p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-simp" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="전체로는 우상향하지만 세 집단 안에서는 각각 우하향하는 산점도"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 48, y0: 236, x1: 396, y1: 34 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const groups = [[1.4, 2.6], [4.2, 5.0], [7.0, 7.4]];
+        let parts = [];
+        groups.forEach(([cx, cy]) => {
+          const pts = [];
+          for (let i = 0; i < 5; i++) {
+            const x = cx + i * 0.42 - 0.84;
+            pts.push([x, cy - (x - cx) * 0.55]);
+          }
+          parts.push(F.line(S.x(pts[0][0]), S.y(pts[0][1]),
+                            S.x(pts[4][0]), S.y(pts[4][1]), { variant: 'demand' }));
+          parts.push(F.dots(pts.map(([x, y]) => [S.x(x), S.y(y)])));
+        });
+        parts.push(F.line(S.x(0.6), S.y(2.0), S.x(8.4), S.y(8.2), { variant: 'supply' }));
+        parts.push(F.annot(S.x(7.6), S.y(9.0), '전체', { tone: 'red', size: 13 }));
+        parts.push(F.annot(S.x(2.4), S.y(0.9), '집단 안에서는 반대 방향', { size: 12 }));
+        F.draw('#f-simp', { axes: { x: 'x', y: 'y' }, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 12. ③ 정리 ══════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>어디까지 말할 수 있나</h2>
+    <div class="body">
+      <p class="define">회귀는 <span class="t-red">"다른 조건이 같다면"</span> 을 계산해 준다.<br>
+        다만 <span class="t-red">식에 넣은 조건</span>에 한해서다</p>
+      <p class="conclusion">→ 넣지 않은 조건은 계수 안에 그대로 남아 있다.<br>
+        &nbsp;&nbsp;&nbsp;그래서 결론은 언제나 <span class="t-red">"…를 통제했을 때" 라는 단서와 함께</span> 쓴다</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">아산 의료 취약지역 ② 원인 분석 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 14. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 무엇을 통제할지 정한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <p class="sub">지난주에 "10만명당 병원이 적다" 고 찾은 지역들. 왜 그럴까</p>
+      <ol class="steps">
+        <li>원인 후보를 <span class="hl">먼저 종이에 적는다</span> — 인구밀도, 도시화 정도,
+          노령인구 비율, 온양 시가지와의 거리</li>
+        <li>후보마다 <span class="mark">"이것이 병원 수와 지역 특성 둘 다에 영향을 주는가"</span> 를 따진다.
+          둘 다면 혼란변수다</li>
+        <li>데이터로 만들 수 있는 것과 없는 것을 나눈다</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">이 순서를 지킨다.</span> 데이터를 먼저 보고 변수를 고르면
+        눈에 띄는 것만 넣게 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 통제 전후를 비교한다 <span class="en" style="font-size:16px;color:var(--muted)">40분</span></h2>
+    <div class="body tight">
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"아산 12개 지역 자료로 회귀를 해 줘.
+          종속변수는 <b>인구 10만명당 병원 수</b>야.</p>
+        <p>모형을 <span class="mark">단계적으로</span> 보여 줘 —
+          ① 도시화 여부만 ② + 인구밀도 ③ + 노령인구 비율.
+          <span class="mark">각 단계에서 계수가 어떻게 변하는지 표로</span> 정리해 줘.</p>
+        <p>표본이 12개뿐인데 <span class="mark">이 회귀를 믿어도 되는지도 같이 말해 줘.</span>"</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        마지막 문장이 중요하다. <span class="hl">n = 12 는 회귀를 돌리기에 매우 작다</span> —
+        변수를 셋만 넣어도 자유도가 거의 남지 않는다.</p>
+      <p class="caption" style="margin-top:8px">
+        읍면동보다 잘게 나눈 격자 자료를 쓰면 표본이 늘어난다. 그 방법도 물어본다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ③ ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 단서와 함께 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <p class="sub">네 문장으로 쓴다</p>
+      <ol class="steps">
+        <li><span class="hl">통제 전</span> — 무엇이 얼마나 차이 났나</li>
+        <li><span class="hl">통제 후</span> — 그 차이가 얼마나 줄었나. <span class="mark">숫자로</span></li>
+        <li><span class="hl">남은 것의 해석</span> — 줄지 않은 부분은 무엇으로 볼 수 있나</li>
+        <li><span class="hl">단서</span> — 무엇을 통제하지 못했나. 표본은 충분했나</li>
+      </ol>
+      <p class="emph" style="margin-top:16px">
+        제출: <span class="t-red">모형 비교표 + 네 문장</span> + 로직 문서</p>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">가정 과제 (10주차)</span> — 도로교통공단 TAAS 공개 데이터로
+        어린이 교통사고 위험지역을 집에서 분석해 제출한다. 절차는 별도로 배부한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>8·9쪽 회귀 결과 — COMPAS 「주택 시장 특성분석」(세종시, SBJ_2102_001) 공개 데이터<br>
+          2017~2020 계약분 · 전용 60㎡ 초과 · 취소 제외 15,486건<br>
+          신도시/편입 구분은 지역명이 <span class="code">동</span> 으로 끝나는지
+          <span class="code">리</span> 로 끝나는지로 나눴다</li>
+        <li>산출 방법 — <span class="code">analysis/10-세종회귀.py</span> (외부 라이브러리 없이
+          정규방정식을 직접 푼다), 판단 근거는 <span class="code">analysis/10-세종회귀-로직.md</span></li>
+        <li>4·6·11쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 18. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
