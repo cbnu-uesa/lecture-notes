@@ -43,6 +43,17 @@
              font-size: 11px; line-height: 1.7; color: #4A4741; white-space: pre-wrap; }
   .doc .h { color: var(--brand-crimson); font-weight: 700; }
   .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+  /* 확인 지점 — "이게 보이면 성공" */
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  /* 시간표 */
+  .tt { width: 100%; table-layout: fixed; margin-top: 6px; }
+  .tt td, .tt th { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -330,82 +341,135 @@ cheongju-apt.csv — 국토부 실거래가 API
     <p class="section-sub">설치 · 첫 분석 · 재현되게 만들기 — 약 1시간 30분</p>
   </section>
 
-  <!-- ══ 16. 실습 ① 설치 ═════════════════════════════════ -->
+  <!-- ══ 16. 실습 개요 ═══════════════════════════════════ -->
   <section>
-    <h2>실습 ① — 설치와 첫 대화 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <h2>오늘 실습의 도착점</h2>
+    <div class="body tight">
+      <p class="emph"><span class="hl">새 대화를 열어도 같은 결과가 나오는 폴더</span>를 만든다</p>
+      <table class="tt">
+        <thead><tr><th style="width:18%">시각</th><th style="width:34%">할 일</th><th>끝났다는 신호</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:20</td><td>설치와 첫 대화</td><td>"이 폴더에 뭐가 있어?" 에 답이 온다</td></tr>
+          <tr><td>0:20–0:45</td><td>로직만 요구</td><td>판단 다섯 가지를 <span class="hl">내가</span> 정했다</td></tr>
+          <tr><td>0:45–1:05</td><td>실행 · 어긋남 확인</td><td>두 결과가 <span class="hl">다른</span> 것을 봤다</td></tr>
+          <tr><td>1:05–1:30</td><td>CLAUDE.md · 재현</td><td>두 결과가 <span class="hl">같아졌다</span></td></tr>
+        </tbody>
+      </table>
+      <p class="sub" style="margin-top:12px">시작 전 확인</p>
+      <p>노트북 · 클로드 계정 · 3주차 <span class="code">cheongju-apt.csv</span> 와 출처 문서</p>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">셋 중 하나라도 없으면 지금 말한다.</span>
+        데이터가 없으면 옆 사람 것을 복사해 쓴다 — 오늘 배울 것은 데이터가 아니라 절차다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 실습 ① 설치 ═════════════════════════════════ -->
+  <section>
+    <h2>① 설치와 첫 대화 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:20</span></h2>
     <div class="body tight">
       <ol class="steps">
         <li>터미널을 연다 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
-        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 따른다.
-          <span class="hl">버전마다 달라지므로 화면에 적힌 대로 한다</span></li>
-        <li>로그인한다 — 2주차에 만든 계정</li>
-        <li>실습 폴더 <span class="code">ds2026/</span> 을 만들고 3주차
-          <span class="code">cheongju-apt.csv</span> 와 출처 문서를 넣는다.
-          그 폴더에서 <span class="code">claude</span> 를 실행한다</li>
+        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 그대로 따른다</li>
+        <li>실습 폴더를 만들고 그 안으로 들어간다<br>
+          <span class="code">mkdir ds2026 &amp;&amp; cd ds2026</span></li>
+        <li>3주차 CSV 와 출처 문서를 그 폴더에 넣는다</li>
+        <li><span class="code">claude</span> 를 실행하고 로그인한다</li>
         <li>"이 폴더에 뭐가 있어?" 라고 물어본다</li>
       </ol>
-      <p class="caption" style="margin-top:10px">
-        막히면 오류 메시지를 <span class="hl">그대로</span> 클로드에게 붙여 넣는다.</p>
+      <div class="ck"><b>✓ 확인 지점</b> — 클로드가 <span class="code">cheongju-apt.csv</span> 를 이름으로 말한다.
+        파일을 읽겠다며 <b>허용을 물어보면</b> 권한 모델이 살아 있는 것이다.</div>
+      <div class="stuck"><b>막히면</b> — 오류 메시지를 <b>통째로 복사해</b> 웹 클로드에 붙여 넣고 물어본다.
+        그래도 안 되면 오늘은 웹 대화창으로 따라온다. ②③은 그대로 되고 ④만 파일 대신 메모로 한다.</div>
     </div>
   </section>
 
-  <!-- ══ 17. 실습 ② 로직 요구 ════════════════════════════ -->
+  <!-- ══ 18. 실습 ② 로직 ═════════════════════════════════ -->
   <section>
-    <h2>실습 ② — 로직만 요구한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <h2>② 로직만 요구한다 <span class="en" style="font-size:16px;color:var(--muted)">0:20–0:45</span></h2>
     <div class="body tight">
       <div class="prompt-box">
-        <p class="who">프롬프트</p>
-        <p>"이 폴더의 <b>cheongju-apt.csv</b> 로 청주 상당구의
-          <b>동별 ㎡당 가격</b>을 비교하고 싶어.</p>
-        <p><span class="mark">코드는 아직 쓰지 마.</span> 어떤 자료를 어떻게 걸러
-          무엇을 계산할지 <span class="mark">로직을 문서로</span> 먼저 보여 줘.</p>
-        <p><span class="mark">판단이 필요한 자리는 선택지를 같이 적어 줘</span> —
-          네가 정하지 말고 내가 고르게."</p>
+        <p class="who">그대로 쓴다</p>
+        <p>"이 폴더의 <b>cheongju-apt.csv</b> 로 청주 상당구의 <b>동별 ㎡당 가격</b>을 비교하고 싶어.
+          <span class="mark">코드는 아직 쓰지 마.</span> 어떤 자료를 어떻게 걸러 무엇을 계산할지
+          <span class="mark">로직을 문서로</span> 먼저 보여 줘.
+          <span class="mark">판단이 필요한 자리는 선택지를 같이 적어 줘</span> — 네가 정하지 말고 내가 고르게."</p>
       </div>
-      <p class="sub" style="margin-top:12px">받은 로직을 읽고 다섯 가지를 정한다</p>
-      <p>전용면적 하한 · 이상 거래 처리 · 평균이냐 중앙값이냐 ·
-        거래 적은 동 · 기간을 나눌 것인가.
-        <span class="hl">정한 것과 이유를 메모해 둔다 — 실습 ④의 재료다.</span></p>
+      <p class="sub" style="margin-top:12px">받은 로직을 읽고 다섯을 정한다 — <span class="hl">정한 것과 이유를 함께 적는다</span></p>
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <tbody>
+          <tr><td style="width:34%">전용면적 하한</td><td>소형을 뺄 것인가. 왜</td></tr>
+          <tr><td>이상 거래</td><td>직거래·취소분을 어떻게 알아보고 어찌할 것인가</td></tr>
+          <tr><td>대표값</td><td>평균과 중앙값 중 무엇을. 왜</td></tr>
+          <tr><td>거래 적은 동</td><td>몇 건 미만이면 표에서 뺄 것인가</td></tr>
+          <tr><td>기간</td><td>12개월을 한 덩어리로 볼 것인가</td></tr>
+        </tbody>
+      </table>
+      <div class="ck"><b>✓ 확인 지점</b> — 다섯 줄이 <b>이유와 함께</b> 손에 있다.
+        "왜" 를 못 쓴 줄이 있으면 그건 아직 정한 것이 아니다.</div>
     </div>
   </section>
 
-  <!-- ══ 18. 실습 ③ 어긋남 확인 ══════════════════════════ -->
+  <!-- ══ 19. 실습 ③ 어긋남 ═══════════════════════════════ -->
   <section>
-    <h2>실습 ③ — 실행하고, 어긋남을 본다 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <h2>③ 실행하고, 어긋남을 본다 <span class="en" style="font-size:16px;color:var(--muted)">0:45–1:05</span></h2>
     <div class="body tight">
       <ol class="steps">
         <li>"정한 대로 하고 결과를 표로 저장해 줘" 라고 시킨다.
-          결과를 로직 문서와 대조한다</li>
-        <li>이제 <span class="hl">새 대화를 연다</span> (<span class="code">/clear</span> 또는 새 창)</li>
-        <li>같은 요청을 <span class="mark">글자 그대로</span> 다시 한다</li>
-        <li>두 결과를 나란히 놓고 본다</li>
+          <span class="hl">결과를 로직 문서와 대조한다</span> — 걸러진 건수가 말한 대로인가</li>
+        <li>표를 <span class="mark">캡처하거나 파일로 남긴다.</span> 제출물의 '전(前)' 이다</li>
+        <li><span class="code">/clear</span> 를 치거나 터미널을 닫고 다시 연다</li>
+        <li>①에서 쓴 요청을 <span class="mark">글자 그대로</span> 다시 붙여 넣는다.
+          단, 이번에는 "로직 먼저" 를 빼고 그냥 "동별 ㎡당 가격 비교해 줘" 라고만 한다</li>
+        <li>두 결과를 나란히 놓는다</li>
       </ol>
-      <p class="emph" style="margin-top:14px">
-        면적 하한이 사라졌거나 중앙값이 평균으로 바뀌었을 것이다.
-        <span class="hl">클로드가 틀린 것이 아니다 — 내가 정한 것을 말해 주지 않았을 뿐이다.</span></p>
-      <p class="caption" style="margin-top:8px">이 화면을 캡처해 둔다. 제출물의 '전(前)' 이다.</p>
+      <div class="ck"><b>✓ 확인 지점</b> — 두 표가 <b>다르다.</b>
+        면적 하한이 사라졌거나 중앙값이 평균으로 바뀌었거나 거래 3건짜리 동이 올라와 있다.</div>
+      <div class="stuck"><b>같게 나왔다면</b> — 운이 좋았거나 앞 대화가 남아 있는 것이다.
+        터미널을 완전히 닫고 다시 해 본다. 그래도 같으면 <b>그대로 다음으로 간다</b> —
+        ④에서 규칙을 적고 나면 왜 같았는지 알게 된다.</div>
     </div>
   </section>
 
-  <!-- ══ 19. 실습 ④ CLAUDE.md ════════════════════════════ -->
+  <!-- ══ 20. 실습 ④ CLAUDE.md ════════════════════════════ -->
   <section>
-    <h2>실습 ④ — 규칙을 적고 재현시킨다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <h2>④ 규칙을 적고 재현시킨다 <span class="en" style="font-size:16px;color:var(--muted)">1:05–1:30</span></h2>
     <div class="body tight">
       <ol class="steps">
-        <li>실습 ②에서 메모한 판단 다섯을 <span class="code">CLAUDE.md</span> 로 옮긴다.
-          <span class="hl">규칙마다 이유를 한 줄씩</span></li>
-        <li>초안을 보여 주고 묻는다 — "아직 애매해서 네가 임의로 정하게 될 자리가 어디야?
-          <span class="mark">규칙을 새로 만들지는 말고</span> 어디가 비었는지만 알려 줘"</li>
-        <li>또 <span class="hl">새 대화</span>를 열어 같은 요청을 한다.
-          이번에는 <span class="mark">같은 결과가 나와야 한다</span></li>
-        <li>다르면 규칙이 덜 적힌 것이다. 갈린 자리를 찾아 보태고 같아질 때까지 반복한다</li>
-        <li><span class="code">/revise-claude-md</span> 로 오늘 정한 것이 빠짐없이 반영됐는지 확인한다</li>
+        <li>②에서 정한 다섯을 <span class="code">CLAUDE.md</span> 로 옮긴다.
+          <span class="hl">규칙 한 줄, 이유 한 줄</span> <span class="t">8분</span></li>
+        <li>초안을 보여 주고 묻는다 — "아직 애매해서 <span class="mark">네가 임의로 정하게 될 자리</span>가 어디야?
+          규칙을 새로 만들지는 말고 어디가 비었는지만 알려 줘" <span class="t">5분</span></li>
+        <li>지적받은 자리를 채운다 <span class="t">4분</span></li>
+        <li>또 <span class="hl">새 대화</span>를 열어 ③의 4번과 <span class="mark">똑같이</span> 요청한다 <span class="t">5분</span></li>
+        <li><span class="code">/revise-claude-md</span> 로 빠뜨린 것이 없는지 확인한다 <span class="t">3분</span></li>
       </ol>
-      <p class="emph" style="margin-top:12px">
-        제출: <span class="t-red">로직 문서 + 결과표 + CLAUDE.md + 재현 확인 기록</span> (전·후를 나란히)</p>
-      <p class="caption" style="margin-top:6px">
-        이 주의 요점은 문법이 아니라 <span class="hl">"규칙을 적으면 재현된다"</span> 를 몸으로 겪는 것이다.<br>
-        가정 과제: 자기 프로젝트 폴더에도 CLAUDE.md 를 만든다.</p>
+      <div class="ck"><b>✓ 확인 지점</b> — 이번 결과가 <b>①의 표와 같다.</b>
+        다르면 규칙이 덜 적힌 것이다 — 어디가 갈렸는지 찾아 보태고 다시 한다.</div>
+      <div class="stuck"><b>시간이 모자라면</b> — 4·5번을 못 해도 좋다. <b>CLAUDE.md 를 쓰는 데까지가 핵심</b>이고
+        재현 확인은 집에서 해 온다. 반대로 <b>일찍 끝났으면</b> 면적 하한을 85㎡ 로 바꿔 다시 돌려 보고
+        결과가 얼마나 달라지는지 본다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 21. 제출 ════════════════════════════════════════ -->
+  <section>
+    <h2>제출물</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:34%">무엇</th><th>어느 정도면 되나</th></tr></thead>
+        <tbody>
+          <tr><td>로직 문서</td><td>클로드가 준 것에 <span class="hl">내가 고른 자리를 표시</span>한 것</td></tr>
+          <tr><td>동별 요약표</td><td>결과 그대로</td></tr>
+          <tr><td class="hl">CLAUDE.md</td><td>규칙 다섯 줄과 <span class="hl">각각의 이유</span></td></tr>
+          <tr><td class="hl">재현 확인 기록</td><td>③의 '전' 과 ④의 '후' 를 <span class="hl">나란히</span></td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        가장 중요한 것은 마지막 줄이다. <span class="hl">두 표가 달랐다가 같아진 화면</span>이
+        오늘 배운 것의 증거다.</p>
+      <p class="caption" style="margin-top:10px">
+        가정 과제 — 자기 문제정의서 데이터로도 같은 것을 해 본다.
+        폴더를 따로 만들고 CLAUDE.md 를 쓴다. <span class="hl">다음 주에 그 폴더에 스킬을 붙인다.</span></p>
     </div>
   </section>
 

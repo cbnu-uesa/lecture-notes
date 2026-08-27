@@ -40,6 +40,15 @@
          font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
   .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
   .bad { color: var(--brand-crimson); }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  .tt { width: 100%; table-layout: fixed; margin-top: 6px; }
+  .tt td, .tt th { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -393,64 +402,133 @@ git push -u origin 면적하한-실험
     <p class="section-sub">내 분석을 저장소로 만들기 — 약 1시간 30분</p>
   </section>
 
-  <!-- ══ 15. 실습 ① ══════════════════════════════════════ -->
+  <!-- ══ 15. 실습 개요 ═══════════════════════════════════ -->
   <section>
-    <h2>실습 ① — 기록을 시작한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <h2>오늘 실습의 도착점</h2>
+    <div class="body tight">
+      <p class="emph"><span class="hl">남이 README 만 보고 내 결과를 다시 만들 수 있는 저장소</span></p>
+      <table class="tt">
+        <thead><tr><th style="width:18%">시각</th><th style="width:36%">할 일</th><th>끝났다는 신호</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:25</td><td>① 기록을 시작한다</td><td>첫 커밋이 남았다</td></tr>
+          <tr><td>0:25–0:55</td><td>② 브랜치로 실험하고 되돌린다</td><td>main 이 <span class="hl">그대로</span>다</td></tr>
+          <tr><td>0:55–1:30</td><td>③ 서로 재현해 본다</td><td>남의 결과를 <span class="hl">내가</span> 만들었다</td></tr>
+        </tbody>
+      </table>
+      <p class="sub" style="margin-top:12px">시작 전 확인</p>
+      <ul>
+        <li>지난주 <span class="code">ds2026/</span> 폴더 (CLAUDE.md · 스킬 · 에이전트가 들어 있다)</li>
+        <li>깃 설치 · 깃허브 계정 · <span class="code">gh</span> 설치</li>
+      </ul>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">③은 짝이 필요하다.</span> 홀수면 셋이 한 조로 돌려 가며 한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>① 기록을 시작한다 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:25</span></h2>
     <div class="body tight">
       <ol class="steps">
-        <li>깃과 <span class="code">gh</span> 를 설치하고 <span class="code">gh auth login</span> 으로 로그인한다</li>
-        <li>실습 폴더 <span class="code">ds2026/</span> 에서 <span class="code">git init</span></li>
-        <li><span class="hl">커밋하기 전에</span> <span class="code">.gitignore</span> 를 만든다 —
-          인증키·원본 데이터·재생성되는 산출물</li>
-        <li><span class="code">git status</span> 로 <span class="mark">무엇이 올라갈지 눈으로 확인</span>한다</li>
-        <li>첫 커밋을 한다</li>
+        <li><span class="code">gh auth login</span> 으로 로그인한다 (브라우저가 열린다) <span class="t">5분</span></li>
+        <li><span class="code">ds2026/</span> 에서 <span class="code">git init</span> <span class="t">1분</span></li>
+        <li><span class="hl">커밋하기 전에</span> <span class="code">.gitignore</span> 를 만든다 <span class="t">8분</span></li>
+        <li><span class="code">git status</span> 로 <span class="mark">올라갈 목록을 눈으로 읽는다</span> <span class="t">3분</span></li>
+        <li><span class="code">git add .</span> → <span class="code">git commit -m "…"</span> <span class="t">3분</span></li>
       </ol>
       <div class="prompt-box">
-        <p class="who">프롬프트</p>
+        <p class="who">3번을 이렇게 시킨다</p>
         <p>"이 폴더를 깃 저장소로 만들려고 해. 먼저
-          <span class="mark">어떤 파일이 올라가면 안 되는지 목록으로</span> 알려 주고,
+          <span class="mark">어떤 파일이 올라가면 안 되는지 목록으로</span> 알려 주고
           .gitignore 초안을 보여 줘. 내가 확인하면 커밋하자."</p>
       </div>
+      <div class="ck"><b>✓ 확인 지점</b> — <span class="code">git status</span> 목록에
+        <b>인증키·원본 CSV 가 없다.</b> 보이면 <span class="code">.gitignore</span> 를 고치고 다시 본다.</div>
     </div>
   </section>
 
-  <!-- ══ 16. 실습 ② ══════════════════════════════════════ -->
+  <!-- ══ 17. 실습 ② ══════════════════════════════════════ -->
   <section>
-    <h2>실습 ② — 되돌려 본다 <span class="en" style="font-size:16px;color:var(--muted)">30분</span></h2>
+    <h2>② 실험하고 되돌린다 <span class="en" style="font-size:16px;color:var(--muted)">0:25–0:55</span></h2>
     <div class="body tight">
       <ol class="steps">
-        <li>브랜치를 하나 만든다 — <span class="code">git switch -c 면적하한-실험</span></li>
-        <li>CLAUDE.md 의 면적 하한을 <span class="hl">85㎡ 로 바꾸고</span> 분석을 다시 돌린다.
-          결과가 얼마나 달라지는지 본다</li>
-        <li>커밋하고, <span class="code">git log --oneline</span> · <span class="code">git diff</span> 로
-          <span class="mark">무엇이 바뀌었는지</span> 확인한다</li>
-        <li>main 으로 돌아가 <span class="hl">원래 결과가 그대로인지</span> 확인한다</li>
-        <li>실험을 살릴지 버릴지 정한다. 버릴 거면 브랜치를 지운다</li>
+        <li><span class="code">git switch -c 면적하한-실험</span> <span class="t">2분</span></li>
+        <li>CLAUDE.md 의 면적 하한을 <span class="hl">85㎡ 로 바꾸고</span> 분석을 다시 돌린다 <span class="t">10분</span></li>
+        <li><span class="code">git diff</span> 로 무엇이 바뀌었는지 보고 커밋한다 <span class="t">5분</span></li>
+        <li><span class="code">git switch main</span> 으로 돌아간다 <span class="t">2분</span></li>
+        <li>CLAUDE.md 를 열어 본다. 분석도 다시 돌려 본다 <span class="t">6분</span></li>
+        <li>실험을 살릴지 버릴지 정하고, 버릴 거면 브랜치를 지운다 <span class="t">5분</span></li>
       </ol>
-      <p class="emph" style="margin-top:12px">
-        4번이 핵심이다. <span class="hl">브랜치를 쓰면 실험이 본 작업을 건드리지 않는다</span> —
-        이것을 몸으로 확인하고 나면 실험이 과감해진다.</p>
+      <div class="ck"><b>✓ 확인 지점</b> — 5번에서 CLAUDE.md 가 <b>60㎡ 로 돌아와 있다.</b>
+        결과표도 원래 값이다. <b>실험이 본 작업을 건드리지 않았다.</b></div>
+      <div class="stuck"><b>switch 가 거부되면</b> — 저장하지 않은 변경이 있는 것이다.
+        커밋하거나 되돌린 뒤 다시 한다. <b>무엇을 어떻게 할지는 클로드에게 물어보고 설명을 듣고 승인한다.</b></div>
     </div>
   </section>
 
-  <!-- ══ 17. 실습 ③ ══════════════════════════════════════ -->
+  <!-- ══ 18. 실습 ③ 올리기 ═══════════════════════════════ -->
   <section>
-    <h2>실습 ③ — 남이 재현할 수 있게 <span class="en" style="font-size:16px;color:var(--muted)">35분</span></h2>
+    <h2>③-1 올리고 설명서를 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">0:55–1:15</span></h2>
     <div class="body tight">
       <ol class="steps">
-        <li>깃허브 저장소를 만들고 올린다. <span class="hl">공개 여부를 스스로 정하고 이유를 적는다</span></li>
-        <li><span class="code">README.md</span> 를 쓴다 — 무엇을 했나 · 데이터를 어떻게 받나 ·
-          분석 규칙 · 다시 만드는 순서</li>
-        <li><span class="mark">옆 사람과 저장소 주소를 바꾼다.</span>
-          README 만 보고 상대의 결과를 다시 만들어 본다</li>
-        <li>막힌 지점을 상대에게 알려 주고, 자기 README 를 고친다</li>
+        <li><span class="code">gh repo create</span> 로 저장소를 만들고 올린다.
+          <span class="hl">공개 여부를 스스로 정하고 이유를 한 줄 적는다</span> <span class="t">7분</span></li>
+        <li><span class="code">README.md</span> 를 쓴다 <span class="t">10분</span></li>
+        <li>커밋하고 올린다. <span class="mark">브라우저로 저장소를 열어 눈으로 확인한다</span> <span class="t">3분</span></li>
       </ol>
-      <p class="emph" style="margin-top:12px">
-        3번이 오늘의 진짜 시험이다. <span class="hl">내가 아는 것과 적어 둔 것은 다르다</span> —
-        남이 막히는 자리에서 그 차이가 드러난다.</p>
-      <p class="caption" style="margin-top:8px">
-        제출: <span class="t-red">저장소 주소 + 커밋 기록 + README + 상대 저장소 재현 후기</span><br>
-        다음 주부터는 매주 실습 결과를 이 저장소에 쌓는다. 14주차 종합의 바탕이 된다.</p>
+      <p class="sub" style="margin-top:10px">README 에 반드시 들어갈 넷</p>
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <tbody>
+          <tr><td style="width:28%">무엇을 했나</td><td>한두 문장</td></tr>
+          <tr><td class="hl">데이터 받는 법</td><td>출처 · 조건 · 인증키를 어디에 넣나 (3주차 출처 문서를 옮긴다)</td></tr>
+          <tr><td>분석 규칙</td><td>CLAUDE.md 를 가리키고 요점만</td></tr>
+          <tr><td class="hl">다시 만드는 순서</td><td>실행할 명령을 순서대로</td></tr>
+        </tbody>
+      </table>
+      <div class="ck"><b>✓ 확인 지점</b> — 브라우저에서 저장소를 열었을 때
+        <b>인증키도 원본 데이터도 보이지 않는다.</b></div>
+    </div>
+  </section>
+
+  <!-- ══ 19. 실습 ③ 교환 ═════════════════════════════════ -->
+  <section>
+    <h2>③-2 서로 재현해 본다 <span class="en" style="font-size:16px;color:var(--muted)">1:15–1:30</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>옆 사람과 저장소 주소를 바꾼다 <span class="t">1분</span></li>
+        <li>상대 저장소를 받는다 — <span class="code">git clone &lt;주소&gt;</span> <span class="t">2분</span></li>
+        <li><span class="hl">README 만 보고</span> 상대의 결과를 다시 만들어 본다.
+          <span class="mark">막히면 물어보지 말고 그 지점을 적는다</span> <span class="t">8분</span></li>
+        <li>막힌 지점을 상대에게 알려 준다. 받은 지적으로 자기 README 를 고친다 <span class="t">4분</span></li>
+      </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 상대의 결과표와 <b>같은 숫자</b>가 나온다.
+        안 나오면 README 에 빠진 것이 있다는 뜻이고, <b>그 발견이 오늘의 성과다.</b></div>
+      <div class="stuck"><b>시간이 모자라면</b> — 3번의 <b>막힌 지점 목록까지만</b> 하고 4번은 집에서.
+        <b>일찍 끝났으면</b> 상대 저장소에 브랜치를 만들어 README 를 고치고 PR 을 올려 본다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 20. 제출 ════════════════════════════════════════ -->
+  <section>
+    <h2>제출물</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:32%">무엇</th><th>어느 정도면 되나</th></tr></thead>
+        <tbody>
+          <tr><td>저장소 주소</td><td>공개 여부와 <span class="hl">그렇게 정한 이유 한 줄</span></td></tr>
+          <tr><td>커밋 기록</td><td><span class="code">git log --oneline</span> 결과.
+            <span class="hl">메시지만 읽고 흐름이 보여야 한다</span></td></tr>
+          <tr><td>README</td><td>넷이 다 있고 <span class="hl">③-2 로 고친 흔적</span>이 있을 것</td></tr>
+          <tr><td class="hl">재현 후기</td><td>상대 저장소에서 <span class="hl">어디서 막혔는지</span>와
+            내 README 를 어떻게 고쳤는지</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        마지막 줄이 이 강의의 핵심이다. <span class="hl">내가 아는 것과 적어 둔 것은 다르다</span> —
+        남이 막히는 자리에서만 그 차이가 드러난다.</p>
+      <p class="caption" style="margin-top:10px">
+        <span class="hl">다음 주부터 매주 실습 결과를 이 저장소에 커밋한다.</span>
+        14주차에는 이 기록 전체가 증거 패키지의 바탕이 된다.</p>
     </div>
   </section>
 

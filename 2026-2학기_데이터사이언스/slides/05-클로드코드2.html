@@ -39,6 +39,15 @@
   .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
          font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
   .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  .tt { width: 100%; table-layout: fixed; margin-top: 6px; }
+  .tt td, .tt th { font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -400,64 +409,148 @@ claude mcp add &lt;이름&gt; -- &lt;실행 명령&gt;
     <p class="section-sub">스킬 만들고 · 도구 붙이고 · 검사역 두기 — 약 1시간 30분</p>
   </section>
 
-  <!-- ══ 15. 실습 ① 스킬 ═════════════════════════════════ -->
+  <!-- ══ 15. 실습 개요 ═══════════════════════════════════ -->
   <section>
-    <h2>실습 ① — 스킬을 만든다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <h2>오늘 실습의 도착점</h2>
     <div class="body tight">
-      <ol class="steps">
-        <li>지난주 CLAUDE.md 를 다시 읽고 <span class="hl">절차에 해당하는 부분</span>을 찾는다</li>
-        <li><span class="code">.claude/skills/월별요약/SKILL.md</span> 를 만든다.
-          <span class="mark">description 을 공들여 쓴다</span> — 클로드가 이 문장으로 판단한다</li>
-        <li><span class="code">/월별요약 202608</span> 로 불러 본다</li>
-        <li>이번에는 부르지 말고 <span class="mark">"8월 실거래 요약 좀"</span> 이라고만 해 본다.
-          클로드가 스스로 스킬을 꺼내 쓰는가</li>
-      </ol>
-      <p class="emph" style="margin-top:12px">
-        4번이 안 되면 <span class="hl">description 이 부족한 것</span>이다.
-        언제 쓰는 스킬인지 더 구체적으로 고쳐 다시 해 본다.</p>
+      <p class="emph">지난주 폴더에 <span class="hl">스킬 하나와 검사역 하나</span>를 붙인다</p>
+      <table class="tt">
+        <thead><tr><th style="width:18%">시각</th><th style="width:36%">할 일</th><th>끝났다는 신호</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:30</td><td>① 스킬 만들기</td><td>부르지 않아도 클로드가 꺼내 쓴다</td></tr>
+          <tr><td>0:30–1:05</td><td>② 검사역 에이전트와 루프</td><td>일부러 넣은 오류를 <span class="hl">잡아낸다</span></td></tr>
+          <tr><td>1:05–1:30</td><td>③ 도구 붙이기</td><td>손으로 안 받고 가져온다</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:12px">
+        <span class="hl">순서를 강의와 바꿨다.</span> ③은 환경에 따라 오래 걸릴 수 있어 뒤로 뺐다 —
+        ①②가 오늘의 필수이고 ③은 되는 데까지 한다.</p>
+      <p class="sub" style="margin-top:12px">시작 전 확인</p>
+      <p>지난주 <span class="code">ds2026/</span> 폴더와 그 안의 <span class="code">CLAUDE.md</span> ·
+        3주차 인증키</p>
     </div>
   </section>
 
-  <!-- ══ 16. 실습 ② MCP ══════════════════════════════════ -->
+  <!-- ══ 16. 실습 ① 스킬 ═════════════════════════════════ -->
   <section>
-    <h2>실습 ② — 도구를 붙인다 <span class="en" style="font-size:16px;color:var(--muted)">30분</span></h2>
+    <h2>① 스킬을 만든다 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:30</span></h2>
     <div class="body tight">
       <ol class="steps">
-        <li>3주차 인증키를 꺼낸다.
-          <span class="hl">키는 CLAUDE.md 에도 .mcp.json 에도 적지 않는다</span></li>
-        <li>실거래가 API 를 클로드가 직접 부르게 만든다.
-          MCP 서버로 붙이거나, 스크립트로 감싸 스킬로 만들거나 — <span class="mark">둘 중 하나를 고른다</span></li>
-        <li><span class="code">/mcp</span> 로 붙은 도구를 확인한다</li>
-        <li>서원구 최근 3개월을 받아 본다 (구 코드는 3주차에 찾아 둔 것)</li>
+        <li>CLAUDE.md 를 다시 읽고 <span class="hl">절차에 해당하는 부분</span>을 찾는다 —
+          "무엇을 계산한다" 가 아니라 "어떤 순서로 한다" 인 것 <span class="t">5분</span></li>
+        <li>폴더와 파일을 만든다<br>
+          <span class="code">mkdir -p .claude/skills/월별요약</span> →
+          그 안에 <span class="code">SKILL.md</span> <span class="t">10분</span></li>
+        <li><span class="code">/월별요약 202608</span> 로 불러 본다 <span class="t">5분</span></li>
+        <li>이번에는 부르지 말고 <span class="mark">"8월 실거래 요약 좀"</span> 이라고만 한다 <span class="t">10분</span></li>
       </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 4번에서 클로드가 <b>스스로 스킬을 꺼내 쓴다.</b>
+        안 되면 <span class="code">description</span> 이 부족한 것이다 —
+        "언제 쓰는 스킬인지" 를 더 구체적으로 고쳐 다시 한다.</div>
+      <div class="stuck"><b>무엇을 스킬로 할지 모르겠으면</b> — "월별 실거래 요약" 을 그대로 쓴다.
+        지정한 달의 건수·중앙값·최고/최저 동을 표로 내는 절차다. 자기 것이 생기면 나중에 바꾸면 된다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 17. 실습 ② 검사 항목 ════════════════════════════ -->
+  <section>
+    <h2>② 무엇을 검사할지 먼저 정한다 <span class="en" style="font-size:16px;color:var(--muted)">0:30–0:45</span></h2>
+    <div class="body tight">
+      <p class="sub">"제대로 받았다" 를 무엇으로 판정할 것인가. <span class="hl">사람이 정한다</span></p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:30%">검사 항목</th><th>어긋나면 무슨 일인가</th></tr></thead>
+        <tbody>
+          <tr><td>기간이 다 찼나</td><td>한 달이 통째로 비면 그 달 요청만 실패한 것이다</td></tr>
+          <tr><td>건수가 그럴듯한가</td><td>0건이거나 갑자기 10배면 지역코드나 기간이 잘못됐다</td></tr>
+          <tr><td>필수 열이 다 있나</td><td>응답 형식이 바뀌면 조용히 열이 빠진다</td></tr>
+          <tr><td>결측·중복</td><td>같은 거래가 두 번 들어오면 평균이 흔들린다</td></tr>
+          <tr><td>값의 범위</td><td>가격이 음수거나 면적이 0 이면 받는 중에 깨진 것이다</td></tr>
+        </tbody>
+      </table>
+      <div class="ck"><b>✓ 확인 지점</b> — 이 표를 <b>CLAUDE.md 에 옮겨 적었다.</b>
+        다음부터는 말하지 않아도 검사한다.</div>
+      <p class="caption" style="margin-top:8px">
+        항목을 더해도 좋다. <span class="hl">다만 "이상하면 알려 줘" 같은 말은 항목이 아니다</span> —
+        무엇을 보고 판정하는지 적어야 검사가 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 18. 실습 ② 에이전트와 루프 ══════════════════════ -->
+  <section>
+    <h2>② 검사역을 두고 루프를 돌린다 <span class="en" style="font-size:16px;color:var(--muted)">0:45–1:05</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">.claude/agents/data-checker.md</span> 를 만든다.
+          <span class="mark">tools 에 쓰기 도구를 넣지 않는다</span> — 검사역은 고치지 않는다 <span class="t">8분</span></li>
+        <li>루프를 시킨다 <span class="t">7분</span></li>
+      </ol>
+      <div class="prompt-box">
+        <p class="who">그대로 쓴다</p>
+        <p>"데이터를 받고 → <b>data-checker 에게 넘겨 검사하고</b> → 문제가 있으면 고치고 →
+          다시 검사하는 순서로 해 줘. 검사 항목은 CLAUDE.md 에 있어.</p>
+        <p><span class="mark">통과할 때까지 반복하되, 세 번 해도 안 되면 멈추고 나에게 물어봐.</span>
+          끝나면 무엇을 검사했고 무엇이 걸렸는지 기록으로 남겨 줘."</p>
+      </div>
+      <ol class="steps" style="margin-top:8px">
+        <li value="3">일부러 틀린다 — 없는 기간(<span class="code">2099년 1월</span>)이나
+          잘못된 지역코드를 넣고 다시 돌린다 <span class="t">5분</span></li>
+      </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 루프가 <b>일부러 넣은 오류를 잡아낸다.</b>
+        못 잡으면 검사 항목이 부족한 것이다. 이 화면을 남긴다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 19. 실습 ③ 도구 붙이기 ══════════════════════════ -->
+  <section>
+    <h2>③ 도구를 붙인다 <span class="en" style="font-size:16px;color:var(--muted)">1:05–1:30</span></h2>
+    <div class="body tight">
+      <p class="sub">두 갈래 중 <span class="hl">하나를 고른다.</span> 둘 다 "손으로 안 받는다" 는 같은 목적이다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:26%">갈래</th><th style="width:22%">난이도</th><th>이렇게 한다</th></tr></thead>
+        <tbody>
+          <tr><td class="hl">A. 스킬로 감싸기</td><td>쉽다 · 대부분 성공</td>
+              <td>API 호출 스크립트를 만들고 그것을 부르는 스킬을 둔다</td></tr>
+          <tr><td>B. MCP 서버</td><td>환경을 탄다</td>
+              <td><span class="code">claude mcp add</span> 로 붙이고 <span class="code">/mcp</span> 로 확인</td></tr>
+        </tbody>
+      </table>
       <div class="prompt-box">
         <p class="who">프롬프트</p>
         <p>"실거래가 API 를 <span class="mark">네가 직접 부르게</span> 하고 싶어.
-          <span class="mark">어떻게 붙일 생각인지 먼저 알려 주고</span>, 확인하면 진행해.
-          인증키는 환경변수로 줄게."</p>
+          <span class="mark">A(스크립트+스킬)와 B(MCP 서버) 중 내 환경에 뭐가 나은지 먼저 말해 주고</span>,
+          어떻게 붙일지 알려 줘. 확인하면 진행해. 인증키는 환경변수로 줄게."</p>
       </div>
+      <div class="ck"><b>✓ 확인 지점</b> — 서원구 최근 3개월을 <b>손으로 받지 않고</b> 가져온다.
+        받은 뒤 ②의 검사역이 자동으로 도는지도 본다.</div>
+      <div class="stuck"><b>안 되면 그대로 둔다.</b> 어디까지 갔고 무엇에 막혔는지만 적어 제출한다 —
+        <b>막힌 지점을 아는 것도 결과다.</b> 인증키는 어느 파일에도 적지 않았는지 마지막으로 확인한다.</div>
     </div>
   </section>
 
-  <!-- ══ 17. 실습 ③ 에이전트 ═════════════════════════════ -->
+  <!-- ══ 20. 제출 ════════════════════════════════════════ -->
   <section>
-    <h2>실습 ③ — 검사역을 둔다 <span class="en" style="font-size:16px;color:var(--muted)">35분</span></h2>
+    <h2>제출물</h2>
     <div class="body tight">
-      <ol class="steps">
-        <li>검증 항목을 <span class="hl">사람이 먼저 정한다</span> —
-          기간이 다 찼나 · 행 수가 그럴듯한가 · 필수 열이 있나 · 결측/중복/음수가 없나</li>
-        <li><span class="code">.claude/agents/data-checker.md</span> 를 만든다.
-          <span class="mark">tools 에 쓰기 도구를 넣지 않는다</span></li>
-        <li>받고 → 검사역에게 넘기고 → 문제가 있으면 고치고 → 다시 검사하는 루프를 돌린다.
-          <span class="hl">"세 번 해도 안 되면 멈추고 물어봐" 를 반드시 넣는다</span></li>
-        <li>일부러 틀려 본다 — 없는 기간(2099년 1월)이나 잘못된 지역코드.
-          <span class="mark">루프가 실제로 잡는가</span></li>
-      </ol>
-      <p class="emph" style="margin-top:12px">
-        제출: <span class="t-red">SKILL.md + 에이전트 정의 + 루프 실행 기록</span>
-        (일부러 넣은 오류를 잡아낸 화면 포함)</p>
-      <p class="caption" style="margin-top:6px">
-        가정 과제: 만든 것 중 남과 나눠 쓸 만한 것이 있으면 플러그인 구조로 묶어 본다.</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:30%">무엇</th><th style="width:14%">필수</th><th>어느 정도면 되나</th></tr></thead>
+        <tbody>
+          <tr><td><span class="code">SKILL.md</span></td><td class="hl">필수</td>
+              <td>부르지 않아도 꺼내진 화면을 함께</td></tr>
+          <tr><td><span class="code">data-checker.md</span></td><td class="hl">필수</td>
+              <td><span class="code">tools</span> 에 쓰기 도구가 없어야 한다</td></tr>
+          <tr><td>루프 실행 기록</td><td class="hl">필수</td>
+              <td><span class="hl">일부러 넣은 오류를 잡아낸 화면</span></td></tr>
+          <tr><td>도구 연결 기록</td><td>되는 데까지</td>
+              <td>막혔으면 어디서 왜 막혔는지</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        세 번째가 오늘의 핵심 증거다. <span class="hl">검증은 사람이 정하고 AI 가 수행한다</span> 를
+        화면으로 보여 주는 것이다.</p>
+      <p class="caption" style="margin-top:10px">
+        가정 과제 — 만든 것 중 남과 나눠 쓸 만한 것이 있으면 플러그인 구조로 묶어 본다
+        (<span class="code">.claude-plugin/plugin.json</span> + <span class="code">skills/</span> + <span class="code">agents/</span>).
+        <span class="hl">다음 주에 이 폴더를 저장소로 만든다.</span></p>
     </div>
   </section>
 
