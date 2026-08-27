@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>13강. 처방적 분석 — 무엇을 해야 하는가</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>13강. 처방적 분석<br>무엇을 해야 하는가</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>충전소를 어디에 지어야 하나?</h2>
+    <div class="body">
+      <ul>
+        <li>광양에 충전기가 <span class="num">44</span>기 있다</li>
+        <li>예산으로 <span class="num">8</span>기를 더 놓을 수 있다면</li>
+        <li><span class="mark">어디에</span> 놓아야 하는가 — 그리고 왜 그곳인가</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 정의 ══════════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>처방적 분석 <span class="en" style="font-size:20px">prescriptive</span></h2>
+    <div class="body">
+      <p class="define">여러 대안 중 <span class="t-red">무엇을 할지 고르는</span> 일</p>
+      <p class="conclusion">→ 앞의 셋과 결정적으로 다르다.
+        기술·진단·예측은 <span class="t-red">사실을 말했지만</span><br>
+        &nbsp;&nbsp;&nbsp;처방은 <span class="t-red">가치 판단이 반드시 들어간다</span> —
+        무엇을 좋다고 볼 것인가를 정해야 한다</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 오늘의 세 방법 ════════════════════════════════ -->
+  <section>
+    <h2>오늘 배울 세 가지</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:24%">방법</th><th style="width:34%">답하는 질문</th><th>필요한 것</th></tr></thead>
+        <tbody>
+          <tr><td>① 시나리오 분석</td><td>이렇게 되면 어떻게 되나</td><td>가정 몇 벌</td></tr>
+          <tr><td>② 비용편익</td><td>할 만한 가치가 있나</td><td>편익을 <span class="hl">돈으로 바꾸는 규칙</span></td></tr>
+          <tr><td>③ 입지 최적화</td><td>어디에 놓아야 가장 좋은가</td><td class="hl">"좋다" 의 정의 (목적함수)</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:16px">
+        오른쪽 열이 전부 <span class="hl">사람이 정하는 것</span>이다.
+        AI 는 정한 뒤의 계산을 대신할 뿐이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 5. ① 원리 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  시나리오 분석</p>
+    <h2>하나의 미래 대신 몇 벌의 미래</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>12주차에서 예측구간이 <span class="hl">담지 못하는 불확실성</span>이 있다고 했다 —
+          모형을 잘못 골랐거나 구조가 바뀌는 경우다.</p>
+        <p style="margin-top:10px">그런 것은 확률로 재지 않고
+          <span class="hl">"이렇게 되면 이 값" 으로 나눠 놓는다.</span></p>
+        <p style="margin-top:10px">보통 셋을 만든다 —
+          <span class="mark">낮음 · 기준 · 높음</span>.
+          각각이 어떤 가정 위에 있는지 적는 것이 핵심이다.</p>
+        <p class="emph" style="margin-top:12px">
+          시나리오는 예측이 아니라 <span class="t-red">가정의 목록</span>이다.</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-sce" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="현재까지의 관측에서 세 갈래로 갈라지는 시나리오 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 48, y0: 236, x1: 396, y1: 40 });
+        const S = F.scale({ x: [0, 20], y: [0, 280] });
+        const obs = [];
+        for (let t = 0; t <= 10; t += 1) obs.push([t, 60 + 7.4 * t + (t % 3 - 1) * 5]);
+        const from = [10, 60 + 74];
+        const mk = (slope) => {
+          const a = [from];
+          for (let t = 10.5; t <= 20; t += 0.5) a.push([t, from[1] + slope * (t - 10)]);
+          return a;
+        };
+        F.draw('#f-sce', {
+          axes: { x: '시간', y: '값' },
+          parts: [
+            F.raw(`<rect x="${S.x(10)}" y="${S.y(280)}" width="${S.x(20) - S.x(10)}"
+                     height="${S.y(0) - S.y(280)}" fill="#F7F5F2"/>`),
+            F.curve(S.curve(mk(11.5)), { variant: 'supply', dash: '6 4' }),
+            F.curve(S.curve(mk(7.0)), { variant: 'demand', dash: '6 4' }),
+            F.curve(S.curve(mk(2.6)), { variant: 'i1', dash: '6 4' }),
+            F.curve(S.curve(obs)),
+            F.dots(obs.map(([x, y]) => [S.x(x), S.y(y)])),
+            F.annot(S.x(19.6), S.y(258), '높음', { anchor: 'end', tone: 'red', size: 12.5 }),
+            F.annot(S.x(19.6), S.y(212), '기준', { anchor: 'end', size: 12.5 }),
+            F.annot(S.x(19.6), S.y(158), '낮음', { anchor: 'end', size: 12.5 }),
+            F.annot(S.x(3.4), S.y(250), '여기까지는 사실', { size: 12 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 6. ② 원리 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  비용편익</p>
+    <h2>편익을 돈으로 바꾸는 순간 가치판단이 들어온다</h2>
+    <div class="body tight">
+      <p class="sub">충전기 한 기를 놓는 편익을 무엇으로 잴 것인가</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:32%">편익의 정의</th><th>그러면 어디가 유리해지나</th></tr></thead>
+        <tbody>
+          <tr><td>덮는 인구 수</td><td>인구가 많은 <span class="hl">도심</span></td></tr>
+          <tr><td>전기차 대수</td><td>이미 전기차가 많은 곳 — <span class="mark">있는 곳이 더 받는다</span></td></tr>
+          <tr><td>충전 사각지대 해소</td><td>인구가 적어도 <span class="hl">아무것도 없는 외곽</span></td></tr>
+          <tr><td>이용 예상 횟수</td><td>통과 교통이 많은 간선도로변</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">같은 데이터로 네 개의 다른 답이 나온다.</span>
+        무엇을 편익이라 부를지가 곧 정책의 방향이다.</p>
+      <p class="caption" style="margin-top:8px">
+        순현재가치 $NPV=\sum_t \dfrac{B_t-C_t}{(1+r)^t}$ 도 마찬가지다 —
+        할인율 $r$ 을 얼마로 두느냐에 따라 먼 미래의 편익이 살거나 죽는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 7. ③ 원리 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ③  입지 최적화</p>
+    <h2>최대커버 문제</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>후보지 중 <span class="hl">$k$ 개</span>를 골라
+          기준 거리 안에 들어오는 <span class="hl">수요를 최대로</span> 만든다.</p>
+        <p class="formula-key" style="margin-top:8px">
+          $\max \displaystyle\sum_{i} w_i z_i$</p>
+        <p class="caption" style="margin-top:2px">
+          $w_i$ 는 수요 $i$ 의 크기, $z_i$ 는 그 수요가 덮이면 1</p>
+        <p style="margin-top:10px">후보가 235곳이면 8개를 고르는 경우의 수가
+          <span class="mark">천억 가지가 넘는다.</span> 다 해 볼 수 없다.</p>
+        <p style="margin-top:8px">그래서 <span class="hl">탐욕 알고리즘</span>을 쓴다 —
+          매번 <span class="mark">가장 많이 새로 덮는 곳</span>을 하나씩 고른다.</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-cov" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="수요 점들 위에 원 두 개가 겹치며 덮이는 점과 덮이지 않는 점을 구분한 최대커버 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const el = document.getElementById('f-cov');
+        const dem = [[70,90],[110,70],[140,110],[95,140],[160,66],[128,160],
+                     [255,96],[290,130],[240,150],[300,80],[268,180],
+                     [360,220],[200,230],[80,215],[330,168]];
+        const sites = [[118,110,66],[276,128,66]];
+        let s = '';
+        sites.forEach(([x, y, r]) => {
+          s += `<circle cx="${x}" cy="${y}" r="${r}" fill="#A02948" fill-opacity=".10"
+                  stroke="#A02948" stroke-dasharray="5 4"/>`;
+        });
+        dem.forEach(([x, y]) => {
+          const on = sites.some(([sx, sy, r]) => Math.hypot(x - sx, y - sy) <= r);
+          s += on ? `<circle class="pt" cx="${x}" cy="${y}" r="4.5"/>`
+                  : `<circle cx="${x}" cy="${y}" r="4.5" fill="#C9C5BE"/>`;
+        });
+        sites.forEach(([x, y]) => { s += `<circle cx="${x}" cy="${y}" r="6.5" fill="#A02948"/>`; });
+        s += `<text class="annot" x="118" y="34" text-anchor="middle" style="font-size:12.5px">후보지 A</text>
+              <text class="annot" x="276" y="46" text-anchor="middle" style="font-size:12.5px">후보지 B</text>
+              <text class="annot" x="210" y="272" text-anchor="middle" style="font-size:12.5px">
+                진한 점은 덮인 수요, 흐린 점은 못 덮은 수요</text>`;
+        el.insertAdjacentHTML('beforeend', s);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 8. ③ 예시 — 결과 ════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  입지 최적화</p>
+    <h2>광양 — 8기를 더 놓는다면</h2>
+    <div class="body tight">
+      <p class="sub">수요 격자 <span class="num">2,035</span>개 · 인구 <span class="num">145,683</span>명 ·
+        기존 충전기 <span class="num">44</span>기 · 후보 주차장 <span class="num">235</span>곳 · 반경 500m</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:10%">순서</th><th style="width:44%">후보지</th>
+          <th style="width:24%">새로 덮는 인구</th><th>누적 커버</th></tr></thead>
+        <tbody>
+          <tr><td>—</td><td>기존 44기</td><td>—</td><td class="num">71.5%</td></tr>
+          <tr><td>1</td><td>사랑아파트 앞</td><td class="hl num">5,401</td><td class="num">75.2%</td></tr>
+          <tr><td>2</td><td>덕산마을 회관</td><td class="num">4,273</td><td class="num">78.2%</td></tr>
+          <tr><td>3</td><td>중동 1703-5</td><td class="num">3,102</td><td class="num">80.3%</td></tr>
+          <tr><td>4</td><td>마동 1164-1</td><td class="num">2,291</td><td class="num">81.9%</td></tr>
+          <tr><td>⋮</td><td>⋮</td><td>⋮</td><td>⋮</td></tr>
+          <tr><td>8</td><td>백합아파트 41동 주변</td><td class="num">1,616</td><td class="hl num">87.0%</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:12px">
+        여덟 곳을 더 놓으면 커버가 <span class="hl num">71.5% → 87.0%</span> 로 오른다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 9. ③ 예시 — 한계효용 ════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  입지 최적화</p>
+    <h2>몇 개를 놓을 것인가는 여기서 나온다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-mar" viewBox="0 0 700 265" style="width:680px" role="img"
+           aria-label="충전소를 하나씩 더할 때 새로 덮는 인구가 5401명에서 1616명으로 줄어드는 막대그래프"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        첫 한 곳이 <span class="num">5,401</span>명, 여덟 번째는 <span class="num">1,616</span>명 —
+        <span class="hl">한 기당 비용과 견주어 효용이 그 아래로 내려가는 지점에서 멈춘다.</span></p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 74, y0: 214, x1: 660, y1: 34 });
+        const d = [5401, 4273, 3102, 2291, 2114, 1935, 1837, 1616];
+        const S = F.scale({ x: [0, 8], y: [0, 6200] });
+        const w = S.x(1) - S.x(0);
+        let bars = '';
+        d.forEach((v, i) => {
+          bars += `<rect class="area-bar" x="${S.x(i) + 7}" y="${S.y(v)}"
+                     width="${w - 14}" height="${S.y(0) - S.y(v)}"/>`;
+        });
+        F.draw('#f-mar', {
+          axes: { x: '몇 번째로 놓는가', y: '새로 덮는 인구(명)' },
+          parts: [
+            F.raw(bars),
+            ...d.map((v, i) => F.annot(S.x(i + 0.5), S.y(v) - 8, v.toLocaleString(),
+              { anchor: 'middle', size: 12 })),
+            ...d.map((v, i) => F.annot(S.x(i + 0.5), S.y(0) + 18, String(i + 1),
+              { anchor: 'middle', size: 12 })),
+            F.curve(S.curve(d.map((v, i) => [i + 0.5, v])), { variant: 'supply' }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 10. 주의 — 목적함수 ═════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  입지 최적화</p>
+    <h2>주의 — 목적함수에 숨은 가치판단</h2>
+    <div class="body tight">
+      <p class="sub">이 계산은 "덮는 인구를 최대로" 라는 목표 위에 서 있다. 바꾸면 답이 바뀐다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:34%">목표를 이렇게 바꾸면</th><th>답이 이렇게 바뀐다</th></tr></thead>
+        <tbody>
+          <tr><td>덮는 인구 최대 <span class="caption">(오늘의 계산)</span></td>
+              <td>인구 밀집지에 몰린다. 외곽은 계속 비어 있다</td></tr>
+          <tr><td>가장 먼 사람의 거리를 최소</td><td class="hl">외곽부터 놓게 된다. 전체 커버는 낮아진다</td></tr>
+          <tr><td>지역 간 형평</td><td>읍면마다 최소 1기씩 — 효율은 떨어진다</td></tr>
+          <tr><td>이용량 최대</td><td>이미 전기차가 많은 곳에 더 놓는다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">어느 것도 틀리지 않았다.</span> 다만 서로 다른 정책이다 —
+        분석가가 아니라 <span class="t-red">정책 결정자가 골라야 하는 것</span>이다.</p>
+      <p class="caption" style="margin-top:8px">
+        그래서 처방적 분석의 보고서는 <span class="hl">목적함수를 맨 앞에 적는다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 11. 주의 — 이 분석의 한계 ═══════════════════════ -->
+  <section>
+    <h2>이 계산이 못 하는 것</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:30%">타협한 것</th><th>왜 문제이고 어떻게 하면 나아지나</th></tr></thead>
+        <tbody>
+          <tr><td>수요를 <span class="hl">인구</span>로 잡음</td>
+              <td>전기차 대수가 맞지만 읍면동 단위뿐이라 격자에 못 붙인다.
+                중마동은 인구 58,479명에 전기차 26대, 광양읍은 49,276명에 40대다</td></tr>
+          <tr><td>직선거리</td><td>광양은 산과 강이 있다. 도로망을 쓰면 순서가 바뀐다</td></tr>
+          <tr><td>급속·완속을 같게 셈</td><td>용량과 혼잡을 넣어야 실제 접근성이 된다</td></tr>
+          <tr><td>후보지의 실현성</td><td>소유 관계·전력 인입·주차면수를 확인해야 한다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        그래서 이 목록은 <span class="t-red">결정이 아니라 후보지 8곳</span>이다.
+        <span class="hl">"현장 확인이 필요하다" 를 적는 것까지가 분석이다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 12. 정리 ════════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>네 단계를 지나왔다</h2>
+    <div class="body">
+      <p class="define">무슨 일이 일어났나 → 왜 일어났나 →<br>
+        앞으로 어떻게 될까 → <span class="t-red">무엇을 해야 하는가</span></p>
+      <p class="conclusion">→ 마지막 단계에만 <span class="t-red">가치판단</span>이 들어간다.<br>
+        &nbsp;&nbsp;&nbsp;그 판단을 감추지 않고 <span class="t-red">맨 앞에 적는 것</span>이 이 수업이 가르친 전부다</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">광양 충전소 입지 제안 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 14. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 목적함수를 먼저 정한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>COMPAS 「전기자동차 충전소 최적입지 선정」(광양시) 를 받는다</li>
+        <li><span class="hl">데이터를 열기 전에</span> 정한다 —
+          무엇을 좋다고 볼 것인가, 수요를 무엇으로 잴 것인가, 기준 거리는 몇 m 인가</li>
+        <li>정한 것과 <span class="mark">이유</span>를 CLAUDE.md 에 적는다</li>
+      </ol>
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"충전소 입지를 고르려고 해. 목적함수 후보를 <b>3~4개</b> 제시하고,
+          각각이 <span class="mark">어떤 지역에 유리한지</span> 알려 줘.
+          <span class="mark">네가 고르지 말고 내가 고를게.</span>"</p>
+      </div>
+      <p class="caption" style="margin-top:10px">
+        10쪽의 표가 그 답의 본보기다. <span class="hl">고르는 것은 사람이다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 최적화를 돌린다 <span class="en" style="font-size:16px;color:var(--muted)">35분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>기존 44기가 지금 몇 %를 덮는지 먼저 낸다 (강의값 71.5%와 맞춰 본다)</li>
+        <li>후보 8곳을 <span class="hl">탐욕적으로</span> 고르고
+          <span class="mark">각 단계에서 새로 덮는 인구</span>를 표로 남긴다</li>
+        <li>기준 거리를 <span class="hl">300m 와 1km 로 바꿔</span> 다시 돌린다.
+          후보지 목록이 얼마나 달라지는가</li>
+        <li>목적함수를 "가장 먼 사람의 거리 최소" 로 바꿔 돌려 본다</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        3·4번이 오늘의 핵심 연습이다. <span class="hl">설정을 바꾸면 답이 바뀐다는 것</span>을
+        직접 보고 나면, 결과표만 들고 다니지 않게 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ③ ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 제안서로 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">30분</span></h2>
+    <div class="body tight">
+      <p class="sub">다섯 부분으로 쓴다. 순서를 지킨다</p>
+      <ol class="steps">
+        <li><span class="hl">목적함수</span> — 무엇을 좋다고 보았나. <span class="mark">맨 앞에</span></li>
+        <li>현황 — 지금 몇 %가 덮이나</li>
+        <li>제안 — 후보지 몇 곳과 그때의 커버</li>
+        <li>몇 개가 적정한가 — <span class="hl">한계효용 그래프</span>를 근거로</li>
+        <li>한계 — 무엇을 타협했고 무엇을 현장에서 확인해야 하나</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        제출: <span class="t-red">입지 제안서 (다섯 부분) + 지도 + 로직 문서</span></p>
+      <p class="caption" style="margin-top:8px">
+        이 과제의 수상작들이 COMPAS 분석 결과 탭에 공개되어 있다.
+        <span class="hl">자기 제안과 견주어 보면 좋다</span> — 목적함수를 무엇으로 잡았는지 먼저 찾아본다.<br>
+        다음 주에는 자기 프로젝트로 이 전 과정을 완주한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>8·9·11쪽 수치 — COMPAS 「전기자동차 충전소 최적입지 선정」<br>
+          (광양시, SBJ_2009_001) 공개 데이터 · 2026. 8. 26. 내려받음<br>
+          격자별 인구현황(100×100) 2,035개 격자 145,683명 · 충전기설치현황 44기 ·
+          주차장 공간정보 235곳</li>
+        <li>산출 방법 — <span class="code">analysis/13-광양충전소.py</span>
+          (반경 500m · 탐욕 알고리즘),
+          판단 근거와 한계는 <span class="code">analysis/13-광양충전소-로직.md</span></li>
+        <li>5·7쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 18. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
