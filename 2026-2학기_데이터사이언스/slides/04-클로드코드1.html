@@ -349,43 +349,50 @@ cheongju-apt.csv — 국토부 실거래가 API
       <table class="tt">
         <thead><tr><th style="width:18%">시각</th><th style="width:34%">할 일</th><th>끝났다는 신호</th></tr></thead>
         <tbody>
-          <tr><td>0:00–0:20</td><td>설치와 첫 대화</td><td>"이 폴더에 뭐가 있어?" 에 답이 온다</td></tr>
-          <tr><td>0:20–0:45</td><td>로직만 요구</td><td>판단 다섯 가지를 <span class="hl">내가</span> 정했다</td></tr>
-          <tr><td>0:45–1:05</td><td>실행 · 어긋남 확인</td><td>두 결과가 <span class="hl">다른</span> 것을 봤다</td></tr>
-          <tr><td>1:05–1:30</td><td>CLAUDE.md · 재현</td><td>두 결과가 <span class="hl">같아졌다</span></td></tr>
+          <tr><td>0:00–0:10</td><td>설치 확인</td><td>사전 과제가 된 사람은 바로 ②로</td></tr>
+          <tr><td>0:10–0:35</td><td>로직만 요구</td><td>판단 다섯 가지를 <span class="hl">내가</span> 정했다</td></tr>
+          <tr><td>0:35–0:55</td><td>실행 · 어긋남 확인</td><td>두 결과가 <span class="hl">다른</span> 것을 봤다</td></tr>
+          <tr><td>0:55–1:30</td><td>CLAUDE.md · 재현</td><td>두 결과가 <span class="hl">같아졌다</span></td></tr>
         </tbody>
       </table>
       <p class="sub" style="margin-top:12px">시작 전 확인</p>
-      <p>노트북 · 클로드 계정 · 3주차 <span class="code">cheongju-apt.csv</span> 와 출처 문서</p>
+      <p><span class="hl">지난주 사전 과제</span>(클로드 코드 설치) · <span class="code">ds2026/</span> 폴더에
+        3주차 <span class="code">cheongju-apt.csv</span> 와 출처 문서</p>
       <p class="caption" style="margin-top:8px">
-        <span class="hl">셋 중 하나라도 없으면 지금 말한다.</span>
+        <span class="hl">설치가 안 된 사람은 지금 손을 든다.</span> 첫 10분에 함께 본다.
         데이터가 없으면 옆 사람 것을 복사해 쓴다 — 오늘 배울 것은 데이터가 아니라 절차다.</p>
     </div>
   </section>
 
-  <!-- ══ 17. 실습 ① 설치 ═════════════════════════════════ -->
+  <!-- ══ 17. 실습 ① 설치 확인 ═══════════════════════════ -->
   <section>
-    <h2>① 설치와 첫 대화 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:20</span></h2>
+    <h2>① 설치 확인 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:10</span></h2>
     <div class="body tight">
+      <p class="sub">사전 과제가 된 사람 — 3분이면 끝난다</p>
       <ol class="steps">
-        <li>터미널을 연다 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
-        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 그대로 따른다</li>
-        <li>실습 폴더를 만들고 그 안으로 들어간다<br>
-          <span class="code">mkdir ds2026 &amp;&amp; cd ds2026</span></li>
-        <li>3주차 CSV 와 출처 문서를 그 폴더에 넣는다</li>
-        <li><span class="code">claude</span> 를 실행하고 로그인한다</li>
-        <li>"이 폴더에 뭐가 있어?" 라고 물어본다</li>
+        <li><span class="code">ds2026/</span> 폴더에서 <span class="code">claude</span> 를 실행한다</li>
+        <li>"이 폴더에 뭐가 있어?" 라고 물어 <span class="hl">CSV 를 이름으로 말하는지</span> 확인한다</li>
+        <li>확인됐으면 <span class="mark">바로 ②로 넘어간다.</span> 기다리지 않는다</li>
       </ol>
-      <div class="ck"><b>✓ 확인 지점</b> — 클로드가 <span class="code">cheongju-apt.csv</span> 를 이름으로 말한다.
-        파일을 읽겠다며 <b>허용을 물어보면</b> 권한 모델이 살아 있는 것이다.</div>
-      <div class="stuck"><b>막히면</b> — 오류 메시지를 <b>통째로 복사해</b> 웹 클로드에 붙여 넣고 물어본다.
-        그래도 안 되면 오늘은 웹 대화창으로 따라온다. ②③은 그대로 되고 ④만 파일 대신 메모로 한다.</div>
+      <div class="ck"><b>✓ 확인 지점</b> — 파일을 읽겠다며 <b>허용을 물어본다.</b>
+        이 물음이 오늘 배울 권한 모델이다. 내용을 읽고 승인한다.</div>
+      <p class="sub" style="margin-top:14px">안 된 사람 — 셋 중 하나다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <tbody>
+          <tr><td style="width:32%">설치가 안 됐다</td><td>가져온 오류 메시지를 함께 본다</td></tr>
+          <tr><td>로그인이 안 된다</td><td>계정과 구독 상태를 확인한다</td></tr>
+          <tr><td>폴더를 못 찾는다</td><td><span class="code">pwd</span> 로 지금 어디인지부터 본다</td></tr>
+        </tbody>
+      </table>
+      <div class="stuck"><b>10분 안에 안 되면 웹 대화창으로 따라온다.</b>
+        ②③은 그대로 되고 ④만 파일 대신 메모로 한다. <b>수업이 설치에 잡아먹히지 않게 한다</b> —
+        설치는 쉬는 시간이나 수업 뒤에 마저 본다.</div>
     </div>
   </section>
 
   <!-- ══ 18. 실습 ② 로직 ═════════════════════════════════ -->
   <section>
-    <h2>② 로직만 요구한다 <span class="en" style="font-size:16px;color:var(--muted)">0:20–0:45</span></h2>
+    <h2>② 로직만 요구한다 <span class="en" style="font-size:16px;color:var(--muted)">0:10–0:35</span></h2>
     <div class="body tight">
       <div class="prompt-box">
         <p class="who">그대로 쓴다</p>
@@ -411,7 +418,7 @@ cheongju-apt.csv — 국토부 실거래가 API
 
   <!-- ══ 19. 실습 ③ 어긋남 ═══════════════════════════════ -->
   <section>
-    <h2>③ 실행하고, 어긋남을 본다 <span class="en" style="font-size:16px;color:var(--muted)">0:45–1:05</span></h2>
+    <h2>③ 실행하고, 어긋남을 본다 <span class="en" style="font-size:16px;color:var(--muted)">0:35–0:55</span></h2>
     <div class="body tight">
       <ol class="steps">
         <li>"정한 대로 하고 결과를 표로 저장해 줘" 라고 시킨다.
@@ -432,22 +439,23 @@ cheongju-apt.csv — 국토부 실거래가 API
 
   <!-- ══ 20. 실습 ④ CLAUDE.md ════════════════════════════ -->
   <section>
-    <h2>④ 규칙을 적고 재현시킨다 <span class="en" style="font-size:16px;color:var(--muted)">1:05–1:30</span></h2>
+    <h2>④ 규칙을 적고 재현시킨다 <span class="en" style="font-size:16px;color:var(--muted)">0:55–1:30</span></h2>
     <div class="body tight">
       <ol class="steps">
         <li>②에서 정한 다섯을 <span class="code">CLAUDE.md</span> 로 옮긴다.
-          <span class="hl">규칙 한 줄, 이유 한 줄</span> <span class="t">8분</span></li>
+          <span class="hl">규칙 한 줄, 이유 한 줄</span> <span class="t">12분</span></li>
         <li>초안을 보여 주고 묻는다 — "아직 애매해서 <span class="mark">네가 임의로 정하게 될 자리</span>가 어디야?
-          규칙을 새로 만들지는 말고 어디가 비었는지만 알려 줘" <span class="t">5분</span></li>
-        <li>지적받은 자리를 채운다 <span class="t">4분</span></li>
-        <li>또 <span class="hl">새 대화</span>를 열어 ③의 4번과 <span class="mark">똑같이</span> 요청한다 <span class="t">5분</span></li>
+          규칙을 새로 만들지는 말고 어디가 비었는지만 알려 줘" <span class="t">7분</span></li>
+        <li>지적받은 자리를 채운다 <span class="t">6분</span></li>
+        <li>또 <span class="hl">새 대화</span>를 열어 ③의 4번과 <span class="mark">똑같이</span> 요청한다.
+          <span class="hl">같아질 때까지 ①~④를 반복한다</span> <span class="t">7분</span></li>
         <li><span class="code">/revise-claude-md</span> 로 빠뜨린 것이 없는지 확인한다 <span class="t">3분</span></li>
       </ol>
       <div class="ck"><b>✓ 확인 지점</b> — 이번 결과가 <b>①의 표와 같다.</b>
         다르면 규칙이 덜 적힌 것이다 — 어디가 갈렸는지 찾아 보태고 다시 한다.</div>
-      <div class="stuck"><b>시간이 모자라면</b> — 4·5번을 못 해도 좋다. <b>CLAUDE.md 를 쓰는 데까지가 핵심</b>이고
-        재현 확인은 집에서 해 온다. 반대로 <b>일찍 끝났으면</b> 면적 하한을 85㎡ 로 바꿔 다시 돌려 보고
-        결과가 얼마나 달라지는지 본다.</div>
+      <div class="stuck"><b>설치를 못 한 사람은</b> 웹 대화창에서 CLAUDE.md 대신
+        "이 규칙을 지켜서 다시 해 줘" 라고 규칙을 붙여 넣는다. <b>재현되는 것을 보는 것이 목적</b>이라 그것으로 충분하다.
+        <b>일찍 끝났으면</b> 면적 하한을 85㎡ 로 바꿔 다시 돌려 보고 결과가 얼마나 달라지는지 본다.</div>
     </div>
   </section>
 

@@ -31,6 +31,13 @@
   .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
           background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
   .src { font-size: 13px; line-height: 1.72; color: var(--ink-2); margin: 4px 0 0; }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
   .src li { margin-bottom: 8px; }
   .src .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; }
 </style>
@@ -273,7 +280,34 @@
         제출: <span class="t-red">cheongju-apt.csv + 출처 문서</span> —
         <span class="hl">다음 주에 이 파일로 첫 분석을 한다.</span></p>
       <p class="caption" style="margin-top:6px">
-        가정 과제: 자기 문제정의서에 필요한 데이터도 하나 찾아 둔다. 없으면 없다고 적어 온다.</p>
+        가정 과제: 자기 문제정의서에 필요한 데이터도 하나 찾아 둔다. 없으면 없다고 적어 온다.<br>
+        <span class="hl">그리고 다음 장의 사전 과제를 반드시 해 온다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 13-b. 다음 주 사전 과제 ══════════════════════════ -->
+  <section>
+    <h2>다음 주까지 — 클로드 코드를 설치해 온다</h2>
+    <div class="body tight">
+      <p class="emph"><span class="hl">수업 시간에 설치하지 않는다.</span>
+        4주차는 설치가 끝난 상태에서 시작한다</p>
+      <ol class="steps">
+        <li>터미널을 연다 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
+        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 그대로 따른다</li>
+        <li>실습 폴더를 만든다 — <span class="code">mkdir ds2026 &amp;&amp; cd ds2026</span></li>
+        <li>오늘 받은 <span class="code">cheongju-apt.csv</span> 와 출처 문서를 그 폴더에 넣는다</li>
+        <li><span class="code">claude</span> 를 실행하고 로그인한 뒤
+          <span class="mark">"이 폴더에 뭐가 있어?"</span> 라고 물어본다</li>
+      </ol>
+      <div class="ck"><b>✓ 되었는지 확인하는 법</b> — 클로드가
+        <span class="code">cheongju-apt.csv</span> 를 <b>이름으로 말한다.</b>
+        그 화면을 캡처해 온다. 이것이 사전 과제 제출물이다.</div>
+      <div class="stuck"><b>안 되면 그대로 가져온다.</b> 오류 메시지를 캡처해 오면 수업 시작 때 함께 본다.
+        <b>혼자 두 시간 붙들고 있지 않는다</b> — 30분 해 보고 안 되면 멈춘다.
+        설치가 끝내 안 되어도 4주차 실습의 대부분은 웹 대화창으로 따라올 수 있다.</div>
+      <p class="caption" style="margin-top:10px">
+        왜 미리 하나 — 설치는 환경마다 걸리는 시간이 크게 다르다.
+        <span class="hl">수업 시간은 설치가 아니라 "로직을 요구하는 법" 에 쓴다.</span></p>
     </div>
   </section>
 
