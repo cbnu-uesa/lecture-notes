@@ -32,22 +32,22 @@
     },
     {
       "no": 4,
-      "title": "클로드 코드 Ⅰ — 설치와 첫 분석",
+      "title": "클로드 코드 Ⅰ — 설치와 CLAUDE.md",
       "file": "04-클로드코드1.html",
       "date": "2026. 9. 28.",
       "status": "done"
     },
     {
       "no": 5,
-      "title": "클로드 코드 Ⅱ — CLAUDE.md와 컨텍스트",
+      "title": "클로드 코드 Ⅱ — 스킬·플러그인·MCP·에이전트",
       "file": "05-클로드코드2.html",
       "date": "2026. 10. 5.",
       "status": "done"
     },
     {
       "no": 6,
-      "title": "클로드 코드 Ⅲ — MCP와 에이전트",
-      "file": "06-클로드코드3.html",
+      "title": "깃과 깃허브 — 기록하고 나누기",
+      "file": "06-깃과깃허브.html",
       "date": "2026. 10. 12.",
       "status": "done"
     },
