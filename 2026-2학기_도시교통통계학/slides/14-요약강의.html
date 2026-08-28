@@ -1365,8 +1365,10 @@ window.POPCIRCLE = function (sel) {
     <h2>회귀의 표준오차 (standard error)</h2>
     <div class="body tight">
       <p class="sub">추정오차(estimation error) = 잔차(residual) = 실제값 − 추정치</p>
-      <p class="sub" style="margin-bottom:2px">표준오차(standard error): 잔차 제곱의 평균에 제곱근을
-        취한 것 (Root Mean Squared Error, RMSE)</p>
+      <p class="sub" style="margin-bottom:2px">표준오차(standard error): 잔차 제곱합을 자유도(n−2)로
+        나눈 뒤 제곱근을 취한 것</p>
+      <p class="side-note" style="margin:0 0 2px 14px">잔차 제곱의 <em>평균</em>에 제곱근을 취한
+        RMSE 와는 나누는 수만 다르다 (n 대신 n−2)</p>
       <p class="sub">→ 표준오차가 작을수록 회귀직선이 자료를 잘 요약</p>
       <div class="cols top" style="margin-top:2px">
         <div class="col-l">
@@ -1629,7 +1631,7 @@ window.POPCIRCLE = function (sel) {
           <p class="sub" style="margin-bottom:2px">설명변수가 추가될수록 자유도가 감소하도록 조정</p>
           <p class="sub" style="margin:0">→ 설명변수 추가에 따른 SSE의 감소속도 &lt;
             설명변수 추가에 따른 자유도 감소속도</p>
-          <p class="sub" style="margin:0">→ 표준오차가 증가 → 결정계수는 오히려 감소</p>
+          <p class="sub" style="margin:0">→ 표준오차가 증가 → <em>조정된</em> 결정계수는 오히려 감소</p>
         </div>
       </div>
       <div class="cols top" style="margin-top:12px">
@@ -1640,7 +1642,7 @@ window.POPCIRCLE = function (sel) {
         <div class="col-r">
           <p class="sub" style="margin:0">→ 설명변수 추가에 따라 SSE가 충분히 많이 감소해야</p>
           <p class="sub" style="margin:0 0 0 14px">(즉, 설명변수가 잔차를 크게 줄여야)</p>
-          <p class="sub" style="margin:0 0 0 14px">회귀직선의 설명력인 결정계수가 증가</p>
+          <p class="sub" style="margin:0 0 0 14px">회귀직선의 설명력인 <em>조정된</em> 결정계수가 증가</p>
         </div>
       </div>
     </div>
@@ -1794,7 +1796,7 @@ window.POPCIRCLE = function (sel) {
         <li><span class="sub" style="display:inline">사건 (event)</span>
           <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 결과, 표본공간의 부분 집합</p></li>
         <li style="margin-top:22px"><span class="sub" style="display:inline">표본공간 (sample space)</span>
-          <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 모든 사건의 집합</p></li>
+          <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 모든 결과(근원사건)의 집합</p></li>
         <li style="margin-top:22px"><span class="sub" style="display:inline">확률 (probability)</span>
           <p style="margin:6px 0 0 12px">사건 A의 확률은 표본공간에서 사건 A가 나타나는 경우가
             모든 사건의 경우의 수에서 차지하는 비중</p></li>
@@ -2020,7 +2022,7 @@ window.POPCIRCLE = function (sel) {
           <ol class="dense" style="margin-top:8px">
             <li>B가 일어났다는 것을 알았을 때 A가 일어날 확률은</li>
             <li style="margin-top:14px">B가 일어날 확률의 합에서</li>
-            <li style="margin-top:14px">B가 일어났을 때 A가 일어날 확률이 차지하는 비중</li>
+            <li style="margin-top:14px">A와 B가 함께 일어날 확률이 차지하는 비중</li>
           </ol>
           <p class="formula-key" style="text-align:center;margin-top:16px">
             $$P(A|B) = \frac{P(A \cap B)}{P(B)}$$</p>
@@ -2121,7 +2123,7 @@ window.POPCIRCLE = function (sel) {
             <li>B가 일어났다는 것을 알았을 때 A가 일어날 확률은</li>
             <li style="margin-top:10px">B가 일어났을 때 A가 일어날 확률과<br>
               B가 일어났을 때 A가 일어나지 않을 확률의 합에서</li>
-            <li style="margin-top:10px">B가 일어났을 때 A가 일어날 확률이 차지하는 비중</li>
+            <li style="margin-top:10px">A와 B가 함께 일어날 확률이 차지하는 비중</li>
           </ol>
           <p class="formula-key" style="text-align:center;margin-top:12px;font-size:14px">
             $$P(A|B) = \frac{P(A \cap B)}{P(B)}
@@ -2194,7 +2196,7 @@ window.POPCIRCLE = function (sel) {
         <div class="col-r">
           <p style="margin:0;font-size:13px">
             $P(A|B) = \dfrac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}
-            = \dfrac{0.5 * 1}{0.5 * 1 + 0.5 * 0.25} = 0.75$</p>
+            = \dfrac{0.5 * 1}{0.5 * 1 + 0.5 * 0.25} = 0.8$</p>
         </div>
       </div>
     </div>
@@ -2370,7 +2372,7 @@ window.POPCIRCLE = function (sel) {
   <section>
     <h2>확률변수 합으로 만든 새로운 확률변수의 특징</h2>
     <div class="body tight">
-      <p class="sub">제곱근 법칙 (square root law) = 대수의 법칙(평균의 법칙)</p>
+      <p class="sub">제곱근 법칙 (square root law) → 대수의 법칙(평균의 법칙)의 근거</p>
       <p class="emph" style="margin:6px 0 0">특정 확률분포를 따르는 확률변수(X)를 합하여 만든
         새로운 확률변수(Y=X<sub>1</sub>+X<sub>2</sub>+…+X<sub>n</sub>)의 표준편차는</p>
       <p class="emph" style="margin:0">처음 확률변수가 갖는 표준편차(SD(X))와
@@ -2392,7 +2394,7 @@ window.POPCIRCLE = function (sel) {
   <section>
     <h2>확률변수 평균으로 만든 새로운 확률변수의 특징</h2>
     <div class="body tight">
-      <p class="sub">제곱근 법칙 (square root law) = 대수의 법칙(평균의 법칙)</p>
+      <p class="sub">제곱근 법칙 (square root law) → 대수의 법칙(평균의 법칙)의 근거</p>
       <p class="emph" style="margin:6px 0 0">특정 확률분포를 따르는 확률변수(X)의 합을 평균하여 만든
         새로운 확률변수(Y=X<sub>1</sub>+X<sub>2</sub>+…+X<sub>n</sub>/n)의 표준편차는</p>
       <p class="emph" style="margin:0">처음 확률변수가 갖는 표준편차(SD(X))를
@@ -2737,7 +2739,7 @@ window.POPCIRCLE = function (sel) {
     <h2>가설검정 (hypothesis test)</h2>
     <div class="body tight">
       <p class="sub">표본통계량이 귀무가설 하의 분포에서 도출되었다고 가정한 상태에서<br>
-        실제 통계치가 귀무가설 하에서 도출될 확률을 계산하여 귀무가설을 검증하는 것</p>
+        실제 통계치 이상으로 극단적인 값이 귀무가설 하에서 나올 확률을 계산하여 귀무가설을 검증하는 것</p>
       <div class="cols top w56" style="margin-top:4px">
         <div class="col-l">
           <ol class="dense" style="font-size:13.5px">
@@ -2811,7 +2813,7 @@ window.POPCIRCLE = function (sel) {
         <div><p>우리가 증명하고자 하는 가설, 차이는 실질적이다.</p></div>
       </div>
       <div class="def-row slim">
-        <div class="def-tag">유의수준<br><span class="en">(significant level)</span></div>
+        <div class="def-tag">유의수준<br><span class="en">(significance level)</span></div>
         <div><p>귀무가설이 옳다는 가정 하에서 귀무가설의 기각여부를 결정하는데 사용할 기준 확률</p></div>
       </div>
       <div class="def-row slim">
@@ -2820,7 +2822,7 @@ window.POPCIRCLE = function (sel) {
       </div>
       <div class="def-row slim">
         <div class="def-tag">유의확률<br><span class="en">(p-value)</span></div>
-        <div><p>귀무가설이 옳다는 가정 하에서 계산된 검정 통계량이 도출될 확률</p></div>
+        <div><p>귀무가설이 옳다는 가정 하에서 관측된 검정통계량 이상으로 극단적인 값이 나올 확률</p></div>
       </div>
     </div>
   </section>

@@ -179,7 +179,7 @@
         <ul>
           <li>저울의 측정오차</li>
           <li>키와 몸무게의 분포</li>
-          <li>식물의 꽃잎 개수</li>
+          <li>같은 공정에서 만든 부품의 치수</li>
         </ul>
         <p class="emph" style="margin-left:26px">:</p>
         <p class="emph" style="margin-top:26px">대체로 평균을 중심으로 수렴하고<br>
@@ -529,8 +529,8 @@
         자료를 거의 100% 묘사할 수 있다<br>→ 하지만 자료가 정규분포를 안따르면?</p>
       <p class="sub" style="margin-top:28px">백분위수 (percentile)</p>
       <p class="emph">하나의 히스토그램을 100개의 균등한 영역으로 나눈 99개의 경계점<br>
-        (즉, 자료의 1%, 2%, 3%, … , 100% 지점)</p>
-      <p class="sub" style="margin-top:20px">사분위수 (quantile)</p>
+        (즉, 자료의 1%, 2%, 3%, … , 99% 지점)</p>
+      <p class="sub" style="margin-top:20px">사분위수 (quartile)</p>
       <p class="emph">백분위수를 대표하는 지점으로서,
         제1사분위(제25백분위), 제2사분위(제50백분위 = 중앙값), 제3사분위(제75백분위)</p>
       <p class="sub" style="margin-top:20px">사분위수 범위 (interquartile range, IQR)</p>
@@ -571,7 +571,7 @@
           “최소값, 제1사분위수, 제2사분위수(중앙값), 제3사분위수, 최대값”의
           다섯가지 통계량으로 나타낸 그림</p>
         <svg class="fig" id="f-skew" viewBox="0 0 350 250" style="width:350px;margin-top:6px" role="img">
-          <title>왼쪽으로 치우침·오른쪽으로 치우침·대칭인 분포의 상자그림과 그에 대응하는 분포 곡선</title>
+          <title>왼쪽으로 늘어짐·오른쪽으로 늘어짐·대칭인 분포의 상자그림과 그에 대응하는 분포 곡선</title>
         </svg>
       </div>
     </div>
@@ -853,7 +853,7 @@ realPanel('#f-sd', { x0: 30, y0: 172, x1: 380, y1: 66 });
   Fig.draw('#f-box2', { parts: parts, check: false });
 })();
 
-/* ── 원본 p.26 오른쪽 : 치우침에 따른 상자그림과 분포 곡선 ────── */
+/* ── 원본 p.26 오른쪽 : 늘어짐에 따른 상자그림과 분포 곡선 ────── */
 (function () {
   /* 치우친 분포도 손으로 그리지 않는다. 왜도정규분포
      f(x) ∝ 2 φ(x) Φ(αx) 의 α 부호만 바꿔 좌우 대칭인 한 쌍을 만든다. */
@@ -869,7 +869,7 @@ realPanel('#f-sd', { x0: 30, y0: 172, x1: 380, y1: 66 });
   };
 
   const CAPT = 14, T = 44, Q3M = 150, BOTC = 186;    // 수염·상자의 세로 좌표
-  const cells = [[54, 66, '왼쪽으로 치우침', -5, 72], [166, 126, '오른쪽으로 치우침', 5, 108],
+  const cells = [[54, 66, '왼쪽으로 늘어짐', -5, 72], [166, 126, '오른쪽으로 늘어짐', 5, 108],
                  [278, 96, '대칭', 0, 0]];
   const parts = [];
   cells.forEach(([cx, med, label]) => {

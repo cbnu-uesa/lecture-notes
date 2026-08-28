@@ -764,7 +764,7 @@
       </ul>
       <p class="lead t-define" style="margin-top:18px">왜 이런 일이 발생했을까?</p>
       <ul>
-        <li>1996년 당시 국립기상청 예측의 오차범위는 ±9피트(약 2.7m)로서
+        <li>1997년 당시 국립기상청 예측의 오차범위는 ±9피트(약 2.7m)로서
           범람 가능성은 약 35%에 달했음</li>
       </ul>
       <p class="big-say" style="margin-top:26px">자료를 대표하는 특성으로 평균은 부족하다!</p>
@@ -925,12 +925,12 @@
       <p class="emph">편차의 승수 이유: 1) 편차를 증폭, 2) 필요에 따라 양수, 음수로 전환</p>
       <div style="margin-top:26px">
         <p class="sub">왜도(skewness): 분포가 좌우로 비대칭적인 정도</p>
-        <p class="derive">→ 0: 대칭분포, +: 오른쪽으로 치우침, −: 왼쪽으로 치우침</p>
+        <p class="derive">→ 0: 대칭분포, +: 오른쪽으로 늘어짐, −: 왼쪽으로 늘어짐</p>
       </div>
       <div style="margin-top:26px">
         <p class="sub">첨도(kurtosis): 분포의 꼬리가 두꺼운 정도, 양극단 자료가 얼마나 많은지를 측정</p>
-        <p class="derive">→ 3: 정규분포, 3이상: 정규분포보다 뾰족함(꼬리가 두꺼움),
-          3이하: 정규분표보다 완만함(꼬리가 얇음)</p>
+        <p class="derive">→ 3: 정규분포, 3 초과: 정규분포보다 뾰족함(꼬리가 두꺼움),
+          3 미만: 정규분포보다 완만함(꼬리가 얇음)</p>
       </div>
     </div>
   </section>
@@ -993,11 +993,14 @@
   <section>
     <h2>심슨의 역설<span class="en">(Simpson's paradox)</span></h2>
     <div class="body stack">
-      <p class="lead t-define">하위집단에서 관찰된 관계가 하위집단이 결합될 경우 반대로 나타나는 현상</p>
-      <p class="derive t-red">→ 혼동요인(compounding factor)의 통제 필요성</p>
+      <p class="lead t-define">하위집단에서 관찰된 관계가 하위집단을 합치면 사라지거나 반대로 나타나는 현상</p>
+      <p class="derive t-red">→ 혼동요인(confounding factor)의 통제 필요성</p>
       <svg class="fig" id="f-simpson" viewBox="0 0 700 260" style="width:640px;margin-top:8px" role="img">
         <title>A학과 합격률 23%, B학과 합격률 53%인데 남성 총 합격률 44%가 여성 총 합격률 35%보다 높게 나오는 그림</title>
       </svg>
+      <p class="caption" style="text-align:center;margin-top:4px">
+        주: 학과별 합격률은 남녀가 같은데도 합치면 남성이 높게 나온다 —
+        지원한 학과의 구성이 다르기 때문이다</p>
     </div>
     <script>
       (function () {

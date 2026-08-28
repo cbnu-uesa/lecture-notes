@@ -354,12 +354,15 @@
       <p class="qz" style="margin-bottom:18px">3. 다음 명제의 참과 거짓을 판별하시오.</p>
       <p class="qz-item">(1) 어떤 데이터 분포가 왼쪽으로 길게 늘어진(left-skewed) 형태를 보일 때
         <span class="in">평균, 중앙값, 최빈값의 일반적인 크기 관계는 최빈값 &gt; 중앙값 &gt; 평균이다.
-          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span></p>
+          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span>
+        <span class="fragment" data-fragment-index="0" style="color:var(--brand-crimson);font-weight:700">→ 참</span></p>
       <p class="qz-item">(2) 히스토그램에서 상대도수가 아닌 밀도를 활용하는 이유는
         <span class="in">모든 막대의 높이를 비슷하게 만들어 미적으로 보기좋게 하기 위함이다.
-          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span></p>
+          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span>
+        <span class="fragment" data-fragment-index="0" style="color:var(--brand-crimson);font-weight:700">→ 거짓 — 계급폭이 다른 구간을 견주기 위해서다</span></p>
       <p class="qz-item">(3) 자료의 표준화는 자료에서 평균을 빼고 표준편차로 나누어 평균은 1,
-        표준편차는 0으로 만드는 과정이다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</p>
+        표준편차는 0으로 만드는 과정이다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment" data-fragment-index="0" style="color:var(--brand-crimson);font-weight:700">→ 거짓 — 평균 0, 표준편차 1 이다</span></p>
     </div>
   </section>
 
@@ -718,7 +721,7 @@
     <div class="body tight">
       <div class="cols top" style="margin-top:0">
         <div class="col-l" style="flex:0 0 62%">
-          <p class="sub" style="margin-bottom:2px">단순회귀<span class="en">(single regression)</span></p>
+          <p class="sub" style="margin-bottom:2px">단순회귀<span class="en">(simple regression)</span></p>
           <p class="emph" style="margin:0 0 8px 14px">하나의 설명변수(X)와 종속변수(Y) 간의 관계를 분석</p>
           <p class="sub" style="margin:0 0 20px 14px">아파트 가격 (Y) = a + b*접근성(X)</p>
           <p class="sub" style="margin-bottom:2px">(다)중회귀<span class="en">(multiple regression)</span></p>
@@ -857,7 +860,7 @@
           <p class="sub" style="margin-bottom:2px">설명변수가 추가될수록 자유도가 감소하도록 조정</p>
           <p class="sub" style="margin:0">→ 설명변수 추가에 따른 SSE의 감소속도 &lt;
             설명변수 추가에 따른 자유도 감소속도</p>
-          <p class="sub" style="margin:0">→ 표준오차가 증가 → 결정계수는 오히려 감소</p>
+          <p class="sub" style="margin:0">→ 표준오차가 증가 → <em>조정된</em> 결정계수는 오히려 감소</p>
         </div>
       </div>
       <div class="cols top" style="margin-top:12px">
@@ -868,7 +871,7 @@
         <div class="col-r">
           <p class="sub" style="margin:0">→ 설명변수 추가에 따라 SSE가 충분히 많이 감소해야</p>
           <p class="sub" style="margin:0 0 0 14px">(즉, 설명변수가 잔차를 크게 줄여야)</p>
-          <p class="sub" style="margin:0 0 0 14px">회귀직선의 설명력인 결정계수가 증가</p>
+          <p class="sub" style="margin:0 0 0 14px">회귀직선의 설명력인 <em>조정된</em> 결정계수가 증가</p>
         </div>
       </div>
     </div>

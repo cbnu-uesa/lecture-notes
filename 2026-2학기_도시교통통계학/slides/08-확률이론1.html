@@ -229,7 +229,8 @@ window.L8 = (function () {
   /* 표준정규 확률밀도 — 아래 세 슬라이드의 그림이 모두 이 함수 하나에서 나온다 */
   const phi = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
 
-  /* 이산변수의 히스토그램 — 0.5 간격의 막대(선)와 그 끝의 빈 점 */
+  /* 이산변수의 히스토그램 — 간격 1 의 막대(선)와 그 끝의 빈 점.
+     간격이 1 이라야 막대 높이의 합이 1 이 되어 확률질량함수가 된다 (2026-08-28 바로잡음). */
   function pmfPlot(sel) {
     const F = Fig.withBox({ x0: 44, y0: 166, x1: 288, y1: 18 });
     const S = F.scale({ x: [-3.3, 3.3], y: [0, 0.44] });
@@ -238,8 +239,8 @@ window.L8 = (function () {
       s += txt(S.x(k), 181, String(k), { size: 9, anchor: 'middle' });
     for (const v of [0, 0.1, 0.2, 0.3, 0.4])
       s += txt(38, S.y(v) + 3, v.toFixed(1), { size: 9, anchor: 'end' });
-    for (let k = -6; k <= 6; k++) {                    // x = −3, −2.5, …, 3
-      const x = k / 2, h = phi(x);
+    for (let k = -3; k <= 3; k++) {                    // x = −3, −2, …, 3
+      const x = k, h = phi(x);
       s += `<path d="M${S.x(x)},${S.y(0)} L${S.x(x)},${S.y(h)}" ` +
            `stroke="var(--ink)" stroke-width="1.2"/>`;
       s += `<circle class="dot-open" cx="${S.x(x)}" cy="${S.y(h)}" r="2.6"/>`;
@@ -710,10 +711,11 @@ window.L8 = (function () {
       </ul>
       <p style="margin:0 0 0 34px;font-weight:700;color:var(--ink)">〈상자 A〉</p>
       <svg class="fig" id="f-tree-a" viewBox="0 0 580 128"
-           style="width:500px;margin-left:16px" role="img">
+           style="width:452px;margin-left:16px" role="img">
         <title>상자 A의 비복원추출 나무그림. 첫번째 시행의 확률 5분의 3에서 갈라져,
           붉은 카드를 꺼냈으면 4분의 2, 파란 카드를 꺼냈으면 4분의 3이 된다</title>
       </svg>
+      <p class="side-note" style="margin:2px 0 0 34px">→ 첫 장을 본 뒤의 확률 $P(R|\cdot)$ 은 0.5 와 0.75 로 갈린다</p>
     </div>
     <script>
       (function () {
@@ -753,10 +755,11 @@ window.L8 = (function () {
       </ul>
       <p style="margin:0 0 0 34px;font-weight:700;color:var(--ink)">〈상자 B〉</p>
       <svg class="fig" id="f-tree-b" viewBox="0 0 580 128"
-           style="width:500px;margin-left:16px" role="img">
+           style="width:452px;margin-left:16px" role="img">
         <title>상자 B의 비복원추출 나무그림. 첫번째 시행의 확률 5분의 3에서 갈라져,
           붉은 카드를 꺼냈으면 49분의 29, 파란 카드를 꺼냈으면 49분의 30이 된다</title>
       </svg>
+      <p class="side-note" style="margin:2px 0 0 34px">→ B 에서는 0.59 와 0.61 로 거의 붙는다. 무조건부 $P(R)$ 은 A·B 모두 3/5 로 같다</p>
     </div>
     <script>
       (function () {
@@ -775,7 +778,7 @@ window.L8 = (function () {
         <li><span class="sub" style="display:inline">사건 (event)</span>
           <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 결과, 표본공간의 부분 집합</p></li>
         <li style="margin-top:22px"><span class="sub" style="display:inline">표본공간 (sample space)</span>
-          <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 모든 사건의 집합</p></li>
+          <p style="margin:6px 0 0 12px">특정한 실험 혹은 시행에서 관찰 가능한 모든 결과(근원사건)의 집합</p></li>
         <li style="margin-top:22px"><span class="sub" style="display:inline">확률 (probability)</span>
           <p style="margin:6px 0 0 12px">사건 A의 확률은 표본공간에서 사건 A가 나타나는 경우가
             모든 사건의 경우의 수에서 차지하는 비중</p></li>
@@ -933,11 +936,11 @@ window.L8 = (function () {
           <p style="margin:4px 0 0 12px">주사위를 2개 던져서 나온 눈의 합이라는 사건<br>
             동전을 던져서 앞면이 나올 사건</p>
           <p style="margin:4px 0 0 12px">→ 특정 값에 대한 사건의 확률 계산 가능
-            (∵ 경우의 수가 유한하므로)</p></li>
+            (∵ 경우의 수를 셀 수 있으므로)</p></li>
         <li style="margin-top:18px"><span class="sub" style="display:inline">연속변수</span>
           <p style="margin:4px 0 0 12px">1~10 사이의 실수 중에서 하나의 수를 뽑는 사건</p>
           <p style="margin:4px 0 0 12px">→ 특정 값에 대한 사건의 확률은 모두 0에 수렴
-            (∵ 경우의 수가 무한하므로)</p>
+            (∵ 경우의 수를 셀 수 없으므로)</p>
           <p style="margin:4px 0 0 12px">→ 연속사건의 경우 특정 값에 대한 확률이 아닌
             특정 구간에 속할 확률을 계산</p></li>
       </ul>
@@ -958,7 +961,7 @@ window.L8 = (function () {
           <p class="panel-head">이산변수의 히스토그램</p>
           <div class="fig-note">
             <svg class="fig" id="f-pmf1" viewBox="0 0 300 200" style="width:206px" role="img">
-              <title>이산변수의 히스토그램 — 0.5 간격의 값마다 세로 막대가 서 있고
+              <title>이산변수의 히스토그램 — 간격 1 의 값마다 세로 막대가 서 있고
                 그 끝이 종모양을 이룬다</title>
             </svg>
             <div>
@@ -982,7 +985,7 @@ window.L8 = (function () {
               <p>→ 구간의 상대빈도 계산</p>
               <p style="margin-top:10px">f(x) = 높이 = 밀도</p>
               <p class="ind">= 상대도수 / 구간길이</p>
-              <p class="ind">= 구간에 속한 개별 값의 확률</p>
+              <p class="ind">→ 밀도 × 구간길이 = 그 구간에 속할 확률</p>
             </div>
           </div>
         </div>
@@ -1008,7 +1011,7 @@ window.L8 = (function () {
           <p class="panel-head">이산변수의 히스토그램</p>
           <div class="fig-note">
             <svg class="fig" id="f-pmf2" viewBox="0 0 300 200" style="width:200px" role="img">
-              <title>이산변수의 히스토그램 — 0.5 간격의 값마다 세로 막대가 서 있고
+              <title>이산변수의 히스토그램 — 간격 1 의 값마다 세로 막대가 서 있고
                 그 끝이 종모양을 이룬다</title>
             </svg>
             <div>
@@ -1031,7 +1034,7 @@ window.L8 = (function () {
               <p>f(x) = 높이 = 밀도</p>
               <p class="ind">= 상대도수 / 구간길이</p>
               <p class="ind" style="color:var(--brand-crimson);font-weight:700">
-                = 구간에 속한 개별 값의 확률</p>
+                → 밀도 × 구간길이 = 그 구간에 속할 확률</p>
               <p style="text-align:center;color:var(--chart-blue);margin-top:2px">↓</p>
               <p style="text-align:center;color:var(--brand-crimson);font-weight:700">확률밀도함수</p>
             </div>
@@ -1098,7 +1101,7 @@ window.L8 = (function () {
         <li>확률은 0~1 사이의 값을 가지며, 각 사건의 확률은 시행을 무한 반복하거나 사건의 특성을
           보고 개념적으로 계산할 수 있다.</li>
         <li>사건이란 특정 시행이나 실험에서 관찰가능한 결과를 의미하며, 표본공간은 발생 가능한
-          모든 사건의 집합을 의미한다.</li>
+          모든 결과(근원사건)의 집합을 의미한다.</li>
         <li>표본공간에서 발생하는 각 사건들에 대응한 실수 값을 확률변수라하며, 각 확률변수가
           나타날 가능성에 대한 분포가 바로 확률분포이다.</li>
         <li>이산확률변수에 대한 확률분포함수를 확률질량함수, 연속확률변수에 대한 확률분포함수를
