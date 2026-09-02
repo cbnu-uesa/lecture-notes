@@ -9,6 +9,9 @@
 .caption   { font-size: var(--fs-caption); font-weight: 400; color: var(--muted); }
 
 /* 캡션: 표·그림 위 파란 라벨 (2강 p.2 "아이스크림의 가격에 따른 소비량") */
+/* 캡션 안의 주소 — 출처 표기 (design.md §4.5) */
+.u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11px; }
+
 .caption-blue {
   font-size: var(--fs-emph);
   font-weight: 500;
