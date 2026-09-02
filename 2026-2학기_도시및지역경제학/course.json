@@ -11,8 +11,8 @@
   "lectures": [
     {
       "no": 1,
-      "title": "강의소개와 주요 개념",
-      "file": "01-서론과주요개념.html",
+      "title": "강의소개",
+      "file": "01-강의소개.html",
       "date": "2026. 9. 2.",
       "status": "done"
     },
