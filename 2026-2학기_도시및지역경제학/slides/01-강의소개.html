@@ -364,20 +364,20 @@
                 F.annot(S.x(44), S.y(26), '1.  옷에 비해 상대적으로 가격이 싸짐', { tone: 'red', size: 14 }),
                 F.annot(S.x(44), S.y(23.6), '2.  가격하락에 의해 실질소득이 증가함', { tone: 'red', size: 14 }),
 
-                // 1단계 — 대체효과 (보상 예산선이 IC0에 접한다)
+                // 첫 장 — 대체효과까지만 (보상 예산선이 IC0에 접한다)
                 F.line(...S.p([0, 21.65]), ...S.p([57.74, 0]), { variant: 'alt' }),
                 F.dot(...E2, { label: 'E″', lx: 4, ly: 16 }),
                 F.arrow(E[0] + 7, E[1] + 5, E2[0] - 7, E2[1] - 5, { tone: 'red' }),
-                F.raw(`<path d="M${E[0]},${F.BOX.y0 - 8} L${E[0]},${F.BOX.y0} L${E2[0]},${F.BOX.y0} L${E2[0]},${F.BOX.y0 - 8}" fill="none" stroke="#7C7C7C" stroke-width="1"/>`, { fragment: 0 }),
+                F.raw(`<path d="M${E[0]},${F.BOX.y0 - 8} L${E[0]},${F.BOX.y0} L${E2[0]},${F.BOX.y0} L${E2[0]},${F.BOX.y0 - 8}" fill="none" stroke="#7C7C7C" stroke-width="1"/>`),
                 F.annot((E[0] + E2[0]) / 2, F.BOX.y0 + 18, '대체효과', { anchor: 'middle', size: 13 }),
 
-                // 2단계 — 소득효과
-                F.curve(IC1, { fragment: 1 }),
-                F.line(...S.p([0, 25]), ...S.p([66.67, 0]), { variant: 'alt' }),
-                F.dot(...E1, { label: 'E`', lx: 8, ly: -9 }),
-                F.arrow(E2[0] + 6, E2[1] - 4, E1[0] - 6, E1[1] + 6, { tone: 'red' }),
-                F.raw(`<path d="M${E2[0]},${F.BOX.y0 - 8} L${E2[0]},${F.BOX.y0 + 26} L${E1[0]},${F.BOX.y0 + 26} L${E1[0]},${F.BOX.y0 - 8}" fill="none" stroke="#7C7C7C" stroke-width="1"/>`, { fragment: 1 }),
-                F.annot((E2[0] + E1[0]) / 2, F.BOX.y0 + 44, '소득효과', { anchor: 'middle', size: 13 }),
+                // 다음 장 — 소득효과를 얹는다 (새 예산선 · IC1 · E`)
+                F.curve(IC1, { fragment: 0 }),
+                F.line(...S.p([0, 25]), ...S.p([66.67, 0]), { variant: 'alt', fragment: 0 }),
+                F.dot(...E1, { label: 'E`', lx: 8, ly: -9, fragment: 0 }),
+                F.arrow(E2[0] + 6, E2[1] - 4, E1[0] - 6, E1[1] + 6, { tone: 'red', fragment: 0 }),
+                F.raw(`<path d="M${E2[0]},${F.BOX.y0 - 8} L${E2[0]},${F.BOX.y0 + 26} L${E1[0]},${F.BOX.y0 + 26} L${E1[0]},${F.BOX.y0 - 8}" fill="none" stroke="#7C7C7C" stroke-width="1"/>`, { fragment: 0 }),
+                F.annot((E2[0] + E1[0]) / 2, F.BOX.y0 + 44, '소득효과', { anchor: 'middle', size: 13, fragment: 0 }),
               ],
             });
           })();
