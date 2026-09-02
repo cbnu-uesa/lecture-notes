@@ -9,7 +9,11 @@
 """
 import csv, pathlib, statistics as st, sys
 
-SRC = pathlib.Path.home() / 'data/compas/sejong-housing/3.세종시_아파트(매매)_실거래가.csv'
+HERE = pathlib.Path(__file__).resolve().parent
+FILE = '3.세종시_아파트(매매)_실거래가.csv'
+# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+SRC = (HERE / 'data' / FILE if (HERE / 'data' / FILE).exists()
+       else pathlib.Path.home() / 'data/compas/sejong-housing' / FILE)
 AREA_MIN = 60
 
 def ols(X, y):
@@ -73,6 +77,19 @@ def main():
     print(f'모형2  ㎡당 = {b2[0]:.0f} + {b2[1]:.0f}·신도시 {b2[2]:+.1f}·나이            R² {r2:.3f}')
     print(f'모형3  ㎡당 = {b3[0]:.0f} + {b3[1]:.0f}·신도시 {b3[2]:+.1f}·나이 {b3[3]:+.2f}·면적  R² {r3:.3f}')
     print(f'\n신도시 계수 {b1[1]:.0f} → {b2[1]:.0f} ({(1-b2[1]/b1[1])*100:.0f}% 감소)')
+
+    path = HERE / '10-세종회귀-모형별.csv'
+    with open(path, 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['모형', '절편', '신도시', '건물나이', '전용면적', 'R2'])
+        w.writerow(['1. 신도시만', round(b1[0], 1), round(b1[1], 1), '', '', round(r1, 3)])
+        w.writerow(['2. +건물나이', round(b2[0], 1), round(b2[1], 1), round(b2[2], 2), '', round(r2, 3)])
+        w.writerow(['3. +전용면적', round(b3[0], 1), round(b3[1], 1), round(b3[2], 2),
+                    round(b3[3], 3), round(r3, 3)])
+        w.writerow([])
+        w.writerow(['표본', len(rows), '신도시', len(nw), '편입', len(od)])
+        w.writerow(['㎡당 중앙값(만원)', '', '신도시', round(st.median(nw)), '편입', round(st.median(od))])
+    print(f'\n요약표 저장\n  → {path.name}')
 
 if __name__ == '__main__':
     main()

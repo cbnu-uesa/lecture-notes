@@ -146,6 +146,61 @@
     </div>
   </section>
 
+  <!-- ══ 6. ① 바뀐 것만 쌓는다 ═══════════════════════════ -->
+  <section>
+    <p class="mth">① 깃</p>
+    <h2>깃은 바뀐 것만 골라 쌓는다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-only" viewBox="0 0 840 300" style="width:790px" role="img"
+           aria-label="첫 커밋에는 세 파일이 모두 담기고, 파일 하나를 고친 뒤의 커밋에는 그 파일만 새로 담기며 나머지는 앞 커밋의 것을 그대로 쓴다는 도식">
+        <title>바뀐 파일만 새로 담긴다</title>
+
+        <text x="30" y="34" font-size="11.5" font-weight="700" fill="#8A867E"
+              letter-spacing="0.06em">작업 폴더</text>
+        <text x="420" y="34" font-size="11.5" font-weight="700" fill="#8A867E"
+              letter-spacing="0.06em">커밋</text>
+
+        <g font-size="12.5">
+          <rect x="30" y="48" width="150" height="30" fill="#EDE9E3"/><text x="42" y="68">분석.py</text>
+          <rect x="30" y="86" width="150" height="30" fill="#EDE9E3"/><text x="42" y="106">정리.py</text>
+          <rect x="30" y="124" width="150" height="30" fill="#EDE9E3"/><text x="42" y="144">README.md</text>
+        </g>
+        <g stroke="#7C7C7C" stroke-width="1.2" fill="none">
+          <path d="M184,63 L240,90"/><path d="M184,101 L240,101"/><path d="M184,139 L240,112"/>
+        </g>
+
+        <rect x="244" y="48" width="176" height="106" fill="#D8D3CB"/>
+        <text x="332" y="72" text-anchor="middle" font-size="13" font-weight="700">커밋 1 · 첫 기록</text>
+        <g font-size="11.5" text-anchor="middle" fill="#4A4741">
+          <text x="332" y="96">분석.py</text><text x="332" y="116">정리.py</text><text x="332" y="136">README.md</text>
+        </g>
+
+        <text x="30" y="200" font-size="12.5" font-weight="700" fill="#A02948">정리.py 한 줄을 고치고 다시 커밋하면</text>
+        <g font-size="12.5">
+          <rect x="30" y="212" width="150" height="30" fill="#EDE9E3"/><text x="42" y="232">정리.py</text>
+        </g>
+        <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M184,227 L240,227"/></g>
+
+        <rect x="244" y="188" width="176" height="82" fill="#F6ECEF" stroke="#A02948" stroke-width="1.2"/>
+        <text x="332" y="212" text-anchor="middle" font-size="13" font-weight="700" fill="#A02948">커밋 2</text>
+        <text x="332" y="236" text-anchor="middle" font-size="11.5" fill="#A02948" font-weight="700">정리.py — 새로 담는다</text>
+        <text x="332" y="256" text-anchor="middle" font-size="11.5" fill="#4A4741">나머지 둘 — 커밋 1 의 것을 그대로</text>
+
+        <g stroke="#8A867E" stroke-width="1.1" stroke-dasharray="4 3" fill="none">
+          <path d="M424,120 L452,120 L452,222 L424,222"/>
+        </g>
+        <path d="M418,222 L428,217 L428,227 Z" fill="#8A867E"/>
+
+        <text x="486" y="100" font-size="13.5" fill="#4A4741">깃은 파일 이름이 아니라
+          <tspan font-weight="700" fill="#A02948">내용을 보고</tspan> 같은지 다른지 안다.</text>
+        <text x="486" y="128" font-size="13.5" fill="#4A4741">그래서 수천 개 파일 중 바뀐 것만 골라 담고,</text>
+        <text x="486" y="152" font-size="13.5" fill="#4A4741">나머지는 앞의 것을 다시 쓴다.</text>
+        <text x="486" y="200" font-size="12.5" fill="#8A867E">그래서 커밋이 쌓여도</text>
+        <text x="486" y="222" font-size="12.5" fill="#8A867E">저장소가 그만큼 무거워지지 않는다.</text>
+      </svg>
+    </div>
+  </section>
+
   <!-- ══ 6. ① 네 가지 동작 ═══════════════════════════════ -->
   <section class="s-split">
     <p class="mth">① 깃</p>
@@ -333,6 +388,122 @@ CLAUDE.md 참조 (60㎡ 초과 · 중앙값)
         <text x="660" y="118" text-anchor="end" font-size="12" fill="#4A4741">좋으면 합친다</text>
         <text x="420" y="214" text-anchor="middle" font-size="13.5" fill="#4A4741">
           아니면 <tspan font-weight="700">그냥 버린다</tspan> — main 은 그대로다</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ ③ 명령어 판 ═════════════════════════════════════ -->
+  <section>
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>깃에는 자리가 넷 있다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-cmd" viewBox="0 0 840 300" style="width:800px" role="img"
+           aria-label="작업 폴더, 커밋 대기, 저장소, 깃허브 네 자리를 두고 add·commit·push 가 무엇을 어느 자리로 옮기는지 단계별로 보여 주는 도식">
+        <title>네 자리와 그 사이를 옮기는 명령어</title>
+
+        <g font-size="11.5" font-weight="700" fill="#8A867E" letter-spacing="0.05em">
+          <text x="16" y="36">작업 폴더</text>
+          <text x="210" y="36">커밋 대기</text>
+          <text x="374" y="36">저장소 <tspan font-weight="400" font-size="10.5">— 내 컴퓨터</tspan></text>
+          <text x="664" y="36">깃허브 <tspan font-weight="400" font-size="10.5">— 인터넷</tspan></text>
+        </g>
+
+        <rect x="16" y="44" width="160" height="200" fill="none" stroke="#E2DED7" stroke-width="1.2"/>
+        <rect x="210" y="44" width="130" height="200" fill="none" stroke="#E2DED7"
+              stroke-width="1.2" stroke-dasharray="4 3"/>
+        <rect x="664" y="44" width="160" height="200" fill="none" stroke="#E2DED7" stroke-width="1.2"/>
+
+        <g font-size="12">
+          <rect x="26" y="60" width="140" height="26" fill="#EDE9E3"/><text x="36" y="78">분석.py</text>
+          <rect x="26" y="92" width="140" height="26" fill="#EDE9E3"/><text x="36" y="110">정리.py</text>
+          <rect x="26" y="124" width="140" height="26" fill="#EDE9E3"/><text x="36" y="142">README.md</text>
+        </g>
+
+        <g class="fragment" data-fragment-index="1">
+          <rect x="374" y="44" width="256" height="200" fill="none" stroke="#A02948" stroke-width="1.2"/>
+          <text x="384" y="66" font-size="11" fill="#8A867E">기록이 쌓이는 곳 — 폴더 안의 .git</text>
+        </g>
+
+        <g class="fragment fade-out" data-fragment-index="3">
+        <g class="fragment" data-fragment-index="2">
+          <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M180,104 L198,104"/></g>
+          <path d="M206,104 L196,99 L196,109 Z" fill="#A02948"/>
+          <text x="193" y="92" text-anchor="middle" font-size="10.5" font-weight="700" fill="#A02948">add</text>
+          <g font-size="11" fill="#4A4741" text-anchor="middle">
+            <rect x="220" y="60" width="110" height="24" fill="#F6ECEF"/><text x="275" y="76">분석.py</text>
+            <rect x="220" y="92" width="110" height="24" fill="#F6ECEF"/><text x="275" y="108">정리.py</text>
+            <rect x="220" y="124" width="110" height="24" fill="#F6ECEF"/><text x="275" y="140">README.md</text>
+          </g>
+        </g>
+        </g>
+
+        <g class="fragment" data-fragment-index="3">
+          <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M344,104 L362,104"/></g>
+          <path d="M370,104 L360,99 L360,109 Z" fill="#A02948"/>
+          <text x="357" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#A02948">commit</text>
+          <circle cx="430" cy="180" r="14" fill="#A02948"/>
+          <text class="on-dark" x="430" y="185" text-anchor="middle" font-size="11"
+                font-weight="700" fill="#FFF">c1</text>
+          <text x="430" y="212" text-anchor="middle" font-size="10.5" fill="#4A4741">첫 기록</text>
+        </g>
+        <g class="fragment fade-out" data-fragment-index="6">
+          <g class="fragment" data-fragment-index="3">
+            <rect x="404" y="222" width="52" height="19" fill="#EDE9E3"/>
+            <text x="430" y="235" text-anchor="middle" font-size="10.5" fill="#4A4741">main</text>
+          </g>
+        </g>
+
+        <g class="fragment" data-fragment-index="4">
+          <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M634,180 L652,180"/></g>
+          <path d="M660,180 L650,175 L650,185 Z" fill="#A02948"/>
+          <text x="647" y="168" text-anchor="middle" font-size="10.5" font-weight="700" fill="#A02948">push</text>
+          <circle cx="744" cy="180" r="14" fill="#6E6A63"/>
+          <text class="on-dark" x="744" y="185" text-anchor="middle" font-size="11"
+                font-weight="700" fill="#FFF">c1</text>
+          <rect x="706" y="222" width="76" height="19" fill="#EDE9E3"/>
+          <text x="744" y="235" text-anchor="middle" font-size="10" fill="#4A4741">origin/main</text>
+        </g>
+
+        <g class="fragment" data-fragment-index="5">
+          <path d="M444,180 C476,180 486,138 506,132" stroke="#A02948" stroke-width="1.6" fill="none"/>
+          <circle cx="530" cy="126" r="14" fill="#A02948"/>
+          <text class="on-dark" x="530" y="131" text-anchor="middle" font-size="11"
+                font-weight="700" fill="#FFF">c2</text>
+          <rect x="486" y="86" width="88" height="19" fill="#F6ECEF" stroke="#A02948" stroke-width="1"/>
+          <text x="530" y="99" text-anchor="middle" font-size="10" fill="#A02948"
+                font-weight="700">면적하한-실험</text>
+          <text x="530" y="158" text-anchor="middle" font-size="10.5" fill="#4A4741">실험 커밋</text>
+        </g>
+
+        <g class="fragment" data-fragment-index="6">
+          <rect x="504" y="176" width="52" height="19" fill="#EDE9E3"/>
+          <text x="530" y="189" text-anchor="middle" font-size="10.5" fill="#4A4741">main</text>
+          <path d="M462,231 L496,198" stroke="#8A867E" stroke-width="1.1" stroke-dasharray="4 3" fill="none"/>
+          <path d="M500,194 L492,198 L497,204 Z" fill="#8A867E"/>
+          <text x="374" y="264" font-size="11.5" fill="#A02948" font-weight="700">
+            main 이 실험 자리까지 따라온다 — 새 커밋 없이 포인터만 옮겨 간다</text>
+        </g>
+
+        <g font-size="13" fill="#4A4741">
+          <g class="fragment current-visible" data-fragment-index="1"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git init</tspan> — 이 폴더를 기록 대상으로 삼는다</text></g>
+          <g class="fragment current-visible" data-fragment-index="2"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git add .</tspan> — 이번 커밋에 담을 것을 골라 둔다. 파일은 그 자리에 그대로 있다</text></g>
+          <g class="fragment current-visible" data-fragment-index="3"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git commit -m "첫 기록"</tspan> — 골라 둔 것을 이름 붙여 저장소에 남긴다</text></g>
+          <g class="fragment current-visible" data-fragment-index="4"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git push</tspan> — 저장소의 커밋을 깃허브로 올린다</text></g>
+          <g class="fragment current-visible" data-fragment-index="5"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git switch -c 면적하한-실험</tspan> — main 을 두고 딴 줄기로 나가 커밋한다</text></g>
+          <g class="fragment current-visible" data-fragment-index="6"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git merge 면적하한-실험</tspan> — 실험이 쓸 만하면 main 으로 합친다</text></g>
+        </g>
       </svg>
     </div>
   </section>

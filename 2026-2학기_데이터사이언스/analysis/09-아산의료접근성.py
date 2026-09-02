@@ -9,7 +9,10 @@
 """
 import csv, collections, math, pathlib, statistics as st, sys
 
-BASE = pathlib.Path.home() / 'data/compas/asan-medical'
+HERE = pathlib.Path(__file__).resolve().parent
+# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+BASE = (HERE / 'data' if (HERE / 'data' / '21.아산시_병원정보.csv').exists()
+        else pathlib.Path.home() / 'data/compas/asan-medical')
 # 온양 시가지의 법정동. 인구 파일은 행정동(온양1~6동), 병원 파일은 법정동을 쓴다.
 # 그대로 이으면 온양 지역 병원이 0개가 된다 — 9강에서 다루는 함정이다.
 DONG = {'온천동', '모종동', '용화동', '풍기동', '권곡동', '읍내동',
@@ -65,6 +68,16 @@ def main():
     srt = sorted(per.items(), key=lambda kv: kv[1])
     print(f'10만명당 최저 {srt[0][0]} {srt[0][1]:.1f} · 최고 {srt[-1][0]} {srt[-1][1]:.1f} '
           f'({srt[-1][1]/srt[0][1]:.1f}배)')
+
+    path = HERE / '09-아산의료접근성-지역별.csv'
+    with open(path, 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['지역', '인구', '병원', '의사', '10만명당병원'])
+        w.writerows([[n, pop[n], hos.get(n, 0), doc.get(n, 0), round(per[n], 1)] for n in order])
+        w.writerow([])
+        w.writerow(['인구 vs 병원 수 r', round(corr([pop[n] for n in order], [hos.get(n,0) for n in order]), 3)])
+        w.writerow(['인구 vs 10만명당 병원 r', round(corr([pop[n] for n in order], [per[n] for n in order]), 3)])
+    print(f'\n요약표 저장\n  → {path.name}')
 
     print('\n[참고] 이름을 그대로 이었다면 — 온양1~6동 인구 '
           f'{sum(v for k, v in pop.items() if k == "온양 시가지"):,}명에 병원 '

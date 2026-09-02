@@ -9,7 +9,11 @@
 """
 import datetime, math, pathlib, statistics as st, sys, xml.etree.ElementTree as ET, zipfile
 
-SRC = pathlib.Path.home() / 'data/compas/hwaseong-population/1.화성시_인구데이터.xlsx'
+HERE = pathlib.Path(__file__).resolve().parent
+FILE = '1.화성시_인구데이터.xlsx'
+# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+SRC = (HERE / 'data' / FILE if (HERE / 'data' / FILE).exists()
+       else pathlib.Path.home() / 'data/compas/hwaseong-population' / FILE)
 NS = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
 HOLDOUT = 12          # 마지막 12개월은 검증용으로 떼어 둔다
 
@@ -77,6 +81,23 @@ def main():
     print(f'\n실제 {te[-1][0]} = {yt[-1]:,}명')
     b1 = fit(xs, ys, 1)
     print(f'선형 추세의 월 증가폭 {b1[1]:,.0f}명')
+
+    # 슬라이드가 쓰는 표를 CSV 로 남긴다 — 월별 시계열이 11·12강 그림의 원자료다
+    import csv
+    with open(HERE / '11-화성인구-월별.csv', 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f); w.writerow(['연월', '총인구'])
+        w.writerows([[d.isoformat()[:7], v] for d, v in s])
+    with open(HERE / '11-화성인구-모형별.csv', 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['모형', '학습MAPE(%)', '검증MAPE(%)', f'{te[-1][0].isoformat()[:7]} 예측', '실제'])
+        for name, deg in [('선형', 1), ('2차', 2), ('3차', 3)]:
+            b = fit(xs, ys, deg)
+            w.writerow([name, round(mape([predict(b, x) for x in xs], ys), 2),
+                        round(mape([predict(b, x) for x in xt], yt), 2),
+                        round(predict(b, xt[-1])), yt[-1]])
+        w.writerow(['지수', round(lin_, 2), round(lout, 2),
+                    round(math.exp(predict(lb, xt[-1]))), yt[-1]])
+    print('\n요약표 저장\n  → 11-화성인구-월별.csv\n  → 11-화성인구-모형별.csv')
 
 if __name__ == '__main__':
     main()

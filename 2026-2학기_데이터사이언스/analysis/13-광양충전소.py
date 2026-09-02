@@ -8,7 +8,10 @@
 """
 import csv, json, math, pathlib, sys
 
-BASE = pathlib.Path.home() / 'data/compas/gwangyang-ev'
+HERE = pathlib.Path(__file__).resolve().parent
+# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+BASE = (HERE / 'data' if (HERE / 'data' / '01.광양시_충전기설치현황.csv').exists()
+        else pathlib.Path.home() / 'data/compas/gwangyang-ev')
 RADIUS_KM = 0.5      # 걸어서 갈 만한 거리로 잡은 기준. 바꾸면 답이 달라진다
 K = 8                # 추가로 놓을 개수
 
@@ -61,7 +64,7 @@ def main():
     reach = [[i for i, (gx, gy, _) in enumerate(grid) if km(gx, gy, px, py) <= RADIUS_KM]
              for (px, py), _ in cands]
 
-    chosen, cov = [], covered[:]
+    chosen, cov, table = [], covered[:], []
     print(f"{'순서':<4}{'후보지':<26}{'새로 덮는 인구':>14}{'누적 커버':>12}")
     for step in range(1, K + 1):
         gains = [(sum(grid[i][2] for i in reach[j] if not cov[i]), j)
@@ -75,6 +78,18 @@ def main():
         now = sum(g[2] for i, g in enumerate(grid) if cov[i])
         print(f'{step:<4}{cands[best][1][:24]:<26}{gain:>13,.0f}명'
               f'{now/total*100:>11.1f}%')
+        table.append([step, cands[best][1], round(cands[best][0][0], 6),
+                      round(cands[best][0][1], 6), round(gain), round(now / total * 100, 1)])
+
+    path = HERE / '13-광양충전소-선정지.csv'
+    with open(path, 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(['순서', '후보지', '경도', '위도', '새로덮는인구', '누적커버(%)'])
+        w.writerows(table)
+        w.writerow([])
+        w.writerow(['반경(m)', RADIUS_KM * 1000, '총인구', round(total),
+                    '기존 커버(%)', round(base / total * 100, 1)])
+    print(f'\n요약표 저장\n  → {path.name}')
 
 if __name__ == '__main__':
     main()

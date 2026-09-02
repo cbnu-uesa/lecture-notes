@@ -58,10 +58,6 @@
   figure.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
   figure.shot figcaption { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
 
-  /* 출처 목록 */
-  .src { font-size: 12.5px; line-height: 1.72; color: var(--ink-2); margin: 4px 0 0; }
-  .src li { margin-bottom: 7px; }
-  .src .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -85,10 +81,50 @@
         <li>그 결정이 옳다는 것을 무엇으로 보여줄 것인가?</li>
       </ul>
       <figure class="shot">
-        <img src="../assets/cc-cheongju-oldtown.jpg"
-             alt="밤에 언덕 위에서 내려다본 청주 원도심. 앞쪽은 저층 주택가가 어둡고, 뒤쪽 신시가지는 밝게 빛난다">
-        <figcaption>청주 원도심의 밤. 앞쪽 저층 주택가와 뒤쪽 신시가지의 밝기가 다르다.<br>
-          Minseong Kim, 2019 · Wikimedia Commons · CC BY-SA 4.0</figcaption>
+        <svg viewBox="0 0 392 330" style="width:100%;height:auto" role="img"
+             aria-label="도서관 후보 두 곳의 도보 권역을 원으로 그린 그림. 두 원 어디에도 들어가지 않는 집들이 크림슨 점으로 남아 있다">
+          <title>어느 쪽에 지어도 걸어서 닿지 않는 집이 남는다</title>
+          <circle cx="145" cy="120" r="72" fill="#A02948" fill-opacity="0.07"
+                  stroke="#A02948" stroke-width="1.3" stroke-dasharray="5 4"/>
+          <circle cx="250" cy="190" r="72" fill="#6E6A63" fill-opacity="0.07"
+                  stroke="#6E6A63" stroke-width="1.3" stroke-dasharray="5 4"/>
+          <g fill="#8A867E">
+            <circle cx="110" cy="85" r="4"/>
+            <circle cx="150" cy="60" r="4"/>
+            <circle cx="95" cy="140" r="4"/>
+            <circle cx="175" cy="105" r="4"/>
+            <circle cx="120" cy="170" r="4"/>
+            <circle cx="80" cy="110" r="4"/>
+            <circle cx="197" cy="155" r="4"/>
+            <circle cx="185" cy="168" r="4"/>
+            <circle cx="255" cy="240" r="4"/>
+            <circle cx="295" cy="175" r="4"/>
+            <circle cx="235" cy="225" r="4"/>
+            <circle cx="300" cy="210" r="4"/>
+            <circle cx="270" cy="145" r="4"/>
+          </g>
+          <g fill="#A02948">
+            <circle cx="40" cy="50" r="4"/>
+            <circle cx="75" cy="35" r="4"/>
+            <circle cx="330" cy="60" r="4"/>
+            <circle cx="360" cy="120" r="4"/>
+            <circle cx="45" cy="255" r="4"/>
+            <circle cx="100" cy="265" r="4"/>
+            <circle cx="345" cy="255" r="4"/>
+            <circle cx="300" cy="270" r="4"/>
+            <circle cx="365" cy="215" r="4"/>
+          </g>
+          <rect x="136" y="111" width="18" height="18" fill="#A02948"/>
+          <text x="145" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#A02948">후보 A</text>
+          <rect x="241" y="181" width="18" height="18" fill="#6E6A63"/>
+          <text x="250" y="216" text-anchor="middle" font-size="12" font-weight="700" fill="#4A4741">후보 B</text>
+          <text x="196" y="300" text-anchor="middle" font-size="11.5" fill="#4A4741">
+            원 = 걸어서 갈 만한 거리</text>
+          <circle cx="86" cy="320" r="4" fill="#8A867E"/>
+          <text x="98" y="324" font-size="11.5" fill="#4A4741">닿는 집</text>
+          <circle cx="196" cy="320" r="4" fill="#A02948"/>
+          <text x="208" y="324" font-size="11.5" fill="#A02948" font-weight="700">어느 쪽에도 닿지 않는 집</text>
+        </svg>
       </figure>
     </div>
   </section>
@@ -97,8 +133,8 @@
   <section class="s-definition">
     <h2>이 수업의 목표</h2>
     <div class="body">
-      <p class="define">도시 데이터를 분석하여 도시가 직면한 문제를 해결하는<br>
-        정책과 의사결정에 필요한 <span class="t-red">증거(evidence)</span>를 제시하는 능력</p>
+      <p class="define">도시가 직면한 문제를 해결하기 위하여<br>
+        도시 데이터를 분석하여 정책과 의사결정에 필요한 <span class="t-red">증거(evidence)</span>를 제시하는 능력</p>
       <p class="conclusion">→ 분석 그 자체가 아니라, 분석으로 <span class="t-red">주장을 뒷받침하는 것</span>이 목적이다</p>
     </div>
   </section>
@@ -193,8 +229,11 @@
           <text x="745" y="222" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A02948">로직을 검증한다</text>
         </g>
       </svg>
-      <p class="caption" style="text-align:center;margin-top:4px">
-        도구가 바뀔 때마다 "사람이 해야 하는 일"의 정의가 바뀌었다.</p>
+      <p class="emph" style="text-align:center;margin-top:2px">
+        도구가 바뀔 때마다 <span class="hl">"사람이 해야 하는 일"의 정의가 바뀌었다.</span></p>
+      <p class="caption" style="text-align:center;margin-top:6px">
+        출처: R · Python · Gemini · Claude 로고 — Simple Icons, CC0 1.0 (simpleicons.org).
+        각 상표는 해당 기업의 것이며 제품을 가리키는 용도로만 썼다</p>
     </div>
   </section>
 
@@ -208,7 +247,10 @@
                 aria-label="SWE-bench Verified 점수가 2024년 3월 22퍼센트에서 2025년 11월 80.9퍼센트로 오른 꺾은선그래프"></canvas>
       </div>
       <p class="caption" style="text-align:center;margin-top:2px">
-        Anthropic이 자사 모델에 대해 공개한 값이다. 측정 방식과 도구 설정이 판마다 달라 절대 비교에는 한계가 있다. (출처는 마지막 장)</p>
+        주: Anthropic 이 자사 모델에 대해 공개한 값이며, 측정 방식과 도구 설정이 판마다 달라 절대 비교에는 한계가 있다</p>
+      <p class="caption" style="text-align:center;margin-top:3px">
+        출처: Anthropic 공개 자료 <span class="u">anthropic.com</span>
+        (3 Opus · 3.5 Sonnet · Opus 4 · Opus 4.5 시스템 카드) · 벤치마크 정의 <span class="u">swebench.com</span></p>
     </div>
     <script>
       (function () {
@@ -228,6 +270,7 @@
             borderWidth: 2.8, pointRadius: 5, pointStyle: 'circle', tension: 0 }] },
           options: {
             animation: false,                 // PDF 캡처가 흔들리지 않게 끈다 (design.md §6.3)
+            devicePixelRatio: 3,              // 캔버스를 3배로 그린다 — PDF 에서 흐려지지 않게
             responsive: true, maintainAspectRatio: false,
             layout: { padding: { top: 18, right: 10 } },
             plugins: {
@@ -280,8 +323,7 @@
       <p class="define">에이전틱 AI(클로드 코드, Codex 등)의 등장으로<br>
         코드 오류는 거의 사라졌고,<br>
         규칙화하기 힘든 요청이 아니라면 대부분 수행한다</p>
-      <p class="conclusion">→ 사람이 코드를 짜거나, AI가 만든 코드의 오류를 검토할 필요가<br>
-        &nbsp;&nbsp;&nbsp;사실상 없어졌다</p>
+      <p class="conclusion">→ 사람이 코드를 짜거나, AI가 만든 코드의 오류를 검토할 필요가 사실상 없어졌다</p>
     </div>
   </section>
 
@@ -345,8 +387,10 @@ out.to_csv("result.csv")</div>
           <p class="yr">2026~</p>
         </div>
       </div>
-      <p class="emph fragment" style="text-align:center;margin-top:40px">
+      <p class="emph fragment" style="text-align:center;margin-top:34px">
         코드는 이제 AI의 일이다. <span class="t-red">로직은 여전히 사람의 일이다.</span></p>
+      <p class="emph fragment" style="text-align:center;margin-top:10px">
+        그리고 <span class="t-red">문제정의도 여전히 사람의 일이다.</span></p>
     </div>
   </section>
 
@@ -354,10 +398,8 @@ out.to_csv("result.csv")</div>
   <section class="s-definition">
     <h2>이 수업의 원칙</h2>
     <div class="body">
-      <p class="define">코드 대신 <span class="t-red">로직을 문서로</span> 요구하고,<br>
-        그 로직을 이해하고 검증한다</p>
-      <p class="conclusion">→ "무엇을, 왜, 어떻게 계산했는가"를 설명하지 못하는 분석은<br>
-        &nbsp;&nbsp;&nbsp;증거가 될 수 없다</p>
+      <p class="define">코드 대신 <span class="t-red">로직을 문서로</span> 요구하고, 그 로직을 이해하고 검증한다</p>
+      <p class="conclusion">→ "무엇을, 왜, 어떻게 계산했는가"를 설명하지 못하는 분석은 증거가 될 수 없다</p>
     </div>
   </section>
 
@@ -379,8 +421,10 @@ out.to_csv("result.csv")</div>
         <div class="arr"></div>
         <div class="node">주장</div>
       </div>
-      <p class="caption fragment" style="text-align:center;margin-top:36px">
+      <p class="caption fragment" style="text-align:center;margin-top:30px">
         회색 상자 하나만 AI의 일이다. 나머지 다섯은 사람의 일이고, 이 수업이 가르치는 것이다.</p>
+      <p class="caption fragment" style="text-align:center;margin-top:8px">
+        단, <span class="hl">나머지 다섯도 AI와 함께 한다.</span></p>
     </div>
   </section>
 
@@ -424,14 +468,15 @@ out.to_csv("result.csv")</div>
     <h2>실습 데이터는 어디서 오나</h2>
     <div class="body tight">
       <p class="sub">COMPAS <span class="en">(compas.lh.or.kr)</span> — LH가 운영하는 도시문제 데이터 분석 공모 플랫폼</p>
-      <p>2019년부터 <span class="hl">46개 과제</span>가 열렸고, 과제마다 실제 도시 데이터가 정제되어 함께 공개된다.
-        실습은 이 과제들의 <span class="hl">공개 데이터</span>를 쓴다 — 각자 회원가입해 직접 내려받는다.
-        비공개로 표시된 데이터(유동인구·카드매출 등)는 쓰지 않는다.</p>
+      <p>실습은 이 과제들의 <span class="hl">공개 데이터</span>를 쓴다.</p>
+      <p>각자 회원가입해 직접 내려받는다.</p>
+      <p>비공개로 표시된 데이터(유동인구·카드매출 등)는 쓰지 않는다.</p>
       <figure class="shot" style="width:700px;margin:10px auto 0">
         <img src="../assets/cc-compas-list.png"
              alt="COMPAS 아이디어 공모전 목록 화면. 과제 카드 세 장에 제목, 종료 여부, 상금, 참가 팀 수, 기간이 적혀 있다">
         <figcaption style="text-align:center">
-          COMPAS 아이디어 공모전 목록 · compas.lh.or.kr · 2026. 8. 26. 갈무리</figcaption>
+          출처: COMPAS 국토도시 데이터 분석 플랫폼, 한국토지주택공사(LH) ·
+          compas.lh.or.kr · 2026. 8. 26. 갈무리</figcaption>
       </figure>
     </div>
   </section>
@@ -455,9 +500,6 @@ out.to_csv("result.csv")</div>
       <p class="caption" style="margin-top:16px">
         네 과제 모두 수상작의 보고서와 소스코드가 공개되어 있다. 자기 분석을 끝낸 뒤 견주어 보면,
         같은 데이터로 어디까지 갈 수 있는지 알 수 있다.</p>
-      <p class="emph" style="margin-top:14px">
-        10주차에는 <span class="hl">도로교통공단 TAAS</span> 공개 데이터로
-        어린이 교통사고 위험지역을 집에서 직접 분석해 제출한다.</p>
     </div>
   </section>
 
@@ -469,13 +511,15 @@ out.to_csv("result.csv")</div>
         <div class="row"><span class="d">(9/7)</span><span>1주차. 왜 데이터 분석을 AI와 함께 하는가</span></div>
         <div class="row"><span class="d">(9/14)</span><span>2주차. AI와 함께 도시 문제 정의하기</span></div>
         <div class="row"><span class="d">(9/21)</span><span>3주차. 도시 데이터는 어디에 있는가</span></div>
-        <div class="row"><span class="d">(9/28)</span><span>4주차. 클로드 코드 Ⅰ — 설치와 첫 분석</span></div>
-        <div class="row"><span class="d">(10/5)</span><span>5주차. 클로드 코드 Ⅱ — CLAUDE.md와 컨텍스트</span></div>
-        <div class="row"><span class="d">(10/12)</span><span>6주차. 클로드 코드 Ⅲ — MCP와 에이전트</span></div>
+        <div class="row"><span class="d">(9/28)</span><span>4주차. 클로드 코드 Ⅰ — 설치와 CLAUDE.md</span></div>
+        <div class="row"><span class="d">(10/5)</span><span>5주차. 클로드 코드 Ⅱ — 스킬·플러그인·MCP·에이전트</span></div>
+        <div class="row"><span class="d">(10/12)</span><span>6주차. 깃과 깃허브 — 기록하고 나누기</span></div>
         <div class="row"><span class="d">(10/19)</span><span>7주차. 기술적 분석 — 무슨 일이 일어났는가</span></div>
         <div class="row exam"><span class="d">(10/26)</span><span>8주차. 중간고사</span></div>
-        <div class="row"><span class="d">(11/2, 11/9)</span><span>9-10주차. 진단적 분석 — 왜 일어났는가</span></div>
-        <div class="row"><span class="d">(11/16, 11/23)</span><span>11-12주차. 예측적 분석 — 앞으로 어떻게 될 것인가</span></div>
+        <div class="row"><span class="d">(11/2)</span><span>9주차. 진단적 분석 Ⅰ — 상관과 인과</span></div>
+        <div class="row"><span class="d">(11/9)</span><span>10주차. 진단적 분석 Ⅱ — 회귀와 혼란변수</span></div>
+        <div class="row"><span class="d">(11/16)</span><span>11주차. 예측적 분석 Ⅰ — 추세와 회귀 예측</span></div>
+        <div class="row"><span class="d">(11/23)</span><span>12주차. 예측적 분석 Ⅱ — 머신러닝과 불확실성</span></div>
         <div class="row"><span class="d">(11/30)</span><span>13주차. 처방적 분석 — 무엇을 해야 하는가</span></div>
         <div class="row"><span class="d">(12/7)</span><span>14주차. 종합 — 자기 프로젝트에 적용</span></div>
         <div class="row exam"><span class="d">(12/14)</span><span>15주차. 기말고사</span></div>
@@ -488,15 +532,13 @@ out.to_csv("result.csv")</div>
     <h2>수업 운영과 평가</h2>
     <div class="body tight">
       <p class="sub">2주차부터 매주 이 순서로 진행한다</p>
-      <p class="emph">강의 약 1시간 + <span class="hl">실습 약 1시간 30분</span> — 실습이 없는 주는 없다</p>
+      <p class="emph">강의 약 1시간 + <span class="hl">실습 약 1시간 30분</span></p>
       <div class="grade-bar" style="margin-top:22px">
         <div class="seg s1" style="flex:0 0 10%">출석<br>(10%)</div>
         <div class="seg s2" style="flex:0 0 30%">중간고사<br>(30%)</div>
         <div class="seg s3" style="flex:0 0 30%">기말고사<br>(30%)</div>
         <div class="seg s4" style="flex:0 0 30%">과제<br>(30%)</div>
       </div>
-      <p class="caption" style="margin-top:8px;text-align:center">
-        과제 = 문제정의서(2주차) + 주차별 실습 산출물 + 가정 과제(10주차)</p>
       <p class="sub" style="margin-top:16px">다음 주까지 준비할 것</p>
       <ul>
         <li>노트북 — 2주차부터 매주 실습에 쓴다</li>
@@ -506,41 +548,7 @@ out.to_csv("result.csv")</div>
     </div>
   </section>
 
-  <!-- ══ 18. 출처 — 항목이 여섯이라 두 단으로 나눈다 ═══ -->
-  <section class="s-split">
-    <h2>자료 출처</h2>
-    <div class="body tight">
-      <div class="col-l">
-        <p class="sub">SWE-bench Verified 점수 (6쪽)<br>— 모두 Anthropic 공개 자료</p>
-        <ul class="src">
-          <li>Claude 3 Opus 22% · 3.5 Sonnet 33% · 신형 3.5 Sonnet 49%<br>
-            <span class="u">anthropic.com/research/swe-bench-sonnet</span></li>
-          <li>Claude Opus 4 72.5% (2025. 5. 22.)<br>
-            <span class="u">anthropic.com/news/claude-4</span></li>
-          <li>Claude Opus 4.5 80.9% (2025. 11. · System Card)<br>
-            <span class="u">anthropic.com/claude-opus-4-5-system-card</span></li>
-          <li>벤치마크 자체 — 파이썬 저장소 실제 이슈 2,294건 중<br>사람이 검증한 500건<br>
-            <span class="u">swebench.com</span></li>
-        </ul>
-      </div>
-      <div class="col-r">
-        <p class="sub">데이터 · 이미지</p>
-        <ul class="src">
-          <li>COMPAS 국토도시 데이터 분석 플랫폼, 한국토지주택공사(LH)<br>
-            <span class="u">compas.lh.or.kr</span> · 14쪽 화면은 2026. 8. 26. 갈무리</li>
-          <li>R · Python · Gemini · Claude 로고 (5쪽)<br>
-            Simple Icons, <span class="hl">CC0 1.0</span> · <span class="u">simpleicons.org</span><br>
-            각 상표는 해당 기업의 것이며 제품을 가리키는 용도로만 썼다</li>
-          <li>청주 원도심 야경 (2쪽)<br>
-            Minseong Kim, 2019 · <span class="hl">CC BY-SA 4.0</span><br>
-            <span class="u">commons.wikimedia.org</span><br>
-            File:Cheongju Old Town at Night.jpg</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ 19. T10 마무리 ══════════════════════════════════ -->
+  <!-- ══ 18. T10 마무리 ══════════════════════════════════ -->
   <section class="s-closing">
     <p class="qa">Q &amp; A</p>
     <div class="qa-rule"></div>

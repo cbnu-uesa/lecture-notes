@@ -9,7 +9,11 @@
 """
 import csv, collections, statistics as st, pathlib, sys
 
-SRC = pathlib.Path.home() / 'data/compas/sejong-housing/3.세종시_아파트(매매)_실거래가.csv'
+HERE = pathlib.Path(__file__).resolve().parent
+FILE = '3.세종시_아파트(매매)_실거래가.csv'
+# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+SRC = (HERE / 'data' / FILE if (HERE / 'data' / FILE).exists()
+       else pathlib.Path.home() / 'data/compas/sejong-housing' / FILE)
 AREA_MIN = 60      # 전용면적 하한(㎡). 소형은 임대 목적이 섞여 성격이 다르다
 MIN_N    = 100     # 동별 비교에 넣을 최소 거래 건수
 
@@ -30,6 +34,15 @@ def load():
                          'dong': r['시군구'].split()[-1],
                          'area': area, 'amt': amt, 'per': amt / area})
     return rows
+
+def save(name, header, rows):
+    """슬라이드가 쓰는 요약표를 CSV 로 남긴다. 원자료는 저장소에 두지 않는다."""
+    path = HERE / name
+    with open(path, 'w', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        w.writerow(header)
+        w.writerows(rows)
+    print(f'  → {path.name}')
 
 def main():
     if not SRC.exists():
@@ -62,6 +75,25 @@ def main():
     for d, v in ok:
         print(f'  {d:<6} {st.median(v):>5.0f}만원  ({len(v):,}건)')
     print(f'  최고/최저 {st.median(ok[0][1]) / st.median(ok[-1][1]):.2f}배')
+
+    print('\n요약표 저장')
+    save('07-세종주택시장-기술통계.csv', ['지표', '값'], [
+        ['거래건수', len(rows)],
+        ['거래금액 평균(만원)', round(st.mean(amt))],
+        ['거래금액 중앙값(만원)', round(st.median(amt))],
+        ['거래금액 표준편차(만원)', round(st.pstdev(amt))],
+        ['거래금액 Q1(만원)', round(q[0])],
+        ['거래금액 Q3(만원)', round(q[2])],
+        ['거래금액 최소(만원)', min(amt)],
+        ['거래금액 최대(만원)', max(amt)],
+        ['㎡당 평균(만원)', round(st.mean(per))],
+        ['㎡당 중앙값(만원)', round(st.median(per))],
+    ])
+    save('07-세종주택시장-연도별.csv', ['연도', '거래건수', '거래금액중앙값(만원)', '㎡당중앙값(만원)'],
+         [[y, len(by[y]), round(st.median([x['amt'] for x in by[y]])),
+           round(st.median([x['per'] for x in by[y]]))] for y in sorted(by)])
+    save('07-세종주택시장-동별.csv', ['동', '거래건수', '㎡당중앙값(만원)'],
+         [[d, len(v), round(st.median(v))] for d, v in ok])
 
 if __name__ == '__main__':
     main()
