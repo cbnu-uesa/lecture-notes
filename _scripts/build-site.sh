@@ -47,6 +47,12 @@ fi
 # 모든 슬라이드의 CSS·폰트·JS 가 404 가 된다. 빈 .nojekyll 하나로 막는다.
 touch "$OUT/.nojekyll"
 
+# ── Cloudflare Workers 대비 ──────────────────────────────────
+# 깃 연동 배포는 저장소 폴더를 통째로 자산으로 올린다. 파일 하나당 25MiB 제한이
+# 있는데 .git/objects 의 팩 파일이 이를 넘어 배포가 실패한다 (2026-09-04).
+# .assetsignore 는 업로드되지 않으며 여기 적힌 것을 자산에서 뺀다.
+printf '.git\n.git/**\n' > "$OUT/.assetsignore"
+
 # ── 안전 점검 ────────────────────────────────────────────────
 LEAK="$(find "$OUT" \( -name '*.hwp' -o -name '*.xlsx' -o -name '*.pptx' \) -print)"
 if [ -n "$LEAK" ]; then
