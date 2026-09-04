@@ -273,23 +273,44 @@ git push --force https://github.com/cbnu-uesa/lecture-notes.git gh-pages
   데이터를 채우고, index 넷이 `file` 결손에 죽지 않도록 고치고, `check-links.sh` 를
   만들었다. **한 강의의 결손이 페이지 전체를 죽이게 두지 않는다.**
 
-### 접근 제한 — 검토만 하고 미룸 (2026-09-02)
+### 접근 제한 — Cloudflare 로 옮겼다 (2026-09-04)
 
-지금 사이트는 **주소를 아는 사람이면 누구나** 들어온다. 잠글 방법을 알아봤고 결론만 적어 둔다.
-실행은 미뤘다 — 계정을 만들고 수강생 이메일 목록이 나온 뒤에 한다.
+**사이트는 이제 로그인해야 열린다.** 주소도 바뀌었다.
 
-| 방법 | 깃허브 계정 | 잠금 | 비용 |
-|---|---|---|---|
-| GitHub Pages | 필요 | **불가** — 저장소를 비공개로 해도 사이트는 공개. 접근 제어는 Enterprise Cloud 뿐 | 지금 그대로 |
-| Vercel | 불필요 (이메일 가입 · CLI 로 로컬 폴더 배포) | 비밀번호 | Pro + Advanced Deployment Protection **월 $150** |
-| **Cloudflare Pages + Access** | 불필요 | **이메일 허용 목록 + 일회용 코드** | **50명까지 무료** (초과 시 1인당 월 $7) |
+| | 주소 | 상태 |
+|---|---|---|
+| **Cloudflare Workers** | `lecture-notes.kks1104.workers.dev` | **현재 쓰는 곳.** Cloudflare Access 로 잠겨 있다 |
+| GitHub Pages | `cbnu-uesa.github.io/lecture-notes` | 아직 살아 있고 **공개**다. 정리 여부 미정 |
 
-**Cloudflare 로 옮기는 것을 권한다.** `build-site.sh` 가 만든 `dist/` 를 그대로 올리므로
-슬라이드와 빌드 방식은 바뀌지 않는다. 필요한 것은 Cloudflare 계정과 수강생 이메일 목록 둘뿐이다.
-Pages 자체에는 단순 비밀번호 기능이 없어 Access 를 함께 걸어야 한다.
+두 곳 모두 같은 `gh-pages` 브랜치를 본다. `build-site.sh` → `gh-pages` 강제 푸시라는
+배포 절차는 그대로이며, 푸시하면 Cloudflare 가 자동으로 다시 배포한다.
 
-잠그지 않고 노출만 줄이려면 `robots.txt` 와 `noindex` 로 검색에서 빼는 방법이 있다.
-자바스크립트로 비밀번호를 거는 것은 소스가 그대로 내려받히므로 잠금이 아니다.
+**Cloudflare 쪽 설정에서 겪은 것** (같은 실수를 반복하지 않도록 적어 둔다)
+
+- 프로젝트가 Pages 가 아니라 **Workers** 로 만들어져 빌드가 `wrangler` 를 돌린다.
+  그래서 배포본에 **`wrangler.jsonc`** 가 있어야 한다 — 없으면
+  `Missing entry-point to Worker script or to assets directory` 로 죽는다
+- 자산은 **파일 하나당 25MiB** 가 한도다. 저장소 폴더를 통째로 올리므로 `.git` 의
+  팩 파일(127MiB)이 걸린다. **`.assetsignore`** 로 `.git` 을 뺀다
+- 위 두 파일은 `build-site.sh` 가 배포본에 자동으로 만든다. 손으로 만들지 않는다
+- **Production branch 를 `gh-pages` 로** 놓아야 한다. `main` 으로 두면 사이트는 뜨지만
+  `pdf/` 가 깃에 없어 PDF 만 빠지고, 강의 준비 문서까지 사이트에 딸려 올라간다
+- **Builds for non-production branches 는 끈다.** 켜 두면 `main` 에 커밋할 때마다
+  헛도는 빌드가 실패로 쌓인다 (프로덕션이 아닌 브랜치는 `wrangler deploy` 가 아니라
+  `versions upload` 를 돌린다 — 로그에 이 명령이 보이면 브랜치 설정을 의심한다)
+
+**Access 설정** — Zero Trust 는 50명까지 무료다. 지금 정책은 교수 본인만 들어오게 되어 있다.
+학생을 받을 때는 Include 를 **Emails 목록** 또는 `@chungbuk.ac.kr` 로 바꾸고
+Identity provider 를 **One-time PIN** 으로 두면 학생은 계정 없이 메일로 온 코드만 넣으면 된다.
+
+**로그아웃** — 사이트 첫 화면 아래 링크가 있다. 주소로 직접 들어가도 된다.
+
+```
+https://lecture-notes.kks1104.workers.dev/cdn-cgi/access/logout   이 사이트만
+https://weathered-sea-98ca.cloudflareaccess.com/cdn-cgi/access/logout   계정 전체
+```
+
+남의 세션을 끊으려면 Zero Trust → Access → Users 에서 revoke 한다.
 
 ### 저작권 — 배포할 때마다 확인할 것
 

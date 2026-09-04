@@ -25,6 +25,12 @@
   .term { flex: 0 0 96px; font-size: 13px; font-weight: 700; color: var(--accent-red); }
   .name { flex: 1 1 auto; font-size: 17px; font-weight: 500; }
   .count { flex: 0 0 auto; font-size: 13px; font-weight: 400; color: var(--muted); }
+
+  /* 로그아웃 — Cloudflare Access 세션을 지운다. 교실 컴퓨터에서 쓰고 나올 때.
+     Access 가 걸리지 않은 곳(로컬 미리보기 등)에서는 아래 스크립트가 감춘다. */
+  .signout { margin: 40px 0 0; font-size: 13px; }
+  .signout a { color: var(--muted); text-decoration: none; }
+  .signout a:hover { color: var(--accent-red); }
 </style>
 </head>
 <body>
@@ -33,6 +39,8 @@
   <p class="sub">권규상 · 충북대학교</p>
   <hr>
   <ul id="list"></ul>
+  <p class="signout" id="signout" hidden>
+    <a href="/cdn-cgi/access/logout">로그아웃</a></p>
 </div>
 
 <script>
@@ -59,6 +67,13 @@ const COURSES = ['2026-1학기_도시경제학입문', '2026-2학기_도시및�
     li.querySelector('.count').textContent = done + ' / ' + c.lectures.length + '강';
     ul.append(li);
   }
+
+  // 로그아웃 링크는 Access 뒤에 있을 때만 보인다.
+  // 로그인해 있으면 이 요청이 사용자 정보를 200 으로 돌려준다.
+  try {
+    const r = await fetch('/cdn-cgi/access/get-identity');
+    if (r.ok) document.getElementById('signout').hidden = false;
+  } catch (e) { /* Access 가 없는 곳 — 링크를 감춘 채로 둔다 */ }
 })();
 </script>
 </body>
