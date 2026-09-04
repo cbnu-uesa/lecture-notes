@@ -51,7 +51,17 @@ touch "$OUT/.nojekyll"
 # 깃 연동 배포는 저장소 폴더를 통째로 자산으로 올린다. 파일 하나당 25MiB 제한이
 # 있는데 .git/objects 의 팩 파일이 이를 넘어 배포가 실패한다 (2026-09-04).
 # .assetsignore 는 업로드되지 않으며 여기 적힌 것을 자산에서 뺀다.
-printf '.git\n.git/**\n' > "$OUT/.assetsignore"
+printf '.git\n.git/**\nwrangler.jsonc\n' > "$OUT/.assetsignore"
+
+# Workers 배포는 wrangler 가 무엇을 올릴지 알려 주는 설정 파일을 찾는다.
+# 이 파일이 없으면 "Missing entry-point to Worker script or to assets directory" 로 죽는다.
+cat > "$OUT/wrangler.jsonc" <<'JSON'
+{
+  "name": "lecture-notes",
+  "compatibility_date": "2026-09-04",
+  "assets": { "directory": "./" }
+}
+JSON
 
 # ── 안전 점검 ────────────────────────────────────────────────
 LEAK="$(find "$OUT" \( -name '*.hwp' -o -name '*.xlsx' -o -name '*.pptx' \) -print)"
