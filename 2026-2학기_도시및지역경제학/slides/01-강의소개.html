@@ -1,0 +1,602 @@
+<!doctype html>
+<!--
+  1강. 서론과 도시경제학의 주요 개념들
+  교재: 오설리반의 도시경제학 제9판 (이번송·홍성효·김석영 역, 박영사 2022)
+        1장 서론 (p.3~11) · 2장 도시경제학의 주요 개념들 (p.13~33)
+
+  각 <section> 앞 주석의 [p.N] 이 교재 쪽수다. 원본 대조의 실마리이므로 지우지 않는다.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1강. 강의소개</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<style>
+  /* 이 강의에서만 쓰는 미세 조정
+     표에 width 를 주지 않으면 shrink-to-fit 이라 칸이 좁아지고 글이 여러 줄로 접혀
+     표 높이가 두세 배가 된다. 전폭을 쓰게 하고 칸 폭을 못 박는다. */
+  /* components.css 는 .cols 를 align-items:center 로 둔다 — 그림과 글을 나란히 놓을 때의 설정이다.
+     이 강의의 2단은 전부 글이라 가운데 정렬이면 짧은 칸이 아래로 밀린다. 위로 맞춘다. */
+  .body > .cols { align-items: flex-start; }
+  /* 복습 슬라이드의 그림 — 1학기 노트에서 옮겨 온 것이라 가운데로 맞춘다 */
+  .body.stack > svg.fig { margin-left: auto; margin-right: auto; }
+  /* 주별 강의 내용의 시험 주차 — 다른 과목 강의계획 표와 같은 파란색 */
+  .reveal table tr.exam td { color: var(--accent-blue); }
+  .tbl-def { width: 100%; table-layout: fixed; }
+  .tbl-def th:first-child, .tbl-def td:first-child { width: 168px; }
+  .tbl-def td { vertical-align: top; }
+  .tbl-cost { width: 100%; table-layout: fixed; }
+  .tbl-cost th:first-child, .tbl-cost td:first-child { width: 132px; }
+  .tbl-cost td:last-child, .tbl-cost th:last-child { text-align: right; width: 150px; font-variant-numeric: tabular-nums; }
+  .epigraph { font-style: normal; color: var(--ink-2); }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+  /* 판독이 안 된 교재 쪽을 표시하는 자리 (private/스캔-재촬영-필요.md 참조) */
+  .pending { border: 1.4px dashed var(--rule); border-radius: 12px;
+    padding: 22px 26px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>1강. 강의소개</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 왜 경제학의 시각인가 ① 지방 청년의 서울 이주 ══════ -->
+<section>
+  <h2>지방 청년은 왜 서울로 가는가</h2>
+  <div class="body">
+    <div class="cols" style="margin-top:4px">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:4px">편익</p>
+        <ul>
+          <li><strong>임금</strong> — 같은 일에 대한 보수의 차이</li>
+          <li><strong>일자리</strong> — 일자리의 수와 종류, 전공을 살릴 자리</li>
+          <li><strong>어메니티</strong> — 문화 · 의료 · 교육 · 교통</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">비용</p>
+        <ul>
+          <li><strong>주거비</strong> — 전월세와 집값의 차이</li>
+          <li><strong>생활비</strong> — 물가 수준</li>
+          <li><strong>교통체증</strong> — 통근에 드는 시간</li>
+          <li><strong>범죄 · 혼잡</strong> — 밀집이 부르는 비용</li>
+        </ul>
+      </div>
+    </div>
+    <p class="lead t-define" style="text-align:center;margin-top:26px">
+      편익과 비용을 견주어 <span class="mark">이주 결정</span></p>
+  </div>
+</section>
+
+<!-- ══ 3. 왜 경제학의 시각인가 ② 집적의 경제 ════════════════ -->
+<section>
+  <h2>왜 사람들은 도시에 몰려 사는가</h2>
+  <div class="body stack">
+    <div class="triptych" style="margin-top:6px">
+      <div class="cell">
+        <div class="cell-title">Sharing <span class="en">(나눠 쓰기)</span></div>
+        <p>도로 · 전력 · 공항 같은 기반시설과</p>
+        <p>전문 서비스의 공동 이용</p>
+      </div>
+      <div class="cell">
+        <div class="cell-title">Matching <span class="en">(맞추기)</span></div>
+        <p>일자리와 사람이 많을수록</p>
+        <p>서로 맞는 짝을 찾기 쉬움</p>
+      </div>
+      <div class="cell">
+        <div class="cell-title">Learning <span class="en">(배우기)</span></div>
+        <p>가까이 있을수록</p>
+        <p>새로운 기술과 정보의 빠른 전파</p>
+      </div>
+    </div>
+    <p class="emph" style="text-align:center;margin-top:30px">
+      <span class="hl">집적의 경제 (agglomeration economies)</span></p>
+    <p class="emph" style="text-align:center">모여 있을 때 얻을 수 있는 긍정적인 외부성 (생산성의 향상)</p>
+  </div>
+</section>
+
+<!-- ══ 4. 학습 목표 ═════════════════════════════════════════ -->
+<section>
+  <h2>학습 목표</h2>
+  <div class="body stack">
+    <p class="lead t-define">도시와 지역을 경제학의 시각으로 이해하고 분석하여</p>
+    <p class="lead"><span class="mark">합리적인 도시문제 해결방안을 제시</span>하는 것</p>
+  </div>
+</section>
+
+<!-- ══ 5. 주별 강의 내용 ════════════════════════════════════ -->
+<section>
+  <h2>주별 강의 내용</h2>
+  <div class="body tight">
+    <table style="width:100%;table-layout:fixed;margin-top:2px">
+      <thead><tr><th style="width:15%">주차</th><th>강의 내용</th>
+        <th style="width:20%">교재</th></tr></thead>
+      <tbody>
+        <tr><td>1 <span class="en">(9/2)</span></td><td>강의소개</td><td></td></tr>
+        <tr><td>2 <span class="en">(9/9)</span></td><td>도시경제학의 주요개념 및 도시의 생성</td><td>Ch. 1, 2, 3, 4</td></tr>
+        <tr><td>3 <span class="en">(9/16)</span></td><td>도시의 생성 (2)</td><td>Ch. 5, 6</td></tr>
+        <tr><td>4 <span class="en">(9/23)</span></td><td>지역경제에서의 도시들</td><td>Ch. 7</td></tr>
+        <tr><td>5 <span class="en">(9/30)</span></td><td>도시노동시장</td><td>Ch. 8</td></tr>
+        <tr><td>6 <span class="en">(10/7)</span></td><td>도시토지이용과 분포</td><td>Ch. 10, 11, 12</td></tr>
+        <tr><td>7 <span class="en">(10/14)</span></td><td>고용과 주거의 공간적 분포</td><td>Ch. 13, 14, 15</td></tr>
+        <tr class="exam"><td>8 <span class="en">(10/21)</span></td><td>중간고사</td><td></td></tr>
+        <tr><td>9 <span class="en">(10/28)</span></td><td>토지이용정책</td><td>Ch. 16</td></tr>
+        <tr><td>10 <span class="en">(11/4)</span></td><td>도시주택과 공공정책</td><td>Ch. 17</td></tr>
+        <tr><td>11 <span class="en">(11/11)</span></td><td>도시교통</td><td>Ch. 18, 19</td></tr>
+        <tr><td>12 <span class="en">(11/18)</span></td><td>지방정부의 역할과 공공재</td><td>Ch. 20, 21</td></tr>
+        <tr><td>13 <span class="en">(11/25)</span></td><td>교육, 범죄와 공공정책</td><td>Ch. 22, 23</td></tr>
+        <tr><td>14 <span class="en">(12/2)</span></td><td>도시 및 지역경제학 요약강의</td><td></td></tr>
+        <tr class="exam"><td>15 <span class="en">(12/9)</span></td><td>기말고사</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 6. 평가 방법 ═════════════════════════════════════════ -->
+<section>
+  <h2>평가 방법</h2>
+  <div class="body stack">
+    <div class="grade-bar">
+      <div class="seg s2" style="flex:0 0 45%">중간고사<br>(45%)</div>
+      <div class="seg s3" style="flex:0 0 45%">기말고사<br>(45%)</div>
+      <div class="seg s1" style="flex:0 0 10%">출석<br>(10%)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. 강의 교재 ═════════════════════════════════════════ -->
+<section class="s-split">
+  <h2>강의 교재</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">주교재</p>
+      <p class="emph">아서 오설리반(이번송·홍성효·김석영 역), 2022,
+        <span class="mark">오설리반의 도시경제학(제9판)</span>, 박영사.</p>
+      <p class="emph" style="margin-top:14px">원서는
+        Arthur O'Sullivan, <span class="en">Urban Economics</span>, 9th ed., McGraw Hill.</p>
+    </div>
+    <div class="col-r" style="text-align:center">
+      <img src="../assets/tb-osullivan-cover.jpg" alt="오설리반의 도시경제학 제9판 표지"
+           style="height:300px;width:auto;border:1px solid var(--rule)">
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. 섹션 — 경제학 기본 개념 복습 ══════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">복습</p>
+  <p class="section-sub">경제학의 기본 개념 열 가지 · 1학기 도시경제학입문에서</p>
+</section>
+
+<!-- ── 01-Q. 기회비용 ── -->
+<section>
+  <h2>기회비용 <span class="en">(opportunity cost)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 01-A. 기회비용 ── -->
+<section class="s-definition">
+  <h2>기회비용 <span class="en">(opportunity cost)</span></h2>
+  <div class="body">
+    <p class="define">어떤 선택을 통해 포기하는 행위의 최대 가치</p>
+    <p class="conclusion">→ 대학 진학의 비용 = 등록금·생활비 + 진학하지 않았다면 얻었을 소득</p>
+  </div>
+</section>
+
+<!-- ── 02-Q. 한계효용과 한계비용 ── -->
+<section>
+  <h2>한계효용과 한계비용 <span class="en">(marginal utility &amp; marginal cost)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 02-A. 한계효용과 한계비용 ── -->
+<section>
+  <h2>한계효용과 한계비용 <span class="en">(marginal utility &amp; marginal cost)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:2px">한 단위를 더 소비할 때 늘어나는 효용, 한 단위를 더 생산할 때 늘어나는 비용</p>
+    <svg class="fig" id="r-mcac" style="width:430px" viewBox="0 0 520 340" role="img">
+            <title>U자 모양의 한계비용곡선과 평균비용곡선, 그리고 두 곡선이 만나는 점</title>
+          </svg>
+    <script>
+            (function () {
+              const F = Fig.withBox({ x0: 68, y0: 282, x1: 410, y1: 30 });
+              const S = F.scale({ x: [0, 8.4], y: [0, 400] });
+              // 표의 한계비용 60·50·40·50·70·90 → 3에서 최저. 평균비용은 6에서 최저이고 그때 둘이 만난다
+              const MC = S.curve([[0.5, 70], [1, 60], [2, 50], [3, 40], [4, 50], [5, 70], [6, 110], [7, 180], [7.6, 240]]);
+              const AC = S.curve([[1, 360], [2, 205], [3, 150], [4, 125], [5, 114], [6, 110], [7, 118], [7.8, 140]]);
+              F.draw('#r-mcac', {
+                axes: { x: '가구생산량(개)', y: '비용\n(만원)' },
+                parts: [
+                  F.curve(AC, { variant: 'i1' }),
+                  F.curve(MC, { variant: 'demand' }),
+                  F.guide(...S.p([3, 40]), { xtick: '3', only: 'x' }),
+                  F.guide(...S.p([6, 110]), { xtick: '6', only: 'x' }),
+                  F.dot(...S.p([3, 40])),
+                  F.dot(...S.p([6, 110])),
+                  F.annot(S.x(6.2), S.y(268), '한계비용곡선', { size: 13 }),
+                  F.annot(S.x(6.6), S.y(158), '평균비용곡선', { size: 13 }),
+                ],
+              });
+            })();
+          </script>
+    <p class="emph" style="text-align:center;margin-top:4px">→ 한계효용은 체감하고, 한계비용은 어느 지점을 지나면 체증 — 한계비용곡선은 평균비용곡선의 최저점을 지남</p>
+  </div>
+</section>
+
+<!-- ── 03-Q. 수요의 가격탄력성 ── -->
+<section>
+  <h2>수요의 가격탄력성 <span class="en">(price elasticity of demand)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 03-A. 수요의 가격탄력성 ── -->
+<section>
+  <h2>수요의 가격탄력성 <span class="en">(price elasticity of demand)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:2px">가격의 작은 변화에 따른 수요량의 변화 정도</p>
+    <p class="formula-key" style="text-align:center;margin:6px 0 2px">
+      $\varepsilon_p = -\dfrac{\Delta Q_d / Q_d}{\Delta P / P}$</p>
+    <svg class="fig" id="r-unit" viewBox="0 0 300 230" style="width:268px" role="img">
+            <title>단위탄력적 수요곡선: 직각쌍곡선 PQ = k</title>
+          </svg>
+    <script>
+          (function () {
+            const F = Fig.withBox({ x0: 34, y0: 192, x1: 276, y1: 14 });
+            const C = F.convex({ x0: 76, x1: 258, yTop: 30, yBot: 162, bow: 0.22 });
+            F.draw('#r-unit', {
+              axes: { x: 'Q', y: 'P' },
+              parts: [F.curve(C), F.annot(266, 166, 'D', { size: 14 })],
+            });
+          })();
+        </script>
+    <p class="emph" style="text-align:center;margin-top:4px">→ 탄력성 &gt; 1 이면 탄력적, &lt; 1 이면 비탄력적. 단위탄력적이면 직각쌍곡선</p>
+  </div>
+</section>
+
+<!-- ── 04-Q. 무차별곡선 ── -->
+<section>
+  <h2>무차별곡선 <span class="en">(indifference curve)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 04-A. 무차별곡선 ── -->
+<section>
+  <h2>무차별곡선 <span class="en">(indifference curve)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:2px">소비자에게 같은 수준의 효용을 주는 상품묶음의 집합을 그림으로 나타낸 것</p>
+    <svg class="fig" id="r-ic" style="width:430px" viewBox="0 0 520 340" role="img">
+            <title>같은 효용을 주는 상품묶음을 이은 무차별곡선과 효용증가의 방향</title>
+          </svg>
+    <script>
+            (function () {
+              // 직각쌍곡선 xy = 200 — 두 축에 점근하는 교과서 형태
+              const S = Fig.scale({ x: [0, 52], y: [0, 32] });
+              const IC = S.curve(Fig.hyper(200, 6.4, 46, { through: [8, 10, 20, 40] }));
+              Fig.draw('#r-ic', {
+                axes: { x: '쌀(kg)', y: '옷(벌)' },
+                parts: [
+                  Fig.curve(IC),
+                  Fig.guide(...S.p([8, 25]),  { xtick: '8',  ytick: '25' }),
+                  Fig.guide(...S.p([20, 10]), { xtick: '20', ytick: '10' }),
+                  Fig.guide(...S.p([40, 5]),  { xtick: '40', ytick: '5' }),
+                  Fig.dot(...S.p([8, 25]),  { label: 'a', lx: 9, ly: -6 }),
+                  Fig.dot(...S.p([20, 10]), { label: 'b', lx: 9, ly: -6 }),
+                  Fig.dot(...S.p([11, 7]),  { free: true, label: 'c', lx: 9, ly: 12 }),
+                  Fig.dot(...S.p([28, 19]), { free: true, label: 'd', lx: 9, ly: -6 }),
+                  Fig.arrow(S.x(16), S.y(15), S.x(26), S.y(23), { tone: 'red' }),
+                  Fig.annot(S.x(24), S.y(28), '효용증가의 방향', { tone: 'red', size: 14 }),
+                ],
+              });
+            })();
+          </script>
+    <p class="emph" style="text-align:center;margin-top:4px">→ 우하향 · 원점에서 멀수록 높은 효용 · 서로 교차하지 않음 · 원점에 대해 볼록</p>
+  </div>
+</section>
+
+<!-- ── 05-Q. 대체효과와 소득효과 ── -->
+<section>
+  <h2>대체효과와 소득효과 <span class="en">(substitution &amp; income effect)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 05-A. 대체효과와 소득효과 ── -->
+<section>
+  <h2>대체효과와 소득효과 <span class="en">(substitution &amp; income effect)</span></h2>
+  <div class="body stack tight">
+    <p class="sub t-red" style="margin-bottom:2px">대체효과 <span class="en">(substitution effect)</span></p>
+    <p class="emph" style="margin-bottom:8px">어떤 상품이 다른 상품에 비해 상대적으로 더 싸졌기 때문에
+      소비량이 늘어나는 효과</p>
+    <p class="sub t-red" style="margin-bottom:2px">소득효과 <span class="en">(income effect)</span></p>
+    <p class="emph" style="margin-bottom:6px">상품가격 변화에 따른 실질소득 변화에 따른 수요량의 변화 효과</p>
+    <svg class="fig" id="r-se" style="width:560px" viewBox="0 0 920 306" role="img" style="width:100%;margin:2px 0 0 0">
+          <title>쌀 가격 하락에 따른 대체효과와 소득효과의 분해</title>
+        </svg>
+    <script>
+          (function () {
+            const F = Fig.withBox({ x0: 78, y0: 244, x1: 828, y1: 26 });
+            const S = F.scale({ x: [0, 74], y: [0, 30] });
+            // 소득 50만, 옷 2만 → 세로절편 25. 쌀값 1만 → 0.75만 (본문 수치)
+            //   원래   기울기 -0.5    접점 E  (25,    12.5)   IC0 xy = 312.5
+            //   하락후 기울기 -0.375  접점 E` (33.33, 12.5)   IC1 xy = 416.7
+            //   보상   기울기 -0.375  IC0 위 E″ (28.87, 10.83)
+            const IC0 = S.curve(Fig.hyper(312.5, 13, 72, { through: [25, 28.87] }));
+            const IC1 = S.curve(Fig.hyper(416.7, 17, 73, { through: [33.33] }));
+            const E = S.p([25, 12.5]), E2 = S.p([28.87, 10.83]), E1 = S.p([33.33, 12.5]);
+
+            F.draw('#r-se', {
+              axes: { x: '쌀(kg)', y: '옷(벌)' },
+              parts: [
+                F.curve(IC0),
+                F.line(...S.p([0, 25]), ...S.p([50, 0]), { variant: 'i3' }),
+                F.guide(...S.p([0, 25]), { ytick: '25', only: 'y' }),
+                F.guide(...S.p([25, 12.5]), { ytick: '12.5', only: 'y' }),
+                F.annot(S.x(50), F.BOX.y0 + 17, '50', { anchor: 'middle', size: 12 }),
+                F.dot(...E, { label: 'E', lx: -4, ly: -11 }),
+
+                F.annot(S.x(44), S.y(28.4), '쌀 가격의 하락', { tone: 'red', size: 14 }),
+                F.annot(S.x(44), S.y(26), '1.  옷에 비해 상대적으로 가격이 싸짐', { tone: 'red', size: 14 }),
+                F.annot(S.x(44), S.y(23.6), '2.  가격하락에 의해 실질소득이 증가함', { tone: 'red', size: 14 }),
+
+                // 첫 장 — 대체효과까지만 (보상 예산선이 IC0에 접한다)
+                F.line(...S.p([0, 21.65]), ...S.p([57.74, 0]), { variant: 'alt' }),
+                F.dot(...E2, { label: 'E″', lx: 4, ly: 16 }),
+                F.arrow(E[0] + 7, E[1] + 5, E2[0] - 7, E2[1] - 5, { tone: 'red' }),
+                F.raw(`<path d="M${E[0]},${F.BOX.y0 - 8} L${E[0]},${F.BOX.y0} L${E2[0]},${F.BOX.y0} L${E2[0]},${F.BOX.y0 - 8}" fill="none" stroke="#7C7C7C" stroke-width="1"/>`),
+                F.annot((E[0] + E2[0]) / 2, F.BOX.y0 + 18, '대체효과', { anchor: 'middle', size: 13 }),
+
+                // 다음 장 — 소득효과를 얹는다 (새 예산선 · IC1 · E`)
+                F.curve(IC1, { fragment: 0 }),
+                F.line(...S.p([0, 25]), ...S.p([66.67, 0]), { variant: 'alt', fragment: 0 }),
+                F.dot(...E1, { label: 'E`', lx: 8, ly: -9, fragment: 0 }),
+                F.arrow(E2[0] + 6, E2[1] - 4, E1[0] - 6, E1[1] + 6, { tone: 'red', fragment: 0 }),
+                F.raw(`<path d="M${E2[0]},${F.BOX.y0 - 8} L${E2[0]},${F.BOX.y0 + 26} L${E1[0]},${F.BOX.y0 + 26} L${E1[0]},${F.BOX.y0 - 8}" fill="none" stroke="#7C7C7C" stroke-width="1"/>`, { fragment: 0 }),
+                F.annot((E2[0] + E1[0]) / 2, F.BOX.y0 + 44, '소득효과', { anchor: 'middle', size: 13, fragment: 0 }),
+              ],
+            });
+          })();
+        </script>
+  </div>
+</section>
+
+<!-- ── 06-Q. 시장균형 ── -->
+<section>
+  <h2>시장균형 <span class="en">(equilibrium)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 06-A. 시장균형 ── -->
+<section>
+  <h2>시장균형 <span class="en">(equilibrium)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin:14px 0 0">수요와 공급이 맞아떨어져, 다른 요인의 변화가 없는 한 어느 쪽으로도 움직일 유인이 없는 상태</p>
+    <svg class="fig fig-solo" id="r-eq" viewBox="-70 0 590 350" role="img"
+             style="margin:6px 0 0 130px">
+          <title>수요곡선과 공급곡선이 만나는 균형점 E, 초과공급과 초과수요</title>
+        </svg>
+    <script>
+          (function () {
+            const F = Fig.withBox({ x0: 55, y0: 290, x1: 388, y1: 26 });
+            const S = F.scale({ x: [0, 80], y: [0, 26] });
+            // 눈금으로 표시할 점을 곡선이 그대로 지나게 잡는다
+            const D = S.curve([[20, 23.5], [30, 20], [43, 15], [58, 10], [70, 6]]);
+            const SS = S.curve([[20, 6], [30, 10], [43, 15], [58, 20], [70, 23.5]]);
+            const y20 = S.y(20), y10 = S.y(10), x30 = S.x(30), x58 = S.x(58);
+            F.draw('#r-eq', {
+              axes: { x: '공급량(만 통/월)', y: '가격(천원)' },
+              parts: [
+                F.curve(D, { variant: 'demand' }),
+                F.curve(SS, { variant: 'supply' }),
+                F.annot(S.x(72), S.y(23.8), 'S', { size: 15 }),
+                F.annot(S.x(72), S.y(5.8), 'D', { size: 15 }),
+                F.guide(...S.p([58, 20]), { ytick: '20', xtick: '58' }),
+                F.guide(...S.p([30, 20]), { xtick: '30', only: 'x' }),
+                F.guide(...S.p([43, 15]), { ytick: '15', xtick: '43' }),
+                F.raw(`<path class="guide" d="M${F.BOX.x0},${y10} L${x58},${y10}"/>`),
+                F.annot(F.BOX.x0 - 8, y10 + 4, '10', { anchor: 'end', size: 12 }),
+                F.raw(`<path d="M${x30},${y20 - 7} L${x30},${y20 - 16} L${x58},${y20 - 16} L${x58},${y20 - 7}" fill="none" stroke="var(--point-red)" stroke-width="1"/>`),
+                F.annot((x30 + x58) / 2, y20 - 24, '초과공급', { tone: 'red', anchor: 'middle', size: 14 }),
+                F.raw(`<path d="M${x30},${y10 + 7} L${x30},${y10 + 16} L${x58},${y10 + 16} L${x58},${y10 + 7}" fill="none" stroke="var(--chart-blue)" stroke-width="1"/>`),
+                F.annot((x30 + x58) / 2, y10 + 34, '초과수요', { tone: 'blue', anchor: 'middle', size: 14 }),
+                F.annot(S.x(45.5), S.y(14), 'E: 균형점', { size: 14 }),
+                F.annot(F.BOX.x0 - 34, S.y(15) + 4, '균형가격', { anchor: 'end', size: 14 }),
+                F.annot(S.x(43), F.BOX.y0 + 38, '균형거래량', { anchor: 'middle', size: 14 }),
+              ],
+            });
+          })();
+        </script>
+  </div>
+</section>
+
+<!-- ── 07-Q. 소비자잉여 ── -->
+<section>
+  <h2>소비자잉여 <span class="en">(consumer surplus)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 07-A. 소비자잉여 ── -->
+<section>
+  <h2>소비자잉여 <span class="en">(consumer surplus)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:2px">소비자가 교환으로부터 얻는 이득</p>
+    <svg class="fig" id="r-cs" style="width:470px" viewBox="0 0 500 320" role="img">
+            <title>수요곡선 아래·가격선 위 삼각형으로 나타낸 소비자잉여</title>
+          </svg>
+    <script>
+          (function () {
+            const F = Fig.withBox({ x0: 52, y0: 252, x1: 372, y1: 20 });
+            const S = F.scale({ x: [0, 11], y: [0, 1900] });
+
+            // 왼쪽 — 한계편익 막대 + 수요곡선
+            const BARS = [1700, 1520, 1360, 1160, 980, 800];
+            const B1 = F.bars(S, BARS);
+            // 막대 꼭대기의 가로 중앙 두 점을 지나는 직선 (design.md §6.7)
+            const D1 = S.curve([[0, 1790], [9.6, 62]]);
+            // 오른쪽 — 잉여 삼각형 + 지불비용 사각형. B는 반드시 곡선 위에서 구한다.
+            const D2 = S.curve([[0, 1800], [9.6, 100]]);
+            const yP = S.y(900);
+            const B = Fig.at(D2, { y: yP });
+            F.draw('#r-cs', {
+              axes: { x: '볼펜의 양(개)', y: '가격(원)' },
+              parts: [
+                F.raw('<defs><pattern id="hatch-cs" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+                      '<line x1="0" y1="0" x2="0" y2="7" stroke="var(--chart-blue)" stroke-width="1.2"/></pattern></defs>'),
+                F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${S.y(1800)} ${F.BOX.x0},${yP} ${B[0]},${yP}"/>`),
+                F.raw(`<rect fill="url(#hatch-cs)" stroke="var(--chart-blue)" stroke-width="1" x="${F.BOX.x0}" y="${yP}" width="${B[0] - F.BOX.x0}" height="${F.BOX.y0 - yP}"/>`),
+                F.curve(D2, { variant: 'demand' }),
+                F.annot(F.BOX.x0 + 9, S.y(1800) - 7, 'A', { size: 14 }),
+                F.annot(B[0] + 9, yP - 9, 'B', { size: 14 }),
+                F.annot(F.BOX.x0 - 8, yP + 4, 'P̄', { anchor: 'end', size: 14 }),
+                F.annot(B[0], F.BOX.y0 + 17, 'Q̄', { anchor: 'middle', size: 14 }),
+                F.labelIn([[F.BOX.x0, S.y(1800)], [F.BOX.x0, yP], [B[0], yP]],
+                          '소비자\n잉여', { tone: 'red', size: 15 }),
+                F.annot(S.x(2.3), S.y(600), 'P̄ * Q̄', { size: 12 }),
+                F.annot(S.x(2.3), S.y(470), '= 지불비용', { size: 12 }),
+                F.annot(S.x(8.7), S.y(300), 'D', { size: 15 }),
+              ],
+            });
+          })();
+        </script>
+    <p class="emph" style="text-align:center;margin-top:4px">→ 수요곡선 아래, 가격선 위의 면적</p>
+  </div>
+</section>
+
+<!-- ── 08-Q. 기업의 이윤극대화 조건 ── -->
+<section>
+  <h2>기업의 이윤극대화 조건 <span class="en">(profit maximization)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 08-A. 기업의 이윤극대화 조건 ── -->
+<section>
+  <h2>기업의 이윤극대화 조건 <span class="en">(profit maximization)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:2px">한계수입(MR) = 한계비용(MC)</p>
+    <svg class="fig" id="r-mono" viewBox="0 0 600 330" style="width:520px;margin:0 auto" role="img">
+          <title>한계수입과 한계비용이 만나는 생산량에서 수요곡선이 정하는 독점가격</title>
+        </svg>
+    <script>
+          (function () {
+            const F = Fig.withBox({ x0: 58, y0: 282, x1: 440, y1: 26 });
+            const S = F.scale({ x: [0, 10], y: [0, 10] });
+            // 수요 P = 9.4 − 0.62Q, 한계수입 MR = 9.4 − 1.24Q
+            const D  = S.curve([[0.4, 9.15], [9.6, 3.45]]);
+            const MR = S.curve([[0.4, 8.9], [7.4, 0.22]]);
+            const MC = S.curve([[1.2, 2.6], [2.2, 1.85], [3.2, 1.7], [4.2, 2.3], [5.2, 3.6], [6.0, 5.2], [6.6, 7.0]]);
+            const AC = S.curve([[1.4, 5.2], [2.2, 4.3], [3.2, 3.7], [4.2, 3.55], [5.2, 3.8], [6.4, 4.5], [8.0, 5.9], [9.2, 7.0]]);
+            const Q = Fig.cross(MC, MR);                 // MR = MC 인 생산량
+            const E = Fig.at(D,  { x: Q[0] });           // 그 수량에서 수요곡선이 정하는 가격
+            const B = Fig.at(AC, { x: Q[0] });
+            const box = [[F.BOX.x0, E[1]], [Q[0], E[1]], [Q[0], B[1]], [F.BOX.x0, B[1]]];
+            F.draw('#r-mono', {
+              axes: { x: 'Q', y: 'P' },
+              parts: [
+                F.raw(`<polygon class="area-surplus" points="${box.map((q) => q.join(',')).join(' ')}"/>`),
+                F.curve(D, { variant: 'cap' }),
+                F.curve(MR, { variant: 'i3' }),
+                F.curve(AC, { variant: 'i2' }),
+                F.curve(MC),
+                F.raw(`<path class="guide" d="M${Q[0]},${E[1]} L${Q[0]},${F.BOX.y0}"/>`),
+                F.raw(`<path class="guide" d="M${F.BOX.x0},${E[1]} L${Q[0]},${E[1]}"/>`),
+                F.raw(`<path class="guide" d="M${F.BOX.x0},${B[1]} L${Q[0]},${B[1]}"/>`),
+                F.dot(...E, { label: 'E', lx: -4, ly: -12 }),
+                F.dot(...B, { label: 'B', lx: -4, ly: -11 }),
+                F.dot(...Q, { label: 'C', lx: -4, ly: 17 }),
+                F.annot(F.BOX.x0 - 8, E[1] + 5, 'Pm', { anchor: 'end', size: 14, tone: 'red' }),
+                F.annot(F.BOX.x0 - 8, B[1] + 5, 'A', { anchor: 'end', size: 14 }),
+                F.annot(Q[0], F.BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14 }),
+                F.labelIn(box, '(장기) 이윤', { size: 13 }),
+                F.annot(S.x(4.8), S.y(9.7), '한계비용곡선 (MC)', { size: 13 }),
+                F.annot(S.x(7.6), S.y(8.6), '평균비용곡선 (AC)', { size: 13 }),
+                F.annot(S.x(8.6), S.y(2.6), '수요곡선(D)', { size: 13 }),
+                F.annot(S.x(6.4), S.y(0.5), '한계수입곡선(MR)', { size: 13 }),
+              ],
+            });
+          })();
+        </script>
+    <p class="emph" style="text-align:center;margin-top:4px">→ 독점기업은 그 수량에서 수요곡선이 정하는 가격을 매기므로 P &gt; MC</p>
+  </div>
+</section>
+
+<!-- ── 09-Q. 외부성 ── -->
+<section>
+  <h2>외부성 <span class="en">(externality)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 09-A. 외부성 ── -->
+<section class="s-definition">
+  <h2>외부성 <span class="en">(externality)</span></h2>
+  <div class="body">
+    <p class="define">어떤 사람의 행동이 대가 없이 제3자에게 의도하지 않은 혜택이나 손해를 가져다 주는 경우</p>
+    <p class="conclusion">→ 손해는 배기가스 배출, 혜택은 기초학문 발전에 따른 효과</p>
+  </div>
+</section>
+
+<!-- ── 10-Q. 공공재 ── -->
+<section>
+  <h2>공공재 <span class="en">(public goods)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="text-align:center">무엇을 뜻하는가?</p>
+  </div>
+</section>
+
+<!-- ── 10-A. 공공재 ── -->
+<section class="s-definition">
+  <h2>공공재 <span class="en">(public goods)</span></h2>
+  <div class="body">
+    <p class="define">비경합성과 배제불가능성을 가진 재화 및 서비스</p>
+    <p class="conclusion">→ 무임승차자 문제 발생 — 대가를 치르지 않는 사람을 막을 수 없음</p>
+  </div>
+</section>
+
+<!-- ══ 29. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

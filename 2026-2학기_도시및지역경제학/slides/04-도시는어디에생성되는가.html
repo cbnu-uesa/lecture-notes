@@ -1,0 +1,547 @@
+<!doctype html>
+<!--
+  4강. 도시들은 어디에서 생성되는가?
+  교재: 오설리반의 도시경제학 제9판 — 5장 (p.89~103)
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4강. 도시들은 어디에서 생성되는가?</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 이 강의를 관통하는 숫자 ────────────────────────────────
+  // 표 5-1·5-2 와 그림 5-1·5-2 는 같은 값에서 나온다 (design.md §6.5).
+  // 금전적 중량 = 물리적 중량 × 운송료. 이것만 적고 나머지는 유도한다.
+  window.WEIGHT = {
+    dist: 10,                                   // 생산요소 원산지 ~ 시장 거리(마일)
+    resource: {                                 // 표 5-1 자원-지향적 (야구방망이)
+      name: '자원−지향적', input: '목재', output: '야구방망이',
+      wIn: 5, tIn: 1, wOut: 1, tOut: 2,
+    },
+    market: {                                   // 표 5-2 시장-지향적 (음료수)
+      name: '시장−지향적', input: '설탕', output: '음료수',
+      wIn: 1, tIn: 2, wOut: 5, tOut: 2,
+    },
+    mIn(c)  { return c.wIn * c.tIn; },          // 생산요소의 금전적 중량
+    mOut(c) { return c.wOut * c.tOut; },        // 생산물의 금전적 중량
+    // x = 공장에서 생산물 시장까지의 거리
+    costIn(c, x)  { return this.mIn(c) * (this.dist - x); },
+    costOut(c, x) { return this.mOut(c) * x; },
+    total(c, x)   { return this.costIn(c, x) + this.costOut(c, x); },
+  };
+
+  // 그림 5-3 · 5-4 — 중위입지 [p.96~97]
+  window.MEDIAN = {
+    gap: 20,                                    // A·B·M·C 사이 간격(마일)
+    far: 100,                                   // C ~ D 거리(마일)
+    cities: [
+      { name: 'A', x: 0,   n: 2 },
+      { name: 'B', x: 20,  n: 8 },
+      { name: 'M', x: 40,  n: 1 },
+      { name: 'C', x: 60,  n: 1 },
+      { name: 'D', x: 160, n: 9, grown: 13 },   // 그림 5-4 에서 13개로 증가
+    ],
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .tbl-mw { width: 100%; table-layout: fixed; }
+  .tbl-mw th:first-child, .tbl-mw td:first-child { width: 42%; }
+  .tbl-mw th:not(:first-child), .tbl-mw td:not(:first-child) { text-align: center; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>4강. 도시들은<br>어디에서 생성되는가?</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 발문 (p.89) ═══════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:44px">
+      “우리는 길을 잃지 않았다. 단지 우리가 어디에 입지할 것인가에 도전을 받고 있다.”
+      <span class="who">— 미취 헤드버그</span></p>
+    <p class="lead t-define" style="margin-bottom:16px">기업의 입지선정은
+      <span class="mark">다차원의 주도권 경쟁(tug of war)</span>의 결과다</p>
+    <p class="emph">기업을 상이한 방향으로 끌어당기는 힘 —
+      낮은 <strong>운송비용</strong> · 생산적인 <strong>노동자</strong> ·
+      생산에서 외적인 경제를 창출하는 다른 <strong>기업들</strong> · 낮은 <strong>에너지</strong> 비용</p>
+  </div>
+</section>
+
+<!-- ══ 3. 섹션 — 01 운반-집약적 기업 ════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 운반−집약적 기업</p>
+  <p class="section-sub">운송비용이 지배적인 입지요인일 때 · 교재 p.89~94</p>
+</section>
+
+<!-- ══ 4. 운반-집약적 기업과 네 가정 (p.89~90) ══════════════ -->
+<section>
+  <h2>운반−집약적 기업 <span class="en">(transport-intensive firm)</span></h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:6px">운송비용이 총 비용에서
+      <span class="mark">상대적으로 큰 비중</span>을 차지하는 기업</p>
+    <p class="emph" style="margin-bottom:10px">목적은 <strong>생산요소 운송비용</strong>(원산지→생산지)과
+      <strong>생산물 운송비용</strong>(생산지→시장)의 합인 <strong>총 운송비용</strong>을 최소화하는 입지를 고르는 것</p>
+    <ol class="dense">
+      <li><strong>단일 운송가능 생산물</strong> — 단일 생산물의 고정된 양을 생산하고 하나의 시장으로 운송한다</li>
+      <li><strong>단일 운송가능 생산요소</strong> — 하나만 원산지에서 운송된다.
+        나머지는 <strong>편재(ubiquitous)</strong>되어 어디서나 같은 값에 살 수 있다</li>
+      <li><strong>고정요소 비율</strong> — 가격과 상관없이 하나의 방법만 쓴다. 요소대체가 없다</li>
+      <li><strong>고정된 가격</strong> — 기업은 가격에 영향을 미치지 않을 정도로 작다</li>
+    </ol>
+    <p class="derive t-red" style="margin-top:10px">→ 총 수입도 생산요소비용도 모든 입지에서 같다.
+      <strong>공간에 따라 변하는 유일한 비용은 두 운송비용</strong>이다</p>
+  </div>
+</section>
+
+<!-- ══ 5. 표 5-1 자원-지향적 기업 (p.91) ════════════════════ -->
+<section class="s-split">
+  <h2>금전적 중량이 방향을 정한다</h2>
+  <div class="body">
+    <div class="col-l" style="flex:0 0 42%">
+      <p class="emph" style="margin-bottom:14px">1톤의 야구방망이를 만들려면 <strong>5톤의 목재</strong>가 든다 —
+        <strong>중량−감소 행위</strong>다</p>
+      <p class="lead t-define" style="margin-bottom:14px">금전적 중량<br>= 물리적 중량 × 운송료</p>
+      <p class="emph">생산물 운송의 단위비용이 더 높지만(목재는 던져 실을 수 있고 완성된 방망이는 조심히 운반해야 한다),
+        <strong>생산공정에서의 중량 감소가 운송료 차이를 압도</strong>한다</p>
+    </div>
+    <div class="col-r">
+      <p class="caption-blue">표 5−1 자원−지향적 기업에 대한 금전적 중량</p>
+      <table class="tbl-mw" id="t-res"></table>
+      <p class="derive t-red" style="margin-top:12px">→ 생산요소의 금전적 중량이 더 크므로
+        이 기업은 <strong>자원−지향적</strong>이다</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 6. 그림 5-1 (p.92) ═══════════════════════════════════ -->
+<section class="s-split">
+  <h2>자원−지향적 기업은 원산지에 붙는다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">두 운송비용</p>
+      <p class="formula-key" style="margin-bottom:4px">생산요소 운송비용 = wᵢ · tᵢ · (10 − x)</p>
+      <p class="formula-key" style="margin-bottom:16px">생산물 운송비용 = w<sub>Q</sub> · t<sub>Q</sub> · x</p>
+      <p class="emph" id="k-res-move" style="margin-bottom:18px"></p>
+      <p class="derive t-red">→ 총 운송비용은 <strong>생산요소 원산지</strong>에서 최소화된다.
+        사탕무−설탕공장, 양파 건조공장, 광석 가공처리공장이 같은 예다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-res" viewBox="0 0 470 290" style="width:430px" role="img">
+        <title>산림 쪽으로 갈수록 총 운송비용이 내려가 원산지에서 최소가 되는 그림</title></svg>
+      <script>
+        (function () {
+          const W = window.WEIGHT, C = W.resource, D = W.dist;
+          const F = Fig.withBox({ x0: 62, y0: 232, x1: 404, y1: 26 });
+          const S = F.scale({ x: [0, D], y: [0, 60] });
+          const seg = (f, o) => F.line(...S.p([0, f(0)]), ...S.p([D, f(D)]), o);
+          F.draw('#f-res', {
+            axes: { y: '$' },
+            parts: [
+              seg((x) => W.costIn(C, x),  { variant: 'demand' }),
+              seg((x) => W.costOut(C, x), { variant: 'supply' }),
+              seg((x) => W.total(C, x),   {}),
+              F.annot(S.x(5.6), S.y(W.total(C, 5.6)) - 9, '총 운송비용', { size: 12 }),
+              F.annot(S.x(6.4), S.y(W.costIn(C, 6.4)) - 8, '생산요소 운송비용',
+                      { size: 11, tone: 'blue' }),
+              F.annot(S.x(3.4), S.y(W.costOut(C, 3.4)) + 16, '생산물 운송비용',
+                      { size: 11, tone: 'red' }),
+              F.guide(...S.p([0, W.total(C, 0)]), { ytick: String(W.total(C, 0)), only: 'y' }),
+              F.guide(...S.p([D, W.total(C, D)]), { ytick: String(W.total(C, D)), only: 'y' }),
+              F.dot(...S.p([0, W.total(C, 0)]), { label: 'm', lx: 8, ly: -8 }),
+              F.dot(...S.p([D, W.total(C, D)]), { label: 'i', lx: 8, ly: -8 }),
+              F.annot(S.x(0), F.BOX.y0 + 16, '0', { anchor: 'middle', size: 11 }),
+              F.annot(S.x(D), F.BOX.y0 + 16, String(D), { anchor: 'middle', size: 11 }),
+              F.annot(S.x(D / 2), F.BOX.y0 + 16, 'x = 생산물 시장까지의 거리',
+                      { anchor: 'middle', size: 11 }),
+              F.annot(S.x(D / 2), F.BOX.y0 + 32, '10 − x = 생산요소 원산지까지의 거리',
+                      { anchor: 'middle', size: 11 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. 표 5-2 · 그림 5-2 시장-지향적 (p.93~94) ═══════════ -->
+<section class="s-split">
+  <h2>시장−지향적 기업은 시장에 붙는다</h2>
+  <div class="body">
+    <div class="col-l" style="flex:0 0 52%">
+      <p class="emph" style="margin-bottom:10px">음료기업은 <strong>설탕 1톤 + 물 4톤</strong>(편재)으로
+        <strong>병에 든 음료수 5톤</strong>을 만든다 — <strong>중량−증가 행위</strong>다</p>
+      <p class="caption-blue">표 5−2 시장−지향적 기업에 대한 금전적 중량</p>
+      <table class="tbl-mw" id="t-mkt"></table>
+      <p class="emph" id="k-mkt-move" style="margin-top:12px"></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-mkt" viewBox="0 0 470 290" style="width:410px" role="img">
+        <title>시장에서 멀어질수록 총 운송비용이 올라가 시장에서 최소가 되는 그림</title></svg>
+      <script>
+        (function () {
+          const W = window.WEIGHT, C = W.market, D = W.dist;
+          const F = Fig.withBox({ x0: 66, y0: 232, x1: 404, y1: 26 });
+          const S = F.scale({ x: [0, D], y: [0, 118] });
+          const seg = (f, o) => F.line(...S.p([0, f(0)]), ...S.p([D, f(D)]), o);
+          F.draw('#f-mkt', {
+            axes: { y: '$' },
+            parts: [
+              seg((x) => W.costIn(C, x),  { variant: 'demand' }),
+              seg((x) => W.costOut(C, x), { variant: 'supply' }),
+              seg((x) => W.total(C, x),   {}),
+              // 총(20+8x)과 생산물(10x)이 가까우므로 라벨을 위·아래로 갈라 놓는다
+              F.annot(S.x(2.2), S.y(54), '총 운송비용', { size: 12 }),
+              F.annot(S.x(8.8), S.y(62), '생산물 운송비용',
+                      { size: 11, tone: 'red', anchor: 'end' }),
+              F.annot(S.x(7.0), S.y(18), '생산요소 운송비용',
+                      { size: 11, tone: 'blue', anchor: 'end' }),
+              F.guide(...S.p([0, W.total(C, 0)]), { ytick: String(W.total(C, 0)), only: 'y' }),
+              F.guide(...S.p([D, W.total(C, D)]), { ytick: String(W.total(C, D)), only: 'y' }),
+              F.dot(...S.p([0, W.total(C, 0)]), { label: 'm', lx: 8, ly: -8 }),
+              F.dot(...S.p([D, W.total(C, D)]), { label: 'i', lx: -14, ly: -8 }),
+              F.annot(S.x(0), F.BOX.y0 + 16, '0', { anchor: 'middle', size: 11 }),
+              F.annot(S.x(D), F.BOX.y0 + 16, String(D), { anchor: 'middle', size: 11 }),
+              F.annot(S.x(D / 2), F.BOX.y0 + 16, 'x = 생산물 시장까지의 거리',
+                      { anchor: 'middle', size: 11 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const W = window.WEIGHT;
+      const line = (c, id, dir) => {
+        const din = W.mIn(c), dout = W.mOut(c);
+        document.getElementById(id).innerHTML = dir === 'in'
+          ? `산림으로의 1마일 이동은 생산요소비용을 <strong>${din}달러</strong> 줄이고 ` +
+            `생산물비용을 <strong>${dout}달러</strong> 늘려 <strong>${din - dout}달러의 순 감소</strong>를 낳는다`
+          : `시장에서 멀어지는 1마일 이동은 생산물비용을 <strong>${dout}달러</strong> 늘리고 ` +
+            `생산요소비용을 <strong>${din}달러</strong>만 줄여 <strong>${dout - din}달러의 순 증가</strong>를 낳는다`;
+      };
+      line(W.resource, 'k-res-move', 'in');
+      line(W.market, 'k-mkt-move', 'out');
+
+      const table = (c, id) => {
+        const r = [
+          ['물리적 중량(톤)', c.wIn, c.wOut],
+          ['운송료(1톤−1마일당)', '$' + c.tIn, '$' + c.tOut],
+          ['금전적 중량 = 중량 × 운송료', '$' + W.mIn(c), '$' + W.mOut(c)],
+        ];
+        document.getElementById(id).innerHTML =
+          `<thead><tr><th></th><th>생산요소(${c.input})</th><th>생산물(${c.output})</th></tr></thead>` +
+          '<tbody>' + r.map(([a, b, d]) => `<tr><td>${a}</td><td>${b}</td><td>${d}</td></tr>`).join('') + '</tbody>';
+      };
+      table(W.resource, 't-res');
+      table(W.market, 't-mkt');
+    })();
+  </script>
+</section>
+
+<!-- ══ 8. 시장-지향의 세 이유 (p.94) ════════════════════════ -->
+<section>
+  <h2>생산물 운송이 비싼 세 가지 경우</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">생산물이 더 무거워서가 아니라
+      <strong>운송하는 데 더 비싸기 때문에</strong> 시장−지향적이 된다</p>
+    <ol class="dense">
+      <li><strong>부피가 큰</strong> — 자동차조립기업의 생산물(조립된 자동차)은 생산요소(전선 묶음, 금속판)보다 부피가 크다.
+        1톤의 자동차를 수송하는 비용이 1톤의 부품을 수송하는 비용을 넘는다</li>
+      <li><strong>부패하기 쉬운</strong> — 제빵의 생산물은 생산요소보다 상하기 쉬워 제빵업자들을 소비자쪽으로 끌어당긴다</li>
+      <li><strong>위험한</strong> — 무기제조업자는 무해한 생산요소를 결합해 치명적인 생산물을 만든다.
+        위험한(혹은 부서지기 쉬운) 생산물의 장거리 운송을 피해 시장 인근에 입지한다</li>
+    </ol>
+    <p class="derive t-red" style="margin-top:16px">→ 거꾸로 생산요소가 부피가 크거나 부패하기 쉽거나 깨지기 쉽거나 위험하면
+      <strong>자원−지향적</strong>이 된다. 통조림 공장은 생과일을 냉장트럭으로 옮겨야 해서 농장 근처에 선다</p>
+  </div>
+</section>
+
+<!-- ══ 9. 섹션 — 02 중위입지의 원리 ═════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 중위입지의 원리</p>
+  <p class="section-sub">생산요소나 시장이 여럿일 때 · 교재 p.95~99</p>
+</section>
+
+<!-- ══ 10. 중위입지의 원리 (p.95) ═══════════════════════════ -->
+<section>
+  <h2>중위입지의 원리 <span class="en">(principle of median location)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:14px"><span class="mark">중위입지가 총 통행거리를 최소화한다</span></p>
+    <p class="emph" style="margin-bottom:36px">중위입지는 통행목적지들을 두 개의 동일한 절반으로 나누어,
+      목적지들의 절반은 한 방향에 다른 절반은 다른 방향에 놓이게 한다</p>
+    <p class="sub t-red" style="margin-bottom:2px">예시 — 기계를 수리하는 픽스잇(Fixit)의 가정</p>
+    <p class="emph">① 모든 생산요소(도구와 부품)는 편재해 운송비용이 영(0)이다<br>
+      ② 수리서비스의 가격은 고정되었고 1주일에 한 번 개별 공장을 방문한다<br>
+      ③ 개별 수리를 위한 공장으로의 통행은 별개의 통행을 요구한다</p>
+  </div>
+</section>
+
+<!-- ══ 11. 그림 5-3 · 5-4 (p.96~97) — fragment 2단계 ════════ -->
+<section>
+  <h2>중위입지는 어디인가</h2>
+  <div class="body">
+    <svg class="fig" id="f-median" viewBox="0 0 700 260" style="width:620px;margin:2px 0 0 108px" role="img">
+      <title>다섯 도시의 공장 수 막대와 그 중위입지가 M에서 D로 옮겨 가는 그림</title></svg>
+    <script>
+      (function () {
+        const M = window.MEDIAN, F = Fig;
+        const X0 = 96, X1 = 620, Y = 200, HMAX = 150;
+        const maxN = Math.max(...M.cities.map((c) => c.grown || c.n));
+        const px = (x) => X0 + (x / M.cities[M.cities.length - 1].x) * (X1 - X0);
+        const parts = [
+          F.raw(`<path d="M${X0 - 26},${Y} L${X1 + 20},${Y}" stroke="var(--ink)" stroke-width="1" fill="none"/>`),
+          F.annot(X0 - 34, Y - 76, '공장의 수', { anchor: 'middle', size: 11 }),
+          F.annot((X0 + X1) / 2, Y + 36, '도시', { anchor: 'middle', size: 12 }),
+        ];
+        M.cities.forEach((c) => {
+          [[c.n, 0], [c.grown, 1]].forEach(([n, step]) => {
+            if (!n) return;
+            const h = (n / maxN) * HMAX, w = 26;
+            parts.push(F.raw(
+              `<rect x="${px(c.x) - w / 2}" y="${Y - h}" width="${w}" height="${h}" ` +
+              `fill="var(--brand-crimson)" fill-opacity="${n >= 8 ? 0.85 : 0.35}" ` +
+              `stroke="var(--brand-crimson)" stroke-width="1"/>`, { fragment: step }));
+            parts.push(F.annot(px(c.x), Y - h - 7, String(n),
+                               { anchor: 'middle', size: 12, fragment: step }));
+          });
+          parts.push(F.annot(px(c.x), Y + 17, c.name, { anchor: 'middle', size: 13 }));
+        });
+        parts.push(F.annot(px(40), Y + 54, '↑ 중위입지 M — 서쪽 10명, 동쪽 10명',
+                           { anchor: 'middle', size: 12, tone: 'red', fragment: 0 }));
+        parts.push(F.annot(px(160), Y + 54, '↑ 이제는 D',
+                           { anchor: 'middle', size: 12, tone: 'red', fragment: 1 }));
+        F.draw('#f-median', { parts });
+      })();
+    </script>
+    <p class="emph" style="margin-top:4px">A·B·M·C는 <strong>20마일 간격</strong>, D는 C로부터 <strong>100마일</strong>.
+      M에서 C로 20마일 이동하면 동쪽 통행거리는 200마일(10×20) 줄지만
+      서쪽은 220마일(11×20) 늘어 <strong>총 통행거리가 증가</strong>한다</p>
+    <p class="derive t-red" style="margin-top:2px">→ D의 공장이 13개로 늘면 중위입지가 D로 옮겨 간다.
+      <strong>대도시들에서 수요의 집중이 대도시들을 성장하게 한다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 12. 고객 간 거리는 무관 (p.96) ═══════════════════════ -->
+<section>
+  <h2>고객 간 거리는 입지선택에 무관하다</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:30px">도시 D가 도시 C로부터 100마일 대신
+      <span class="mark">300마일만큼 떨어져 있어도 중위입지는 여전히 도시 M</span>이다</p>
+    <p class="emph" style="margin-bottom:30px">픽스잇의 총 통행거리는 도시 M에서 —
+      보다 높은 수준에서 — 여전히 최소화된다</p>
+    <p class="derive t-red">→ 중요한 것은 <strong>어느 쪽에 목적지가 몇 개 있는가</strong>이지
+      그것들이 얼마나 멀리 있는가가 아니다.
+      중위입지로부터 멀어지는 이동은 <strong>과반수의 공장에 대한 통행거리를 증가시킨다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 13. 그림 5-5 환적지점 (p.97~98) ══════════════════════ -->
+<section class="s-split">
+  <h2>환적지점과 항구도시들</h2>
+  <div class="body">
+    <div class="col-l" style="flex:0 0 44%">
+      <p class="lead t-define" style="margin-bottom:12px"><span class="mark">환적지점</span>은 재화가
+        하나의 운송수단에서 다른 운송수단으로 옮겨지는 지점이다</p>
+      <p class="emph" style="margin-bottom:12px">가구공장은 지점 F에서 목재를, 지점 G에서 직물을 얻어
+        가구로 가공하고 지점 M의 해외시장에 판매한다.
+        생산요소의 금전적 중량 <strong>12달러(6+6)</strong>가 생산물의 <strong>9달러</strong>를 넘는 중량−감소 행위다</p>
+      <p class="derive t-red">→ 진정한 중위입지는 없지만
+        <strong>항구가 중위입지에 가장 가깝다</strong></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-port" viewBox="0 0 440 260" style="width:420px" role="img">
+        <title>시장·항구·두 생산요소 원산지가 Y자로 이어진 항구입지 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig;
+          const M = [46, 130], P = [206, 130], Fp = [396, 46], G = [396, 214];
+          const link = (a, b, dash) => F.raw(
+            `<path d="M${a[0]},${a[1]} L${b[0]},${b[1]}" stroke="var(--ink)" stroke-width="2.2" ` +
+            `fill="none"${dash ? ' stroke-dasharray="7 5"' : ''}/>`);
+          F.draw('#f-port', {
+            parts: [
+              link(M, P, false), link(P, Fp, true), link(P, G, true),
+              ...[M, P, Fp, G].map((p) => F.dot(p[0], p[1], { free: true, r: 6 })),
+              F.annot(M[0], M[1] - 14, '시장 M', { anchor: 'middle', size: 13 }),
+              F.annot(M[0] + 12, M[1] + 26, '(금전적 중량 = $9)', { size: 11 }),
+              F.annot(P[0], P[1] - 14, '항구', { anchor: 'middle', size: 13, tone: 'red' }),
+              F.annot(Fp[0], Fp[1] - 14, '생산요소 원산지 F', { anchor: 'end', size: 13 }),
+              F.annot(G[0], G[1] + 24, '생산요소 원산지 G', { anchor: 'end', size: 13 }),
+              F.annot(302, 74, '(금전적 중량 = $6)', { anchor: 'middle', size: 11 }),
+              F.annot(302, 194, '(금전적 중량 = $6)', { anchor: 'middle', size: 11 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 14. 항구도시 사례 (p.99) ═════════════════════════════ -->
+<section>
+  <h2>항구도시들</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>시애틀</strong> — 1880년에 제재소마을로 출발. 서부 워싱턴주에서 벌목한 통나무를
+        시애틀 제재소에서 가공한 후 다른 주와 나라들로 선적하였다</li>
+      <li><strong>볼티모어</strong> — 미국에서 제일 처음의 <strong>신흥도시(boomtown)</strong>.
+        밀가루 제분소들이 주위 농업지의 밀을 가공해 서인도제도로 수출하였다</li>
+      <li><strong>버펄로</strong> — 밀가루 제분소의 중심지. 오대호를 가로질러 중서부 주들로부터 밀이 선적되었고,
+        버펄로에서 밀가루로 가공되어 철도로 동부 도시들에 운송되었다</li>
+    </ol>
+    <p class="derive t-red" style="margin-top:20px">→ 둘 다 밀가루 제분소마을이었으나 선박의 이용이 달랐다.
+      <strong>볼티모어는 생산물(밀가루)을 수출</strong>했고
+      <strong>버펄로는 생산요소(밀)를 수입</strong>했다</p>
+  </div>
+</section>
+
+<!-- ══ 15. 섹션 — 03 노동, 에너지, 집적의 경제 ══════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 노동, 에너지, 그리고 집적의 경제</p>
+  <p class="section-sub">운송비용이 덜 중요해진 뒤에 남는 것 · 교재 p.99~103</p>
+</section>
+
+<!-- ══ 16. 운송비용이 덜 중요해졌다 (p.99) ══════════════════ -->
+<section>
+  <h2>운송비용이 덜 중요해졌다</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:16px">역사적으로 자원−지향적 혹은 시장−지향적이었던 많은 산업에서,
+      이제 기업들은 <strong>생산요소 원산지와 시장으로부터 멀리 입지한다</strong>.
+      운송비용을 감소시킨 두 혁신 때문이다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">1. 교통기술</p>
+        <p>빠른 해양선박과 <strong>컨테이너</strong> 기술이 선박운송 비용을 낮췄고,
+          철도와 트럭의 개선이 육상운송 비용을 낮췄다.
+          보다 빠르고 효율적인 비행기가 항공운송 비용을 낮췄다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">2. 생산기술</p>
+        <p>생산요소의 <strong>물리적 중량</strong>이 줄었다.
+          1톤의 강철을 만드는 데 필요한 석탄과 광물의 양이 꾸준히 감소했는데,
+          개선된 생산방식과 철광석(운송되는 생산요소) 대신
+          <strong>고철</strong>(지역에서 구입 가능한 생산요소)의 이용 덕분이다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 17. 노동비용 (p.100) ═════════════════════════════════ -->
+<section>
+  <h2>노동비용</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">노동은 생산비용의 대략 <span class="mark">3/4</span>을 차지한다.
+      노동자가 대도시 밖으로 통근하는 것은 비현실적이므로 노동은 <span class="mark">지역 생산요소</span>다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">임금과 기업활동</p>
+        <p style="margin-bottom:10px">바틱(Bartik, 1991)은 대도시 임금에 대한
+          기업활동의 <strong>장기 탄력성이 −1.0 ~ −2.0</strong>이라고 결론짓는다 —
+          임금 10% 감소가 기업활동을 10~20% 증가시킨다</p>
+        <p class="caption">신생기업 수의 탄력성은 약 −1.0. 임금 10% 증가가 창업을 10% 감소시킨다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">기후는 임금을 통해 작용한다</p>
+        <p style="margin-bottom:10px">노동자가 따뜻한 날씨를 선호한다면 내쉬균형을 위해
+          <strong>남부의 임금이 북부보다 낮아야</strong> 한다.
+          그렇지 않으면 남부로 이주해 같은 임금과 나은 날씨를 함께 얻으려 할 것이다</p>
+        <p class="caption">랩파포트(2007) — 1920년경부터 미국 주민들이 좋은 날씨를 지닌 곳으로 이주했고,
+          핵심 요인은 <strong>소비 편의시설로서 좋은 날씨의 가치 증가</strong>였다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:12px">→ 기업을 따라가는 노동자 대신에,
+      <strong>기업들이 노동자들을 따라간다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 18. 에너지 기술 (p.101) ══════════════════════════════ -->
+<section>
+  <h2>에너지 기술이 입지를 바꿔 왔다</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>물레바퀴</strong> (19세기 전반기) — 에너지는 운송될 수 없는 지역 생산요소였다.
+        섬유제조업체들이 뉴잉글랜드의 시골 개울을 따라 공장을 세웠다.
+        물레바퀴 도시: <strong>로웰 · 로렌스 · 홀리요크 · 루이스턴</strong></li>
+      <li><strong>증기엔진</strong> (19세기 후반기) — 에너지를 운송 가능한 생산요소로 만들었다.
+        제약은 석탄 공급. 펜실베니아 석탄탄광 인근이나 항해 가능한 수로를 따라 입지했고,
+        이후 <strong>철도</strong>가 노선망을 따라 공장을 낳았다</li>
+      <li><strong>전기</strong> — 발전기는 1860년대에 향상되고 <strong>전기발동기는 1888년</strong>에 발명되었다.
+        벨트−기어 시스템이 개별 기계의 작은 전기발동기로 대체되었다.
+        첫 전기동력 공장은 <strong>나이아가라 폭포</strong> 수력발전설비에 인접했다</li>
+    </ol>
+    <p class="derive t-red" style="margin-top:12px">→ 전기의 개발은 입지결정에서 에너지의 중요성을 낮췄다.
+      다만 <strong>알루미늄은 에너지비용이 총 비용의 약 30%</strong>여서 여전히 값싼 전기를 따라간다</p>
+  </div>
+</section>
+
+<!-- ══ 19. 제조업벨트 (p.102~103) ═══════════════════════════ -->
+<section>
+  <h2>미국의 제조업벨트 — 성장과 쇠퇴</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:10px">19세기 후반에 발전했다. 규모의 경제를 쓰려면 대규모의
+      이동 불가능한 자원(석탄·철광석)이 필요했고, 제조업벨트는 그 접근에 자연적 이점을 가지고 있었다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">국가 전체 제조업 고용에서의 비중</p>
+        <p style="margin-bottom:12px"><strong>1947년까지 70%</strong> →
+          <strong>2000년까지 약 40%</strong></p>
+        <p class="caption" style="margin-bottom:14px">분산의 중요한 요인은 제조업벨트의 자연적 이점을 감소시킨
+          <strong>운송비용의 일반적인 감소</strong>였다</p>
+        <p class="sub t-red" style="margin-bottom:2px">1970~2000년 인구 변화 <span class="en">(Glaeser, 1991)</span></p>
+        <p>감소 — 디트로이트 −7% · 클리블랜드 −28% · 피츠버그 −5%<br>
+          증가 — 보스턴 +11% · 미네아폴리스 +50%</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">갈린 것은 인적자본이었다</p>
+        <p style="margin-bottom:12px">쇠퇴한 도시들은 노동력에서 <strong>대졸자 비중이 낮았고</strong>,
+          성장한 도시들은 높았다</p>
+        <p style="margin-bottom:12px">지난 40년간 저숙련 단순노무 수요는 줄고
+          (금융·법률서비스·의료 같은) <strong>고숙련 지식 노동 수요는 늘었다</strong>.
+          교육받은 노동력을 지닌 도시는 그 전환에 준비가 되어 있었다</p>
+        <p class="derive t-red">→ 대학 학위를 지닌 성인 인구 비중에 대한
+          <strong>인구성장의 탄력성 1.2</strong> — 대졸자 비중 10% 증가가 인구성장률을 12% 높인다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 20. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

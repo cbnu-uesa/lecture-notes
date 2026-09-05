@@ -1,0 +1,510 @@
+<!doctype html>
+<!--
+  9강. 토지 임대료와 공장용 토지
+  교재: 오설리반의 도시경제학 제9판 — 10장 (p.195~207). PART 03 의 시작.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9강. 토지 임대료와 공장용 토지</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 농업용 토지 [p.197~199] ────────────────────────────────
+  // 비용함수 하나에서 평균비용·한계비용을 함께 유도한다 (design.md §6.5).
+  //   TC(q) = F + αq²  →  ac(q) = F/q + αq,  mc(q) = 2αq
+  // F 와 α 는 교재가 인쇄한 (p*, q*, ac*) 세 값에서 역산한 것이다.
+  //   높은 비옥도 : p*=11, q*=100, ac*=6  → 이윤 500
+  //   중간 비옥도 : p*=11, q**=90, ac**=8 → 이윤 270
+  window.FARM = {
+    price: 11,
+    land: [
+      { tag: '높은 비옥도', q: 100, ac: 6, dot: 'h', variant: null },
+      { tag: '중간의 비옥도', q: 90, ac: 8, dot: 'm', variant: 'supply' },
+    ],
+    // mc(q) = 2αq = p*  →  α = p*/(2q).  ac(q) = F/q + αq = ac*  →  F = q(ac* − αq)
+    alpha(L) { return this.price / (2 * L.q); },
+    F(L)     { return L.q * (L.ac - this.alpha(L) * L.q); },
+    ac(L, q) { return this.F(L) / q + this.alpha(L) * q; },
+    mc(L, q) { return 2 * this.alpha(L) * q; },
+    profit(L){ return (this.price - L.ac) * L.q; },
+  };
+
+  // ── 제조업 입지 [p.201~204] ────────────────────────────────
+  // r(x) = (총 수입 − 운송비용(x) − 노동비용(x) − 중간재비용) / T
+  // Δr/Δx = (−f + c) / T
+  window.PLANT = {
+    revenue: 92, inter: 10, wage0: 40, c: 4, T: 1,
+    city: [
+      { tag: '마차 도시',  f: 10, marks: [1, 5] },   // 기울기 −6
+      { tag: '트럭 도시',  f: 1,  marks: [1, 5] },   // 기울기 +3
+    ],
+    transport(C, x) { return C.f * x; },
+    labor(x)        { return this.wage0 - this.c * x; },
+    total(C, x)     { return this.inter + this.labor(x) + this.transport(C, x); },
+    bid(C, x)       { return (this.revenue - this.total(C, x)) / this.T; },
+    slope(C)        { return (-C.f + this.c) / this.T; },
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .tbl-farm { width: 100%; table-layout: fixed; }
+  .tbl-farm th:first-child, .tbl-farm td:first-child { width: 40%; }
+  .tbl-farm th:not(:first-child), .tbl-farm td:not(:first-child) { text-align: right; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>9강. 토지 임대료와<br>공장용 토지</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 발문 (p.195) ══════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:44px">
+      “토지에 있어서의 고민거리는 그들이 더 이상 이것을 만들지 않는다는 것이다.”
+      <span class="who">— 윌 로저스</span></p>
+    <p class="lead t-define" style="margin-bottom:16px">고정된 공급의 토지에 대한 경쟁은
+      토지가 <span class="mark">잔여재산분배청구권자</span>임을 의미한다</p>
+    <p class="emph">토지 임대료는 기업의 <strong>총 수입에서 생산의 비토지 비용을 뺀 것</strong>과 동일하다.
+      지주는 기업이 다른 생산요소들에 대해 모두 지불한 이후에 남은 것을 얻는다.
+      농업용 토지의 가격은 <strong>비옥도</strong>를, 제조업용 토지의 가격은 <strong>접근성</strong>을 반영한다</p>
+  </div>
+</section>
+
+<!-- ══ 3. 섹션 — 01 비옥도와 잉여의 원칙 ════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 비옥도와 잉여의 원칙</p>
+  <p class="section-sub">농업용 토지의 가격은 무엇이 정하는가 · 교재 p.195~200</p>
+</section>
+
+<!-- ══ 4. 잉여의 원칙 (p.195) ═══════════════════════════════ -->
+<section>
+  <h2>잉여의 원칙 <span class="en">(the leftover principle)</span></h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:24px"><strong>데이비드 리카르도(1821)</strong>는 농업용 토지의 가격이
+      이의 비옥도에 의해 결정된다는 아이디어에 기여하였다.
+      토지 비옥도의 증가는 생산비용을 감소시키며, 따라서 농부는 이 토지에서 작물을 재배하기 위해
+      보다 많이 지불할 용의를 지닌다</p>
+    <p class="lead t-define" style="margin-bottom:24px">비옥한 토지에 대한 농부들 간 경쟁적인 입찰은
+      <span class="mark">승리하는 입찰자가 영(0)의 경제적 이윤을 갖는 수준</span>으로 토지의 가격을 상승시킨다</p>
+    <p class="derive t-red">→ 승리하는 입찰자에 의해 지불되는 임대료는
+      <strong>총 수입에서 비토지 비용을 뺀 것</strong>과 동일하다.
+      지주는 농부가 다른 생산요소들에 대해 지불한 후에 남는 돈을 얻는다</p>
+  </div>
+</section>
+
+<!-- ══ 5. 임대료 · 시장가치 · 토지의 가격 (p.195~196) ═══════ -->
+<section>
+  <h2>토지 임대료, 시장가치, 그리고 토지의 가격</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">토지 임대료 <span class="en">land rent</span></p>
+        <p style="margin-bottom:14px">대지를 이용할 권리에 대한 <strong>연간 지불액</strong>.
+          농부는 옥수수 재배를 위한 1헥타르의 토지를 이용하기 위해 지주에게 연간 <strong>300달러</strong>를 지불할 수 있다</p>
+        <p class="sub t-red" style="margin-bottom:2px">시장가치 <span class="en">market value</span></p>
+        <p>토지 소유를 위한 <strong>구입가격</strong>.
+          옥수수 재배에 적합한 토지의 시장가치는 1헥타르당 <strong>6,000달러</strong>가 될 수 있다</p>
+      </div>
+      <div class="col-r">
+        <p class="emph" style="margin-bottom:8px">토지는 소득의 흐름을 낳는 자산이며,
+          투자자가 지불하고자 하는 최대치는 <strong>소득 흐름의 현재가치</strong>와 동일하다.
+          시장 이자율 i = 5%라면</p>
+        <p class="formula-key" style="margin-bottom:12px">$PV = R/i = \$300 / 0.05 = \$6{,}000$</p>
+        <p class="caption">이 현재가치는 은행 계좌에 예치하는 것 대신에 토지에 투자하는 것의
+          <strong>기회비용</strong>을 반영한 것이다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:16px">→ 이 책에서 <strong>토지의 가격은 토지 임대료와 동의어</strong>다.
+      연간 임대료를 이자율로 나누면 시장가치가, 시장가치에 이자율을 곱하면 암묵적 가격(연간 임대료)이 된다</p>
+  </div>
+</section>
+
+<!-- ══ 6. 다섯 가정 (p.197) ═════════════════════════════════ -->
+<section>
+  <h2>농업용 토지 임대료 모형의 다섯 가정</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">임차 농부들이 다양한 비옥도의 토지에 옥수수를 재배하는 지역을 고려하라</p>
+    <ol class="dense">
+      <li><strong>생산물 시장에서의 완전한 경쟁</strong> — 농부들은 가격수용자들이고, 경제적 이윤은 장기적으로 영(0)이다</li>
+      <li><strong>공통의 생산요소 가격들</strong> — 비토지 생산요소들(재료·노동·자본)의 가격은 지역 전체에 걸쳐 동일하다</li>
+      <li><strong>가장 높은 입찰자에게 토지를 임대</strong> — 지주는 가장 높은 입찰자에게 토지를 임대한다</li>
+      <li><strong>영(0)의 운송비용</strong> — 운송비용은 영(0)이다</li>
+      <li><strong>국가수준에서의 가격들</strong> — 모든 가격들은 국가 시장에서 결정되고 지역에서의 사건들에 영향을 받지 않는다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 7. 그림 10-1 · 10-2 (p.197~199) — fragment 2단계 ═════ -->
+<section class="s-split">
+  <h2>비옥도가 지불용의를 정한다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">한계비용곡선은 <strong>평균 총 비용곡선을 최저점에서 관통</strong>한다.
+        비용곡선은 재료·자본·노동·농부의 기회비용을 포함한 <strong>모든 비토지 비용</strong>을 담는다</p>
+      <p style="margin-bottom:10px">농부는 <strong>가격 = 한계비용</strong>인 생산량에서 이윤을 극대화하고,
+        음영 사각형이 <strong>이윤 사각형</strong>이다</p>
+      <table class="tbl-farm" id="t-farm"></table>
+      <p class="derive t-red" style="margin-top:8px" id="k-farm"></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-farm" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>비옥도가 높은 토지에서 이윤 사각형이 더 크고, 비옥도가 낮아지면 비용곡선이 올라가 이윤이 줄어드는 그림</title></svg>
+      <script>
+        (function () {
+          const A = window.FARM;
+          const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
+          const S = F.scale({ x: [0, 150], y: [0, 16] });
+          const samp = (f, a, b) => {
+            const o = [];
+            for (let i = 0; i <= 70; i++) { const q = a + ((b - a) * i) / 70; o.push([q, f(q)]); }
+            return S.curve(o);
+          };
+          const parts = [
+            F.line(F.BOX.x0, S.y(A.price), S.x(146), S.y(A.price), { variant: 'cap', dash: '8 5' }),
+            F.annot(F.BOX.x0 - 8, S.y(A.price) + 4, 'p*', { anchor: 'end', size: 12 }),
+          ];
+          A.land.forEach((L, i) => {
+            const o = L.variant ? { variant: L.variant } : {};
+            parts.push(F.raw(
+              `<rect class="area-surplus" x="${S.x(0)}" y="${S.y(A.price)}" ` +
+              `width="${S.x(L.q) - S.x(0)}" height="${S.y(L.ac) - S.y(A.price)}"/>`,
+              { fragment: i }));
+            parts.push(F.curve(samp((q) => A.ac(L, q), 22, 146), { ...o, fragment: i }));
+            parts.push(F.curve(samp((q) => A.mc(L, q), 22, Math.min(146, (16 / (2 * A.alpha(L))))),
+                               { ...o, dash: '6 4', fragment: i }));
+            parts.push(F.guide(...S.p([L.q, L.ac]),
+                               { xtick: i ? 'q**' : 'q*', ytick: i ? 'ac**' : 'ac*', fragment: i }));
+            parts.push(F.dot(...S.p([L.q, A.price]), { label: L.dot, lx: 8, ly: -8, fragment: i }));
+            parts.push(F.annot(S.x(142), S.y(A.ac(L, 142)) + (i ? -8 : 16), L.tag,
+                               { size: 11, anchor: 'end', tone: i ? 'red' : undefined, fragment: i }));
+          });
+          F.draw('#f-farm', { axes: { x: '수량', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const A = window.FARM;
+      document.getElementById('t-farm').innerHTML =
+        '<thead><tr><th>토지</th><th>p*</th><th>ac</th><th>q</th><th>이윤</th></tr></thead><tbody>' +
+        A.land.map((L) =>
+          `<tr><td style="text-align:left">${L.tag}</td><td>${A.price}</td>` +
+          `<td>${L.ac}</td><td>${L.q}</td><td><strong>${A.profit(L)}달러</strong></td></tr>`).join('') +
+        '</tbody>';
+      const [a, b] = A.land;
+      document.getElementById('k-farm').innerHTML =
+        `→ 비옥도가 높을수록 비용곡선이 낮다. 높은 비옥도에서 중간 비옥도로의 이동은 ` +
+        `토지에 대한 지불용의를 <strong>${A.profit(a)}달러에서 ${A.profit(b)}달러로</strong> 감소시킨다`;
+    })();
+  </script>
+</section>
+
+<!-- ══ 8. 경쟁과 잉여의 원칙 (p.199~200) ════════════════════ -->
+<section>
+  <h2>경쟁이 지불용의를 임대료로 바꾼다</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">잉여의 원칙:
+      <span class="mark">균형 토지 임대료는 총 수입에서 비토지 비용을 뺀 것과 동일하다</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">경쟁이 강요한다</p>
+        <p style="margin-bottom:10px">개별 농부는 높은−비옥도 토지에 대해 <strong>500달러</strong>까지 지불할 용의가 있고
+          경쟁에 의해 그렇게 하도록 강요된다.
+          500달러보다 적은 임대료에서 지주는 조금 더 지불할 용의가 있는 또 다른 농부를 찾을 수 있다</p>
+        <p class="derive t-red">→ 균형 임대료가 경제적 이윤을 영(0)으로 만들기 때문에
+          <strong>농부들은 상이한 농지들 간에 무차별</strong>하다.
+          높은−비옥도 토지의 생산비용 절약은 <strong>보다 높은 토지비용에 의해 정확히 상쇄</strong>된다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">시장진입에 제약이 있으면 적용되지 않는다</p>
+        <p style="margin-bottom:10px"><strong>진(Gene)</strong>이 생산비용을 200달러만큼 줄이는 농업기술에
+          특허를 가지고 있다고 하자. 지주는 700달러를 받을 것으로 예상할 수 없는데
+          그 금액을 지불하고자 하는 경쟁하는 농부들이 없기 때문이다</p>
+        <p class="caption">진은 단지 500달러를 지불하고 <strong>200달러의 경제적 이윤</strong>을 얻는다.
+          특허에 기인한 이러한 잉여는 <strong>경제적 임대료(economic rent)</strong>로 알려진다.
+          특허가 만료되고 모든 농부가 같은 기술에 접근하면
+          지주는 임대료를 <strong>700달러</strong>로 올려 이를 토지 임대료로 전환할 수 있다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. 섹션 — 02 제조업: 토지가격과 입지 ═════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 제조업: 토지가격과 입지</p>
+  <p class="section-sub">도시환경에서는 비옥도가 아니라 접근성이다 · 교재 p.200~207</p>
+</section>
+
+<!-- ══ 10. 단순 모형의 다섯 가정 (p.200~201) ════════════════ -->
+<section>
+  <h2>자전거 제조업체의 단순 모형</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">도시환경에서 한 구획의 토지에 대한 지불용의는
+      <strong>비옥도보다는 접근성</strong>에 의존한다.
+      토지는 가장 높은 입찰자에게 할당되며, 따라서 제조업체의 토지 입찰이 어디에 입지하는가를 결정한다</p>
+    <ol class="dense">
+      <li><strong>고정된 생산요소와 생산물 수량</strong> — 개별 기업은 1헥타르의 토지를 포함하여
+        고정된 양의 생산요소로 고정된 양의 자전거를 생산한다</li>
+      <li><strong>고정된 생산요소와 생산물의 가격</strong> — 자전거의 가격도 중간재 생산요소의 가격도 고정되어 있다</li>
+      <li><strong>중심부의 운송터미널</strong> — 수입과 수출은 중심부의 화물터미널(기차터미널 혹은 항구)을 거친다</li>
+      <li><strong>도시 내 운송</strong> — 마차를 이용한다. 1킬로미터당 운송비용은 <strong>f = 10달러</strong></li>
+      <li><strong>노동비용</strong> — 임금은 통근비용을 보상한다. 중심부에서 가장 높고,
+        1킬로미터 이동은 노동비용을 <strong>c = 4달러</strong>만큼 감소시킨다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 11. 그림 10-3 마차 도시 (p.201~202) ══════════════════ -->
+<section>
+  <h2>마차 도시에서의 제조업 임대료</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">총 비용은 중심부에서 <strong>50달러</strong>이고
+      5킬로미터에서 <strong>80달러</strong>다. 거리 1단위 증가는 운송비용을 10달러 늘리고
+      노동비용을 4달러 줄여 <strong>6달러의 순 증가</strong>를 가져온다</p>
+    <svg class="fig" id="f-wagon" viewBox="0 0 720 268" style="width:640px;margin:2px 0 0 100px" role="img">
+      <title>마차 도시에서 중심부로부터 멀어질수록 총비용이 올라 토지 입찰액이 42달러에서 12달러로 떨어지는 그림</title></svg>
+    <script>
+      (function () {
+        const P = window.PLANT, C = P.city[0], F = Fig;
+        const parts = [];
+        // 위 칸 — 비용의 공간적 변화
+        const A = { x0: 62, y0: 150, x1: 400, y1: 22 };
+        const ax = (x) => A.x0 + (x / 5.6) * (A.x1 - A.x0);
+        const ay = (v) => A.y0 - (v / 100) * (A.y0 - A.y1);
+        const aln = (f, o) => F.line(ax(0), ay(f(0)), ax(5.4), ay(f(5.4)), o);
+        parts.push(F.raw(`<path class="axis" d="M${A.x0},${A.y1 - 6} L${A.x0},${A.y0} L${A.x1 + 10},${A.y0}"/>`));
+        parts.push(F.annot(A.x0, A.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+        parts.push(aln((x) => P.revenue, { variant: 'demand' }));
+        parts.push(F.annot(ax(2.7), ay(P.revenue) - 7, '총 수입', { anchor: 'middle', size: 11, tone: 'blue' }));
+        parts.push(aln((x) => P.total(C, x), {}));
+        parts.push(F.annot(ax(3.1), ay(P.total(C, 3.1)) - 8, '총 비용', { size: 11 }));
+        parts.push(aln((x) => P.labor(x), { variant: 'cap' }));
+        parts.push(F.annot(ax(1.9), ay(P.labor(1.9)) - 8, '노동비용', { size: 11 }));
+        parts.push(aln((x) => P.transport(C, x), { variant: 'supply' }));
+        parts.push(F.annot(ax(4.3), ay(P.transport(C, 4.3)) - 8, '운송비용', { size: 11, tone: 'red' }));
+        parts.push(aln((x) => P.inter, { variant: 'i1' }));
+        parts.push(F.annot(ax(3.5), ay(P.inter) + 14, '중간재 생산요소 비용', { size: 11 }));
+        [50, 80].forEach((v) => {
+          parts.push(F.raw(`<path class="guide" d="M${A.x0 - 5},${ay(v)} L${ax(5.2)},${ay(v)}"/>`));
+          parts.push(F.annot(A.x0 - 9, ay(v) + 4, String(v), { anchor: 'end', size: 11 }));
+        });
+        [1, 2, 3, 4, 5].forEach((x) =>
+          parts.push(F.annot(ax(x), A.y0 + 15, String(x), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(ax(2.7), A.y0 + 31, '중심부로부터의 거리(km)', { anchor: 'middle', size: 11 }));
+
+        // 아래 칸 — 지불용의 지대
+        const B = { x0: 452, y0: 150, x1: 660, y1: 22 };
+        const bx = (x) => B.x0 + (x / 5.6) * (B.x1 - B.x0);
+        const by = (v) => B.y0 - (v / 50) * (B.y0 - B.y1);
+        parts.push(F.raw(`<path class="axis" d="M${B.x0},${B.y1 - 6} L${B.x0},${B.y0} L${B.x1 + 10},${B.y0}"/>`));
+        parts.push(F.annot(B.x0, B.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+        parts.push(F.line(bx(0), by(P.bid(C, 0)), bx(5.4), by(P.bid(C, 5.4)), { variant: 'supply' }));
+        parts.push(F.annot(bx(3.0), by(P.bid(C, 3.0)) + 16, '토지에 대한 지불용의 지대',
+                           { anchor: 'middle', size: 11, tone: 'red' }));
+        C.marks.forEach((x) => {
+          const v = P.bid(C, x);
+          parts.push(F.raw(`<path class="guide" d="M${B.x0 - 5},${by(v)} L${bx(x)},${by(v)} L${bx(x)},${B.y0}"/>`));
+          parts.push(F.annot(B.x0 - 9, by(v) + 4, String(v), { anchor: 'end', size: 11 }));
+          parts.push(F.annot(bx(x), B.y0 + 15, String(x), { anchor: 'middle', size: 11 }));
+        });
+        parts.push(F.annot(bx(2.7), B.y0 + 31, '중심부로부터의 거리(km)', { anchor: 'middle', size: 11 }));
+        F.draw('#f-wagon', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 입찰액은 총 수입에서 총 비용을 뺀 것이다.
+      중심부에서 <strong>42달러 = 92 − 50</strong>이고 1km당 6달러씩 줄어
+      1km에서 36달러, 5km에서 12달러가 된다</p>
+  </div>
+</section>
+
+<!-- ══ 12. 지대곡선의 기울기 (p.203) ════════════════════════ -->
+<section>
+  <h2>지대곡선의 기울기는 f 와 c 가 정한다</h2>
+  <div class="body stack">
+    <p class="formula-key" style="margin-bottom:14px">
+      $r(x) = \dfrac{\text{총 수입} - \text{운송비용}(x) - \text{노동비용}(x) - \text{중간재 생산요소 비용}}{T}$</p>
+    <p class="emph" style="margin-bottom:20px">r(x)는 단위 토지당 입찰액, T는 이 기업이 점유한 토지의 양(부지 면적)이다</p>
+    <p class="formula-key" style="margin-bottom:20px">
+      $\dfrac{\Delta r}{\Delta x} = \dfrac{-f + c}{T} = \dfrac{-10 + 4}{1} = -6\text{달러}$</p>
+    <p class="emph" style="margin-bottom:16px">이 단순한 모형은 <strong>20세기 초의 운송기술</strong>을 반영한다.
+      트럭은 아직 개발되지 않아 도시 내 운송은 마차에 의해 이뤄져 느리고 비쌌다.
+      도시 간 운송은 선박·기차로 이뤄져 제조업체들은 중심부의 항구나 철도터미널 근처에 입지하려 했다.
+      대조적으로 노동자들은 교외 주거지역에서 <strong>빠른 시내 전차</strong>로 통근하였다</p>
+    <p class="derive t-red">→ <strong>f &gt; c</strong>이기 때문에 제조업 지대곡선은 음(−)의 기울기를 가지며,
+      제조업체들은 중심부 운송터미널에 가까운 부지를 다른 토지 이용자보다 높은 가격으로 입찰해 획득하였다</p>
+  </div>
+</section>
+
+<!-- ══ 13. 그림 10-4 트럭 도시 (p.203~204) ══════════════════ -->
+<section>
+  <h2>트럭이 기울기를 뒤집는다</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">1910년에 개발된 도시 내 트럭은 마차보다 두 배만큼 빠르고 운행하는 데 덜 비쌌다.
+      1910년과 1920년 사이 시카고에서 트럭의 수는 <strong>800에서 23,000으로</strong> 증가하였다.
+      단위 운송비용 f 가 <strong>10달러에서 1달러로</strong> 감소한다고 하자</p>
+    <svg class="fig" id="f-truck" viewBox="0 0 720 260" style="width:640px;margin:2px 0 0 100px" role="img">
+      <title>트럭 도시에서는 총비용이 거리에 따라 내려가 토지 입찰액이 45달러에서 57달러로 오르는 그림</title></svg>
+    <script>
+      (function () {
+        const P = window.PLANT, C = P.city[1], F = Fig;
+        const parts = [];
+        const A = { x0: 62, y0: 146, x1: 400, y1: 22 };
+        const ax = (x) => A.x0 + (x / 5.6) * (A.x1 - A.x0);
+        const ay = (v) => A.y0 - (v / 100) * (A.y0 - A.y1);
+        const aln = (f, o) => F.line(ax(0), ay(f(0)), ax(5.4), ay(f(5.4)), o);
+        parts.push(F.raw(`<path class="axis" d="M${A.x0},${A.y1 - 6} L${A.x0},${A.y0} L${A.x1 + 10},${A.y0}"/>`));
+        parts.push(F.annot(A.x0, A.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+        parts.push(aln(() => P.revenue, { variant: 'demand' }));
+        parts.push(F.annot(ax(2.7), ay(P.revenue) - 7, '총 수입', { anchor: 'middle', size: 11, tone: 'blue' }));
+        parts.push(aln((x) => P.total(C, x), {}));
+        parts.push(F.annot(ax(3.4), ay(P.total(C, 3.4)) - 8, '총 비용', { size: 11 }));
+        parts.push(aln((x) => P.labor(x), { variant: 'cap' }));
+        parts.push(F.annot(ax(1.7), ay(P.labor(1.7)) - 8, '노동비용', { size: 11 }));
+        parts.push(aln((x) => P.transport(C, x), { variant: 'supply' }));
+        parts.push(F.annot(ax(3.0), ay(P.transport(C, 3.0)) - 8, '운송비용', { size: 11, tone: 'red' }));
+        [1, 2, 3, 4, 5].forEach((x) =>
+          parts.push(F.annot(ax(x), A.y0 + 15, String(x), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(ax(2.7), A.y0 + 31, '중심부로부터의 거리(km)', { anchor: 'middle', size: 11 }));
+
+        const B = { x0: 452, y0: 146, x1: 660, y1: 22 };
+        const bx = (x) => B.x0 + (x / 5.6) * (B.x1 - B.x0);
+        const by = (v) => B.y0 - ((v - 30) / 40) * (B.y0 - B.y1);
+        parts.push(F.raw(`<path class="axis" d="M${B.x0},${B.y1 - 6} L${B.x0},${B.y0} L${B.x1 + 10},${B.y0}"/>`));
+        parts.push(F.annot(B.x0, B.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+        parts.push(F.line(bx(0), by(P.bid(C, 0)), bx(5.4), by(P.bid(C, 5.4)), { variant: 'supply' }));
+        parts.push(F.annot(bx(2.9), by(P.bid(C, 2.9)) + 17, '토지에 대한 지불용의 지대',
+                           { anchor: 'middle', size: 11, tone: 'red' }));
+        C.marks.forEach((x) => {
+          const v = P.bid(C, x);
+          parts.push(F.raw(`<path class="guide" d="M${B.x0 - 5},${by(v)} L${bx(x)},${by(v)} L${bx(x)},${B.y0}"/>`));
+          parts.push(F.annot(B.x0 - 9, by(v) + 4, String(v), { anchor: 'end', size: 11 }));
+          parts.push(F.annot(bx(x), B.y0 + 15, String(x), { anchor: 'middle', size: 11 }));
+        });
+        parts.push(F.annot(bx(2.7), B.y0 + 31, '중심부로부터의 거리(km)', { anchor: 'middle', size: 11 }));
+        F.draw('#f-truck', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 이제 <strong>Δr/Δx = (−1 + 4)/1 = +3달러</strong>.
+      생산요소와 생산물을 운송하는 비용이 노동자를 운송하는 비용보다 낮으면
+      기업은 <strong>운송터미널에서 먼 토지에 더 많이 입찰</strong>하고 교외의 노동력에 가까워진다</p>
+  </div>
+</section>
+
+<!-- ══ 14. 그림 10-5 순환고속도로 도시 (p.205~206) ══════════ -->
+<section class="s-split">
+  <h2>순환고속도로 도시</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px">도시 간 트럭과 고속도로체계의 결합은 제조업체들로 하여금
+        <strong>중심부 항구나 철도터미널에 대한 의존성으로부터 자유롭게</strong> 하였다.
+        지불용의 지대곡선은 <strong>고속도로에서 절정</strong>에 달한다</p>
+      <p style="margin-bottom:12px">기업이 고속도로를 향해 이동함에 따라 운송비용과 노동비용이 <strong>모두 감소</strong>하므로
+        입찰액은 증가한다. x″의 고속도로를 넘어서면 중심부와 고속도로로부터 멀어지는 이동은
+        운송비용을 증가시키고 노동비용을 감소시킨다</p>
+      <p class="derive t-red">→ 두 입지에서 운송비용은 영(0)이다. 차이는 <strong>노동비용</strong>이다 —
+        중심부 입지는 더 긴 통근거리를 보상할 높은 임금을 요구해 노동비용이 높고,
+        따라서 입찰액이 낮다 (<strong>r′ &lt; r″</strong>). 잉여의 원칙과 부합한다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-belt" viewBox="0 0 470 290" style="width:430px" role="img">
+        <title>고속도로 지대곡선이 순환고속도로 위치에서 정점에 달하고 항구 지대곡선보다 높은 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 66, y0: 250, x1: 404, y1: 34 });
+          const S = F.scale({ x: [0, 10], y: [0, 10] });
+          const XH = 6.4;                       // 순환고속도로의 위치 x″
+          const rPort = (x) => 3.0 + 0.18 * x;  // 항구 기반 — 완만한 양의 기울기
+          const rHwy  = (x) => x <= XH ? 2.1 + 0.95 * x : 8.18 - 0.55 * (x - XH);
+          F.draw('#f-belt', {
+            axes: { x: '중심부로부터의 거리(킬로미터)', y: '지불용의\n지대($)' },
+            parts: [
+              F.line(...S.p([0.4, rPort(0.4)]), ...S.p([4.6, rPort(4.6)]), { variant: 'demand' }),
+              F.annot(S.x(0.6), S.y(rPort(0.6)) + 16, '지불용의 지대 : 항구', { size: 11, tone: 'blue' }),
+              F.line(...S.p([1.9, rHwy(1.9)]), ...S.p([XH, rHwy(XH)]), {}),
+              F.line(...S.p([XH, rHwy(XH)]), ...S.p([9.4, rHwy(9.4)]), {}),
+              F.annot(S.x(4.6), S.y(rHwy(4.6)) - 10, '지불용의 지대 : 고속도로', { size: 11, anchor: 'end' }),
+              F.guide(...S.p([XH, rHwy(XH)]), { xtick: "x″", ytick: "r″" }),
+              F.dot(...S.p([XH, rHwy(XH)]), { label: 'b', lx: 8, ly: -8 }),
+              F.guide(F.BOX.x0, S.y(rPort(0.4)), { ytick: "r′", only: 'y' }),
+              F.dot(...S.p([3.05, rPort(3.05)]), { label: 'a', lx: -6, ly: -12 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 15. 그림 10-6 임대료 표면 (p.206) ════════════════════ -->
+<section>
+  <h2>순환도로 도시에서의 토지 임대료 표면</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">항구나 중심부 철도터미널이 존재하지 않으며,
+      제조업체들은 중간재를 수입하고 생산물을 수출하기 위해 <strong>고속도로에 의존</strong>한다.
+      도시 간 고속도로는 도시 중심부를 지나고 <strong>우회 고속도로는 도시 간 고속도로에 연결</strong>된다</p>
+    <img src="../assets/tb-rent-surface.jpg"
+         alt="도시 위 토지 임대료를 높이로 나타낸 3차원 표면. 도시 중심부와 도시 간 고속도로를 따라 임대료가 솟아 있고 순환도로를 따라 원형의 능선이 가장 높게 형성되어 있다"
+         style="display:block;height:214px;width:auto;margin:4px auto 0">
+    <p class="caption" style="margin-top:2px;text-align:center">오설리반, 『오설리반의 도시경제학』 제9판, 박영사, 2022, 그림 10−6 (p.206)</p>
+    <p class="derive t-red" style="margin-top:2px">→ 토지에 대한 입찰가격은 <strong>순환도로에서 최고</strong>에 도달한다.
+      여기서 운송비용은 영(0)이고 노동비용은 중심부에 보다 가까운 고속도로 입지에서보다 낮다.
+      순환도로를 넘어서면 노동비용이 상대적으로 낮은 비율로 감소하므로 입찰가격은 운송비용이 증가함에 따라 감소한다</p>
+  </div>
+</section>
+
+<!-- ══ 16. 제조업의 공간적 분포 (p.207) ═════════════════════
+     그림 10-7(덴버 지도)은 스캔의 뒷면 비침이 지도의 회색 계조와 겹쳐
+     쓸 만한 품질로 잘라 낼 수 없었다. 글로 대신한다. -->
+<section>
+  <h2>제조업 임대료와 제조업의 공간적 분포</h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:24px">교재 <strong>그림 10−7</strong>은 2015년 덴버에서 제조업의 공간적 분포를 보여준다.
+      인구조사표준지역을 퍼즐조각으로 그리고 <strong>제조업 고용밀도</strong>만큼 밀어 올린 지도다.
+      제조업 밀도는 인구조사표준지역에서 <strong>1헥타르당 제조업 노동자수</strong>와 같다.
+      1헥타르는 100평방미터로 풋볼 경기장의 대략 두 배에 해당한다</p>
+    <p class="lead t-define" style="margin-bottom:24px">지도에서 <span class="mark">리본모양은 대도시지역을 지나는 고속도로</span>를 나타낸다</p>
+    <p class="derive t-red">→ 다수의 큰 대도시지역들에서와 같이,
+      <strong>거대한 제조업 고용은 고속도로에 접근 가능한 지역에 존재한다</strong>.
+      대부분의 기업들이 도시 간 고속도로체계에 연결된 고속도로 가까이에 입지하므로
+      도시 제조업 고용은 <strong>분산적이고 널리 퍼진다</strong></p>
+  </div>
+</section>
+
+<!-- ══ 17. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

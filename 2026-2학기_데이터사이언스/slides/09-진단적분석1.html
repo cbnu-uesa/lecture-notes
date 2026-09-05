@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>9강. 진단적 분석 Ⅰ — 상관과 인과</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+  .bad { color: var(--point-red, #A02948); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>9강. 진단적 분석 Ⅰ<br>상관과 인과</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>아산의 어느 동네는 왜 병원이 멀까?</h2>
+    <div class="body">
+      <ul>
+        <li>7주차에는 "어디가 다르다" 까지만 말했다</li>
+        <li>이제 <span class="mark">왜 그런가</span>를 묻는다</li>
+        <li>그런데 "왜" 는 데이터가 저절로 말해 주지 않는다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 정의 ══════════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>진단적 분석 <span class="en" style="font-size:20px">diagnostic</span></h2>
+    <div class="body">
+      <p class="define">두 가지가 <span class="t-red">함께 움직이는지</span> 보고,<br>
+        그것이 원인 때문인지 <span class="t-red">따져 보는</span> 일</p>
+      <p class="conclusion">→ 기술적 분석이 "무엇" 이라면 진단적 분석은 "왜" 다.<br>
+        &nbsp;&nbsp;&nbsp;그리고 "왜" 는 대부분 <span class="t-red">틀린다</span> — 틀리는 방식을 배우는 것이 오늘이다</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 오늘의 세 방법 ════════════════════════════════ -->
+  <section>
+    <h2>오늘 배울 세 가지</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:24%">방법</th><th style="width:32%">답하는 질문</th><th>한계</th></tr></thead>
+        <tbody>
+          <tr><td>① 상관</td><td>둘이 함께 움직이나</td><td>움직임의 <span class="hl">방향을 말하지 못한다</span></td></tr>
+          <tr><td>② 집단 비교</td><td>어느 집단이 다른가</td><td>다른 조건이 섞여 있다</td></tr>
+          <tr><td>③ 접근성 지표</td><td>얼마나 닿기 어려운가</td><td>무엇을 "가깝다" 로 볼지 <span class="hl">사람이 정한다</span></td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:16px">
+        셋 다 <span class="hl">인과를 증명하지 못한다.</span> 인과에 다가가는 방법은 10주차에서 다룬다.
+        오늘은 증거를 모으고 그 한계를 정확히 말하는 데까지 간다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 5. ① 원리 — 상관 ════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  상관</p>
+    <h2>함께 움직이는 정도를 하나의 숫자로</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>두 변수가 같은 방향으로 움직이면 <span class="hl">양(+)</span>,
+          반대로 움직이면 <span class="hl">음(−)</span>이다.</p>
+        <p style="margin-top:8px">각자의 평균에서 떨어진 정도를 곱해 더한 뒤,
+          단위를 없애려고 각자의 산포로 나눈다.</p>
+        <p class="formula-key" style="margin-top:8px">
+          $r=\dfrac{\sum (x_i-\bar{x})(y_i-\bar{y})}
+                   {\sqrt{\sum (x_i-\bar{x})^2}\sqrt{\sum (y_i-\bar{y})^2}}$</p>
+        <p style="margin-top:8px">단위가 없어졌으므로 <span class="hl">−1 에서 +1 사이</span>다.
+          인구(명)와 병원(개)처럼 단위가 달라도 견줄 수 있다.</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-r" viewBox="0 0 420 300" style="width:410px" role="img"
+             aria-label="상관계수가 각각 0.9, 0.3, 마이너스 0.8, 0에 가까운 네 산점도"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const cfg = [[0.9,'r ≈ +0.9'], [0.3,'r ≈ +0.3'], [-0.8,'r ≈ −0.8'], [0,'r ≈ 0']];
+        let s = '';
+        cfg.forEach((c, k) => {
+          const ox = (k % 2) * 208 + 14, oy = Math.floor(k / 2) * 150 + 16;
+          const w = 176, h = 108;
+          s += `<rect x="${ox}" y="${oy}" width="${w}" height="${h}" fill="none" stroke="#E2DED7"/>`;
+          // 결정론적 의사난수 — 매 렌더에서 같은 그림이 나오게 한다
+          let seed = 7 + k * 13;
+          const rnd = () => { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; };
+          const g = () => (rnd() + rnd() + rnd() + rnd() - 2) / 1.1;
+          for (let i = 0; i < 26; i++) {
+            const a = g(), b = g();
+            const y = c[0] * a + Math.sqrt(Math.max(0, 1 - c[0] * c[0])) * b;
+            const px = ox + w / 2 + a * w / 5.2, py = oy + h / 2 - y * h / 5.2;
+            if (px > ox + 3 && px < ox + w - 3 && py > oy + 3 && py < oy + h - 3)
+              s += `<circle class="pt" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="2.8"/>`;
+          }
+          s += `<text class="annot" x="${ox + w / 2}" y="${oy + h + 20}" text-anchor="middle" style="font-size:12.5px">${c[1]}</text>`;
+        });
+        document.getElementById('f-r').innerHTML =
+          document.querySelector('#f-r title')?.outerHTML || '' ;
+        document.getElementById('f-r').insertAdjacentHTML('beforeend', s);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 6. ① 언제 쓰나 ══════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  상관</p>
+    <h2>상관이 답해 주는 것과 아닌 것</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:44%">이런 질문에 쓴다</th><th>이런 질문에는 못 쓴다</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>인구가 많은 곳에 병원도 많은가</td>
+            <td class="bad">인구가 많아서 병원이 생긴 것인가</td>
+          </tr>
+          <tr>
+            <td>노령인구 비율이 높은 곳이 의료 이용도 많은가</td>
+            <td class="bad">고령화가 의료 수요를 늘린 것인가</td>
+          </tr>
+          <tr>
+            <td>어떤 변수를 다음 분석에 넣어 볼 만한가</td>
+            <td class="bad">그 변수를 바꾸면 결과가 바뀌는가</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">
+        상관은 <span class="hl">탐색의 도구</span>다. 무엇을 더 볼지 정하는 데 쓰고,
+        결론을 내리는 데 쓰지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 7. ① 예시 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  상관</p>
+    <h2>같은 자료에서 두 개의 상관이 나온다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <svg class="fig" id="f-sc" viewBox="0 0 420 280" style="width:400px" role="img"
+             aria-label="아산 12개 지역의 인구와 병원 수를 그린 산점도. 거의 직선에 가깝다"></svg>
+      </div>
+      <div class="col-r">
+        <table style="width:100%;table-layout:fixed">
+          <thead><tr><th style="width:62%">무엇과 무엇</th><th>r</th></tr></thead>
+          <tbody>
+            <tr><td>인구 — 병원 수</td><td class="hl num">0.972</td></tr>
+            <tr><td>인구 — 10만명당 병원</td><td class="num">0.297</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:12px">위는 <span class="hl">"사람 많은 데 병원 많다"</span> 는 말이다.
+          거의 아무것도 알려 주지 않는다.</p>
+        <p style="margin-top:8px">아래는 <span class="hl">인구 대비</span>로 바꾼 것이다.
+          관계가 흐려진다 — 인구가 적어도 병원 밀도가 높은 곳이 있다는 뜻이다.</p>
+        <p class="emph" style="margin-top:12px">
+          분모를 무엇으로 두느냐가 <span class="t-red">결론을 바꾼다.</span></p>
+        <p class="caption" style="margin-top:8px">
+          아산시 12개 지역 · 인구 2023.12 · 병원 358곳</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 58, y0: 226, x1: 398, y1: 30 });
+        const d = [[122384,163],[86711,74],[45009,45],[23285,25],[20657,10],[19243,11],
+                   [6051,2],[5795,7],[5384,6],[4267,5],[4089,5],[2921,1]];
+        const S = F.scale({ x: [0, 130000], y: [0, 175] });
+        F.draw('#f-sc', {
+          axes: { x: '인구(명)', y: '병원 수' },
+          parts: [
+            F.dots(d.map(([x, y]) => [S.x(x), S.y(y)])),
+            F.annot(S.x(118000), S.y(150), '온양 시가지', { anchor: 'end', size: 12 }),
+            F.annot(S.x(30000), S.y(28), '읍·면', { size: 12 }),
+            F.annot(S.x(6000), S.y(160), 'r = 0.972', { tone: 'red', size: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 8. ① 주의 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  상관</p>
+    <h2>주의 — 상관이 인과가 아닌 네 가지 이유</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-cau" viewBox="0 0 840 250" style="width:800px" role="img"
+           aria-label="정방향 인과, 역인과, 제3의 변수, 우연 네 가지 경우를 화살표로 비교한 도식"></svg>
+      <p class="caption" style="text-align:center;margin-top:6px">
+        <span class="hl">상관계수는 네 경우를 구별하지 못한다.</span> 넷 다 같은 r 이 나올 수 있다.</p>
+    </div>
+    <script>
+      (function () {
+        const box = (x, y, t, fill) =>
+          `<rect x="${x}" y="${y}" width="54" height="34" fill="${fill}"/>` +
+          `<text class="${fill === '#A02948' ? 'on-dark' : ''}" x="${x + 27}" y="${y + 22}" ` +
+          `text-anchor="middle" font-size="14" font-weight="700" fill="${fill === '#A02948' ? '#FFF' : '#16181C'}">${t}</text>`;
+        const cases = [
+          ['정방향', 'X가 Y를 낳는다'],
+          ['역인과', 'Y가 X를 낳는다'],
+          ['제3의 변수', 'Z가 둘 다 낳는다'],
+          ['우연', '아무 관계 없다'],
+        ];
+        let s = '';
+        cases.forEach((c, k) => {
+          const ox = k * 205 + 24;
+          s += `<text class="annot" x="${ox + 88}" y="${28}" text-anchor="middle" style="font-size:13.5px;font-weight:700">${c[0]}</text>`;
+          if (k === 0) {
+            s += box(ox + 26, 96, 'X', '#EDE9E3') + box(ox + 122, 96, 'Y', '#EDE9E3');
+            s += `<path class="axis" d="M${ox + 84},113 L${ox + 116},113" stroke-width="1.4"/>
+                  <path d="M${ox + 120},113 L${ox + 110},108 L${ox + 110},118 Z" fill="#16181C"/>`;
+          } else if (k === 1) {
+            s += box(ox + 26, 96, 'X', '#EDE9E3') + box(ox + 122, 96, 'Y', '#EDE9E3');
+            s += `<path class="axis" d="M${ox + 118},113 L${ox + 86},113" stroke-width="1.4"/>
+                  <path d="M${ox + 82},113 L${ox + 92},108 L${ox + 92},118 Z" fill="#16181C"/>`;
+          } else if (k === 2) {
+            s += box(ox + 26, 130, 'X', '#EDE9E3') + box(ox + 122, 130, 'Y', '#EDE9E3');
+            s += box(ox + 74, 62, 'Z', '#A02948');
+            s += `<path class="axis" d="M${ox + 92},96 L${ox + 60},126" stroke-width="1.4"/>
+                  <path d="M${ox + 56},130 L${ox + 62},119 L${ox + 69},127 Z" fill="#16181C"/>
+                  <path class="axis" d="M${ox + 112},96 L${ox + 144},126" stroke-width="1.4"/>
+                  <path d="M${ox + 148},130 L${ox + 135},127 L${ox + 142},119 Z" fill="#16181C"/>`;
+          } else {
+            s += box(ox + 26, 96, 'X', '#EDE9E3') + box(ox + 122, 96, 'Y', '#EDE9E3');
+            s += `<path class="guide" d="M${ox + 84},113 L${ox + 116},113"/>
+                  <text class="annot" x="${ox + 100}" y="${100}" text-anchor="middle" style="font-size:15px">?</text>`;
+          }
+          s += `<text class="annot" x="${ox + 88}" y="${190}" text-anchor="middle" style="font-size:12px">${c[1]}</text>`;
+        });
+        const el = document.getElementById('f-cau');
+        el.insertAdjacentHTML('beforeend', s);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 9. ② 원리 — 집단 비교 ═══════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  집단 비교</p>
+    <h2>나눠서 견주면 차이가 드러난다</h2>
+    <div class="body tight">
+      <p class="sub">아산시 12개 지역 · 인구 10만명당 병원 수</p>
+      <svg class="fig" id="f-grp" viewBox="0 0 700 250" style="width:680px" role="img"
+           aria-label="아산 지역별 인구 10만명당 병원 수 가로 막대그래프. 온양 시가지가 가장 높고 염치읍이 가장 낮다"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        최고 온양 시가지 <span class="num">133.2</span>, 최저 염치읍 <span class="num">33.1</span> —
+        <span class="hl">4.0배</span>. 7주차 세종의 5.33배와 같은 종류의 숫자다.</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 108, y0: 212, x1: 660, y1: 20 });
+        const d = [['온양 시가지',133.2],['송악면',122.3],['인주면',120.8],['도고면',117.2],
+                   ['영인면',111.4],['둔포면',107.4],['탕정면',100.0],['배방읍',85.3],
+                   ['신창면',57.2],['음봉면',48.4],['선장면',34.2],['염치읍',33.1]];
+        const S = F.scale({ x: [0, 150], y: [0, d.length] });
+        const bh = (S.y(0) - S.y(1)) * 0.66;
+        let bars = '';
+        d.forEach((v, i) => {
+          const y = S.y(i + 0.5) - bh / 2;
+          const c = i === 0 ? '#A02948' : (i >= d.length - 2 ? '#6E6A63' : '#D8D3CB');
+          bars += `<rect x="${S.x(0)}" y="${y}" width="${S.x(v[1]) - S.x(0)}" height="${bh}" fill="${c}"/>`;
+        });
+        F.draw('#f-grp', {
+          parts: [
+            F.raw(`<path class="axis" d="M${S.x(0)},${S.y(0)} L${S.x(0)},${S.y(d.length)}"/>`),
+            F.raw(bars),
+            ...d.map((v, i) => F.annot(S.x(0) - 7, S.y(i + 0.5) + 4, v[0], { anchor: 'end', size: 11.5 })),
+            ...d.map((v, i) => F.annot(S.x(v[1]) + 7, S.y(i + 0.5) + 4, v[1].toFixed(1), { size: 11.5 })),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 10. ② 주의 — 진짜 함정 ══════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  집단 비교</p>
+    <h2>이 표를 만들다가 실제로 겪은 일</h2>
+    <div class="body tight">
+      <p class="sub">인구 파일과 병원 파일을 읍면동 이름으로 그냥 이었더니</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:26%">지역</th><th style="width:20%">인구</th><th style="width:16%">병원</th><th>결론</th></tr></thead>
+        <tbody>
+          <tr><td>온양1~6동</td><td class="num">122,384</td><td class="bad num">0</td>
+              <td class="bad">아산 최대의 의료 사막</td></tr>
+          <tr><td>배방읍</td><td class="num">86,711</td><td class="num">74</td><td>정상</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        인구 파일은 <span class="hl">행정동</span>(온양1~6동), 병원 파일은
+        <span class="hl">법정동</span>(온천동·모종동·용화동…)을 쓴다.</p>
+      <p style="margin-top:10px">읍·면은 두 파일에서 이름이 같아 아무 경고 없이 붙는다.
+        <span class="mark">그래서 더 위험하다</span> — 표는 그럴듯하게 만들어지고 숫자만 틀린다.</p>
+      <p class="caption" style="margin-top:10px">
+        3주차에 "행정동과 법정동은 다르다" 고 말했던 그 함정이다.
+        법정동 12개를 온양 시가지로 묶어 고쳤다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 11. ② 주의 — 생태학적 오류 ══════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ②  집단 비교</p>
+    <h2>집단의 평균은 개인의 사정이 아니다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>"염치읍은 10만명당 병원이 33개다" 는 <span class="hl">지역의 값</span>이다.</p>
+        <p style="margin-top:10px">염치읍 주민 개인이 병원에 못 간다는 뜻이 아니다.
+          <span class="mark">경계 너머 온양 시가지로 가면 된다.</span></p>
+        <p style="margin-top:10px">집단 수준의 관계를 개인에게 그대로 옮기는 것을
+          <span class="hl">생태학적 오류</span>라 한다.</p>
+        <p class="emph" style="margin-top:12px">
+          행정경계로 자른 지표는 <span class="t-red">경계에서 가장 많이 틀린다.</span></p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-eco" viewBox="0 0 420 280" style="width:400px" role="img"
+             aria-label="행정경계 양쪽에 병원이 몰려 있어 경계 근처 주민이 실제로는 가까운 병원을 이용하는 상황 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const el = document.getElementById('f-eco');
+        let s = `
+          <rect x="24" y="40" width="176" height="190" fill="#F2EFEA"/>
+          <rect x="200" y="40" width="196" height="190" fill="#EDE9E3"/>
+          <path d="M200,40 L200,230" stroke="#A02948" stroke-width="2" stroke-dasharray="6 4"/>
+          <text class="annot" x="112" y="60" text-anchor="middle" style="font-size:13px;font-weight:700">염치읍</text>
+          <text class="annot" x="298" y="60" text-anchor="middle" style="font-size:13px;font-weight:700">온양 시가지</text>
+          <text class="annot" x="200" y="252" text-anchor="middle" style="font-size:12px;font-weight:700" fill="#A02948">행정경계</text>`;
+        // 병원 — 온양 쪽에 몰려 있다
+        [[232,96],[262,124],[300,100],[336,130],[268,170],[318,178],[352,96],[228,150]]
+          .forEach(([x, y]) => { s += `<circle cx="${x}" cy="${y}" r="5" fill="#A02948"/>`; });
+        s += `<circle cx="70" cy="180" r="5" fill="#A02948"/>`;
+        // 주민 — 경계 근처
+        s += `<circle class="pt" cx="176" cy="128" r="4.5"/>`;
+        s += `<path class="axis" d="M182,128 L222,110" stroke-width="1.4"/>
+              <path d="M226,108 L215,107 L218,116 Z" fill="#16181C"/>`;
+        s += `<text class="annot" x="176" y="150" text-anchor="middle" style="font-size:12px">경계 주민</text>`;
+        s += `<text class="annot" x="60" y="212" style="font-size:11.5px">● 병원</text>`;
+        el.insertAdjacentHTML('beforeend', s);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 12. ③ 원리 — 접근성 ═════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ③  접근성 지표</p>
+    <h2>"가깝다" 를 숫자로 만든다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">가장 단순한 것부터</p>
+        <ul>
+          <li><span class="hl">최근접 거리</span> — 가장 가까운 병원까지 몇 m</li>
+          <li><span class="hl">일정 반경 안의 개수</span> — 1km 안에 몇 개</li>
+          <li><span class="hl">공급 대비 수요</span> — 그 병원을 몇 명이 나눠 쓰나</li>
+        </ul>
+        <p style="margin-top:12px">셋째가 중요하다. 가까워도 <span class="mark">그 병원을 쓰는 사람이 많으면</span>
+          실제로는 접근하기 어렵다.</p>
+        <p class="formula-key" style="margin-top:8px">
+          $R_j=\dfrac{S_j}{\sum_{k \in d_{kj} \le d_0} P_k}$</p>
+        <p class="caption" style="margin-top:6px">
+          병원 $j$ 의 공급 $S_j$ 를, 그 병원에 닿을 수 있는 인구 $P_k$ 의 합으로 나눈다.
+          이것을 지역마다 다시 더하면 2SFCA 라 부르는 지표가 된다.</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-acc" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="병원 반경 안에 들어오는 인구를 세어 병원 하나가 감당하는 인구를 구하는 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const el = document.getElementById('f-acc');
+        let s = `
+          <circle cx="150" cy="120" r="86" fill="#A02948" fill-opacity=".10" stroke="#A02948" stroke-dasharray="5 4"/>
+          <circle cx="150" cy="120" r="7" fill="#A02948"/>
+          <text class="annot" x="150" y="102" text-anchor="middle" style="font-size:12.5px;font-weight:700">병원</text>
+          <path class="guide" d="M150,120 L236,120"/>
+          <text class="annot" x="193" y="136" text-anchor="middle" style="font-size:12px">기준 거리 $d_0$</text>`;
+        // 반경 안 인구
+        [[112,88],[178,92],[120,158],[186,152],[150,178],[96,124],[204,120]]
+          .forEach(([x, y]) => { s += `<circle class="pt" cx="${x}" cy="${y}" r="4"/>`; });
+        // 반경 밖 인구
+        [[300,80],[336,140],[292,196],[352,86]]
+          .forEach(([x, y]) => { s += `<circle cx="${x}" cy="${y}" r="4" fill="#C9C5BE"/>`; });
+        s += `<text class="annot" x="322" y="230" text-anchor="middle" style="font-size:12px">밖의 인구는\n세지 않는다</text>`;
+        s += `<text class="annot" x="150" y="248" text-anchor="middle" style="font-size:12.5px" fill="#A02948">
+                안의 인구 7명이 이 병원 하나를 나눠 쓴다</text>`;
+        el.insertAdjacentHTML('beforeend', s);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 13. ③ 언제 쓰나 · 주의 ══════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  접근성 지표</p>
+    <h2>지표를 만들 때 사람이 정해야 하는 것</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:26%">정할 것</th><th style="width:34%">선택지</th><th>바꾸면</th></tr></thead>
+        <tbody>
+          <tr><td>거리를 무엇으로</td><td>직선 · 도로 · 이동시간</td><td>산·강이 있으면 직선거리가 크게 틀린다</td></tr>
+          <tr><td>기준 거리 $d_0$</td><td>500m · 1km · 30분</td><td class="hl">기준을 늘리면 취약지역이 사라진다</td></tr>
+          <tr><td>공급을 무엇으로</td><td>병원 수 · 의사 수 · 병상 수</td><td>염치읍은 병원 2곳에 <span class="hl">의사 0명</span>이다</td></tr>
+          <tr><td>수요를 무엇으로</td><td>총인구 · 노령인구 · 유동인구</td><td>대상이 누구냐에 따라 취약지가 달라진다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">여기서 정한 것이 결론을 만든다.</span> 그래서 지표는 결과가 아니라
+        <span class="t-red">판단의 묶음</span>이다 — CLAUDE.md 에 적어 두어야 하는 이유다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 14. 로직 문서 ═══════════════════════════════════ -->
+  <section>
+    <h2>오늘 숫자의 판단 목록</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:28%">정한 것</th><th style="width:26%">어떻게</th><th>왜</th></tr></thead>
+        <tbody>
+          <tr><td>지역 단위</td><td class="hl">읍·면 11 + 온양 시가지</td><td>행정동·법정동이 어긋나 그대로는 이을 수 없다</td></tr>
+          <tr><td>인구 시점</td><td>2023. 12.</td><td>자료에 있는 가장 최근 시점</td></tr>
+          <tr><td>병원 범위</td><td>358곳 전부</td><td>의원·치과·한의원·보건지소를 나누면 표본이 너무 작아진다</td></tr>
+          <tr><td>이름 없는 병원</td><td>4건 제외</td><td>지역을 알 수 없어 어디에도 넣을 수 없다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        세 번째 줄은 <span class="hl">타협이다.</span> 의원 하나와 종합병원 하나가 같은 1로 세어진다 —
+        그래서 의사 수를 함께 봤다.</p>
+      <p class="src">전체 로직: <span class="code">analysis/09-아산의료접근성-로직.md</span> ·
+        스크립트: <span class="code">analysis/09-아산의료접근성.py</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">아산 의료 취약지역 ① 현황 진단 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 16. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 데이터를 잇는다 <span class="en" style="font-size:16px;color:var(--muted)">30분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>COMPAS 「보건의료 불균형 — 의료 취약지역 도출」(아산시) 를 받는다</li>
+        <li>인구·병원·약국 세 파일을 읍면동으로 잇는다</li>
+        <li><span class="hl">이었더니 이상한 곳이 없는지 반드시 확인한다</span> —
+          인구는 많은데 시설이 0인 지역이 있으면 멈춘다</li>
+      </ol>
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"세 파일을 읍면동 기준으로 이어 줘. 잇기 전에
+          <span class="mark">양쪽의 지역 이름 목록을 각각 보여 주고, 한쪽에만 있는 이름을 알려 줘.</span>
+          그다음에 어떻게 맞출지 상의하자."</p>
+      </div>
+      <p class="caption" style="margin-top:10px">
+        시키기 전에 <span class="hl">양쪽 이름을 먼저 대조하는 습관</span>을 들인다.
+        이 한 문장이 오늘 강의에서 본 사고를 막는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 지표를 만들고 비교한다 <span class="en" style="font-size:16px;color:var(--muted)">35분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>지역별 <span class="hl">인구 10만명당 병원 수</span>와 <span class="hl">의사 수</span>를 낸다</li>
+        <li>인구와 병원 수의 상관계수, 인구와 10만명당 병원의 상관계수를 각각 구한다</li>
+        <li>둘이 왜 다른지 한 문장으로 설명해 본다</li>
+        <li>공급을 병원 수 대신 <span class="mark">의사 수</span>로 바꿔 다시 낸다.
+          순위가 바뀌는 지역을 찾는다</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        4번이 오늘의 핵심 연습이다. <span class="hl">지표를 바꾸면 취약지역이 바뀐다</span> —
+        그 사실을 직접 보고 나면 지표를 함부로 고르지 않게 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 18. 실습 ③ ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 말할 수 있는 것까지만 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <p class="sub">세 문장으로 쓴다</p>
+      <ol class="steps">
+        <li><span class="hl">확인한 것</span> — 어느 지역이 어떤 지표에서 낮은가 (숫자와 함께)</li>
+        <li><span class="hl">짐작하는 것</span> — 왜 그럴 것 같은가. <span class="mark">"~로 보인다" 로 쓴다</span></li>
+        <li><span class="hl">이 분석으로 알 수 없는 것</span> — 무엇을 더 봐야 확인되는가</li>
+      </ol>
+      <p class="emph" style="margin-top:16px">
+        제출: <span class="t-red">취약지역 후보 표 + 세 문장</span> + 로직 문서</p>
+      <p class="caption" style="margin-top:8px">
+        다음 주에는 3번에 적은 것을 실제로 따진다 — 회귀로 다른 조건을 통제한다.<br>
+        가정 과제: 자기 문제정의서 데이터에서도 두 변수의 상관을 구해 본다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 19. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>모든 수치 — COMPAS 「보건의료 불균형 해소를 위한 의료 취약지역 도출 분석」<br>
+          (아산시, SBJ_2405_001) 공개 데이터 · 2026. 8. 26. 내려받음<br>
+          인구 2023. 12. 기준 345,796명 · 병원 358곳 · 약국 126곳</li>
+        <li>산출 방법 — <span class="code">analysis/09-아산의료접근성.py</span>,
+          판단 근거는 <span class="code">analysis/09-아산의료접근성-로직.md</span></li>
+        <li>5·8·11·12쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
+        <li>12쪽의 지표는 2SFCA(2-step floating catchment area) 의 1단계다.
+          이 과제 최우수작도 같은 방법을 썼다 — COMPAS 분석 결과 탭에서 볼 수 있다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 20. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

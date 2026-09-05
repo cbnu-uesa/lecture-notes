@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6강. 회귀분석 (2)</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols.top { align-items: flex-start; }
+  ol.dense { margin: 0 0 0 2px; padding-left: 22px; }
+  ol.dense > li { margin-bottom: 5px; }
+  ul.slim { margin: 0; padding-left: 18px; }
+  ul.slim > li { margin-bottom: 3px; }
+
+  /* 퀴즈 문제 발문 — 원본은 본문과 같은 크기의 검은 글씨다 */
+  .qz { font-size: 14px; line-height: 1.5; margin: 0 0 8px; color: var(--ink); }
+  .qz + .qz { margin-top: -4px; }
+  .qz-item { font-size: 14px; line-height: 1.5; margin: 0 0 14px; color: var(--ink); }
+  .qz-item .in { display: block; padding-left: 20px; }
+
+  /* 퀴즈 2 — 표준정규분포표 · 그림 · 풀이 세 칸 */
+  .quiz2 { display: flex; gap: 18px; align-items: flex-start; margin-top: 4px; }
+  .quiz2 .ztab { flex: 0 0 108px; }
+  .quiz2 .ztab img { width: 100%; display: block; }
+  .quiz2 .fig-col { flex: 0 0 auto; }
+  .quiz2 .sol { flex: 1 1 auto; font-size: 13px; line-height: 1.55; color: var(--ink); }
+  .quiz2 .sol p { margin: 0 0 6px; }
+  .quiz2 .sol .ans { font-size: 22px; font-weight: 700; color: var(--brand-crimson); margin-top: 10px; }
+
+  /* 도수분포표 (퀴즈 1-1) */
+  .tbl-freq { font-size: 12px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-freq th, .reveal .tbl-freq td { padding: 2px 6px; text-align: center; }
+
+  /* 원본이 수식 옆·아래에 작은 회색 글씨로 붙여 둔 각주 */
+  .side-note { font-size: 11px; line-height: 1.45; color: var(--muted); }
+  .fx-row { display: flex; align-items: center; gap: 34px; }
+  .fx-row .fx { flex: 0 0 auto; }
+
+  /* 원본 p.16 — 교육연수 아래 (X), 소득 아래 (Y) */
+  .xy { color: var(--brand-crimson); font-weight: 700; font-size: 12px; }
+
+  /* 원본 p.22 — 우측 크림슨 설명 묶음 */
+  .brace-note { font-size: 13px; line-height: 1.6; color: var(--brand-crimson);
+                font-weight: 700; }
+  .brace-note .thin { font-weight: 400; }
+
+  /* 원본 p.13 — 종속변수 / 설명변수 두 덩이 */
+  .var-block { margin-top: 22px; }
+  .var-block .name { font-size: 21px; font-weight: 700; color: var(--brand-crimson);
+                     margin: 0 0 4px; letter-spacing: -.02em; }
+  .var-block .desc { font-size: 15px; color: var(--ink-2); margin: 0; }
+
+  /* 원본 p.29 — 등분산성 / 이분산성 두 판 */
+  .pair-fig { display: flex; gap: 24px; justify-content: center; margin-top: 8px; }
+  .pair-fig .cell { flex: 1 1 0; text-align: center; }
+  .pair-fig .cell img { width: 100%; max-width: 316px; }
+  .pair-fig .cell .ttl { font-size: 15px; font-weight: 700; color: var(--brand-crimson);
+                         margin: 0 0 4px; }
+</style>
+
+<script>
+  /* ─────────────────────────────────────────────────────────────
+     한 곳에서만 선언하는 상수. 표·그림·본문 숫자가 모두 여기서 나온다
+     (design.md §6.5). 손으로 옮겨 적으면 반드시 어긋난다. */
+
+  /* 소수 첫째 자리까지. 유도값을 화면에 찍기 전에 반드시 통과시킨다
+     (7.2*11 = 79.19999999999999 같은 것을 막는다) */
+  window.r1 = (v) => Math.round(v * 10) / 10;
+  window.r2 = (v) => Math.round(v * 100) / 100;
+  window.fmt = (v) => String(window.r1(v));
+  window.fmt2 = (v) => String(window.r2(v));
+
+  /* 퀴즈 1-1 (원본 p.3~4) — 인쇄된 것은 계급경계와 괄호 안의 밀도, 그리고 200명뿐이다.
+     빈도·상대빈도는 밀도에서 되돌려 구한다. */
+  window.EDU_HIST = [[0, 5, 0.4], [5, 8, 2], [8, 9, 4], [9, 12, 4],
+                     [12, 13, 34], [13, 16, 6], [16, 20, 6]]
+    .map(([lo, hi, den]) => {
+      const rel = den * (hi - lo);          // 상대빈도(%)
+      return { lo, hi, den, rel, f: (rel / 100) * 200 };
+    });
+
+  /* 퀴즈 1-2 (원본 p.5~8) — TOEIC 점수 */
+  window.TOEIC = { mu: 750, sd: 100, a: 500, b: 600 };
+
+  /* 원본 p.14 — 30-40세 도시남성 198명 */
+  window.MEN = (() => {
+    const mx = 12.5, sdx = 2, my = 163, sdy = 77, r = 0.33;
+    const b1 = window.r1(r * sdy / sdx);    // 12.7 만원/년
+    return { mx, sdx, my, sdy, r, b1, b0: window.r2(my - b1 * mx), rsdy: window.r1(r * sdy) };
+  })();
+
+  /* 원본 p.15~19, p.21 — 도시여성 근로자 108명 */
+  window.WOMEN = (() => {
+    const mx = 11, sdx = 3.6, my = 89, sdy = 60, r = 0.43;
+    const b1 = window.r1(r * sdy / sdx);    // 7.2 만원/년
+    return { mx, sdx, my, sdy, r, b1, b0: window.r1(my - b1 * mx) };
+  })();
+
+  /* 원본 p.23~25 결정계수 도해 — 회귀직선 하나에서 관측치·추정치·평균을 모두 유도한다.
+     T = R + E 가 그림에서 저절로 성립한다. */
+  window.R2FIG = (() => {
+    const a = 2.0, b = 0.55;                // 회귀직선 y = a + b x
+    const xbar = 4.5, xi = 7.6, yi = 8.3;
+    const ybar = a + b * xbar;              // (x̄, ȳ) 는 회귀직선 위에 있다
+    const yhat = a + b * xi;
+    return { a, b, xbar, ybar, xi, yi, yhat, line: (x) => a + b * x };
+  })();
+
+  /* 히스토그램 하나를 그리는 공용 함수 (2강과 같은 방식).
+     계급 폭이 제각각(5, 3, 1, 3, 1, 3, 4)이라 막대 폭은 x축 눈금에서 계산한다. */
+  window.Hist = function (sel, o) {
+    const B = o.box;
+    const px = (v) => B.x0 + ((v - o.x[0]) / (o.x[1] - o.x[0])) * (B.x1 - B.x0);
+    const py = (v) => B.y0 - (v / o.yMax) * (B.y0 - B.y1);
+    let s = '';
+    (o.yTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${B.x0 - 7}" y="${py(t) + 4}" text-anchor="end">${t}</text>`;
+      s += `<path class="axis" d="M${B.x0 - 4},${py(t)} L${B.x0},${py(t)}"/>`;
+    });
+    o.bins.forEach((b, i) => {
+      const [lo, hi, v] = b;
+      s += `<rect class="area-bar" x="${px(lo)}" y="${py(v)}" ` +
+           `width="${px(hi) - px(lo)}" height="${B.y0 - py(v)}"/>`;
+      if (o.barLabel) {
+        const t = o.barLabel(i);
+        if (t) s += `<text class="annot muted" x="${(px(lo) + px(hi)) / 2}" y="${py(v) - 6}" ` +
+                    `text-anchor="middle" style="font-size:10px">${t}</text>`;
+      }
+    });
+    s += `<path class="axis" d="M${B.x0},${B.y1 - 4} L${B.x0},${B.y0} L${B.x1 + 8},${B.y0}"/>`;
+    (o.xTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${px(t)}" y="${B.y0 + 15}" text-anchor="middle" ` +
+           `style="font-size:10px">${t}</text>`;
+    });
+    if (o.xLabel) s += `<text class="axis-name" x="${B.x1 + 12}" y="${B.y0 + 15}">${o.xLabel}</text>`;
+    if (o.yLabel) s += `<text class="axis-name" x="${B.x0 - 6}" y="${B.y1 - 8}" text-anchor="end">${o.yLabel}</text>`;
+    document.querySelector(sel).innerHTML = s;
+  };
+
+  /* 세로 중괄호 — 결정계수 도해의 T · R · E 표시.
+     dir = -1 이면 왼쪽으로, +1 이면 오른쪽으로 뾰족하게 나온다. */
+  window.brace = function (x, y1, y2, w, dir) {
+    const m = (y1 + y2) / 2;
+    const q = Math.min(w, (m - y1) / 2);
+    const d = dir * w;
+    return `<path d="M${x},${y1} Q${x + d},${y1} ${x + d},${y1 + q} ` +
+           `L${x + d},${m - q} Q${x + d},${m} ${x + 2 * d},${m} ` +
+           `Q${x + d},${m} ${x + d},${m + q} L${x + d},${y2 - q} ` +
+           `Q${x + d},${y2} ${x},${y2}" fill="none" ` +
+           `stroke="var(--accent-blue)" stroke-width="1.3"/>`;
+  };
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. T1 표지 (원본 p.1) ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>6강. 회귀분석 (2)</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. T12 섹션 구분 (원본 p.2) ═════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">퀴즈 1 풀이</p>
+  </section>
+
+  <!-- ══ 3. 퀴즈 1-1 (원본 p.3~4 합침) ═══════════════════════
+       빈 도수분포표가 채워지는 것이 전부라 한 장의 fragment 로 만든다 -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body tight">
+      <p class="qz">1. 다음의 히스토그램은 200명의 교육연수에 대한 분포이다(괄호 안은 밀도).
+        이를 참고하여 아래의 도수분포표를 작성하시오.</p>
+      <p class="qz">(단, 계급구간은 좌측경계는 포함하되 우측경계는 포함하지 않음)</p>
+      <div class="cols top" style="margin-top:4px">
+        <div class="col-l">
+          <svg class="fig" id="f-quiz-hist" viewBox="0 0 400 240" style="width:400px" role="img">
+            <title>교육연수 200명의 밀도 히스토그램. 계급별 밀도가 괄호 안에 적혀 있다</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <table class="tbl-freq">
+            <thead><tr><th>계급</th><th>절대빈도(명)</th><th>상대빈도(%)</th><th>밀도</th></tr></thead>
+            <tbody id="tb-quiz"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const T = window.EDU_HIST;
+        document.getElementById('tb-quiz').innerHTML = T.map((b) =>
+          `<tr><td>${b.lo}-${b.hi}</td>` +
+          `<td><span class="fragment" data-fragment-index="0">${b.f}</span></td>` +
+          `<td><span class="fragment" data-fragment-index="0">${b.rel}</span></td>` +
+          `<td><span class="fragment" data-fragment-index="0">${b.den}</span></td></tr>`).join('');
+        Hist('#f-quiz-hist', {
+          box: { x0: 44, y0: 196, x1: 344, y1: 30 }, x: [0, 20], yMax: 42,
+          yTicks: [10, 20, 30, 40], xTicks: [0, 5, 8, 9, 12, 13, 16, 20],
+          bins: T.map((b) => [b.lo, b.hi, b.den]),
+          barLabel: (i) => `(${T[i].den})`,
+          xLabel: '교육연수', yLabel: '(%)',
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 4. 퀴즈 1-2 문제 (원본 p.5~6 합침) ══════════════════
+       p.5 는 표만, p.6 은 거기에 정규분포곡선이 얹힌다 → fragment -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body tight">
+      <p class="qz">2. TOEIC 시험의 점수를 집계한 결과 평균이 750점이고, 표준편차는 100인
+        정규분포곡선을 따른다고 한다.</p>
+      <p class="qz">500점~600점 사이에는 대략 몇 %의 학생이 있겠는가?
+        답과 풀이과정을 쓰시오(아래 그림은 표준정규분포표이다).</p>
+      <div class="quiz2">
+        <div class="ztab">
+          <img src="../assets/tb-reg2-z-table.png"
+               alt="표준정규분포표. 세로로 z 값 0.0부터 3.0까지, 가로로 소수 둘째 자리 0.00·0.01·0.02가 놓인 표">
+        </div>
+        <div class="fig-col">
+          <svg class="fig" id="f-toeic-sd" viewBox="0 0 420 250" style="width:420px" role="img">
+            <title>평균 750점, 표준편차 100점인 정규분포곡선. 650점과 850점이 평균에서 ±1표준편차 떨어져 있다</title>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const { mu, sd } = window.TOEIC;
+        const F = Fig.withBox({ x0: 24, y0: 190, x1: 396, y1: 60 });
+        const S = F.scale({ x: [mu - 3.6 * sd, mu + 3.6 * sd], y: [0, 0.0045] });
+        const pdf = F.normal(mu, sd, mu - 3.6 * sd, mu + 3.6 * sd,
+                             { through: [mu - sd, mu, mu + sd] });
+        let s = `<path class="axis" d="M${S.x(mu - 3.6 * sd)},${S.y(0)} L${S.x(mu + 3.6 * sd)},${S.y(0)}"/>`;
+        // 곡선과 눈금선은 같은 함수에서 나오므로 높이가 어긋날 수 없다
+        [mu - sd, mu, mu + sd].forEach((v) => {
+          const y = Fig.at(S.curve(pdf), { x: S.x(v) })[1];
+          s += `<path d="M${S.x(v)},${S.y(0)} L${S.x(v)},${y}" stroke="var(--accent-blue)" ` +
+               `stroke-width="0.9" fill="none"/>`;
+          s += `<text class="tick" x="${S.x(v)}" y="${S.y(0) + 22}" text-anchor="middle" ` +
+               `style="font-size:14px">${v}</text>`;
+        });
+        s += F.curve(S.curve(pdf), { variant: 'demand' });
+        // ±1SD 양쪽 화살표
+        const yTop = S.y(0.00435);
+        [[mu - sd, mu, '−1SD'], [mu, mu + sd, '+1SD']].forEach(([p, q, lab]) => {
+          s += `<path d="M${S.x(p)},${yTop} L${S.x(q)},${yTop}" stroke="var(--accent-blue)" ` +
+               `stroke-width="1.2" fill="none" marker-start="url(#ah-blue)" marker-end="url(#ah-blue)"/>`;
+          s += `<text class="annot blue" x="${(S.x(p) + S.x(q)) / 2}" y="${yTop - 7}" ` +
+               `text-anchor="middle" style="font-size:12px">${lab}</text>`;
+        });
+        Fig.draw('#f-toeic-sd', { parts: [Fig.raw(s, { fragment: 0 })] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 5. 퀴즈 1-2 풀이 (원본 p.7~8 합침) ══════════════════
+       p.7 은 500~600 구간을 칠한 원자료 분포, p.8 은 거기에 표준화한 분포와
+       풀이가 더해진다 → 한 장의 2단계 -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body tight">
+      <p class="qz">2. TOEIC 시험의 점수를 집계한 결과 평균이 750점이고, 표준편차는 100인
+        정규분포곡선을 따른다고 한다.</p>
+      <p class="qz">500점~600점 사이에는 대략 몇 %의 학생이 있겠는가?
+        답과 풀이과정을 쓰시오(아래 그림은 표준정규분포표이다).</p>
+      <div class="quiz2">
+        <div class="ztab">
+          <img src="../assets/tb-reg2-z-table.png"
+               alt="표준정규분포표. 세로로 z 값 0.0부터 3.0까지, 가로로 소수 둘째 자리 0.00·0.01·0.02가 놓인 표">
+        </div>
+        <div class="fig-col">
+          <svg class="fig" id="f-toeic-sol" viewBox="0 0 300 336" style="width:272px" role="img">
+            <title>위는 평균 750점 분포에서 500~600점 구간을 칠한 그림, 아래는 그것을 표준화해 −2.5~−1.5 구간을 칠한 표준정규분포</title>
+          </svg>
+        </div>
+        <div class="sol">
+          <p>$X \sim N(750,\ 100^2)$</p>
+          <p style="margin-top:10px">〈정규분포를 따르는 자료의 표준화〉</p>
+          <p id="sol-z1"></p>
+          <p id="sol-z2"></p>
+          <div class="fragment" data-fragment-index="0">
+            <p style="margin-top:10px">P(−2.5 ≤ Z ≤ −1.5)</p>
+            <p>= 0.4938 − 0.4332 = 0.0606</p>
+            <p class="ans">답: 6.06%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const { mu, sd, a, b } = window.TOEIC;
+        const za = (a - mu) / sd, zb = (b - mu) / sd;
+        document.getElementById('sol-z1').textContent =
+          `Z(${a}) = (${a}−${mu})/${sd} = ${za}`;
+        document.getElementById('sol-z2').textContent =
+          `Z(${b}) = (${b}−${mu})/${sd} = ${zb}`;
+
+        /* 두 판이 같은 분포다 — 위는 원자료 단위, 아래는 표준화 단위.
+           같은 z 구간을 칠하므로 두 그림의 빨간 넓이가 저절로 같아진다. */
+        function panel(top, bot, m, s, lo, hi, ticks) {
+          const F = Fig.withBox({ x0: 16, y0: bot, x1: 284, y1: top });
+          const SC = F.scale({ x: [m - 3.6 * s, m + 3.6 * s], y: [0, 0.0042 / (s / 100)] });
+          const full = F.normal(m, s, m - 3.6 * s, m + 3.6 * s, { through: [lo, hi, m] });
+          const cut = full.filter((p) => p[0] >= lo && p[0] <= hi);
+          let g = `<path class="axis" d="M${SC.x(m - 3.6 * s)},${SC.y(0)} L${SC.x(m + 3.6 * s)},${SC.y(0)}"/>`;
+          g += F.under(SC.curve(cut), { cls: 'area-loss', baseY: SC.y(0) });
+          [lo, hi].forEach((v) => {
+            g += `<path d="M${SC.x(v)},${SC.y(0)} L${SC.x(v)},${top + 4}" ` +
+                 `stroke="var(--brand-crimson)" stroke-width="1.4" stroke-dasharray="5 4" fill="none"/>`;
+          });
+          g += `<path d="M${SC.x(m)},${SC.y(0)} L${SC.x(m)},${top + 4}" ` +
+               `stroke="var(--accent-blue)" stroke-width="0.9" fill="none"/>`;
+          g += F.curve(SC.curve(full), { variant: 'demand' });
+          ticks.forEach(([v, lab]) => {
+            g += `<text class="tick" x="${SC.x(v)}" y="${SC.y(0) + 20}" text-anchor="middle" ` +
+                 `style="font-size:13px">${lab}</text>`;
+          });
+          return g;
+        }
+
+        const up = panel(20, 124, mu, sd, a, b,
+                         [[a, a], [b, b], [mu, mu]]);
+        const dn = panel(196, 300, 0, 1, za, zb,
+                         [[za, '−2.5'], [zb, '−1.5'], [0, '0']]);
+        const arr = `<path class="arrow" d="M150,144 L150,182" marker-end="url(#ah-ink)" ` +
+                    `stroke-width="3"/>`;
+        Fig.draw('#f-toeic-sol', {
+          parts: [Fig.raw(up), Fig.raw(dn + arr, { fragment: 0 })],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 6. 퀴즈 1-3 (원본 p.9) ══════════════════════════════ -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body">
+      <p class="qz" style="margin-bottom:18px">3. 다음 명제의 참과 거짓을 판별하시오.</p>
+      <p class="qz-item">(1) 어떤 데이터 분포가 왼쪽으로 길게 늘어진(left-skewed) 형태를 보일 때
+        <span class="in">평균, 중앙값, 최빈값의 일반적인 크기 관계는 최빈값 &gt; 중앙값 &gt; 평균이다.
+          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span></p>
+      <p class="qz-item">(2) 히스토그램에서 상대도수가 아닌 밀도를 활용하는 이유는
+        <span class="in">모든 막대의 높이를 비슷하게 만들어 미적으로 보기좋게 하기 위함이다.
+          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span></p>
+      <p class="qz-item">(3) 자료의 표준화는 자료에서 평균을 빼고 표준편차로 나누어 평균은 1,
+        표준편차는 0으로 만드는 과정이다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</p>
+    </div>
+  </section>
+
+  <!-- ══ 7. 지난 강의 요약 (원본 p.10) ═══════════════════════ -->
+  <section>
+    <h2>지난 강의 요약</h2>
+    <div class="body tighter">
+      <ol class="dense">
+        <li>산포도 상에서 두 변수 x, y의 관계가 대략적인 선형관계를 따를 경우,
+          x의 변화를 통해 y의 변화량을 추정해볼 수 있다.</li>
+        <li><em>x에 대응하는 y의 부분집합별 평균을 추정하는 직선을 찾는 통계적 방법을 회귀분석</em>이라 한다.</li>
+        <li>두 변수 x, y 간의 상관계수를 알고 있을 경우,
+          <em>회귀직선의 기울기는 r×(SDy/SDx)와 같다.</em></li>
+        <li><em>회귀(regression)는 극단적인 값도 평균으로 돌아가는 성질이 있기 때문에 붙여진 이름이다.</em></li>
+        <li><em>회귀직선 위의 점은 x에 대응하는 y의 평균에 대한 추정치이며,
+          이 값과 실제 관측값 간의 차이를 추정오차라 한다.</em></li>
+        <li>추정오차의 표준적인 값을 구하기 위해
+          <em>추정오차 제곱의 평균값에 제곱근을 씌운 것을 표준오차</em>라 한다.</li>
+        <li>두 변수의 평균을 지나는 무수히 많은 직선 중
+          <em>표준오차를 최소화하는 직선의 기울기와 절편을 찾는 추정방법을 최소제곱법</em>이라고 하며,
+          이 때 구한 기울기는 상관계수와 두 변수의 표준편차로 구한 기울기와 같다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══ 8. 회귀분석 (원본 p.11) ═════════════════════════════ -->
+  <section>
+    <h2>회귀분석</h2>
+    <div class="body stack">
+      <p class="lead t-define" style="text-align:center">x변수에 대응하는 y변수의 “부분집합별”
+        평균값을 추정하는 통계적 방법</p>
+      <img src="../assets/tb-regression-subset-mean.png" style="width:620px;display:block;margin:6px auto 0"
+           alt="키를 가로축, 몸무게를 세로축에 놓은 산포도. 추가 정보가 없으면 임의의 한 사람의 몸무게는 전체 평균 63.5kg으로 추정하지만, 키가 179.5cm라는 정보가 있으면 그 부분집합의 평균인 74.8kg으로 추정한다는 설명이 달려 있다">
+    </div>
+  </section>
+
+  <!-- ══ 9. 상관계수를 활용한 회귀직선의 기울기 도출 (원본 p.12) ══ -->
+  <section>
+    <h2>상관계수를 활용한 회귀직선의 기울기 도출</h2>
+    <div class="body tight">
+      <p class="sub">x변수에 대응하는 y변수의 평균값을 추정하는 통계적 방법</p>
+      <div class="cols top" style="margin-top:2px;align-items:center">
+        <div class="col-l" style="flex:0 0 44%">
+          <img src="../assets/tb-scatter-height-weight.png" style="width:100%"
+               alt="키와 몸무게의 산포도. 실선은 회귀직선이고 점선은 표준편차선이다">
+        </div>
+        <div class="col-r">
+          <p class="sub" style="text-align:center;margin-bottom:2px">분포를 하나의 직선으로 근사 →</p>
+          <svg class="fig" id="f-slope" viewBox="0 0 400 236" style="width:330px" role="img">
+            <title>평균점에서 가로로 SDx만큼, 세로로 r×SDy만큼 간 곳이 추정치가 되는 그림. 이 직각삼각형의 기울기가 회귀직선의 기울기다</title>
+          </svg>
+          <p class="emph" style="text-align:center;margin:4px 0 0">회귀직선의 기울기
+            $= r * \dfrac{SD_y}{SD_x}$</p>
+          <p class="sub" style="margin:4px 0 0">→ 상관계수를 y의 단위로 변환하는 것</p>
+          <p class="sub" style="margin:0">→ y= a+(r*SDy/SDx)*X</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 56, y0: 196, x1: 372, y1: 30 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const P1 = [1.6, 1.9];                 // 평균점
+        const P2 = [7.4, 7.6];                 // 추정치
+        let s = `<path class="axis" d="M${S.x(0.4)},${S.y(9.6)} L${S.x(0.4)},${S.y(0.5)} ` +
+                `L${S.x(9.6)},${S.y(0.5)}" marker-start="url(#ah-ink)" marker-end="url(#ah-ink)"/>`;
+        s += `<text class="axis-name" x="${S.x(0.4) - 12}" y="${S.y(9.6) + 4}" text-anchor="end">y</text>`;
+        s += `<text class="axis-name" x="${S.x(9.6)}" y="${S.y(0.5) + 18}" text-anchor="middle">x</text>`;
+        // 평균점과 추정치를 잇는 직선
+        s += `<path d="M${S.x(P1[0])},${S.y(P1[1])} L${S.x(P2[0])},${S.y(P2[1])}" ` +
+             `stroke="var(--ink)" stroke-width="1.4" fill="none"/>`;
+        // 가로 SDx · 세로 r×SDy
+        const both = 'stroke="var(--accent-blue)" stroke-width="1.4" fill="none" ' +
+                     'marker-start="url(#ah-blue)" marker-end="url(#ah-blue)"';
+        s += `<path ${both} d="M${S.x(P1[0])},${S.y(P1[1])} L${S.x(P2[0])},${S.y(P1[1])}"/>`;
+        s += `<path ${both} d="M${S.x(P2[0])},${S.y(P1[1])} L${S.x(P2[0])},${S.y(P2[1])}"/>`;
+        s += `<text class="annot" x="${S.x((P1[0] + P2[0]) / 2)}" y="${S.y(P1[1]) + 17}" ` +
+             `text-anchor="middle">SD<tspan style="font-size:9px">x</tspan></text>`;
+        s += `<text class="annot" x="${S.x(P2[0]) + 9}" y="${S.y((P1[1] + P2[1]) / 2) + 4}">` +
+             `r × SD<tspan style="font-size:9px">y</tspan></text>`;
+        // 평균점(빨간 점)과 추정치(빨간 ×)
+        s += `<circle class="dot" cx="${S.x(P1[0])}" cy="${S.y(P1[1])}" r="4.5" data-free="1"/>`;
+        s += `<path d="M${S.x(P2[0]) - 4},${S.y(P2[1]) - 4} L${S.x(P2[0]) + 4},${S.y(P2[1]) + 4} ` +
+             `M${S.x(P2[0]) - 4},${S.y(P2[1]) + 4} L${S.x(P2[0]) + 4},${S.y(P2[1]) - 4}" ` +
+             `stroke="var(--brand-crimson)" stroke-width="1.8" fill="none"/>`;
+        s += `<text class="annot blue" x="${S.x(0.9)}" y="${S.y(4.3)}">평균점</text>`;
+        s += `<path class="arrow blue" d="M${S.x(1.5)},${S.y(4.0)} L${S.x(1.55)},${S.y(2.4)}" ` +
+             `marker-end="url(#ah-blue)"/>`;
+        s += `<text class="annot blue" x="${S.x(7.2)}" y="${S.y(9.4)}" text-anchor="middle">추정치</text>`;
+        s += `<path class="arrow blue" d="M${S.x(7.2)},${S.y(9.0)} L${S.x(7.35)},${S.y(8.0)}" ` +
+             `marker-end="url(#ah-blue)"/>`;
+        Fig.draw('#f-slope', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 10. 회귀방정식 — 정의 (원본 p.13) ═══════════════════ -->
+  <section>
+    <h2>회귀방정식 <span class="en">(regression equation)</span></h2>
+    <div class="body">
+      <p class="sub">x변수에 대응하는 y변수의 평균값을 추정하는 회귀직선을 나타내는 방정식</p>
+      <p style="margin:0 0 -4px">$Y = b_0 + b_1 X$</p>
+      <div class="fx-row" style="margin-top:2px">
+        <div class="fx">$b_1 = r * \dfrac{SD_y}{SD_x}$</div>
+        <div class="fx">$b_0 = \bar{Y} - b_1 \bar{X}$</div>
+      </div>
+      <div class="var-block">
+        <p class="name">종속변수<span class="en">(dependent variable, Y)</span></p>
+        <p class="desc">추정되는 변수 (궁극적으로 알고자 하는 변수)</p>
+      </div>
+      <div class="var-block">
+        <p class="name">설명변수(독립변수)<span class="en">(independent variable, X)</span></p>
+        <p class="desc">종속변수를 추정하기 위해 활용하는 변수</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 11. 회귀방정식 — 기울기와 절편 구하기 (원본 p.14) ═══ -->
+  <section>
+    <h2>회귀방정식 <span class="en">(regression equation)</span></h2>
+    <div class="body tight">
+      <p class="sub">x변수에 대응하는 y변수의 평균값을 추정하는 회귀직선을 나타내는 방정식</p>
+      <p class="emph" style="font-weight:700;color:var(--ink);margin:0">회귀직선의 기울기와 절편 구하기</p>
+      <div style="display:flex;gap:14px;align-items:flex-start;margin-top:2px">
+        <div style="flex:0 0 26%">
+          <img src="../assets/tb-reg2-edu-income-scatter.png" style="width:100%"
+               alt="교육수준(년)을 가로축, 소득(만원/월)을 세로축에 놓은 산포도와 우상향하는 회귀직선">
+        </div>
+        <div style="flex:0 0 21%">
+          <p class="caption" style="margin:0">30-40세 도시남성 198명의 표본자료</p>
+          <ul class="slim" style="font-size:12px;margin-top:3px" id="men-facts"></ul>
+        </div>
+        <div style="flex:1 1 auto">
+          <p class="sub" id="men-eq" style="font-size:14px;text-align:center;margin-bottom:0"></p>
+          <svg class="fig" id="f-men" viewBox="0 0 470 260" style="width:100%" role="img">
+            <title>평균 교육연수 12.5년·평균 소득 163만원을 지나는 회귀직선. 가로로 SDx=2년, 세로로 r·SDy=25만 4천원 만큼 올라가는 삼각형에서 기울기가 나온다</title>
+          </svg>
+          <p class="caption" id="men-calc" style="margin-top:2px;line-height:1.4"></p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const M = window.MEN;
+        document.getElementById('men-facts').innerHTML = [
+          `평균 교육연수 = ${M.mx}년`, `교육연수 표준편차 = ${M.sdx}년`,
+          `평균 소득 = ${M.my}만원`, `소득 표준편차 = ${M.sdy}만원`,
+          `상관계수 = ${M.r}`,
+        ].map((t) => `<li>${t}</li>`).join('');
+        document.getElementById('men-eq').textContent =
+          `월소득 = ${M.b0}만원 + ${M.b1}만원/년 * 교육연수`;
+        document.getElementById('men-calc').innerHTML =
+          `기울기 = r × (SD<sub>y</sub>/SD<sub>x</sub>) = ${M.b1}만원/년<br>` +
+          `${M.mx}년 × ${M.b1}만원/년 = ${fmt2(M.mx * M.b1)}만원<br>` +
+          `절편 = ${M.my}만원 − ${fmt2(M.mx * M.b1)}만원 = ${M.b0}만원`;
+
+        const F = Fig.withBox({ x0: 74, y0: 218, x1: 420, y1: 34 });
+        const YMAX = 280, XMAX = 20;
+        const S = F.scale({ x: [0, XMAX], y: [0, YMAX] });
+        const line = (x) => M.b0 + M.b1 * x;
+        let s = `<path class="axis" d="M${S.x(0)},${S.y(YMAX)} L${S.x(0)},${S.y(0)} ` +
+                `L${S.x(XMAX)},${S.y(0)}"/>`;
+        s += `<text class="axis-name" x="${S.x(0)}" y="${S.y(YMAX) - 8}" text-anchor="middle">월 소득</text>`;
+        s += `<text class="axis-name" x="${S.x(XMAX)}" y="${S.y(0) + 17}" text-anchor="end">교육년수</text>`;
+        // 회귀직선 — 플롯 안에서만 그린다
+        const xEnd = Math.min(XMAX, (YMAX - M.b0) / M.b1);
+        s += F.line(S.x(0), S.y(line(0)), S.x(xEnd), S.y(line(xEnd)));
+        const dash = 'stroke="var(--guide)" stroke-width="1.2" stroke-dasharray="3 3" fill="none"';
+        s += `<path ${dash} d="M${S.x(0)},${S.y(M.my)} L${S.x(M.mx)},${S.y(M.my)} L${S.x(M.mx)},${S.y(0)}"/>`;
+        s += `<text class="annot blue" x="${S.x(M.mx) - 8}" y="${S.y(M.my) - 8}" ` +
+             `text-anchor="end" style="font-size:11px">평균소득 ${M.my}만원</text>`;
+        s += `<text class="annot blue" x="${S.x(M.mx)}" y="${S.y(0) + 32}" ` +
+             `text-anchor="middle" style="font-size:11px">평균교육수준 ${M.mx}년</text>`;
+        // SDx 와 r·SDy
+        const x2 = M.mx + M.sdx, y2 = line(x2);
+        const both = 'stroke="var(--accent-blue)" stroke-width="1.3" fill="none" ' +
+                     'marker-start="url(#ah-blue)" marker-end="url(#ah-blue)"';
+        s += `<path ${both} d="M${S.x(M.mx)},${S.y(M.my)} L${S.x(x2)},${S.y(M.my)}"/>`;
+        s += `<path ${both} d="M${S.x(x2)},${S.y(M.my)} L${S.x(x2)},${S.y(y2)}"/>`;
+        s += `<text class="annot blue" x="${S.x(M.mx + M.sdx / 2)}" y="${S.y(M.my) + 16}" ` +
+             `text-anchor="middle" style="font-size:11px">SD<tspan style="font-size:8px">x</tspan>=${M.sdx}년</text>`;
+        s += `<text class="annot blue" x="${S.x(x2) + 7}" y="${S.y((M.my + y2) / 2) + 4}" ` +
+             `style="font-size:11px">r · SD<tspan style="font-size:8px">y</tspan>=${M.rsdy}만원</text>`;
+        // 왼쪽 — 절편과 12.5년치 상승분
+        s += `<path ${both} d="M${S.x(0.55)},${S.y(M.b0)} L${S.x(0.55)},${S.y(M.my)}"/>`;
+        s += `<text class="annot blue" x="${S.x(0.9)}" y="${S.y((M.b0 + M.my) / 2) + 4}" ` +
+             `style="font-size:11px">${fmt2(M.mx * M.b1)}만원</text>`;
+        s += `<path d="M${S.x(0.55)},${S.y(0)} L${S.x(0.55)},${S.y(M.b0)}" ` +
+             `stroke="var(--brand-crimson)" stroke-width="1.6" fill="none" ` +
+             `marker-start="url(#ah-red)" marker-end="url(#ah-red)"/>`;
+        s += `<text class="annot red" x="${S.x(1.35)}" y="${S.y(0) - 5}" ` +
+             `style="font-size:11px">절편 ${M.b0}만원</text>`;
+        Fig.draw('#f-men', { parts: [Fig.raw(s)] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 12. 연습문제 (원본 p.15~16 합침) ════════════════════
+       같은 문제에 풀이만 얹힌다 → 한 장의 fragment -->
+  <section>
+    <h2>연습문제: 회귀방정식 구하기</h2>
+    <div class="body tight">
+      <p class="sub">x변수에 대응하는 y변수의 평균값을 추정하는 회귀직선을 나타내는 방정식</p>
+      <p style="margin:0 0 -4px">$Y = b_0 + b_1 X$</p>
+      <div class="fx-row" style="margin-top:2px">
+        <div class="fx">$b_1 = r * \dfrac{SD_y}{SD_x}$</div>
+        <div class="fx">$b_0 = \bar{Y} - b_1 \bar{X}$</div>
+      </div>
+      <p class="emph" style="font-weight:700;color:var(--ink);margin:14px 0 0">
+        회귀직선의 기울기와 절편 구하기: 교육연수<span class="xy">(X)</span>로
+        소득<span class="xy">(Y)</span>을 추정</p>
+      <div class="cols top" style="margin-top:6px">
+        <div class="col-l" style="flex:0 0 40%">
+          <p class="caption">도시여성 근로자 108명의 표본자료</p>
+          <ul class="slim" style="font-size:14px" id="wm-facts"></ul>
+        </div>
+        <div class="col-r fragment" data-fragment-index="0">
+          <p class="sub" id="wm-eq" style="font-size:16px;margin-bottom:12px"></p>
+          <p class="caption" id="wm-slope" style="margin-bottom:8px"></p>
+          <p class="caption" id="wm-int"></p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const W = window.WOMEN;
+        document.getElementById('wm-facts').innerHTML = [
+          `평균 교육연수 = ${W.mx}년`, `교육연수 표준편차 = ${W.sdx}년`,
+          `평균 소득 = ${W.my}만원`, `소득 표준편차 = ${W.sdy}만원`,
+          `상관계수 = ${W.r}`,
+        ].map((t) => `<li>${t}</li>`).join('');
+        document.getElementById('wm-eq').textContent =
+          `월소득 = ${W.b0}만원 + ${W.b1}만원/년 * 교육연수`;
+        document.getElementById('wm-slope').textContent =
+          `기울기 = ${W.r} * ${W.sdy}만원 / ${W.sdx}년 = ${W.b1}만원 /년`;
+        document.getElementById('wm-int').textContent =
+          `절편 = ${W.my}만원 − ${W.b1}만원/년 * ${W.mx}년 = ${W.b0}만원`;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 13. 회귀분석의 해석 (원본 p.17~19 합침) ═════════════
+       같은 판에 물음과 답이 차례로 얹힌다 → 3단계 -->
+  <section>
+    <h2>회귀분석의 해석</h2>
+    <div class="body tight">
+      <ul class="slim" style="font-size:14px">
+        <li><span class="sub" style="display:inline">설명변수의 기울기</span>:
+          x값 1단위 변화와 관련한 y값의 <em>평균</em>적인 변화량</li>
+        <li><span class="sub" style="display:inline">절편</span>: x값이 0일 때 y값의 상태</li>
+      </ul>
+      <div class="cols top" style="margin-top:10px">
+        <div class="col-l" style="flex:0 0 58%">
+          <p class="emph" style="font-weight:700;color:var(--ink);margin:0 0 2px">
+            예시) 회귀방정식이 다음과 같을 경우</p>
+          <p class="sub" id="int-eq" style="font-size:16px;margin-bottom:4px"></p>
+          <ul class="slim" style="font-size:12.5px" id="int-pred"></ul>
+          <p class="sub" id="int-read" style="margin-top:8px"></p>
+        </div>
+        <div class="col-r">
+          <img src="../assets/tb-reg2-edu-income-arrow.png" style="width:100%"
+               alt="교육연수와 월소득의 산포도. 교육연수 9년에서 16년으로 옮겨가면 회귀직선 위의 추정소득이 올라가지만, 실제로 그렇게 될지 물음표가 붙어 있다">
+        </div>
+      </div>
+      <p class="sub fragment" data-fragment-index="0" style="margin-top:8px">
+        외부에서 임의로 추출한 개인에게 4년의 추가 교육을 시키면
+        <span id="int-add"></span>만원 소득이 증가할까?</p>
+      <p class="sub fragment" data-fragment-index="1" style="margin:0">
+        → 혼동요인(설명변수 이외의 개입할 다른 요인)이 존재 (개인의 성향, 나이, 가정환경 등)</p>
+    </div>
+    <script>
+      (function () {
+        const W = window.WOMEN;
+        document.getElementById('int-eq').textContent =
+          `월소득 = ${W.b0}만원 + ${W.b1}만원 * 교육연수`;
+        document.getElementById('int-pred').innerHTML = [12, 16].map((yr) =>
+          `<li>교육연수가 ${yr}년인 경우 추정소득 = ${W.b0}만원 + ${W.b1}만원/년 *${yr}년 ` +
+          `= ${fmt(W.b0 + W.b1 * yr)}만원</li>`).join('');
+        document.getElementById('int-read').textContent =
+          `해석) 교육수준의 1년 증가와 관련해 월 소득은 평균적으로 ${W.b1}만원 증가함`;
+        document.getElementById('int-add').textContent = fmt(W.b1 * 4);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 14. 혼동요인의 통제 (원본 p.20) ═════════════════════ -->
+  <section>
+    <h2>혼동요인의 통제</h2>
+    <div class="body">
+      <ul class="slim" style="font-size:16px">
+        <li style="margin-bottom:16px"><span class="sub" style="display:inline">실험을 통한 통제</span></li>
+        <li style="margin-bottom:16px">
+          <span class="sub" style="display:inline">제3의 요인을 활용한 집단의 구분</span>: 성별, 연령대 …
+          <p class="emph" style="margin:4px 0 0 4px">예. 홈런과 사사구 수의 관계 →
+            규정타석 타자 / 그 외 타자</p></li>
+        <li><span class="sub" style="display:inline">중회귀분석</span>:
+          성별, 연령을 다른 설명변수(통제변수)로 고려
+          <p class="emph" style="margin:4px 0 0 4px">예. 홈런과 사사구 수의 관계 →
+            모든 타자를 고려하되 홈런 수 외에 타석 수를 설명변수로 추가</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 15. 회귀분석의 해석 — 통계적 통제로 (원본 p.21) ═════ -->
+  <section>
+    <h2>회귀분석의 해석</h2>
+    <div class="body tight">
+      <ul class="slim" style="font-size:14px">
+        <li><span class="sub" style="display:inline">설명변수의 기울기</span>:
+          x값 1단위 변화와 관련한 y값의 <em>평균</em>적인 변화량</li>
+        <li><span class="sub" style="display:inline">절편</span>: x값이 0일 때 y값의 상태</li>
+      </ul>
+      <div class="cols top" style="margin-top:8px">
+        <div class="col-l" style="flex:0 0 66%">
+          <p class="emph" style="font-weight:700;color:var(--ink);margin:0 0 2px">
+            예시) 회귀방정식이 다음과 같을 경우</p>
+          <p class="sub" id="ct-eq" style="font-size:15px;margin-bottom:4px"></p>
+          <ul class="slim" style="font-size:12px" id="ct-pred"></ul>
+          <p class="sub" id="ct-read" style="margin-top:6px;font-size:14px"></p>
+        </div>
+        <div class="col-r">
+          <img src="../assets/tb-reg2-edu-income-arrow.png" style="width:100%"
+               alt="교육연수와 월소득의 산포도. 교육연수 9년에서 16년으로 옮겨가면 회귀직선 위의 추정소득이 올라가지만, 실제로 그렇게 될지 물음표가 붙어 있다">
+        </div>
+      </div>
+      <p class="sub" style="margin-top:6px;font-size:14px">
+        외부에서 임의로 추출한 개인에게 4년의 추가 교육을 시키면
+        <span id="ct-add"></span>만원 소득이 증가할까?</p>
+      <p class="sub" style="margin:0;font-size:14px">
+        → 혼동요인(설명변수 이외의 개입할 다른 요인)이 존재 (개인의 성향, 나이, 가정환경 등)</p>
+      <p class="sub" style="margin:0;font-size:14px">
+        → 다른 요인으로부터 완벽하게 통제된 실험에서만 가능
+        &nbsp;하지만 우리의 분석결과는 단지 표본조사를 통해 얻어낸 관측자료에 불과</p>
+      <p class="sub" style="margin:0;font-size:14px">
+        → 실험을 통한 통제가 어렵기 때문에 통계적 통제(statistical control)의 수단인
+        중회귀분석(multiple regression) 수행</p>
+    </div>
+    <script>
+      (function () {
+        const W = window.WOMEN;
+        document.getElementById('ct-eq').textContent =
+          `월소득 = ${W.b0}만원 + ${W.b1}만원 * 교육연수`;
+        document.getElementById('ct-pred').innerHTML = [12, 16].map((yr) =>
+          `<li>교육연수가 ${yr}년인 경우 추정소득 = ${W.b0}만원 + ${W.b1}만원/년 *${yr}년 ` +
+          `= ${fmt(W.b0 + W.b1 * yr)}만원</li>`).join('');
+        document.getElementById('ct-read').textContent =
+          `해석) 교육수준의 1년 증가와 관련해 월 소득은 평균적으로 ${W.b1}만원 증가함`;
+        document.getElementById('ct-add').textContent = fmt(W.b1 * 4);
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 16. 단순회귀와 (다)중회귀 (원본 p.22) ═══════════════ -->
+  <section>
+    <h2>단순회귀와 (다)중회귀</h2>
+    <div class="body tight">
+      <div class="cols top" style="margin-top:0">
+        <div class="col-l" style="flex:0 0 62%">
+          <p class="sub" style="margin-bottom:2px">단순회귀<span class="en">(single regression)</span></p>
+          <p class="emph" style="margin:0 0 8px 14px">하나의 설명변수(X)와 종속변수(Y) 간의 관계를 분석</p>
+          <p class="sub" style="margin:0 0 20px 14px">아파트 가격 (Y) = a + b*접근성(X)</p>
+          <p class="sub" style="margin-bottom:2px">(다)중회귀<span class="en">(multiple regression)</span></p>
+          <p class="emph" style="margin:0 0 8px 14px">둘 이상의 설명변수(X1, X2, X3…)와
+            종속변수(Y) 간의 관계를 분석</p>
+          <p class="sub" style="margin:0 0 0 14px">아파트 가격 (Y) = a + b1*접근성(X1)
+            + b2*평수(X2) + b3*연식(X3) …</p>
+        </div>
+        <div class="col-r">
+          <p class="brace-note" style="margin:0">
+            아파트 가격에 영향을 미치는<br>
+            다른 요인들을 함께 고려함으로써<br>
+            접근성이 아파트 가격에 미치는<br>
+            <span style="text-decoration:underline">(가급적) 순수한 영향을 파악</span></p>
+          <p class="brace-note" style="text-align:center;margin:6px 0">↓</p>
+          <p class="brace-note" style="margin:0">
+            혼동요인을 통제함으로써<br>
+            관심을 갖는 설명변수가<br>
+            미치는 영향을 더 잘 설명</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 17. 결정계수 (원본 p.23~25 합침) ════════════════════
+       같은 도해에 R(설명되는 부분) → 분해식 → R² 수식이 차례로 얹힌다 → 2단계 -->
+  <section>
+    <h2>결정계수 <span class="en">(coefficient of determination)</span></h2>
+    <div class="body tight">
+      <p class="sub">“회귀직선이 y의 변화를 설명하는 정도”로서 전체 편차 중에
+        회귀선이 설명하는 비율을 의미</p>
+      <p class="fragment" data-fragment-index="1" style="margin:0;font-size:15px">
+        $R^2 = \dfrac{SSR}{SST} = 1 - \dfrac{SSE}{SST}\quad (0 \le R^2 \le 1)$
+        <span class="sub" style="display:inline;margin-left:14px">1에 가까울수록 높은 설명력
+          (단순회귀에서는 상관계수의 제곱)</span></p>
+      <div class="cols top" style="margin-top:2px">
+        <div class="col-l" style="flex:0 0 57%">
+          <svg class="fig" id="f-r2" viewBox="0 0 470 262" style="width:100%" role="img">
+            <title>회귀직선과 관측치 하나를 놓고, 총편차 T를 회귀식으로 설명되는 부분 R와 잔차 E로 나눈 그림</title>
+          </svg>
+        </div>
+        <div class="col-r fragment" data-fragment-index="0">
+          <p style="margin:0;font-size:12px">
+            $y_i - \bar{y} = [(a + b x_i) - \bar{y}] + [y_i - (a + b x_i)]$</p>
+          <p style="margin:0;text-align:center;font-size:13px">
+            $T \quad = \quad R \quad + \quad E$</p>
+          <p style="margin:6px 0 0;font-size:10.5px">
+            $\sum (y_i - \bar{y})^2 = \sum [(a + b x_i) - \bar{y}]^2 + \sum [y_i - (a + b x_i)]^2$</p>
+          <p style="margin:0;text-align:center;font-size:13px">
+            $SST \quad = \quad SSR \quad + \quad SSE$</p>
+          <p class="caption" style="text-align:center;margin:0">
+            (회귀식으로 설명됨) &nbsp;&nbsp; (회귀식으로 설명 안 됨)</p>
+          <ul class="slim" style="font-size:12.5px;margin-top:8px">
+            <li>SST(총제곱합): y의 평균 주위로의 총변동</li>
+            <li>SSR(회귀제곱합): 회귀직선에 의해 설명되는 변동</li>
+            <li>SSE(잔차(오차)제곱합): 회귀직선에 의해 설명되지 않는 변동</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const D = window.R2FIG;
+        const F = Fig.withBox({ x0: 36, y0: 226, x1: 330, y1: 30 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const dash = 'stroke="var(--guide)" stroke-width="1.2" stroke-dasharray="3 3" fill="none"';
+        let s = `<path class="axis" d="M${S.x(0.3)},${S.y(9.6)} L${S.x(0.3)},${S.y(0.4)} ` +
+                `L${S.x(9.4)},${S.y(0.4)}"/>`;
+        s += `<text class="axis-name" x="${S.x(0.3)}" y="${S.y(9.6)} " text-anchor="middle">Y</text>`;
+        s += `<text class="axis-name" x="${S.x(9.4) + 8}" y="${S.y(0.4) + 5}">X</text>`;
+        // 회귀직선 (굵은 회색 화살표)
+        s += `<path d="M${S.x(0.7)},${S.y(D.line(0.7))} L${S.x(8.55)},${S.y(D.line(8.55))}" ` +
+             `stroke="var(--ink-2)" stroke-width="3.2" fill="none" marker-end="url(#ah-ink)"/>`;
+        // ȳ, x̄ 보조선
+        s += `<path ${dash} d="M${S.x(0.3)},${S.y(D.ybar)} L${S.x(D.xi)},${S.y(D.ybar)}"/>`;
+        s += `<path ${dash} d="M${S.x(D.xbar)},${S.y(D.ybar)} L${S.x(D.xbar)},${S.y(0.4)}"/>`;
+        s += `<path ${dash} d="M${S.x(D.xi)},${S.y(D.ybar)} L${S.x(D.xi)},${S.y(D.yi)}"/>`;
+        s += `<text class="annot" x="${S.x(0.3) - 8}" y="${S.y(D.ybar) + 5}" text-anchor="end">ȳ</text>`;
+        s += `<text class="annot" x="${S.x(D.xbar)}" y="${S.y(0.4) + 18}" text-anchor="middle">x̄</text>`;
+        s += `<text class="annot" x="${S.x(D.xbar) + 6}" y="${S.y(D.ybar) + 18}" ` +
+             `style="font-size:11px">(x̄, ȳ)</text>`;
+        // 관측치 × 와 추정치 ○
+        s += `<path d="M${S.x(D.xi) - 5},${S.y(D.yi) - 5} L${S.x(D.xi) + 5},${S.y(D.yi) + 5} ` +
+             `M${S.x(D.xi) - 5},${S.y(D.yi) + 5} L${S.x(D.xi) + 5},${S.y(D.yi) - 5}" ` +
+             `stroke="var(--ink)" stroke-width="2" fill="none"/>`;
+        s += `<circle class="dot-open" cx="${S.x(D.xi)}" cy="${S.y(D.yhat)}" r="3.6" data-free="1"/>`;
+        s += `<text class="annot red" x="${S.x(D.xi)}" y="${S.y(D.yi) - 13}" text-anchor="middle" ` +
+             `style="font-size:11px">관측치 y<tspan style="font-size:8px">i</tspan></text>`;
+        // 중괄호 T (왼쪽) · E, R (오른쪽)
+        s += brace(S.x(D.xi) - 5, S.y(D.yi), S.y(D.ybar), 5, -1);
+        s += brace(S.x(D.xi) + 5, S.y(D.yi), S.y(D.yhat), 5, 1);
+        s += `<text class="annot red" x="${S.x(D.xi) - 26}" y="${S.y((D.yi + D.ybar) / 2) - 3}" ` +
+             `text-anchor="end" style="font-size:10.5px">(yᵢ−ȳ) 총 편차  T</text>`;
+        s += `<text class="annot" x="${S.x(D.xi) + 19}" y="${S.y((D.yi + D.yhat) / 2) - 13}" ` +
+             `style="font-size:10px">E  회귀식으로 설명 안되는 부분` +
+             `<tspan x="${S.x(D.xi) + 27}" dy="12" class="annot red">= 잔차 (yᵢ−ŷᵢ)</tspan></text>`;
+        s += `<text class="annot red" x="${S.x(D.xi) + 19}" y="${S.y(D.ybar) + 18}" ` +
+             `style="font-size:10.5px">추정치 ŷᵢ = b₀ + b₁xᵢ</text>`;
+        // 아래 두 조각은 원본 p.24 에서 더해진다
+        let g = brace(S.x(D.xi) + 5, S.y(D.yhat), S.y(D.ybar), 5, 1);
+        g += `<text class="annot" x="${S.x(D.xi) + 19}" y="${S.y((D.yhat + D.ybar) / 2) + 2}" ` +
+             `style="font-size:10px">R  회귀식으로 설명되는 부분` +
+             `<tspan x="${S.x(D.xi) + 27}" dy="12" class="annot red">(ŷᵢ − ȳ)</tspan></text>`;
+        Fig.draw('#f-r2', { parts: [Fig.raw(s), Fig.raw(g, { fragment: 0 })] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 18. 조정된 결정계수 (원본 p.26) ═════════════════════ -->
+  <section>
+    <h2>조정된 결정계수 <span class="en">(adjusted R2)</span></h2>
+    <div class="body tight">
+      <p class="sub">“회귀직선이 y의 변화를 설명하는 정도”로서 전체 편차 중에
+        회귀선이 설명하는 비율을 의미</p>
+      <div class="cols top" style="margin-top:2px">
+        <div class="col-l" style="flex:0 0 40%">
+          <p style="margin:0;font-size:15px">
+            $R^2 = \dfrac{SSR}{SST} = 1 - \dfrac{SSE}{SST}$</p>
+          <p class="caption" style="margin:8px 0 0">$(0 \le R^2 \le 1)$</p>
+        </div>
+        <div class="col-r">
+          <p class="sub" style="margin-bottom:2px">1에 가까울수록 높은 설명력
+            (단순회귀에서는 상관계수의 제곱)</p>
+          <p class="sub" style="margin:0">→ 설명변수가 추가되면 SSE는 무조건 감소</p>
+          <p class="sub" style="margin:0">→ 결정계수는 계속 증가
+            <span class="thin" style="font-weight:400">(많은 설명변수를 가진 모형이 무조건 유리?!)</span></p>
+        </div>
+      </div>
+      <div class="cols top" style="margin-top:14px">
+        <div class="col-l" style="flex:0 0 40%">
+          <p style="margin:0;font-size:15px">
+            $\text{adj } R^2 = 1 - \dfrac{SSE/(n-k-1)}{SST/(n-1)}$</p>
+          <p class="side-note" style="margin:2px 0 0 26px">n = 표본크기<br>k = 설명변수의 개수</p>
+        </div>
+        <div class="col-r">
+          <p class="sub" style="margin-bottom:2px">설명변수가 추가될수록 자유도가 감소하도록 조정</p>
+          <p class="sub" style="margin:0">→ 설명변수 추가에 따른 SSE의 감소속도 &lt;
+            설명변수 추가에 따른 자유도 감소속도</p>
+          <p class="sub" style="margin:0">→ 표준오차가 증가 → 결정계수는 오히려 감소</p>
+        </div>
+      </div>
+      <div class="cols top" style="margin-top:12px">
+        <div class="col-l" style="flex:0 0 40%">
+          <p class="side-note" style="margin:0;font-size:13px">
+            $cf)\ SE = \sqrt{\dfrac{\sum (y_i - \hat{y}_i)^2}{n-2}}$</p>
+        </div>
+        <div class="col-r">
+          <p class="sub" style="margin:0">→ 설명변수 추가에 따라 SSE가 충분히 많이 감소해야</p>
+          <p class="sub" style="margin:0 0 0 14px">(즉, 설명변수가 잔차를 크게 줄여야)</p>
+          <p class="sub" style="margin:0 0 0 14px">회귀직선의 설명력인 결정계수가 증가</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 19. 아직 안 배운 것들 (원본 p.27) ═══════════════════ -->
+  <section>
+    <h2>회귀분석에 대해 우리가 아직 안 배운 것들</h2>
+    <div class="body stack">
+      <p class="emph" style="font-size:17px;margin-bottom:4px">
+        회귀분석을 통해 추정된 기울기와 절편은 표본자료가 바뀌더라도 얼마나 유지될까?</p>
+      <p class="sub" style="font-size:18px;margin:0 0 34px 22px">→ 기울기와 절편의 유의성 검정</p>
+      <p class="emph" style="font-size:17px;margin-bottom:4px">
+        회귀분석은 어떠한 상황을 만족해야(어떤 조건 하에서만) 신뢰할 만한 분석일까?</p>
+      <p class="sub" style="font-size:18px;margin:0 0 0 22px">
+        → 회귀분석의 조건과 조건에 위배될 경우에 적합한 다른 방법들</p>
+    </div>
+  </section>
+
+  <!-- ══ 20. 잔차도 (원본 p.28) ══════════════════════════════ -->
+  <section>
+    <h2>잔차도 <span class="en">(residual plot)</span></h2>
+    <div class="body tight">
+      <p class="sub">실제값과 회귀직선의 추정치 간의 차이인 잔차의 크기를 y축에 두고,
+        x값의 변화에 따라 표시한 것</p>
+      <p class="sub">→ 잔차도에서 체계적인 패턴(우상향, 우하향, 곡선 등)이 나타날 경우
+        회귀직선이 y를 충분히 추정하지 못함을 의미</p>
+      <img src="../assets/tb-reg2-residual-plot.png"
+           style="width:600px;display:block;margin:12px auto 0"
+           alt="왼쪽은 산포도와 회귀직선, 오른쪽은 같은 자료의 잔차도. 회귀직선에서 점까지의 세로 거리와 잔차도에서 0선까지의 거리가 같은 길이임을 보여 준다">
+    </div>
+  </section>
+
+  <!-- ══ 21. 등분산성과 이분산성 (원본 p.29) ═════════════════ -->
+  <section>
+    <h2>등분산성과 이분산성</h2>
+    <div class="body tight">
+      <p class="sub">회귀직선은 x의 각 부분집합 내에서 y값들이 평균을 중심으로
+        일정간격(표준오차)으로 퍼져 있다고 간주</p>
+      <p class="sub">→ 만약 표준오차가 모든 x의 부분집합에서 일정하지 않을 경우,
+        회귀직선은 x의 부분집합별로 서로 다른 오차를 지님</p>
+      <p class="sub">→ 이분산성이 존재할 경우 y값을 추정하기 위한 회귀직선의 신뢰성에 문제</p>
+      <div class="pair-fig">
+        <div class="cell">
+          <p class="ttl">등분산성<span class="en">(homoscedasticity)</span></p>
+          <img src="../assets/tb-reg2-homoscedastic.jpg"
+               alt="키와 몸무게의 산포도. 몇 개의 키 구간마다 같은 폭의 종모양 분포가 그려져 있다">
+        </div>
+        <div class="cell">
+          <p class="ttl">이분산성<span class="en">(heteroscedasticity)</span></p>
+          <img src="../assets/tb-reg2-heteroscedastic.png"
+               alt="교육수준과 소득의 산포도. 교육수준이 높아질수록 종모양 분포의 폭이 점점 넓어진다">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 22. 주의사항 (원본 p.30) ════════════════════════════ -->
+  <section>
+    <h2>회귀분석을 사용할 때 주의사항</h2>
+    <div class="body stack">
+      <ul class="slim" style="font-size:16px">
+        <li style="margin-bottom:22px">회귀분석은 변수 간의 선형관계를 파악:
+          비선형(non-linear) 관계 X</li>
+        <li>선형관계의 존재(즉, 높은 상관계수)만으로 유의미한 결과라고 볼 수 없음
+          <p class="emph" style="margin:8px 0 0 4px">예. 아이스크림 판매량이 증가하면
+            일사병이 많이 걸린다.</p>
+          <p class="sub" style="margin:8px 0 0 4px">→ 이론적 토대 + 설명 가능여부의 중요성</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 23. 오늘 강의 요약 (원본 p.31) ══════════════════════ -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tighter">
+      <ol class="dense">
+        <li>x변수에 대응하는 y변수의 평균값을 추정하는 회귀직선을 나타내는 방정식을
+          회귀방정식이라 한다.</li>
+        <li>회귀분석에서 추정되는 변수를 종속변수, 종속변수를 추정하기 위해 사용하는 변수를
+          설명변수(독립변수)라 한다.</li>
+        <li>회귀방정식에서 설명변수의 기울기는 설명변수 1단위 변화에 따른 종속변수의
+          평균적 변화량을 의미한다.</li>
+        <li>하나의 설명변수로 종속변수의 변동을 설명하려는 회귀분석을 단순회귀분석,
+          둘 이상의 설명변수로 종속변수의 변동을 설명하려는 회귀분석을 (다)중회귀분석이라 한다.</li>
+        <li>중회귀분석은 종속변수 변동에 영향을 미치는 여러 요인들을 동시에 고려함으로써,
+          혼동요인을 통제하고 설명변수가 종속변수에 미치는 순수한 효과를 더 잘 파악할 수 있게 한다.</li>
+        <li>결정계수는 총 변동 중 회귀직선을 통해 설명 가능한 변동의 비중을 의미한다.</li>
+        <li>회귀분석은 만병통치약이 아니며, 설명변수로 종속변수의 변화를 추정할 때는
+          이론적 토대가 반드시 필요하다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══ 24. T10 마무리 (원본 p.32) ══════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

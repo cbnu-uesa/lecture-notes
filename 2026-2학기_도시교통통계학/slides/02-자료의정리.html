@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2강. 통계학과 자료의 정리</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* ─── 1강과 같은 흐름도 (원본 p.2) ─── */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 40px; }
+  .flow .node { width: 168px; padding: 18px 6px; text-align: center;
+                background: var(--brand-crimson); color: #FFF; font-weight: 700;
+                font-size: var(--fs-body); line-height: 1.35; }
+  .flow .arr { flex: 0 0 86px; text-align: center; position: relative; }
+  .flow .arr::after { content: ''; position: absolute; left: 8px; right: 8px; top: 50%;
+                      border-top: 1.4px solid #7C7C7C; }
+  .big-say { font-size: 26px; font-weight: 700; color: var(--brand-crimson);
+             text-align: center; margin: 38px 0 0; }
+
+  /* ─── 정리되지 않은 원자료 500개 (원본 p.5 · p.9) ───
+     숫자 자체가 "정리되지 않은 자료"라는 메시지이므로 줄이거나 요약하지 않는다. */
+  .nums { font-size: 6.6px; line-height: 1.34; word-spacing: 2.4px;
+          color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: justify; }
+  .nums.mini { font-size: 4.8px; line-height: 1.3; word-spacing: 1.8px; }
+
+  /* ─── 두 갈래 요약 방법 (원본 p.5) ─── */
+  .branch { display: flex; gap: 24px; align-items: center; }
+  .branch .nums { flex: 1 1 auto; }
+  .branch .tags { flex: 0 0 186px; }
+  .branch .tag { background: var(--brand-crimson); color: #FFF; font-weight: 700;
+                 text-align: center; padding: 13px 8px; font-size: var(--fs-sub); }
+  .branch .tag + .tag { margin-top: 48px; }
+
+  /* 크림슨 라벨 + 설명을 여러 줄 얹을 때 쓰는 좁은 판 */
+  .def-row.slim + .def-row.slim { margin-top: 14px; }
+  .def-row.slim .def-tag { flex: 0 0 186px; padding: 8px 8px; font-size: 13px; line-height: 1.35; }
+  .def-row.slim > div > p { font-size: var(--fs-body); }
+
+  /* ─── 도수분포표 계열 ─── */
+  .tbl-freq { font-size: 12px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-freq th, .reveal .tbl-freq td { padding: 2px 6px; text-align: center;
+                                               white-space: nowrap; }
+  .tbl-freq-sm { font-size: 10px; }
+  .reveal .tbl-freq-sm th, .reveal .tbl-freq-sm td { padding: 1px 2px; }
+  .tbl-smoke { font-size: 13px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-smoke th, .reveal .tbl-smoke td { padding: 3px 8px; text-align: center; }
+  .tbl-rep { font-size: 12px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-rep th, .reveal .tbl-rep td { padding: 4px 8px; vertical-align: top; }
+  .reveal .tbl-rep th:first-child, .reveal .tbl-rep td:first-child { width: 20%; text-align: center; }
+  .tbl-scale { font-size: 10.5px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-scale th, .reveal .tbl-scale td { padding: 3px 5px; text-align: center; line-height: 1.3; }
+  .tbl-rep ul { margin: 0; padding-left: 14px; }
+  .tbl-rep li { margin-bottom: 2px; }
+  .tbl-rep li::before { left: -11px; }
+
+  /* ─── 단계 목록 (원본 p.8) ─── */
+  .steps .step { display: flex; gap: 14px; margin-bottom: 9px; }
+  .steps .n { flex: 0 0 56px; font-weight: 700; color: var(--brand-crimson); }
+  .steps .t { flex: 1 1 auto; }
+  .steps .t p { margin: 0 0 2px; }
+
+  /* ─── 문답 (원본 p.9~10) ─── */
+  .qcol .q { font-size: 13px; font-weight: 700; color: var(--brand-crimson);
+             margin: 0 0 3px; line-height: 1.4; }
+  .qcol .a { font-size: 12px; margin: 0 0 1px 12px; line-height: 1.4; }
+  .qcol .blk { margin-bottom: 12px; }
+
+  /* 히스토그램 막대는 면 채움이 아니라 데이터라 진하게 둔다 (1강과 같다) */
+  .reveal svg.fig .area-bar { fill-opacity: 0.5; }
+
+  /* ─── 상대빈도로 그리면 과장되는 두 구간 (원본 p.13 주황) ─── */
+  .reveal svg.fig .area-over { fill: var(--chart-orange); fill-opacity: 0.55;
+                               stroke: #FFF; stroke-width: 1; }
+  .reveal svg.fig .area-move { fill: var(--chart-orange); fill-opacity: 0.32;
+                               stroke: var(--chart-orange); stroke-width: 1.4; }
+  .reveal svg.fig .boxfill  { fill: var(--brand-crimson); }
+  .reveal svg.fig .boxfill2 { fill: var(--muted); }
+  .reveal svg.fig .boxlab   { fill: #FFF; font-size: 13px; font-weight: 700;
+                              stroke: none; paint-order: normal; }
+  .reveal svg.fig .boxlab.sm { font-size: 11px; font-weight: 500; }
+  .reveal svg.fig .frame    { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+  .reveal svg.fig .band     { fill: var(--accent-blue); fill-opacity: 0.28; }
+  .reveal svg.fig .mark-line { stroke: var(--ink-2); stroke-width: 1.2; fill: none; }
+
+  /* ─── 횡단면·시계열·패널 (부록 원본 p.29) ─── */
+  .datagrid { display: grid; grid-template-columns: 118px repeat(4, 1fr);
+              gap: 5px; margin-top: 10px; font-size: 13px; }
+  .datagrid .c { padding: 4px 4px; text-align: center; border: 1px solid var(--rule); }
+  .datagrid .hd { font-weight: 700; color: var(--ink); border: none; }
+  .datagrid .rw { font-weight: 700; color: var(--ink); border: none; text-align: left; }
+  .datagrid .ts { background: rgba(160, 41, 72, 0.14); border-color: var(--brand-crimson); }
+  .datagrid .cs { background: rgba(31, 92, 139, 0.14); border-color: var(--accent-blue); }
+  .gridkey { display: flex; gap: 26px; margin-top: 10px; font-size: 12px; }
+  .gridkey .k { font-weight: 700; }
+  .gridkey .k.ts { color: var(--brand-crimson); }
+  .gridkey .k.cs { color: var(--accent-blue); }
+
+  .reveal .formula-ink { color: var(--ink); }
+  .notes-sm { font-size: 11.5px; line-height: 1.4; }
+  .notes-sm > li { margin-bottom: 3px; }
+
+  /* 우상단 보조 상자 (원본 p.22 정규분포 설명) */
+  .side-note { position: absolute; right: 0; top: 6px; width: 268px;
+               background: #F2F0EC; padding: 12px 14px; }
+  .side-note p { margin: 0 0 4px; font-size: 12px; }
+  .side-note .ttl { font-size: 13px; font-weight: 700; color: var(--ink); }
+</style>
+<script>
+  /* 히스토그램 하나를 그리는 공용 함수.
+     구간 폭이 다른 계급(0-10, 10-20, 20-40, 40-80)을 그대로 다루기 위해
+     막대 폭은 x축 눈금에서 계산한다 — 폭을 손으로 찍지 않는다. */
+  window.Hist = function (sel, o) {
+    const el = document.querySelector(sel);
+    const B = o.box;
+    const px = (v) => B.x0 + ((v - o.x[0]) / (o.x[1] - o.x[0])) * (B.x1 - B.x0);
+    const py = (v) => B.y0 - (v / o.yMax) * (B.y0 - B.y1);
+    let s = '';
+    (o.yTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${B.x0 - 7}" y="${py(t) + 4}" text-anchor="end">${o.yFmt ? o.yFmt(t) : t}</text>`;
+      s += `<path class="axis" d="M${B.x0 - 4},${py(t)} L${B.x0},${py(t)}"/>`;
+    });
+    o.bins.forEach((b, i) => {
+      const [lo, hi, v] = b;
+      if (v > 0) {
+        const cls = (o.barClass && o.barClass(i)) || 'area-bar';
+        s += `<rect class="${cls}" x="${px(lo)}" y="${py(v)}" width="${px(hi) - px(lo)}" height="${B.y0 - py(v)}"/>`;
+      }
+      if (o.barLabel) {
+        const t = o.barLabel(i);
+        if (t) s += `<text class="annot" x="${(px(lo) + px(hi)) / 2}" y="${py(v) - 6}" text-anchor="middle">${t}</text>`;
+      }
+    });
+    s += `<path class="axis" d="M${B.x0},${B.y1 - 4} L${B.x0},${B.y0} L${B.x1 + 8},${B.y0}"/>`;
+    (o.xTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${px(t)}" y="${B.y0 + 15}" text-anchor="middle">${t}</text>`;
+    });
+    if (o.xLabel) s += `<text class="axis-name" x="${B.x1 + 12}" y="${B.y0 + 15}">${o.xLabel}</text>`;
+    if (o.yLabel) s += `<text class="axis-name" x="${B.x0 - 6}" y="${B.y1 - 8}" text-anchor="end">${o.yLabel}</text>`;
+    el.innerHTML = s;
+  };
+
+  /* 원본 p.6·p.9 의 도수분포표. 표와 히스토그램이 같은 숫자에서 나오게
+     여기 한 번만 적고 표 HTML 과 그림 좌표를 모두 여기서 유도한다 (design.md §6.5). */
+  window.HEIGHT_TABLE = [
+    [150, 155, 0], [155, 160, 17], [160, 165, 63], [165, 170, 170],
+    [170, 175, 168], [175, 180, 70], [180, 185, 11], [185, 190, 1],
+  ].map(([lo, hi, f]) => {
+    const rel = f / 500;
+    return { lo, hi, f, rel, den: rel / (hi - lo) };
+  });
+
+  /* 원본 p.11~14 의 흡연량 자료. 인쇄된 것은 밀도(%)와 조사대상 200명뿐이므로
+     빈도·상대빈도는 밀도에서 되돌려 구한다. */
+  window.SMOKE = [[0, 10, 1.5], [10, 20, 3.5], [20, 40, 1.5], [40, 80, 0.5]]
+    .map(([lo, hi, den]) => {
+      const rel = den * (hi - lo);          // 상대빈도(%)
+      return { lo, hi, den, rel, f: (rel / 100) * 200 };
+    });
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. T1 표지 (원본 p.1) ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>2강. 통계학과<br>자료의 정리</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 통계학이란 무엇인가? (원본 p.2) ══════════════════ -->
+  <section>
+    <h2>통계학이란 무엇인가?</h2>
+    <div class="body">
+      <p class="lead t-define">자료를 정리, 분석, 추론하여 유용한 정보를 얻기 위한 언어이자 도구</p>
+      <div class="flow">
+        <div class="node">자료<br>(Data)</div>
+        <div class="arr"></div>
+        <div class="node">통계학<br>(Statistics)</div>
+        <div class="arr"></div>
+        <div class="node">정보<br>(Information)</div>
+      </div>
+      <p class="big-say">숫자는 스스로 말하지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 3. 모집단과 표본 (원본 p.3) ═════════════════════════ -->
+  <section>
+    <h2>모집단과 표본</h2>
+    <div class="body stack">
+      <p class="lead t-define">통계학은 표본을 수집, 정리, 요약하고 이를 토대로 모집단을 추측해보는 작업</p>
+      <svg class="fig" id="f-pop" viewBox="0 0 700 300" style="width:600px" role="img">
+        <title>모집단·모수에서 표본추출로 표본·통계량이 나오고 다시 추론으로 돌아가는 순환도</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        const L = 118, R = 400, W = 184, H = 42;   // 좌·우 상자의 x 와 크기
+        const y1 = 92, y2 = 176;                   // 위(모집단·표본) · 아래(모수·통계량) 줄
+        const cell = (x, y, ko, en, cls) =>
+          `<rect class="${cls}" x="${x}" y="${y}" width="${W}" height="${H}"/>` +
+          `<text class="boxlab" x="${x + W / 2}" y="${y + 17}" text-anchor="middle">${ko}</text>` +
+          `<text class="boxlab sm" x="${x + W / 2}" y="${y + 33}" text-anchor="middle">${en}</text>`;
+        const cap = (x, y, t) =>
+          `<text class="tick" x="${x + W / 2}" y="${y}" text-anchor="middle">${t}</text>`;
+        let s = `<defs><marker id="ah-pop" viewBox="0 0 10 10" refX="9" refY="5"
+                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
+                 </marker></defs>`;
+        s += cell(L, y1, '모집단', '(population)', 'boxfill');
+        s += cap(L, y1 + H + 16, '관심의 대상이 되는 전체');
+        s += cell(L, y2, '모수', '(parameter)', 'boxfill');
+        s += cap(L, y2 + H + 16, '모집단의 특성');
+        s += cell(R, y1, '표본', '(sample)', 'boxfill2');
+        s += cap(R, y1 + H + 16, '모집단의 관측된 일부');
+        s += cell(R, y2, '통계량', '(statistics)', 'boxfill2');
+        s += cap(R, y2 + H + 16, '표본의 특성');
+        // 위: 모집단 → 표본 (표본추출) / 아래: 통계량 → 모수 (추론)
+        s += `<path class="arrow" d="M${L + W / 2},${y1 - 10} C${L + W / 2},22 ${R + W / 2},22 ${R + W / 2},${y1 - 10}"
+                marker-end="url(#ah-pop)"/>`;
+        s += `<path class="arrow" d="M${R + W / 2},${y2 + H + 30} C${R + W / 2},278 ${L + W / 2},278 ${L + W / 2},${y2 + H + 30}"
+                marker-end="url(#ah-pop)"/>`;
+        s += `<text class="annot red" x="350" y="34" text-anchor="middle">표본추출</text>`;
+        s += `<text class="annot red" x="350" y="50" text-anchor="middle">(sampling)</text>`;
+        s += `<text class="annot red" x="350" y="272" text-anchor="middle">추론</text>`;
+        s += `<text class="annot red" x="350" y="288" text-anchor="middle">(inference)</text>`;
+        document.getElementById('f-pop').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 4. 통계학의 분류 (원본 p.4) ═════════════════════════ -->
+  <section>
+    <h2>통계학의 분류</h2>
+    <div class="body stack">
+      <div class="def-row">
+        <div class="def-tag">기술통계학<br><span class="en">(Descriptive Statistics)</span></div>
+        <div><p>주어진 자료를 변수별로 요약하여 자료의 특성을 추출하는 것</p></div>
+      </div>
+      <div class="def-row">
+        <div class="def-tag">추론통계학<br><span class="en">(Inferential Statistics)</span></div>
+        <div><p>정리된 자료에 대한 의미를 해석하여 미지의 세계에 대해 추론</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5. 자료 요약의 중요성 (원본 p.5) ════════════════════ -->
+  <section>
+    <h2>자료 요약의 중요성</h2>
+    <div class="body tight">
+      <p class="lead t-define">어떻게 복잡한 자료를 쉽게 이해할 수 있을까?</p>
+      <div class="branch">
+        <p class="nums">173.9452 167.0524 165.1755 168.9503 167.8278 175.0689 174.5558 163.1998 167.9303 182.4071 170.0865 167.3117 170.0157 165.9688 173.9081 168.4687 172.9141 175.2263 166.9148 165.1542 167.1681 176.3650 163.4230 177.6558 173.2279 170.4248 166.3879 168.2617 174.6061 169.9792 164.2284 171.3428 164.0083 168.1709 175.9949 161.6969 178.3920 161.0537 175.2041 174.4708 175.5165 170.3824 156.8152 167.6744 172.7056 171.4442 172.2809 160.2380 170.8077 181.0719 172.6414 176.6196 163.4179 168.6646 176.7164 159.3315 162.9289 168.1275 174.7978 163.1743 169.1161 162.7446 164.0538 167.7837 173.3347 169.3545 161.3610 167.9163 165.9006 165.6114 175.3140 166.8286 177.5051 180.2922 169.7105 182.0966 165.0782 177.3193 169.9946 173.5769 171.6098 170.7912 159.4056 166.6689 173.2920 171.4869 173.2772 158.1195 182.8473 177.1456 162.9721 174.0446 186.1054 174.4149 168.1645 168.6442 157.3718 178.0165 177.3738 173.6247 163.2734 174.1918 173.0902 167.4414 171.9674 159.5448 170.1965 173.8850 162.5159 167.7356 174.9508 174.0156 175.6882 167.9668 169.9065 168.8607 171.9181 168.9280 167.2434 164.2196 172.0926 177.5079 168.5381 170.7534 175.4362 168.6164 164.5212 168.0575 166.5813 168.9636 170.1889 169.6595 175.7661 168.8849 166.2418 165.8278 163.6789 170.6158 161.9972 164.4514 165.6009 169.3620 167.3582 170.7272 169.8311 175.9151 164.5672 174.0647 168.6522 174.9319 166.8745 173.5325 172.9131 165.6783 161.8099 170.6285 160.6385 170.0311 165.9555 170.4249 174.4922 164.9006 169.4789 166.7866 168.3184 172.8559 169.1145 169.8972 170.2309 162.4196 176.3427 168.3724 171.2827 174.6803 176.0018 166.9887 167.3612 165.8347 173.8691 165.8491 169.6548 175.7479 169.8573 174.9741 171.8807 159.9295 177.6848 168.0427 173.2357 174.8879 162.5755 172.6243 164.0665 173.6709 174.0164 168.8590 170.9760 171.0195 173.8219 168.3679 163.6212 171.1540 168.5141 166.8409 168.9164 173.0946 158.8701 175.8206 164.5288 165.5670 158.1894 164.9823 165.7327 177.2676 173.4219 175.7571 181.4362 171.4638 178.5295 170.0621 174.3886 163.8908 173.3950 168.4890 165.5170 165.9348 172.0334 166.2150 164.2467 164.8198 173.9873 170.0646 174.6084 169.8786 165.4067 168.3603 178.5341 167.7660 170.1359 160.8865 177.0808 164.5990 178.5157 165.7601 173.0580 175.9566 168.4146 172.4484 166.9773 165.3588 163.9838 171.6211 171.8085 177.9590 174.3359 174.4836 162.7608 165.8414 168.8576 168.0688 171.9417 162.8015 168.7763 157.7438 167.2158 159.8326 169.8771 164.0002 174.6716 174.3785 171.3685 176.8282 172.8039 170.8666 167.4701 164.4516 177.3324 170.9696 175.9186 171.7398 167.4149 170.8949 168.4922 170.5572 177.8771 159.6432 179.2546 162.7067 175.3984 167.3634 164.0765 159.7683 167.7692 178.5326 176.6923 169.9958 171.9954 166.7396 166.0020 164.7608 170.9726 172.1636 166.2329 168.6236 178.1802 167.9086 173.3383 174.6190 163.2736 171.3492 172.5841 166.1311 171.8651 162.7907 164.1733 166.1383 168.5117 161.0194 171.2372 160.3393 163.1203 165.3492 162.6872 165.1728 168.0011 164.5874 173.0626 157.5757 167.5293 168.6855 170.9715 176.3505 170.9095 178.9328 176.6978 172.9311 170.3393 160.6011 161.7930 172.8924 169.9824 169.8572 178.2493 171.6566 169.3598 173.7424 171.0348 178.9779 166.2883 169.8534 166.0633 167.9889 171.7778 169.9796 169.3729 165.6952 175.2680 168.8176 174.5450 172.5169 173.8280 174.4046 165.9781 175.6665 169.3383 169.6449 173.4057 171.2064 167.4890 173.1624 171.3657 166.4457 178.8390 167.0058 173.4857 175.0251 173.6596 156.7702 173.2955 173.3359 178.2521 164.8709 178.2149 170.2705 177.0671 180.1775 172.1731 178.7128 170.2315 180.6825 175.4450 168.0324 169.0921 173.1550 174.8644 172.4273 179.4907 160.8841 166.0165 174.8485 172.7940 176.1315 169.2392 171.6922 171.5303 165.6173 164.6354 169.5716 169.2200 167.1341 182.2356 173.9666 174.1979 169.4994 175.8267 174.0875 170.3256 179.8123 167.9269 166.8360 168.9107 165.7188 166.9717 178.6321 172.8200 167.7906 171.1717 174.7858 171.4652 168.5920 171.9310 165.3925 174.8244 166.3842 162.9705 173.7856 171.3890 168.7215 169.3769 170.0617 168.3316 174.3260 169.9579 167.1290 172.8696 171.6045 169.0068 172.3294 172.0110 176.1610 170.4072 171.6571 166.0836 166.8944 178.0107 166.5921 168.0588 172.2608 170.1832 170.9228 176.4251 172.4892 166.5216 170.4013 164.4292 167.6372 171.4857 172.8823 160.7389 175.4827 169.0441 181.6773 175.8564 172.0439 166.9604 171.0505 173.4228 165.7707 169.1361 159.0903 182.0945 167.2762 175.5320 172.6173 162.5249 167.3316 168.6066 179.2663 166.0152 162.2870 171.9752 173.8882 167.0759 163.6968 166.1678 175.6693 170.8713 157.9219 171.8464 168.9734</p>
+        <div class="tags">
+          <div class="tag">그래프로 만들기</div>
+          <div class="tag">숫자 하나로 만들기</div>
+        </div>
+      </div>
+      <p class="caption t-red" style="margin-top:6px">X ~ N(170, 5^2) / 500개 랜덤추출</p>
+    </div>
+  </section>
+
+  <!-- ══ 6. 도수분포표와 히스토그램 (원본 p.6) ═══════════════ -->
+  <section>
+    <h2>그래프로 만들기: 도수분포표와 히스토그램</h2>
+    <div class="body tight">
+      <div class="def-row slim">
+        <div class="def-tag">도수분포표<br><span class="en">(frequency table)</span></div>
+        <div><p>자료를 일정한 계급/구간으로 나누어 해당 구간에 속하는 자료의 빈도를 나타낸 분포표</p></div>
+      </div>
+      <div class="def-row slim">
+        <div class="def-tag">히스토그램<br><span class="en">(histogram)</span></div>
+        <div><p>도수분포표를 그래프로 나타낸 것</p></div>
+      </div>
+      <div class="cols" style="margin-top:12px">
+        <div class="col-l" style="flex:0 0 40%">
+          <p class="sub" style="font-size:13px;margin-bottom:4px">도수분포표</p>
+          <table class="tbl-freq">
+            <thead><tr><th>계급</th><th>(절대)빈도</th><th>상대빈도</th><th>밀도</th></tr></thead>
+            <tbody id="tb-freq"></tbody>
+          </table>
+        </div>
+        <div class="col-r" style="display:flex;gap:14px">
+          <div style="flex:1 1 0">
+            <p class="sub" style="font-size:13px;margin-bottom:2px">히스토그램(절대빈도)</p>
+            <svg class="fig" id="f-h-abs" viewBox="0 0 250 180" role="img">
+              <title>키 자료 500개의 절대빈도 히스토그램</title>
+            </svg>
+          </div>
+          <div style="flex:1 1 0">
+            <p class="sub" style="font-size:13px;margin-bottom:2px">히스토그램(밀도)</p>
+            <svg class="fig" id="f-h-den" viewBox="0 0 250 180" role="img">
+              <title>키 자료 500개의 밀도 히스토그램</title>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const T = window.HEIGHT_TABLE;
+        const r4 = (v) => Number(v.toFixed(4));
+        document.getElementById('tb-freq').innerHTML = T.map((b) =>
+          `<tr><td>${b.lo}-${b.hi}</td><td>${b.f}</td><td>${Number(b.rel.toFixed(3))}</td>` +
+          `<td>${b.f === 0 ? 0 : r4(b.den).toFixed(4)}</td></tr>`).join('');
+        const bins = T.map((b) => [b.lo, b.hi, b.f]);
+        const dbins = T.map((b) => [b.lo, b.hi, b.den]);
+        Hist('#f-h-abs', {
+          box: { x0: 42, y0: 146, x1: 226, y1: 22 }, x: [150, 190], yMax: 175,
+          yTicks: [0, 50, 100, 150], xTicks: [150, 160, 170, 180, 190],
+          bins, yLabel: '빈도',
+        });
+        Hist('#f-h-den', {
+          box: { x0: 42, y0: 146, x1: 226, y1: 22 }, x: [150, 190], yMax: 0.072,
+          yTicks: [0, 0.02, 0.04, 0.06], yFmt: (v) => v.toFixed(2),
+          xTicks: [150, 160, 170, 180, 190], bins: dbins, yLabel: '밀도',
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 7. 히스토그램의 장점과 단점 (원본 p.7) ══════════════ -->
+  <section>
+    <h2>그래프로 만들기: 도수분포표와 히스토그램</h2>
+    <div class="body stack">
+      <div class="def-row slim">
+        <div class="def-tag">도수분포표<br><span class="en">(frequency table)</span></div>
+        <div><p>자료를 일정한 계급/구간으로 나누어 해당 구간에 속하는 자료의 빈도를 나타낸 분포표</p></div>
+      </div>
+      <div class="def-row slim" style="margin-bottom:30px">
+        <div class="def-tag">히스토그램<br><span class="en">(histogram)</span></div>
+        <div><p>도수분포표를 그래프로 나타낸 것</p></div>
+      </div>
+      <p class="emph"><strong>장점:</strong> 자료의 분포와 그 이면의 특징(중심점, 중심점으로부터의 퍼진 정도 등)에 대한 파악 가능</p>
+      <p class="emph"><strong>단점:</strong> 자료의 세부적인 수치에 대한 정보 상실 (계급으로 묶기 때문)</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. 히스토그램 그리기 — 5단계 (원본 p.8) ═════════════ -->
+  <section>
+    <h2>히스토그램 그리기</h2>
+    <div class="body tight">
+      <div class="steps">
+        <div class="step"><div class="n">1단계</div><div class="t">
+          <p>자료 내에서 최대값과 최소값을 찾는다.</p></div></div>
+        <div class="step"><div class="n">2단계</div><div class="t">
+          <p>최대값과 최소값이 포함되도록 자르기 좋은 대강의 범위를 만들고 그 범위 내에서
+             작은 범위, 즉 계급을 만든다.</p>
+          <p class="caption">(계급 수 산정식: $k = 1 + 3.3\,log_{10}N$, &nbsp; $k = 5 \times log_{10}N$)</p></div></div>
+        <div class="step"><div class="n">3단계</div><div class="t">
+          <p>각 계급 내에 속한 자료의 총 개수를 센다. 이 개수가 바로 도수 혹은
+             (절대)빈도(frequency)이다.</p></div></div>
+        <div class="step"><div class="n">4단계</div><div class="t">
+          <p>각 계급의 도수가 전체에서 차지하는 비율을 계산한다.</p>
+          <p>이 비율이 바로 상대도수 혹은 상대빈도(relative frequency)이며,
+             상대도수는 전체에서 차지하는 비율이므로 그 합은 반드시 1이다.</p></div></div>
+        <div class="step"><div class="n">5단계</div><div class="t">
+          <p>그래프의 x축에 계급을 순서대로 나열하고, 각 계급별로 상대도수/계급구간을 적용하여
+             블록높이를 결정한다.</p>
+          <p>계급별 면적(=계급구간ⅹ높이)은 상대도수의 크기와 같아야 하며,
+             이 때 각 계급별 높이가 바로 밀도(density)이다.</p></div></div>
+      </div>
+      <p class="caption" style="margin-top:6px">* 밀도(density): 일정한 단위 당 자료의 비율
+        (물리학: 밀도(density) = 질량(mass) / 부피)</p>
+    </div>
+  </section>
+
+  <!-- ══ 9. 히스토그램 그리기 — 문답 (원본 p.9~10 합침) ══════
+       같은 화면에 Q1~Q3 의 답만 차례로 더해지므로 한 장의 fragment 로 만든다 -->
+  <section>
+    <h2>히스토그램 그리기</h2>
+    <div class="body tight">
+      <p class="nums mini">173.9452 167.0524 165.1755 168.9503 167.8278 175.0689 174.5558 163.1998 167.9303 182.4071 170.0865 167.3117 170.0157 165.9688 173.9081 168.4687 172.9141 175.2263 166.9148 165.1542 167.1681 176.3650 163.4230 177.6558 173.2279 170.4248 166.3879 168.2617 174.6061 169.9792 164.2284 171.3428 164.0083 168.1709 175.9949 161.6969 178.3920 161.0537 175.2041 174.4708 175.5165 170.3824 156.8152 167.6744 172.7056 171.4442 172.2809 160.2380 170.8077 181.0719 172.6414 176.6196 163.4179 168.6646 176.7164 159.3315 162.9289 168.1275 174.7978 163.1743 169.1161 162.7446 164.0538 167.7837 173.3347 169.3545 161.3610 167.9163 165.9006 165.6114 175.3140 166.8286 177.5051 180.2922 169.7105 182.0966 165.0782 177.3193 169.9946 173.5769 171.6098 170.7912 159.4056 166.6689 173.2920 171.4869 173.2772 158.1195 182.8473 177.1456 162.9721 174.0446 186.1054 174.4149 168.1645 168.6442 157.3718 178.0165 177.3738 173.6247 163.2734 174.1918 173.0902 167.4414 171.9674 159.5448 170.1965 173.8850 162.5159 167.7356 174.9508 174.0156 175.6882 167.9668 169.9065 168.8607 171.9181 168.9280 167.2434 164.2196 172.0926 177.5079 168.5381 170.7534 175.4362 168.6164 164.5212 168.0575 166.5813 168.9636 170.1889 169.6595 175.7661 168.8849 166.2418 165.8278 163.6789 170.6158 161.9972 164.4514 165.6009 169.3620 167.3582 170.7272 169.8311 175.9151 164.5672 174.0647 168.6522 174.9319 166.8745 173.5325 172.9131 165.6783 161.8099 170.6285 160.6385 170.0311 165.9555 170.4249 174.4922 164.9006 169.4789 166.7866 168.3184 172.8559 169.1145 169.8972 170.2309 162.4196 176.3427 168.3724 171.2827 174.6803 176.0018 166.9887 167.3612 165.8347 173.8691 165.8491 169.6548 175.7479 169.8573 174.9741 171.8807 159.9295 177.6848 168.0427 173.2357 174.8879 162.5755 172.6243 164.0665 173.6709 174.0164 168.8590 170.9760 171.0195 173.8219 168.3679 163.6212 171.1540 168.5141 166.8409 168.9164 173.0946 158.8701 175.8206 164.5288 165.5670 158.1894 164.9823 165.7327 177.2676 173.4219 175.7571 181.4362 171.4638 178.5295 170.0621 174.3886 163.8908 173.3950 168.4890 165.5170 165.9348 172.0334 166.2150 164.2467 164.8198 173.9873 170.0646 174.6084 169.8786 165.4067 168.3603 178.5341 167.7660 170.1359 160.8865 177.0808 164.5990 178.5157 165.7601 173.0580 175.9566 168.4146 172.4484 166.9773 165.3588 163.9838 171.6211 171.8085 177.9590 174.3359 174.4836 162.7608 165.8414 168.8576 168.0688 171.9417 162.8015 168.7763 157.7438 167.2158 159.8326 169.8771 164.0002 174.6716 174.3785 171.3685 176.8282 172.8039 170.8666 167.4701 164.4516 177.3324 170.9696 175.9186 171.7398 167.4149 170.8949 168.4922 170.5572 177.8771 159.6432 179.2546 162.7067 175.3984 167.3634 164.0765 159.7683 167.7692 178.5326 176.6923 169.9958 171.9954 166.7396 166.0020 164.7608 170.9726 172.1636 166.2329 168.6236 178.1802 167.9086 173.3383 174.6190 163.2736 171.3492 172.5841 166.1311 171.8651 162.7907 164.1733 166.1383 168.5117 161.0194 171.2372 160.3393 163.1203 165.3492 162.6872 165.1728 168.0011 164.5874 173.0626 157.5757 167.5293 168.6855 170.9715 176.3505 170.9095 178.9328 176.6978 172.9311 170.3393 160.6011 161.7930 172.8924 169.9824 169.8572 178.2493 171.6566 169.3598 173.7424 171.0348 178.9779 166.2883 169.8534 166.0633 167.9889 171.7778 169.9796 169.3729 165.6952 175.2680 168.8176 174.5450 172.5169 173.8280 174.4046 165.9781 175.6665 169.3383 169.6449 173.4057 171.2064 167.4890 173.1624 171.3657 166.4457 178.8390 167.0058 173.4857 175.0251 173.6596 156.7702 173.2955 173.3359 178.2521 164.8709 178.2149 170.2705 177.0671 180.1775 172.1731 178.7128 170.2315 180.6825 175.4450 168.0324 169.0921 173.1550 174.8644 172.4273 179.4907 160.8841 166.0165 174.8485 172.7940 176.1315 169.2392 171.6922 171.5303 165.6173 164.6354 169.5716 169.2200 167.1341 182.2356 173.9666 174.1979 169.4994 175.8267 174.0875 170.3256 179.8123 167.9269 166.8360 168.9107 165.7188 166.9717 178.6321 172.8200 167.7906 171.1717 174.7858 171.4652 168.5920 171.9310 165.3925 174.8244 166.3842 162.9705 173.7856 171.3890 168.7215 169.3769 170.0617 168.3316 174.3260 169.9579 167.1290 172.8696 171.6045 169.0068 172.3294 172.0110 176.1610 170.4072 171.6571 166.0836 166.8944 178.0107 166.5921 168.0588 172.2608 170.1832 170.9228 176.4251 172.4892 166.5216 170.4013 164.4292 167.6372 171.4857 172.8823 160.7389 175.4827 169.0441 181.6773 175.8564 172.0439 166.9604 171.0505 173.4228 165.7707 169.1361 159.0903 182.0945 167.2762 175.5320 172.6173 162.5249 167.3316 168.6066 179.2663 166.0152 162.2870 171.9752 173.8882 167.0759 163.6968 166.1678 175.6693 170.8713 157.9219 171.8464 168.9734</p>
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-top:8px">
+        <div style="flex:0 0 212px">
+          <p class="sub" style="font-size:12px;margin-bottom:2px">히스토그램(밀도)</p>
+          <svg class="fig" id="f-h-den2" viewBox="0 0 212 178" role="img">
+            <title>키 자료 500개의 밀도 히스토그램</title>
+          </svg>
+        </div>
+        <div style="flex:0 0 214px">
+          <table class="tbl-freq tbl-freq-sm">
+            <thead><tr><th>계급</th><th>빈도</th><th>상대빈도</th><th>밀도</th></tr></thead>
+            <tbody id="tb-freq2"></tbody>
+          </table>
+        </div>
+        <div class="qcol" style="flex:1 1 auto">
+          <div class="blk">
+            <p class="q">Q1) 자료를 도수분포표와 히스토그램으로 나타내면서 알게 된 점은 무엇인가?</p>
+            <div class="fragment">
+              <p class="a">− 자료의 중심이 165-175 사이에 분포</p>
+              <p class="a">− 자료의 분포가 좌우 대칭 구조를 지님</p>
+            </div>
+          </div>
+          <div class="blk">
+            <p class="q">Q2) 175-180, 180-185 구간을 하나로 합쳐서 히스토그램을 다시 그리고자 할 때,
+              175-185 구간의 히스토그램의 높이는 어떻게 바뀌어야 할까?</p>
+            <div class="fragment">
+              <p class="a">− 두 구간의 상대빈도: 0.14+0.022 = 0.162</p>
+              <p class="a">− 두 구간의 구간 폭: 10</p>
+              <p class="a">− 175-185 구간의 높이: 0.162/10 = 0.0162</p>
+            </div>
+          </div>
+          <div class="blk">
+            <p class="q">Q3) 키가 156인 사람은 전체의 몇 %로 짐작되는가?</p>
+            <div class="fragment">
+              <p class="a">− 155-160 구간의 상대빈도: 3.4% (=0.034*100)</p>
+              <p class="a">− 156인 사람의 비중(%): 3.4% / 5 = 약 0.68%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const T = window.HEIGHT_TABLE;
+        document.getElementById('tb-freq2').innerHTML = T.map((b) =>
+          `<tr><td>${b.lo}-${b.hi}</td><td>${b.f}</td><td>${Number(b.rel.toFixed(3))}</td>` +
+          `<td>${b.f === 0 ? 0 : Number(b.den.toFixed(4)).toFixed(4)}</td></tr>`).join('');
+        Hist('#f-h-den2', {
+          box: { x0: 40, y0: 144, x1: 190, y1: 22 }, x: [150, 190], yMax: 0.072,
+          yTicks: [0, 0.02, 0.04, 0.06], yFmt: (v) => v.toFixed(2),
+          xTicks: [150, 160, 170, 180, 190],
+          bins: T.map((b) => [b.lo, b.hi, b.den]), yLabel: '밀도',
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 10. 예시. 히스토그램의 개념 이해 (원본 p.11~12 합침) ══
+       빈 도수분포표가 채워지는 것이 전부라 한 장의 fragment 로 만든다 -->
+  <section>
+    <h2>예시. 히스토그램의 개념 이해</h2>
+    <div class="body tight">
+      <p class="caption">류근관 (2013) − 2장 연습문제 6번 (p.44) 변형</p>
+      <p class="emph" style="margin:4px 0 0">Q) 다음은 남성 흡연자의 일일 흡연량에 대한 조사결과를 나타낸
+        히스토그램이다. 각 구간의 밀도는 괄호안에 표시되어 있다.
+        조사대상자의 수가 200명이라고 할 때, 이를 바탕으로 우측의 도수분포표를 작성하여라.</p>
+      <p class="caption">(각 구간은 좌측 값은 포함하지만 우측 값은 포함하지 않는다.)</p>
+      <div class="cols" style="margin-top:6px;align-items:flex-start">
+        <div class="col-l">
+          <svg class="fig" id="f-smoke" viewBox="0 0 440 200" role="img">
+            <title>일일 흡연량 히스토그램. 구간별 밀도가 괄호 안에 적혀 있다</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <table class="tbl-smoke">
+            <thead><tr><th>계급</th><th>(절대)빈도(명)</th><th>상대빈도(%)</th><th>밀도</th></tr></thead>
+            <tbody id="tb-smoke"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const S = window.SMOKE;
+        document.getElementById('tb-smoke').innerHTML = S.map((b) =>
+          `<tr><td>${b.lo}-${b.hi}</td>` +
+          `<td><span class="fragment">${b.f}</span></td>` +
+          `<td><span class="fragment">${b.rel}</span></td>` +
+          `<td><span class="fragment">${b.den}</span></td></tr>`).join('');
+        Hist('#f-smoke', {
+          box: { x0: 46, y0: 154, x1: 306, y1: 26 }, x: [0, 80], yMax: 4.3,
+          yTicks: [1, 2, 3, 4], xTicks: [0, 10, 20, 40, 80],
+          bins: S.map((b) => [b.lo, b.hi, b.den]),
+          barLabel: (i) => `(${S[i].den})`,
+          xLabel: '흡연량(단위: 개피)', yLabel: '(%)',
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 11. 히스토그램을 밀도로 나타내는 이유 (원본 p.13~14 합침) ══ -->
+  <section>
+    <h2>히스토그램을 밀도로 나타내는 이유</h2>
+    <div class="body tight">
+      <div style="display:flex;gap:20px">
+        <div style="flex:1 1 0">
+          <p class="sub" style="font-size:13px;margin-bottom:2px">밀도로 나타낸 히스토그램</p>
+          <svg class="fig" id="f-sm-den" viewBox="0 0 440 190" style="width:390px" role="img">
+            <title>흡연량을 밀도로 나타낸 히스토그램</title>
+          </svg>
+        </div>
+        <div style="flex:1 1 0">
+          <p class="sub" style="font-size:13px;margin-bottom:2px">상대빈도로 나타낸 히스토그램</p>
+          <svg class="fig" id="f-sm-rel" viewBox="0 0 440 190" style="width:390px" role="img">
+            <title>흡연량을 상대빈도로 나타낸 히스토그램. 폭이 넓은 두 구간이 과장돼 보인다</title>
+          </svg>
+        </div>
+      </div>
+      <div class="cols" style="margin-top:8px;align-items:flex-start">
+        <div class="col-l" style="flex:0 0 40%">
+          <table class="tbl-smoke" style="font-size:11.5px">
+            <thead><tr><th>계급</th><th>(절대)빈도(명)</th><th>상대빈도(%)</th><th>밀도</th></tr></thead>
+            <tbody id="tb-smoke2"></tbody>
+          </table>
+        </div>
+        <div class="col-r fragment">
+          <p class="emph" style="margin-bottom:4px">20-40, 40-80구간을 밀도로 나타내지 않고
+            상대빈도로 나타내면 해당 구간이 과장되게 보인다.</p>
+          <p class="derive">→ 밀도는 해당 구간 내 1단위가 차지할 비율로 바꾸는 것</p>
+          <p class="derive">→ 히스토그램의 모든 면적을 더하면 1이 되도록 바꾸는 것</p>
+          <p class="derive t-red">→ 확률과 연관!(모든 가능성의 합)</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const S = window.SMOKE;
+        document.getElementById('tb-smoke2').innerHTML = S.map((b) =>
+          `<tr><td>${b.lo}-${b.hi}</td><td>${b.f}</td><td>${b.rel}</td><td>${b.den}</td></tr>`).join('');
+        Hist('#f-sm-den', {
+          box: { x0: 44, y0: 150, x1: 300, y1: 26 }, x: [0, 80], yMax: 4.3,
+          yTicks: [1, 2, 3, 4], xTicks: [0, 10, 20, 40, 80],
+          bins: S.map((b) => [b.lo, b.hi, b.den]),
+          barLabel: (i) => `(${S[i].den})`,
+          xLabel: '흡연량(단위: 개피)', yLabel: '(%)',
+        });
+        Hist('#f-sm-rel', {
+          box: { x0: 44, y0: 150, x1: 300, y1: 26 }, x: [0, 80], yMax: 43,
+          yTicks: [10, 20, 30, 40], xTicks: [0, 10, 20, 40, 80],
+          bins: S.map((b) => [b.lo, b.hi, b.rel]),
+          barClass: (i) => (i >= 2 ? 'area-over' : 'area-bar'),
+          barLabel: (i) => `(${S[i].rel})`,
+          xLabel: '흡연량(단위: 개피)', yLabel: '(%)',
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 12. 평균·중앙값·최빈값 (원본 p.15) ══════════════════ -->
+  <section>
+    <h2>자료를 숫자 하나로 만들기: 평균, 중앙값, 최빈값</h2>
+    <div class="body tight">
+      <div class="triptych">
+        <div class="cell">
+          <div class="cell-title">평균<br><span class="en">(mean)</span></div>
+          <p style="text-align:left">자료의 총합을 자료의 개수로 나눈 것</p>
+          <p class="derive" style="text-align:left">→ 히스토그램의 무게 중심</p>
+          <p class="caption" style="text-align:left">* 모든 자료와 자신과의 차이인 편차의 합을 0으로 만드는 지점</p>
+        </div>
+        <div class="cell">
+          <div class="cell-title">중앙값<br><span class="en">(median)</span></div>
+          <p style="text-align:left">전체 자료의 50%에 위치한 값</p>
+          <p class="derive" style="text-align:left">→ 히스토그램의 면적을 양분하는 값</p>
+        </div>
+        <div class="cell">
+          <div class="cell-title">최빈값<br><span class="en">(mode)</span></div>
+          <p style="text-align:left">자료 내에서 빈도가 가장 큰 값</p>
+          <p class="derive" style="text-align:left">→ 히스토그램의 최대 높이를 갖는 값</p>
+        </div>
+      </div>
+      <svg class="fig" id="f-mean3" viewBox="0 0 620 242" style="width:500px;margin:4px auto 0" role="img">
+        <title>자료 1,2,2,3 · 1,2,2,5 · 1,2,2,7 에서 마지막 값이 커질수록 평균이 오른쪽으로 끌려가는 그림</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        // 세 자료의 마지막 값만 3 → 5 → 7 로 바뀐다. 평균은 자료에서 계산한다.
+        const SETS = [3, 5, 7].map((last) => {
+          const d = [1, 2, 2, last];
+          return { d, mean: d.reduce((a, b) => a + b, 0) / d.length };
+        });
+        const X0 = 74, X1 = 596, Y = [52, 124, 196];   // 각 줄의 축 y
+        const px = (v) => X0 + (v / 8) * (X1 - X0);
+        const unit = 20;                                // 관측치 1개 = 20px 높이
+        let s = '';
+        SETS.forEach((set, r) => {
+          const y = Y[r];
+          s += `<text class="tick" x="${X0 - 10}" y="${y - 6}" text-anchor="end">${set.d.join(',')}</text>`;
+          s += `<path class="axis" d="M${X0},${y} L${X1},${y}"/>`;
+          for (let t = 0; t <= 8; t++) {
+            s += `<text class="tick" x="${px(t)}" y="${y + 14}" text-anchor="middle">${t}</text>`;
+          }
+          // 고정된 세 값(1,2,2)은 크림슨 막대, 움직이는 값은 주황 막대
+          const fixed = [[1, 1], [2, 2]];
+          fixed.forEach(([v, n]) => {
+            const h = n * unit;
+            s += `<rect class="area-bar" x="${px(v - 0.5)}" y="${y - h}"
+                    width="${px(v + 0.5) - px(v - 0.5)}" height="${h}"/>`;
+          });
+          const lv = set.d[3];
+          s += `<rect class="area-move" x="${px(lv - 0.5)}" y="${y - unit}"
+                  width="${px(lv + 0.5) - px(lv - 0.5)}" height="${unit}"/>`;
+          // 평균 위치 — 눈금 숫자 아래에 위를 향한 삼각형으로 찍는다
+          const mx = px(set.mean);
+          s += `<path class="boxfill" d="M${mx},${y + 20} L${mx - 5},${y + 31} L${mx + 5},${y + 31} Z"/>`;
+        });
+        s += `<path class="boxfill" d="M${X1 - 46},${Y[2] + 24} L${X1 - 51},${Y[2] + 35} L${X1 - 41},${Y[2] + 35} Z"/>`;
+        s += `<text class="annot red" x="${X1}" y="${Y[2] + 35}" text-anchor="end">평균</text>`;
+        document.getElementById('f-mean3').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 13. 히스토그램의 형태와 세 대표값 (원본 p.16) ═══════ -->
+  <section>
+    <h2>자료를 숫자 하나로 만들기: 평균, 중앙값, 최빈값</h2>
+    <div class="body tight">
+      <div style="display:flex;align-items:baseline;gap:36px">
+        <p class="sub" style="margin:0">히스토그램의 형태와 평균, 중앙값, 최빈값의 관계</p>
+        <p class="caption" style="margin:0">* 최빈값을 중심으로 평균의 위치를 생각해보자!</p>
+      </div>
+      <div class="triptych" style="margin-top:2px">
+        <div class="cell">
+          <p class="caption" style="margin-bottom:2px">대칭(symmetric)</p>
+          <svg class="fig" id="f-sym" viewBox="0 0 260 190" role="img">
+            <title>좌우 대칭 분포에서 평균·중앙값·최빈값이 한 점에 겹치는 그림</title>
+          </svg>
+        </div>
+        <div class="cell">
+          <p class="caption" style="margin-bottom:2px">오른쪽으로 늘어짐<br>(right-skewed / positive-skewed)</p>
+          <svg class="fig" id="f-right" viewBox="0 0 260 190" role="img">
+            <title>오른쪽으로 늘어진 분포에서 최빈값·중앙값·평균 순으로 놓이는 그림</title>
+          </svg>
+        </div>
+        <div class="cell">
+          <p class="caption" style="margin-bottom:2px">왼쪽으로 늘어짐<br>(left-skewed / negative-skewed)</p>
+          <svg class="fig" id="f-left" viewBox="0 0 260 190" role="img">
+            <title>왼쪽으로 늘어진 분포에서 평균·중앙값·최빈값 순으로 놓이는 그림</title>
+          </svg>
+        </div>
+      </div>
+      <p class="emph" style="margin-top:6px">평균은 극단적인 값의 영향을 받지만,
+        중앙값은 극단적인 값의 영향을 받지 않음</p>
+      <p class="derive t-red">→ 극단적인 값이 존재하는 경우 평균보다 중앙값이 자료의 중심을 더 잘 드러냄</p>
+    </div>
+    <script>
+      (function () {
+        /* 세 대표값의 위치를 손으로 찍지 않는다. 밀도함수를 촘촘히 샘플링해
+           최빈값(최대 높이) · 중앙값(면적 이등분) · 평균(무게중심)을 계산한다. */
+        function build(sel, f, x0, x1, marks) {
+          const N = 400, xs = [], ys = [];
+          for (let i = 0; i <= N; i++) {
+            const x = x0 + ((x1 - x0) * i) / N;
+            xs.push(x); ys.push(f(x));
+          }
+          const total = ys.reduce((a, b) => a + b, 0);
+          const yMax = Math.max(...ys);
+          const mode = xs[ys.indexOf(yMax)];
+          let acc = 0, median = xs[0];
+          for (let i = 0; i <= N; i++) { acc += ys[i]; if (acc >= total / 2) { median = xs[i]; break; } }
+          const mean = xs.reduce((a, x, i) => a + x * ys[i], 0) / total;
+
+          const B = { x0: 18, y0: 148, x1: 242, y1: 26 };
+          const px = (v) => B.x0 + ((v - x0) / (x1 - x0)) * (B.x1 - B.x0);
+          const py = (v) => B.y0 - (v / (yMax * 1.12)) * (B.y0 - B.y1);
+          let s = `<path class="curve curve-demand" d="M` +
+            xs.map((x, i) => `${px(x).toFixed(1)},${py(ys[i]).toFixed(1)}`).join(' L') + `"/>`;
+          s += `<path class="axis" d="M${B.x0},${B.y0} L${B.x1},${B.y0}"/>`;
+          const V = { 최빈값: mode, 중앙값: median, 평균: mean };
+          if (marks === 'one') {
+            s += `<path class="mark-line" d="M${px(mode)},${B.y0} L${px(mode)},${py(yMax)}"/>`;
+            s += `<text class="tick" x="${px(mode)}" y="${B.y0 + 16}" text-anchor="middle">평균 = 중앙값 = 최빈값</text>`;
+          } else {
+            const order = marks === 'right' ? ['최빈값', '중앙값', '평균'] : ['평균', '중앙값', '최빈값'];
+            order.forEach((k) => {
+              s += `<path class="mark-line" d="M${px(V[k])},${B.y0} L${px(V[k])},${py(f(V[k]))}"/>`;
+            });
+            // 세 값이 가까이 붙으므로 가운데(중앙값) 라벨만 한 줄 아래로 내려 겹침을 막는다
+            order.forEach((k, i) => {
+              const y = i === 1 ? B.y0 + 30 : B.y0 + 15;
+              s += `<text class="tick" x="${px(V[k])}" y="${y}" text-anchor="middle">${k}</text>`;
+            });
+          }
+          document.querySelector(sel).innerHTML = s;
+        }
+        const norm = (m, sd) => (x) => Math.exp(-((x - m) ** 2) / (2 * sd * sd));
+        const logn = (m, sd) => (x) => (x <= 0 ? 0 : Math.exp(-((Math.log(x) - m) ** 2) / (2 * sd * sd)) / x);
+        build('#f-sym', norm(0, 1), -4, 4, 'one');
+        build('#f-right', logn(0, 0.75), 0.02, 4, 'right');
+        const R = logn(0, 0.75);
+        build('#f-left', (x) => R(4.02 - x), 0.02, 4, 'left');
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 14. 대표값의 선정 순서와 특성 (원본 p.17) ═══════════ -->
+  <section>
+    <h2>자료요약 (2) 숫자 하나로 만들기: 대표값의 선정 순서와 특성</h2>
+    <div class="body tight">
+      <div class="cols" style="align-items:flex-start">
+        <div class="col-l" style="flex:0 0 40%">
+          <svg class="fig" id="f-pick" viewBox="0 0 360 350" style="width:300px" role="img">
+            <title>범주형인가 · 그룹 전체에 관심이 있는가 · 분포가 비대칭인가에 따라
+              최빈값·산술평균·중앙값을 고르는 흐름도</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <table class="tbl-rep">
+            <thead><tr><th>종류</th><th>장점</th><th>단점</th></tr></thead>
+            <tbody>
+              <tr><td>(산술)평균</td>
+                <td><ul><li>통계학에서 가장 많이 활용되는 대표값</li>
+                        <li>계산이 쉬우며 유용한 정보 제공</li></ul></td>
+                <td><ul><li>이상치에 크게 좌우됨</li></ul></td></tr>
+              <tr><td>중앙값</td>
+                <td><ul><li>데이터 수가 적을 때 계산 용이</li>
+                        <li>이상치에 크게 좌우되지 않음</li></ul></td>
+                <td><ul><li>표본크기가 달라지면 산술평균보다 변화가 더 큼</li></ul></td></tr>
+              <tr><td>최빈값</td>
+                <td><ul><li>데이터가 클 경우에만 의미</li>
+                        <li>계산할 필요가 없음</li>
+                        <li>정량적, 정성적 데이터 모두 사용 가능</li></ul></td>
+                <td><ul><li>데이터가 작을 경우 의미 없음</li></ul></td></tr>
+            </tbody>
+          </table>
+          <p class="caption" style="margin-top:6px">출처: 이희연, 노승철, 2013, p.49</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const Q = [
+          ['데이터가', '범주형인가?', '최빈값'],
+          ['그룹 전체에', '관심이 있는가?', '산술평균'],
+          ['분포가', '비대칭적인가?', '중앙값'],
+        ];
+        const CX = 92, DW = 150, DH = 58, BX = 232, BW = 112, BH = 30;
+        const CY = [40, 148, 256];
+        let s = `<defs><marker id="ah-pick" viewBox="0 0 10 10" refX="9" refY="5"
+                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
+                 </marker></defs>`;
+        Q.forEach(([l1, l2, ans], i) => {
+          const cy = CY[i];
+          s += `<path class="boxfill" d="M${CX},${cy - DH / 2} L${CX + DW / 2},${cy}
+                  L${CX},${cy + DH / 2} L${CX - DW / 2},${cy} Z"/>`;
+          s += `<text class="boxlab sm" x="${CX}" y="${cy - 3}" text-anchor="middle">${l1}</text>`;
+          s += `<text class="boxlab sm" x="${CX}" y="${cy + 13}" text-anchor="middle">${l2}</text>`;
+          s += `<path class="arrow" d="M${CX + DW / 2 + 2},${cy} L${BX - 4},${cy}" marker-end="url(#ah-pick)"/>`;
+          s += `<text class="tick" x="${(CX + DW / 2 + BX) / 2}" y="${cy - 8}" text-anchor="middle">YES</text>`;
+          s += `<rect class="frame" x="${BX}" y="${cy - BH / 2}" width="${BW}" height="${BH}"/>`;
+          s += `<text class="annot" x="${BX + BW / 2}" y="${cy + 5}" text-anchor="middle">${ans}</text>`;
+          const nextY = i < 2 ? CY[i + 1] - DH / 2 - 4 : 314;
+          s += `<path class="arrow" d="M${CX},${cy + DH / 2 + 2} L${CX},${nextY}" marker-end="url(#ah-pick)"/>`;
+          s += `<text class="tick" x="${CX + 16}" y="${(cy + DH / 2 + nextY) / 2 + 4}">NO</text>`;
+        });
+        s += `<rect class="frame" x="${CX - BW / 2}" y="318" width="${BW}" height="${BH}"/>`;
+        s += `<text class="annot" x="${CX}" y="338" text-anchor="middle">산술평균</text>`;
+        document.getElementById('f-pick').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 15. 분산도의 측정 필요 (원본 p.18) ══════════════════ -->
+  <section>
+    <h2>평균과 불확실성: 분산도의 측정 필요</h2>
+    <div class="body stack">
+      <p class="sub">예) 그랜드 포크스 범람</p>
+      <ul>
+        <li>1997년 2월 미국 국립기상청은 노스레드 강의 수위를 평균 49피트(약 14.9m)로 예상
+          당시 그랜드 포크스의 제방은 당시 51피트(약 15.5m)여서 문제가 없을 것으로 판단함</li>
+        <li>1997년 4월 노스레드 강의 수위가 54피트(약 16.5m)로 증가하여 홍수 발생</li>
+      </ul>
+      <p class="lead t-define" style="margin-top:18px">왜 이런 일이 발생했을까?</p>
+      <ul>
+        <li>1996년 당시 국립기상청 예측의 오차범위는 ±9피트(약 2.7m)로서
+          범람 가능성은 약 35%에 달했음</li>
+      </ul>
+      <p class="big-say" style="margin-top:26px">자료를 대표하는 특성으로 평균은 부족하다!</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 표준편차의 중요성 — 두 포트폴리오 (원본 p.19) ═══ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body stack">
+      <div class="def-row slim">
+        <div class="def-tag">표준편차<br><span class="en">(standard deviation)</span></div>
+        <div><p>관측치들이 평균으로부터 얼마나 떨어져 있는지를 나타내는 정도</p></div>
+      </div>
+      <table style="width:520px;margin:34px 0 0 40px">
+        <thead><tr><th>포트폴리오</th><th>수익률</th></tr></thead>
+        <tbody>
+          <tr><td>주식수익률 A</td><td>0, 1, −3, 3, −1</td></tr>
+          <tr><td>주식수익률 B</td><td>0, 5, −7, 7, −5</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:26px">A, B의 평균수익률은 모두 0</p>
+      <p class="derive t-red">→ 두 포트폴리오는 같은 특성을 지니고 있다고 볼 수 있는가?</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 분포를 파악하는 방법 (원본 p.20) ════════════════ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body tight">
+      <div class="def-row slim">
+        <div class="def-tag">표준편차<br><span class="en">(standard deviation)</span></div>
+        <div><p>관측치들이 평균으로부터 얼마나 떨어져 있는지를 나타내는 정도</p></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:40px;margin:14px 0 6px">
+        <p class="sub" style="margin:0">분포를 파악하는 방법</p>
+        <p class="formula-key" style="margin:0">$s = \sqrt{\dfrac{\sum (X_i - \bar{X})^2}{n-1}}$</p>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div class="t">
+          <p class="sub" style="font-size:14px;margin-bottom:2px">평균으로부터의 편차(= 개별 관측치 − 자료의 평균)를 모두 합해보자</p>
+          <p>→ 평균으로부터의 편차의 합은 모든 자료에서 언제나 0이라 분포차이를 구할 수 없음</p></div></div>
+        <div class="step"><div class="n">2</div><div class="t">
+          <p class="sub" style="font-size:14px;margin-bottom:2px">평균으로부터의 편차를 제곱하여 합해보자</p>
+          <p>→ 편차 제곱의 합은 자료의 개수에 영향 (자료가 많아질수록 제곱합의 크기도 증가)</p></div></div>
+        <div class="step"><div class="n">3</div><div class="t">
+          <p class="sub" style="font-size:14px;margin-bottom:2px">평균으로부터의 편차 제곱합을 자료의 개수로 나눠보자</p>
+          <p>→ 자료가 하나인 경우에는? → 자유도(degree of freedom)의 문제</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 18. 자유도 (원본 p.21) ══════════════════════════════ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body tight">
+      <div class="def-row slim">
+        <div class="def-tag">자유도<br><span class="en">(degree of freedom)</span></div>
+        <div><p>자료 내에서 <em>실질적으로 독립인 값</em>의 개수</p></div>
+      </div>
+      <div class="cols" style="margin-top:14px;align-items:center">
+        <div class="col-l" style="flex:0 0 66%">
+          <p class="sub" style="font-size:14px;margin-bottom:2px">표본 평균을 n으로 나누는 이유:</p>
+          <p style="margin-left:16px">모집단에서 n개의 표본을 뽑을 경우<br>
+            표본의 평균은 모집단에서 어떤 표본을 뽑느냐에 따라 늘 달라지므로 독립인 값은 n개</p>
+        </div>
+        <div class="col-r" style="text-align:center">
+          <p class="formula-key" style="margin:0">$\bar{X} = \dfrac{\sum X_i}{n}$</p>
+        </div>
+      </div>
+      <div class="cols" style="margin-top:10px;align-items:center">
+        <div class="col-l" style="flex:0 0 66%">
+          <p class="sub" style="font-size:14px;margin-bottom:2px">표본 표준편차는 n−1로 나누는 이유:</p>
+          <p style="margin-left:16px">표본의 표준편차는 모집단에서 어떤 표본을 뽑는지에 상관없이<br>
+            계산을 위해 평균이 반드시 사전에 정의되어야 하므로 자유도 1을 소비</p>
+        </div>
+        <div class="col-r" style="text-align:center">
+          <p class="formula-key" style="margin:0">$s = \sqrt{\dfrac{\sum (X_i - \bar{X})^2}{n-1}}$</p>
+        </div>
+      </div>
+      <p style="margin-top:12px">예. 표본을 2개 뽑으려고 할 때<br>
+        하나의 표본이 6이고 2개 표본의 평균이 0임을 알고 있다면<br>
+        다른 하나의 표본은 뽑을 필요없이 반드시 −6이 되어야 함</p>
+      <p class="derive">→ 즉 표본을 뽑는 행위를 시행할 필요도 없음</p>
+    </div>
+  </section>
+
+  <!-- ══ 19. 68-95 법칙 (원본 p.22) ══════════════════════════ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body tight">
+      <div class="def-row slim">
+        <div class="def-tag">표준편차<br><span class="en">(standard deviation)</span></div>
+        <div><p>관측치들이 평균으로부터 얼마나 떨어져 있는지를 나타내는 정도</p></div>
+      </div>
+      <div class="side-note" style="top:58px">
+        <p class="ttl">* 정규분포 (normal distribution)</p>
+        <p>− 평균을 중심으로 좌우대칭인 종모양의 분포</p>
+        <svg class="fig" id="f-norm" viewBox="0 0 240 110" style="width:236px" role="img">
+          <title>평균을 중심으로 좌우대칭인 종모양의 정규분포 곡선</title>
+        </svg>
+      </div>
+      <p class="sub" style="margin:16px 0 6px 0;text-decoration:underline;text-underline-offset:4px">
+        (자료가 정규분포를 따른다면) 경험에 기초한 68-95 법칙</p>
+      <ul style="margin-right:290px">
+        <li>관측치의 약 68%가 평균에서 1표준편차 이내로 떨어져있다.</li>
+        <li>관측치의 약 95%가 평균에서 2표준편차 이내로 떨어져있다.</li>
+      </ul>
+      <svg class="fig" id="f-6895" viewBox="0 0 620 160" style="width:520px;margin:10px 0 0" role="img">
+        <title>평균 ±1표준편차 구간에 약 68%, ±2표준편차 구간에 약 95%가 들어간다는 그림</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        // 정규분포 곡선 — 좌표를 찍지 않고 함수에서 뽑는다
+        const B = { x0: 16, y0: 96, x1: 224, y1: 16 };
+        const f = (z) => Math.exp(-(z * z) / 2);
+        const pts = [];
+        for (let i = 0; i <= 160; i++) {
+          const z = -3.4 + (6.8 * i) / 160;
+          pts.push([B.x0 + ((z + 3.4) / 6.8) * (B.x1 - B.x0), B.y0 - f(z) * (B.y0 - B.y1)]);
+        }
+        let s = `<path class="curve curve-demand" d="M${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' L')}"/>`;
+        s += `<path class="axis" d="M${B.x0},${B.y0} L${B.x1},${B.y0}"/>`;
+        const cx = (B.x0 + B.x1) / 2;
+        s += `<path class="mark-line" d="M${cx},${B.y0} L${cx},${B.y1}"/>`;
+        s += `<text class="tick" x="${cx}" y="${B.y1 - 4}" text-anchor="middle">평균</text>`;
+        document.getElementById('f-norm').innerHTML = s;
+
+        // 68-95 두 줄
+        const rows = [{ y: 44, k: 1, pct: '68%' }, { y: 122, k: 2, pct: '95%' }];
+        const X0 = 20, X1 = 600, C = (X0 + X1) / 2, SD = 128;   // 1표준편차 = 128px
+        let t = `<defs><marker id="ah-sd" viewBox="0 0 10 10" refX="9" refY="5"
+                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--accent-blue)" stroke-width="1.6"/>
+                 </marker></defs>`;
+        rows.forEach((r) => {
+          const a = C - r.k * SD, b = C + r.k * SD;
+          t += `<path class="axis" d="M${X0},${r.y} L${X1},${r.y}"/>`;
+          t += `<rect class="band" x="${a}" y="${r.y - 6}" width="${b - a}" height="6"/>`;
+          [a, C, b].forEach((x) => { t += `<path class="axis" d="M${x},${r.y - 8} L${x},${r.y + 4}"/>`; });
+          t += `<path class="arrow blue" d="M${a},${r.y - 18} L${b},${r.y - 18}"
+                  marker-start="url(#ah-sd)" marker-end="url(#ah-sd)"/>`;
+          t += `<text class="annot blue" x="${C}" y="${r.y - 22}" text-anchor="middle">${r.pct}</text>`;
+          t += `<text class="tick" x="${a}" y="${r.y + 18}" text-anchor="middle">평균−${r.k}SD</text>`;
+          t += `<text class="tick" x="${C}" y="${r.y + 18}" text-anchor="middle">평균</text>`;
+          t += `<text class="tick" x="${b}" y="${r.y + 18}" text-anchor="middle">평균 + ${r.k}SD</text>`;
+        });
+        document.getElementById('f-6895').innerHTML = t;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 20. 왜도와 첨도 (원본 p.23) ═════════════════════════ -->
+  <section>
+    <h2>분포의 형태(shape): 왜도와 첨도</h2>
+    <div class="body stack">
+      <p class="emph">편차의 승수 이유: 1) 편차를 증폭, 2) 필요에 따라 양수, 음수로 전환</p>
+      <div style="margin-top:26px">
+        <p class="sub">왜도(skewness): 분포가 좌우로 비대칭적인 정도</p>
+        <p class="derive">→ 0: 대칭분포, +: 오른쪽으로 치우침, −: 왼쪽으로 치우침</p>
+      </div>
+      <div style="margin-top:26px">
+        <p class="sub">첨도(kurtosis): 분포의 꼬리가 두꺼운 정도, 양극단 자료가 얼마나 많은지를 측정</p>
+        <p class="derive">→ 3: 정규분포, 3이상: 정규분포보다 뾰족함(꼬리가 두꺼움),
+          3이하: 정규분표보다 완만함(꼬리가 얇음)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 21. 오늘 강의 요약 (1) (원본 p.24) ══════════════════ -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ol class="dense" style="padding-left:24px">
+        <li>통계학은 복잡한 자료를 정리, 분석, 추론하여 유용한 정보를 얻기 위한 도구이다.</li>
+        <li>우리가 관측하는 대부분의 자료는 실제 관심 대상이 되는 전체 집단인 모집단에서 추출한 표본 자료이며,
+          표본의 특성을 나타내는 통계량을 통해서 모집단의 특성인 모수를 추정해 볼 수 있다.</li>
+        <li>이와 같이 통계학은 표본을 정리, 요약하는 기술통계학과 표본의 통계량으로 관심 대상인
+          모집단을 추론하는 추론통계학으로 크게 나눌 수 있다.</li>
+        <li>기술통계학 차원에서 자료를 요약하는 방법은 자료의 분포를 그래프로 그리는 것과
+          숫자인 통계량으로 표현하는 방법이 있다.</li>
+        <li>자료를 일정한 구간으로 나누고 그 구간 내 자료의 빈도를 기입한 표를 도수분포표라고 하며,
+          구간별 자료의 빈도를 밀도단위(상대도수/구간길이)로 표현한 그래프를 히스토그램이라고 한다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══ 22. 오늘 강의 요약 (2) (원본 p.25) ══════════════════ -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ol class="dense" style="padding-left:24px">
+        <li>자료를 숫자로 요약하는 가장 간단한 방법은 자료가 어떤 지점을 중심으로 분포하고 있는지를 나타내는
+          중심경향성 통계량을 사용하는 방법이며 대표적인 것이 평균, 중앙값, 최빈값이다.</li>
+        <li>평균은 자료의 총합을 자료 개수로 나눈 것으로서 자료의 무게중심을 의미하며,
+          중앙값은 자료를 크기 순으로 나열했을 때 50%에 위치한 값을 의미하며,
+          최빈값은 자료 내에서 빈도가 가장 큰 값을 의미한다.</li>
+        <li>평균은 극단적인 값에 민감하지만 중앙값은 극단적인 값의 영향을 받지 않는다.</li>
+        <li>평균은 자료의 중심경향성을 보여주지만 자료가 중심에서 얼마나 퍼져 있는지,
+          즉 분산된 정도는 알려주지 않기 때문에 자료의 특성을 명확히 알기 위해서는
+          표준편차 혹은 분산을 함께 보아야 한다.</li>
+        <li>평균과 표준편차를 알면 자료의 전반적인 분포를 설명할 수 있다.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ══ 23. T10 마무리 (원본 p.26) ══════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+  <!-- ══ 24. 섹션 — 부록 ═════════════════════════════════════
+       원본 p.27~31 은 pptx 에서 숨김 처리된 슬라이드다 (배포 pdf 26쪽에 없다).
+       내용을 버리지 않되 본 강의와 구분되도록 이 칸막이를 앞에 둔다. -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">부록</p>
+    <p class="section-sub">원본에서 숨김 처리된 슬라이드 (p.27~31)</p>
+  </section>
+
+  <!-- ══ 25. 심슨의 역설 (원본 p.27) ═════════════════════════ -->
+  <section>
+    <h2>심슨의 역설<span class="en">(Simpson's paradox)</span></h2>
+    <div class="body stack">
+      <p class="lead t-define">하위집단에서 관찰된 관계가 하위집단이 결합될 경우 반대로 나타나는 현상</p>
+      <p class="derive t-red">→ 혼동요인(compounding factor)의 통제 필요성</p>
+      <svg class="fig" id="f-simpson" viewBox="0 0 700 260" style="width:640px;margin-top:8px" role="img">
+        <title>A학과 합격률 23%, B학과 합격률 53%인데 남성 총 합격률 44%가 여성 총 합격률 35%보다 높게 나오는 그림</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        /* 지원자 수만 인쇄된 값이고, 눈금의 위치는 그 수에서 유도한다.
+           선의 왼쪽 끝 = A학과, 오른쪽 끝 = B학과이고 눈금은 두 학과 지원자 수의 가중점이다. */
+        const rows = [
+          { y: 62, a: 2533, b: 5909, tot: '약 44%', who: '남성 지원자', up: true },
+          { y: 198, a: 2593, b: 1728, tot: '약 35%', who: '여성 지원자', up: false },
+        ];
+        const X0 = 190, X1 = 510;
+        let s = '';
+        rows.forEach((r) => {
+          const t = r.a / (r.a + r.b);          // A쪽 비중 → 눈금 위치
+          const x = X0 + t * (X1 - X0);
+          s += `<path class="axis" d="M${X0},${r.y} L${X1},${r.y}" stroke-width="2"/>`;
+          s += `<path class="axis" d="M${x},${r.y - 11} L${x},${r.y + 11}" stroke-width="2"/>`;
+          s += `<text class="annot" x="${X0 - 12}" y="${r.y - 4}" text-anchor="end">${r.who}</text>`;
+          s += `<text class="annot" x="${X0 - 12}" y="${r.y + 13}" text-anchor="end">${r.a.toLocaleString()}명</text>`;
+          s += `<text class="annot" x="${X1 + 12}" y="${r.y - 4}">${r.who}</text>`;
+          s += `<text class="annot" x="${X1 + 12}" y="${r.y + 13}">${r.b.toLocaleString()}명</text>`;
+          const ly = r.up ? r.y - 46 : r.y + 30;
+          s += `<text class="annot red" x="${x}" y="${ly}" text-anchor="middle">${r.who}</text>`;
+          s += `<text class="annot red" x="${x}" y="${ly + 15}" text-anchor="middle">총 합격률 ${r.tot}</text>`;
+        });
+        [['A 학과', '합격률: 23%', 78], ['B 학과', '합격률: 53%', 480]].forEach(([n, p, bx]) => {
+          s += `<rect class="frame" x="${bx}" y="106" width="142" height="48"/>`;
+          s += `<text class="annot" x="${bx + 71}" y="126" text-anchor="middle">${n}</text>`;
+          s += `<text class="annot" x="${bx + 71}" y="144" text-anchor="middle">${p}</text>`;
+        });
+        document.getElementById('f-simpson').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 26. 자유도 — 표본이 하나일 때 (원본 p.28) ═══════════ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body tighter">
+      <div class="def-row slim">
+        <div class="def-tag">자유도<br><span class="en">(degree of freedom)</span></div>
+        <div><p>자료 내에서 <em>실질적으로 독립인 값</em>의 개수</p></div>
+      </div>
+      <div class="cols" style="margin-top:8px;align-items:flex-start">
+        <div class="col-l" style="flex:0 0 46%">
+          <svg class="fig" id="f-df" viewBox="0 0 400 130" style="width:300px" role="img">
+            <title>모집단 3, −6, 6 에서 표본 하나 3 을 뽑는 그림</title>
+          </svg>
+          <p class="formula-ink" style="font-size:13px;margin:4px 0 0">
+            $(\text{모})\text{평균} = \dfrac{3+(-6)+6}{3} = 1$</p>
+          <p class="formula-ink" style="font-size:13px;margin:2px 0 0">
+            $(\text{모})\text{표준편차} = \sqrt{\dfrac{(3-1)^2+((-6)-1)^2+(6-1)^2}{3}} = 5.1$</p>
+        </div>
+        <div class="col-r">
+          <p class="formula-ink" style="font-size:13px;margin:0">
+            $\text{표본의 평균} = 3/1 = 3$</p>
+          <p class="formula-ink" style="font-size:13px;margin:2px 0 0">
+            $\text{표본의 표준편차} = \sqrt{\dfrac{(3-3)^2}{1}} = \dfrac{0}{1} = 0$</p>
+          <p class="derive" style="margin-top:6px">→ 한 개의 표본에서 편차를 정의할 수 있는가?</p>
+          <p class="derive t-red">→ 정의할 수 없다는 의미의 부정형인 0/0으로 계산 필요</p>
+        </div>
+      </div>
+      <ul class="notes-sm" style="margin-top:8px">
+        <li>모집단에서 n개의 표본을 뽑을 경우 표본의 평균은 모집단에서 어떤 표본을 뽑느냐에 따라
+          늘 달라지므로 자유도가 n</li>
+        <li>표본의 표준편차는 모집단에서 어떤 표본을 뽑는지에 상관없이 계산을 위해 평균이 반드시
+          사전에 정의되어야 하므로 자유도 1을 소비</li>
+        <li>표본을 2개 뽑으려고 할 때 하나의 표본이 6이고 2개 표본의 평균이 0임을 알고 있다면
+          다른 하나의 표본은 뽑을 필요없이 반드시 −6이 되어야 함. 즉 표본을 뽑는 행위를 시행할 필요도 없음
+          <br>(* 자유도는 다른 의미로 독립적인 게임의 시행횟수로도 생각할 수 있다)</li>
+        <li>표준편차는 불확실성을 의미. 표본 표준편차에서 평균 또한 추정된 값인 표본평균으로
+          계산했다는 것은 불확실성이 더욱 증가했다고 볼 수 있음. 그에 대한 벌점으로서
+          자유도를 하나 차감하는 것</li>
+      </ul>
+    </div>
+    <script>
+      (function () {
+        let s = `<defs><marker id="ah-df" viewBox="0 0 10 10" refX="9" refY="5"
+                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
+                 </marker></defs>`;
+        s += `<ellipse class="frame" cx="96" cy="72" rx="86" ry="44"/>`;
+        s += `<text class="annot" x="96" y="20" text-anchor="middle">모집단</text>`;
+        s += `<text class="annot" x="96" y="78" text-anchor="middle">3, −6, 6</text>`;
+        s += `<ellipse class="frame" cx="322" cy="72" rx="46" ry="34"/>`;
+        s += `<text class="annot" x="322" y="20" text-anchor="middle">표본</text>`;
+        s += `<text class="annot" x="322" y="78" text-anchor="middle">3</text>`;
+        s += `<path class="arrow" d="M188,72 L270,72" marker-end="url(#ah-df)"/>`;
+        s += `<text class="tick" x="229" y="62" text-anchor="middle">표본추출</text>`;
+        document.getElementById('f-df').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 27. 자료의 종류 (원본 p.29) ═════════════════════════ -->
+  <section>
+    <h2>자료의 종류</h2>
+    <div class="body tight">
+      <ul>
+        <li>횡단면 자료(cross-sectional data): 한 시점에서 여러 개체를 관측한 자료</li>
+        <li>시계열 자료(time-series data): 하나의 동일 개체를 여러 시점에서 관측한 자료</li>
+        <li>패널 자료(panel data): 여러 동일 개체를 여러 시점에서 관측한 자료</li>
+      </ul>
+      <div class="datagrid">
+        <div class="c hd"></div>
+        <div class="c hd">2018년</div><div class="c hd">2019년</div>
+        <div class="c hd">2020년</div><div class="c hd">2021년</div>
+        <div class="c rw">서울 GDP</div>
+        <div class="c ts cs"></div><div class="c ts"></div><div class="c ts"></div><div class="c ts"></div>
+        <div class="c rw">부산 GDP</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c rw">대구 GDP</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c rw">광주 GDP</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c rw">⋮</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+      </div>
+      <div class="gridkey">
+        <span><span class="k ts">가로 한 줄</span> = 시계열 자료</span>
+        <span><span class="k cs">세로 한 줄</span> = 횡단면자료</span>
+      </div>
+      <p class="big-say" style="font-size:19px;margin-top:10px">분석목적에 부합하는 자료의 선택이 가장 중요</p>
+    </div>
+  </section>
+
+  <!-- ══ 28. 척도에 따른 자료의 분류 (원본 p.30) ═════════════ -->
+  <section>
+    <h2>척도(scale)에 따른 자료의 분류</h2>
+    <div class="body tight">
+      <table class="tbl-scale">
+        <thead>
+          <tr><th>속성에 따른 분류</th><th>명칭</th><th>예시</th><th>내용</th>
+            <th>사칙연산</th><th>특성</th><th>변량적 특성</th><th>통계량</th></tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="2">질적/정성적<br>(qualitative)</td>
+            <td>명목척도<br>(nominal)</td><td>성별, 직업, 토지이용</td>
+            <td>대상을 다른 것들과 구분</td><td>불가</td><td>범주</td><td>이산</td><td>빈도, 백분율</td></tr>
+          <tr><td>서열척도<br>(ordinal)</td><td>학력, 비옥도, 선호도</td>
+            <td>대상의 우선순위가 있는 경우</td><td>불가</td><td>범주, 순위</td><td>이산</td><td>빈도, 백분율</td></tr>
+          <tr><td rowspan="2">양적/정량적<br>(quantitative)</td>
+            <td>등간척도<br>(interval)</td><td>온도, 주가지수<br>(리커트 척도)</td>
+            <td>대상을 같은 간격으로 표현</td><td>덧셈, 뺄셈</td><td>범주, 순위, 등간</td>
+            <td>이산, 연속</td><td>평균, 표준편차</td></tr>
+          <tr><td>비율척도<br>(ratio)</td><td>거리, 소득</td>
+            <td>대상에 대한 값의 비율이 의미가 있는 경우</td><td>덧셈, 뺄셈,<br>곱셈, 나눗셈</td>
+            <td>범주, 순위, 등간,<br>절대영점</td><td>이산, 연속</td><td>평균, 표준편차</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">변수(variable): 숫자로 표현된 측정치</p>
+      <p class="derive">→ 질적(숫자로 표현하기 어려운 경우) 속성도 변수화 과정을 거쳐
+        숫자로 표현함으로써 변수로 측정</p>
+    </div>
+  </section>
+
+  <!-- ══ 29. 자료의 대표성 (원본 p.31) ═══════════════════════ -->
+  <section>
+    <h2>자료의 대표성</h2>
+    <div class="body stack">
+      <img src="../assets/tb-joongang-2022-bitcoin.png"
+           alt="비트코인 50배 수익을 냈다는 방송인 기욤 패트리의 투자 비결을 다룬 2022년 중앙일보 기사"
+           style="display:block;height:330px;width:auto;margin:0 auto">
+      <p class="caption" style="text-align:center;margin-top:6px">
+        "늦지 않았다" 비트코인 50배 대박…기욤 패트리 투자 비결 | 중앙일보 (joongang.co.kr)</p>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

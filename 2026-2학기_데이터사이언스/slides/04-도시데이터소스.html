@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4강. 도시 데이터는 어디에 있는가</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .src { font-size: 13px; line-height: 1.72; color: var(--ink-2); margin: 4px 0 0; }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  .src li { margin-bottom: 8px; }
+  .src .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>4강. 도시 데이터는 어디에 있는가</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>그 증거의 원료는 어디에 있는가?</h2>
+    <div class="body">
+      <ul>
+        <li>지난주 문제정의서에 "이런 데이터가 필요하다" 고 적었다</li>
+        <li>그게 <span class="mark">실제로 있는가</span></li>
+        <li>있다면 어떻게 손에 넣는가</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 소스 지도 ═════════════════════════════════════ -->
+  <section>
+    <h2>국내 데이터는 크게 일곱 군데에 있다</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:27%">어디</th><th style="width:38%">무엇이 있나</th><th>받는 방식</th></tr></thead>
+        <tbody>
+          <tr><td>KOSIS 국가통계포털</td><td>인구·가구·산업 통계표</td><td>화면 조회 · CSV</td></tr>
+          <tr><td>공공데이터포털</td><td>부처·지자체가 여는 거의 전부</td><td>파일 · <span class="hl">API</span></td></tr>
+          <tr><td>SGIS 통계지리정보</td><td>격자·행정동 단위 공간통계</td><td>화면 · API</td></tr>
+          <tr><td>실거래가 공개시스템</td><td>부동산 매매·전월세 거래</td><td>CSV · <span class="hl">API</span></td></tr>
+          <tr><td>KTDB 교통DB</td><td>통행량·OD·network</td><td>신청 후 제공</td></tr>
+          <tr><td>COMPAS</td><td>과제별로 정제된 도시 데이터</td><td>과제 단위 일괄</td></tr>
+          <tr><td>지자체 데이터포털</td><td>그 도시에만 있는 것</td><td>제각각</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:12px">
+        오늘은 이 중 <span class="hl">실거래가</span> 하나를 세 방식으로 받아 본다.
+        방식을 익히면 나머지도 같다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 세 가지 방식 ══════════════════════════════════ -->
+  <section>
+    <h2>같은 데이터를 얻는 세 가지 방식</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-three" viewBox="0 0 840 270" style="width:800px" role="img"
+           aria-label="수동 다운로드, API 호출, AI 위임 세 방식을 손이 가는 정도와 반복 가능성으로 비교한 도식">
+        <title>데이터를 얻는 세 방식의 비교</title>
+        <g text-anchor="middle">
+          <rect x="30"  y="40" width="234" height="66" fill="#EDE9E3"/>
+          <text x="147" y="72" font-size="18" font-weight="700" fill="#16181C">① 수동 다운로드</text>
+          <text x="147" y="93" font-size="12.5" fill="#4A4741">화면에서 조건을 골라 받는다</text>
+
+          <rect x="303" y="40" width="234" height="66" fill="#D8D3CB"/>
+          <text x="420" y="72" font-size="18" font-weight="700" fill="#16181C">② API 호출</text>
+          <text x="420" y="93" font-size="12.5" fill="#4A4741">인증키로 프로그램이 받는다</text>
+
+          <rect x="576" y="40" width="234" height="66" fill="#A02948"/>
+          <text class="on-dark" x="693" y="72" font-size="18" font-weight="700" fill="#FFF">③ AI 위임</text>
+          <text class="on-dark" x="693" y="93" font-size="12.5" fill="#FFF">조건만 주고 맡긴다</text>
+        </g>
+        <g font-size="12.5" fill="#4A4741" text-anchor="middle">
+          <text x="147" y="140">한 번은 제일 빠르다</text>
+          <text x="147" y="160">열두 달이면 열두 번</text>
+          <text x="420" y="140">키 발급과 규격 이해가 필요</text>
+          <text x="420" y="160">한 번 만들면 반복이 공짜</text>
+          <text x="693" y="140">규격을 몰라도 된다</text>
+          <text x="693" y="160" font-weight="700" fill="#A02948">받은 것이 맞는지 봐야 한다</text>
+        </g>
+        <path class="axis" d="M30,196 L810,196" stroke-width="1.2"/>
+        <path d="M810,196 L800,191 L800,201 Z" fill="#16181C"/>
+        <text x="30" y="220" font-size="12.5" fill="#4A4741">손이 많이 간다</text>
+        <text x="810" y="220" text-anchor="end" font-size="12.5" fill="#4A4741">손이 덜 간다 · 확인할 것이 는다</text>
+        <text x="420" y="250" text-anchor="middle" font-size="13.5" fill="#4A4741">
+          어느 하나가 옳은 게 아니다 — <tspan font-weight="700" fill="#A02948">몇 번 쓸 것인지</tspan>로 고른다</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ 5. API 의 구조 ═══════════════════════════════════ -->
+  <section>
+    <h2>API 는 어렵지 않다 — 주소에 조건을 붙이는 것이다</h2>
+    <div class="body tight">
+      <p class="sub">국토교통부_아파트 매매 실거래가 자료 · <span class="code">getRTMSDataSvcAptTrade</span></p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:24%">붙이는 조건</th><th style="width:30%">뜻</th><th>예</th></tr></thead>
+        <tbody>
+          <tr><td><span class="code">serviceKey</span></td><td>나를 알아보는 열쇠</td><td>포털에서 발급받는다</td></tr>
+          <tr><td><span class="code">LAWD_CD</span></td><td>지역 — 법정동코드 앞 5자리</td><td><span class="hl">43111</span> (청주시 상당구)</td></tr>
+          <tr><td><span class="code">DEAL_YMD</span></td><td>계약 연월</td><td>202608</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        조건 셋을 바꾸면 다른 지역·다른 달이 나온다.
+        <span class="hl">열두 달을 받으려면 열두 번 부르면 된다</span> — 그것이 프로그램이 할 일이다.</p>
+      <p class="caption" style="margin-top:8px">
+        법정동코드는 행정표준코드관리시스템(code.go.kr)에서 찾는다. 청주 나머지 세 구는
+        실습에서 직접 찾는다 — <span class="hl">코드를 찾는 일 자체가 오늘 배울 기술이다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 6. 형식과 함정 ═══════════════════════════════════ -->
+  <section>
+    <h2>받고 나서 겪는 것들</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:26%">겪는 것</th><th>무슨 일인가</th></tr></thead>
+        <tbody>
+          <tr><td>글자가 깨진다</td><td>공공기관 CSV 는 <span class="code">EUC-KR</span> 인 경우가 많다.
+            엑셀은 열리는데 파이썬에서 깨지면 이것이다</td></tr>
+          <tr><td>숫자가 글자다</td><td>거래금액에 쉼표가 들어 있다 — <span class="code">"1,250"</span> 은 숫자가 아니다</td></tr>
+          <tr><td>지역이 안 맞는다</td><td>행정동과 법정동은 다르다. 통계는 행정동, 부동산은 법정동인 경우가 많다</td></tr>
+          <tr><td>기간이 비어 있다</td><td>거래가 없는 달은 행이 아예 없다. 0 이 아니라 <span class="hl">없음</span>이다</td></tr>
+          <tr><td>단위가 다르다</td><td>거래금액은 만원, 면적은 ㎡. 평으로 바꾸면 어디선가 어긋난다</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:12px">
+        전부 클로드가 처리해 준다. <span class="hl">다만 처리했다는 사실을 알고 있어야</span>
+        결과가 이상할 때 어디를 볼지 안다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 7. 데이터 문서화 ═════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>출처를 적지 않은 데이터는 증거가 아니다</h2>
+    <div class="body">
+      <p class="define">받은 날짜 · 출처 주소 · 대상 기간 · 단위 · <span class="t-red">한계</span><br>
+        이 다섯 줄을 적어 두는 것으로 충분하다</p>
+      <p class="conclusion">→ 석 달 뒤의 나는 이 파일이 어디서 왔는지 기억하지 못한다.<br>
+        &nbsp;&nbsp;&nbsp;남이 물었을 때 답하지 못하면 그 분석은 쓸 수 없다</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. 실습 구분 ═════════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">청주 상당구 실거래가를 세 방식으로 받기 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 9. 실습 안내 ═════════════════════════════════════ -->
+  <section>
+    <h2>실습 — 오늘 만들 것</h2>
+    <div class="body tight">
+      <p class="sub">대상</p>
+      <p class="emph">청주시 상당구 아파트 매매 실거래가 · 최근 12개월</p>
+      <p class="caption" style="margin-top:6px">
+        원도심이 있는 구다. 3주차에 정한 연구질문과 이어지고, 5~6주차 내내 이 파일을 쓴다.</p>
+      <p class="sub" style="margin-top:16px">왜 세 번이나 받나</p>
+      <ul>
+        <li>같은 데이터가 나와야 <span class="hl">내가 제대로 받았는지</span> 알 수 있다</li>
+        <li>세 방식의 손이 가는 정도를 몸으로 비교하게 된다</li>
+        <li>③ 이 편하다는 것을 알되, ①②를 해 봐야 <span class="hl">③의 결과를 의심할 수 있다</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 10. 실습 ① 수동 ═════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 손으로 받는다 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>국토교통부 실거래가 공개시스템 <span class="code">rt.molit.go.kr</span> 에 들어간다</li>
+        <li>아파트 → 매매 → 지역을 <span class="hl">충청북도 청주시 상당구</span>로,
+          기간을 최근 12개월로 지정한다</li>
+        <li>화면에서 결과를 훑어본다 — <span class="mark">몇 건인가</span></li>
+        <li>CSV 로 내려받아 열어 본다. 열 이름과 단위를 확인한다</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        메모해 둘 것: <span class="hl">전체 건수</span>. ②③의 결과를 이것과 맞춰 본다.</p>
+      <p class="caption" style="margin-top:8px">
+        조건을 하나씩 바꿔 보면 무엇이 어떻게 걸러지는지 보인다. API 의 파라미터가 곧 이 화면이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 11. 실습 ② API ══════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 인증키를 받는다 <span class="en" style="font-size:16px;color:var(--muted)">35분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">data.go.kr</span> 회원가입 (공공데이터포털)</li>
+        <li>"국토교통부_아파트 매매 실거래가 자료" 를 찾아 <span class="hl">활용신청</span>한다.
+          자동 승인이라 곧 쓸 수 있다</li>
+        <li>마이페이지에서 <span class="hl">인증키(serviceKey)</span>를 확인한다.
+          상세 화면에 요청 주소와 파라미터 설명이 함께 있다</li>
+        <li><span class="code">code.go.kr/stdcode/regCodeL.do</span> 에서 법정동코드를 찾는다 —
+          청주시 상당구 <span class="code">4311100000</span> → 앞 5자리 <span class="hl">43111</span></li>
+        <li>서원구·흥덕구·청원구의 코드도 <span class="mark">직접 찾아 적어 둔다</span></li>
+      </ol>
+      <p class="caption" style="margin-top:12px">
+        <span class="hl">인증키는 남에게 보이지 않는다.</span> 화면 공유나 제출물에 그대로 넣지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 12. 실습 ③ AI 위임 ══════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 맡긴다 <span class="en" style="font-size:16px;color:var(--muted)">20분</span></h2>
+    <div class="body tight">
+      <div class="prompt-box">
+        <p class="who">프롬프트 예시</p>
+        <p>"공공데이터포털의 <b>국토교통부 아파트 매매 실거래가 API</b>를 쓰려고 해.
+          인증키는 따로 알려줄게.</p>
+        <p>지역은 <b>청주시 상당구(LAWD_CD 43111)</b>, 기간은 <b>최근 12개월</b>이야.
+          열두 달을 각각 받아서 <span class="mark">CSV 한 장으로 합쳐 줘.</span></p>
+        <p>합치기 전에 <span class="mark">어떻게 받아서 어떻게 합칠지 먼저 알려 줘.</span>
+          다 받은 뒤에는 <b>달마다 몇 건이 왔는지</b> 표로 보여 줘."</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        마지막 두 문장이 핵심이다. <span class="hl">받기 전에 방법을, 받은 뒤에 건수를</span> 요구한다 —
+        그래야 ①에서 센 건수와 맞춰 볼 수 있다.</p>
+      <p class="caption" style="margin-top:8px">
+        건수가 다르면 멈춘다. 기간 해석이 다른지, 취소 거래를 포함했는지 물어본다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 실습 ④ 출처 문서 ════════════════════════════ -->
+  <section>
+    <h2>실습 ④ — 출처를 적는다 <span class="en" style="font-size:16px;color:var(--muted)">15분</span></h2>
+    <div class="body tight">
+      <p class="sub">데이터 출처 문서 — 다섯 줄이면 된다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:22%">칸</th><th>예</th></tr></thead>
+        <tbody>
+          <tr><td>출처</td><td>국토교통부 아파트 매매 실거래가 자료 (공공데이터포털 API)</td></tr>
+          <tr><td>받은 날</td><td>2026. 9. 21.</td></tr>
+          <tr><td>범위</td><td>청주시 상당구 (LAWD_CD 43111), 2025. 10. ~ 2026. 9. 계약분</td></tr>
+          <tr><td>단위</td><td>거래금액 만원 · 전용면적 ㎡</td></tr>
+          <tr><td>한계</td><td>신고 기준이라 계약일과 시차가 있다. 취소 거래 처리 방식 확인 필요</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">
+        제출: <span class="t-red">cheongju-apt.csv + 출처 문서</span> —
+        <span class="hl">다음 주에 이 파일로 첫 분석을 한다.</span></p>
+      <p class="caption" style="margin-top:6px">
+        가정 과제: 자기 문제정의서에 필요한 데이터도 하나 찾아 둔다. 없으면 없다고 적어 온다.<br>
+        <span class="hl">그리고 다음 장의 사전 과제를 반드시 해 온다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 14. 출처 ═════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src">
+        <li>국토교통부_아파트 매매 실거래가 자료 (오퍼레이션 <span class="code">getRTMSDataSvcAptTrade</span>)<br>
+          <span class="u">data.go.kr/data/15126469/openapi.do</span></li>
+        <li>국토교통부 실거래가 공개시스템 — <span class="u">rt.molit.go.kr</span></li>
+        <li>법정동코드 · 청주시 상당구 4311100000 — 행정표준코드관리시스템<br>
+          <span class="u">code.go.kr/stdcode/regCodeL.do</span> (2026. 8. 26. 조회)</li>
+        <li>그 밖의 소스 — KOSIS <span class="u">kosis.kr</span> · 공공데이터포털 <span class="u">data.go.kr</span> ·
+          SGIS <span class="u">sgis.kostat.go.kr</span> · KTDB <span class="u">ktdb.go.kr</span> ·
+          COMPAS <span class="u">compas.lh.or.kr</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 15. 마무리 ═══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

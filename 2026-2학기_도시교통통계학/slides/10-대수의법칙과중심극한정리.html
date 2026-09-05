@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10강. 대수의 법칙과 중심극한정리</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols { align-items: flex-start; }
+
+  /* 원본이 √ 안에 한글을 넣는다. MathJax 대신 윗줄 하나로 흉내낸다 —
+     \text{} 안의 한글은 tex-svg 출력에서 글꼴이 갈려 자칫 무너진다. */
+  .rad { border-top: 1.1px solid currentColor; padding: 1px 3px 0; margin-left: 1px; }
+
+  /* 복권 게임 표 — 폭을 못 박지 않으면 칸이 접혀 푸터를 넘는다 (design.md §4.3) */
+  .tbl-lot { width: 100%; table-layout: fixed; font-size: 15px; }
+  .reveal .tbl-lot th, .reveal .tbl-lot td { padding: 5px 12px; }
+
+  /* 이미지 두세 장을 나란히 */
+  .imgrow { display: flex; gap: 20px; align-items: flex-start; justify-content: center; }
+  .imgrow figure { margin: 0; }
+  .imgrow img { display: block; width: auto; }
+  .imgrow img.tb { height: 148px; }
+  .imgrow img.fig-w { width: 396px; }
+  .imgrow figcaption { font-size: 11px; color: var(--accent-blue); margin-top: 3px; }
+
+  /* 표본 통계량 슬라이드의 3단 */
+  .samp { display: flex; gap: 16px; align-items: flex-start; }
+  .samp > .a { flex: 0 0 36%; }
+  .samp > .b { flex: 0 0 21%; text-align: center; }
+  .samp > .c { flex: 1 1 auto; }
+  .samp .b p { margin: 0 0 4px; font-size: 14px; }
+  .samp .c p { font-size: 14px; margin-bottom: 2px; }
+
+  ul.slim > li { margin-bottom: 4px; }
+  .hl { color: var(--brand-crimson); font-weight: 700; }
+
+  /* 원본 p.33~36 의 제목은 한 줄에 다 들어가도록 작게 짠 것이다.
+     31px 그대로 두면 두 줄로 접혀 본문 첫 줄을 덮는다. */
+  .s-h24 h2 { font-size: 24px; }
+  .s-h22 h2 { font-size: 22px; }
+  .ind { margin-left: 24px; }
+
+  /* 그림 안 어두운 상자 위의 글자.
+     components.css 가 모든 svg 글자에 흰 3px 테두리를 두르는데(겹침 방지),
+     흰 글자에 그대로 걸리면 자간이 메워져 뭉개진다. 여기서만 테두리를 끈다. */
+  .reveal svg.fig .on-dark { fill: #FFF; font-weight: 700; stroke: none; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- T1 표지 (원본 p.1) -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>10강. 대수의 법칙과<br>중심극한정리</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- 원본 p.2 -->
+  <section>
+    <h2>지난 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>한 사건이 발생할 때 다른 사건이 일어날 수 없는 경우 두 사건 간 관계를
+          상호배반(mutually exclusive)이라 한다.</li>
+        <li>둘 중 하나의 사건이 발생할 확률을 두 사건이 각각 발생할 확률의 합과
+          두 사건이 동시에 발생할 확률의 차로 나타내는 것을 확률의 덧셈법칙이라 한다.</li>
+        <li>한 사건이 발생했다는 조건 하에서 다른 사건이 발생할 확률을 조건부확률이라 한다.</li>
+        <li>두 사건이 모두 일어날 확률을 하나의 사건이 일어날 확률과 그 사건이 일어났다는 조건 하에서
+          다른 하나의 사건이 일어날 조건부확률의 곱으로 나타낸 것을 확률의 곱셈법칙이라 한다.</li>
+        <li>한 사건이 발생할 때 다른 사건이 일어날 확률이 변하지 않는 경우 두 사건 간의 관계를
+          독립(independent)이라 하며, 두 사건 간 관계가 독립일 경우 확률의 곱셉법칙은
+          두 사건이 각각 일어날 확률의 곱으로 나타낼 수 있다.</li>
+        <li>조건부확률을 확률의 곱셈법칙에 따라 변환하면 사전에 설정한 (주관적 견해의) 확률을
+          새롭게 주어진 정보를 활용해 업데이트 시킬 수 있는 베이즈 정리를 도출할 수 있다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.3 -->
+  <section>
+    <h2>확률변수와 확률분포</h2>
+    <div class="body">
+      <div class="def-row">
+        <div class="def-tag">확률변수<br><span class="en">(random variable)</span></div>
+        <p>표본공간에서 정의되는 각 사건들에 대응하는 실수 값</p>
+      </div>
+      <div class="def-row">
+        <div class="def-tag">확률분포<br><span class="en">(probability distribution)</span></div>
+        <p>확률변수가 출현할 가능성, 즉 사건이 발생할 가능성에 대한 분포</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.4 -->
+  <section>
+    <h2>확률분포의 종류</h2>
+    <div class="body">
+      <p class="sub">확률분포를 알려면 우리가 직면한 데이터, 즉 확률변수가 어떻게 나타난 사건인지
+        고민해보아야 한다!</p>
+      <svg class="fig" id="f-tree" viewBox="0 0 848 240" style="width:100%;margin-top:14px" role="img">
+        <title>확률분포를 이산확률분포(베르누이·이항·포아송·음이항)와
+          연속확률분포(균등·정규·지수)로 나눈 계통도</title>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 원본 p.5 -->
+  <section class="s-split">
+    <h2>정규분포 <span class="en">(normal distribution)</span></h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">평균 $\mu$, 표준편차 $\sigma$인 변수 X에 대한 정규분포</p>
+        <p class="formula-key" style="text-align:center;margin:6px 0 0">$X \sim N(\mu,\ \sigma^{2})$</p>
+        <p class="formula-key" style="text-align:center;margin:4px 0 0">
+          $f(X)=\dfrac{1}{\sqrt{2\pi}\sigma}\,e^{-\frac{1}{2}\left(\frac{X-\mu}{\sigma}\right)^{2}}$</p>
+        <p class="caption" style="margin:2px 0 0">$(-\infty &lt; x &lt; +\infty)$</p>
+        <svg class="fig" id="f-bell1" viewBox="0 0 380 160" style="width:380px" role="img">
+          <title>평균 μ, 표준편차 σ인 정규분포의 종모양 곡선과 표준단위 눈금</title>
+        </svg>
+      </div>
+      <div class="col-r">
+        <p class="sub">정규분포의 사례</p>
+        <ul>
+          <li>저울의 측정오차</li>
+          <li>키와 몸무게의 분포</li>
+          <li>식물의 꽃잎 개수</li>
+        </ul>
+        <p class="emph" style="margin-left:26px">:</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.6 -->
+  <section class="s-split">
+    <h2>정규분포 <span class="en">(normal distribution)</span></h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">평균 $\mu$, 표준편차 $\sigma$인 변수 X에 대한 정규분포</p>
+        <p class="formula-key" style="text-align:center;margin:6px 0 0">$X \sim N(\mu,\ \sigma^{2})$</p>
+        <p class="formula-key" style="text-align:center;margin:4px 0 0">
+          $f(X)=\dfrac{1}{\sqrt{2\pi}\sigma}\,e^{-\frac{1}{2}\left(\frac{X-\mu}{\sigma}\right)^{2}}$</p>
+        <p class="caption" style="margin:2px 0 0">$(-\infty &lt; x &lt; +\infty)$</p>
+        <svg class="fig" id="f-bell2" viewBox="0 0 380 160" style="width:380px" role="img">
+          <title>평균 μ, 표준편차 σ인 정규분포의 종모양 곡선과 표준단위 눈금</title>
+        </svg>
+      </div>
+      <div class="col-r">
+        <ol class="dense">
+          <li>평균을 중심으로 좌우 대칭 (symmetric)</li>
+          <li>종 모양 (bell-shaped)</li>
+          <li>봉우리가 하나 (single-peaked)</li>
+        </ol>
+        <svg class="fig" id="f-arr" viewBox="0 0 60 56" style="width:60px;margin:14px 0 14px 40px" role="img">
+          <title>아래 결론으로 이어지는 화살표</title>
+        </svg>
+        <p class="emph">평균과 표준편차에 따라 중심과 퍼진 정도는 달라지지만<br>
+          전반적인 모양은 그대로이며,<br>
+          평균±n표준편차의 비율도 일정함</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.7 -->
+  <section class="s-split wide-fig">
+    <h2>정규분포 <span class="en">(normal distribution)</span></h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">평균 $\mu$, 표준편차 $\sigma$인 변수 X에 대한 정규분포</p>
+        <p class="formula-key" style="text-align:center;margin:12px 0 0">$X \sim N(\mu,\ \sigma^{2})$</p>
+        <p class="formula-key" style="text-align:center;margin:6px 0 0">
+          $f(X)=\dfrac{1}{\sqrt{2\pi}\sigma}\,e^{-\frac{1}{2}\left(\frac{X-\mu}{\sigma}\right)^{2}}$</p>
+        <p class="caption" style="margin:6px 0 0;text-align:center">$(-\infty &lt; x &lt; +\infty)$</p>
+      </div>
+      <div class="col-r">
+        <p class="caption">가) 표준편차가 같고 평균값이 다른 경우
+          (<i>μ</i><sub>1</sub> &lt; <i>μ</i><sub>2</sub> &lt; <i>μ</i><sub>3</sub>,
+          &nbsp;<i>σ</i><sub>1</sub> = <i>σ</i><sub>2</sub> = <i>σ</i><sub>3</sub>)</p>
+        <svg class="fig" id="f-mu" viewBox="0 0 500 120" style="width:500px" role="img">
+          <title>표준편차가 같고 평균만 다른 정규분포 세 개 — 모양은 같고 위치만 옮겨간다</title>
+        </svg>
+        <p class="caption" style="margin-top:10px">나) 표준편차가 다르고 평균값이 같은 경우
+          (<i>μ</i><sub>1</sub> = <i>μ</i><sub>2</sub> = <i>μ</i><sub>3</sub>,
+          &nbsp;<i>σ</i><sub>1</sub> &gt; <i>σ</i><sub>2</sub> &gt; <i>σ</i><sub>3</sub>)</p>
+        <svg class="fig" id="f-sig" viewBox="0 0 340 160" style="width:340px" role="img">
+          <title>평균이 같고 표준편차만 다른 정규분포 세 개 — 표준편차가 작을수록 좁고 뾰족하다</title>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.8 -->
+  <section>
+    <h2>베르누이 분포 <span class="en">(Bernouii distribution)</span></h2>
+    <div class="body">
+      <p class="sub">P의 성공확률로 결과가 둘(성공/실패)로 나뉘는 사건, 즉 0과 1을 확률변수로 갖는 확률분포</p>
+      <p class="formula-key" style="text-align:center;margin:24px 0 30px;font-size:22px">
+        $X \sim Bernouii(p)$</p>
+      <p class="sub" style="margin-bottom:2px">베르누이 시행 <span class="en">(Bernouii trial)</span></p>
+      <p class="emph ind">결과가 둘(성공/실패, 합격/불합격)로 나뉘는 시행 (예. 동전의 앞면/뒷면)
+        → 성공확률 p가 존재</p>
+      <p class="sub" style="margin:20px 0 2px">베르누이 확률변수
+        <span class="en">(Bernouii random variable)</span></p>
+      <p class="emph ind">베르누이 시행에서 성공에 1, 실패에 0을 대응시킨 확률변수</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.9 -->
+  <section>
+    <h2>베르누이 분포의 확률질량함수</h2>
+    <div class="body">
+      <p class="sub">P의 성공확률에 따라 0 혹은 1이 나타날 확률</p>
+      <p class="formula-key" style="text-align:center;margin:26px 0 34px;font-size:20px">
+        $P(X_{1}=x)=p^{x}(1-p)^{1-x}$</p>
+      <p class="sub" style="margin-bottom:2px">베르누이 확률변수
+        <span class="en">(Bernouii random variable)</span></p>
+      <p class="emph ind">베르누이 시행에서 성공에 1, 실패에 0을 대응시킨 확률변수</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.10 -->
+  <section>
+    <h2>이항 분포 <span class="en">(Binomial distribution)</span></h2>
+    <div class="body tight">
+      <p class="sub">성공확률이 p인 베르누이 시행을 n번 반복하여 얻은 베르누이 확률변수의 합을
+        확률변수로 갖는 확률분포</p>
+      <p class="formula-key" style="text-align:center;margin:18px 0 24px;font-size:22px">
+        $Y \sim B(n,\ p)$</p>
+      <ul class="slim">
+        <li>성공확률이 p로 일정한 베르누이 시행으로 얻은 베르누이 확률변수: $X_{1}$</li>
+        <li>베르누이 시행을 n번 반복: $X_{1},\ X_{2},\ X_{3},\cdots,X_{n}$</li>
+        <li>n번 시행한 베르누이 확률변수의 합을 그 값으로 갖는 새로운 확률변수:
+          $Y = X_{1}+X_{2}+X_{3}+\cdots+X_{n}$</li>
+      </ul>
+      <ul class="slim" style="margin-top:14px">
+        <li>새로운 확률변수 Y: 이항확률변수</li>
+        <li>이항확률변수 Y가 따르는 확률분포: 이항분포 (binomial distribution)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.11 -->
+  <section>
+    <h2>이항 분포의 확률질량함수: 이항공식</h2>
+    <div class="body tight">
+      <p class="sub">성공확률이 p인 베르누이 시행을 n번 시행했을 때 k번 성공할 확률</p>
+      <p class="formula-key" style="text-align:center;margin:18px 0 0;font-size:20px">
+        $P(X=k)=\dfrac{n!}{k!(n-k)!}\,p^{k}(1-p)^{n-k}$
+        <span class="caption" style="font-style:italic">&nbsp;(k=0,1,…,n)</span></p>
+      <div class="cols" style="margin-top:2px">
+        <div class="col-l">
+          <p class="caption" style="text-align:center;color:var(--brand-crimson);font-weight:700;margin:0">
+            이항계수</p>
+          <p class="caption" style="text-align:center;margin:0">= n번의 시행에서 조합가능한 경우의 수</p>
+        </div>
+        <div class="col-r">
+          <p class="caption" style="text-align:center;margin:0">하나의 조합이 나타날 확률</p>
+          <p class="caption" style="text-align:center;margin:0">= 모든 조합에서 동일</p>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:24px">이항공식의 적용 조건 (셋 중 하나라도 위배되면 적용되지 않음)</p>
+      <ul class="slim">
+        <li>n은 미리 정해져 있다.</li>
+        <li>매 번의 베르누이 시행은 독립이다.</li>
+        <li>p는 매 시행마다 동일하다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.12 -->
+  <section>
+    <h2>이항공식의 적용사례</h2>
+    <div class="body">
+      <ul>
+        <li>동전을 네 번 던질 때 앞면이 한번 나오는 확률</li>
+        <li>주사위를 열 번 던질 때 1이 세 번 나올 확률</li>
+        <li>타율 3할 타자가 100번 타석에 들어설 때 안타를 50번 칠 확률</li>
+        <li>5지 선다인 기말고사 10문제를 모두 찍을 때 50점 이상 맞을 확률</li>
+        <li>내가 산 주식이 앞으로 5일 간 매일 오를 확률</li>
+        <li>한 장의 붉은 카드와 아홉 장의 푸른 카드가 든 상자에서 다섯번 복원추출 할 때
+          붉은 카드를 두 장 뽑을 확률</li>
+      </ul>
+      <p class="emph" style="text-align:center">:</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.13 -->
+  <section>
+    <h2>이항공식의 적용사례</h2>
+    <div class="body tight">
+      <p class="emph">한 장의 붉은 카드와 아홉 장의 푸른 카드가 든 상자에서 다섯번 복원추출 할 때
+        붉은 카드를 두 장 뽑을 확률</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <p class="sub" style="margin-bottom:2px">1. 가능한 모든 경우를 찾아냄
+            = 5개 중에서 2개를 뽑는 조합</p>
+          <p class="emph ind">RRBBB, RBRBB, ...</p>
+          <p class="sub" style="margin:16px 0 2px">2. 각 경우의 확률을 계산</p>
+          <p class="emph ind" style="margin-bottom:2px">RRBBB
+            $=\frac{1}{10}\times\frac{1}{10}\times\frac{9}{10}\times\frac{9}{10}\times\frac{9}{10}
+            =\left(\frac{1}{10}\right)^{2}\left(\frac{9}{10}\right)^{3}$</p>
+          <p class="emph ind" style="margin-bottom:2px">RBRBB
+            $=\frac{1}{10}\times\frac{9}{10}\times\frac{1}{10}\times\frac{9}{10}\times\frac{9}{10}
+            =\left(\frac{1}{10}\right)^{2}\left(\frac{9}{10}\right)^{3}$</p>
+          <p class="emph ind">:</p>
+          <p class="sub" style="margin:16px 0 2px">3. 덧셈법칙으로 구한 확률을 모두 더함</p>
+          <p class="emph ind">조합가능한 경우의 수
+            $\times \left(\frac{1}{10}\right)^{2}\left(\frac{9}{10}\right)^{3}$</p>
+        </div>
+        <div class="col-r">
+          <p class="sub">이항계수 = 조합가능한 경우의 수</p>
+          <p class="formula-key" style="margin-top:10px">
+            $\mathrm{nC_{k}}=\binom{n}{k}=\dfrac{n!}{k!\,(n-k)!}$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- T12 섹션 구분 (원본 p.14) -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">확률변수의 기대값, 분산, 표준편차</p>
+  </section>
+
+  <!-- 원본 p.15 -->
+  <section>
+    <h2>확률변수의 기대값</h2>
+    <div class="body">
+      <p class="emph" style="margin-bottom:2px">여러분은 한 번만 참여할 수 있는
+        <strong>복권 게임</strong>을 한다.</p>
+      <p class="emph">참가비는 <strong>0원</strong>이고, 다음과 같은 규칙이 있다.</p>
+      <table class="tbl-lot" style="margin:18px 0">
+        <thead><tr><th>결과</th><th>상금</th><th>확률</th></tr></thead>
+        <tbody>
+          <tr><td>1등</td><td>10,000원</td><td>0.1</td></tr>
+          <tr><td>2등</td><td>1,000원</td><td>0.2</td></tr>
+          <tr><td>꽝</td><td>0원</td><td>0.7</td></tr>
+        </tbody>
+      </table>
+      <p class="emph">Q) 게임을 할 때 여러분은 얼마를 벌 것이라고 기대하는가?</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.16 -->
+  <section>
+    <h2>확률변수의 기대값, 분산, 표준편차</h2>
+    <div class="body">
+      <p class="sub" style="margin:20px 0 2px">기대값</p>
+      <p class="emph ind">특정한 확률분포를 따르는 확률변수가 가질 것으로 기대되는 값
+        &nbsp;→&nbsp; $E(X)=\mu$</p>
+      <p class="sub" style="margin:34px 0 2px">분산</p>
+      <p class="emph ind">확률변수와 기대값 간의 차이, 즉 편차의 제곱이 가질 것으로 기대되는 값
+        &nbsp;→&nbsp; $VAR(X)=E\!\left[(X-\mu)^{2}\right]$</p>
+      <p class="sub" style="margin:34px 0 2px">표준편차</p>
+      <p class="emph ind">실현된 값이 기대값과 차이가 나는 정도의 표준적인 크기
+        = 기대값으로 나타낸 표준편차 = √<span class="rad">분산</span></p>
+    </div>
+  </section>
+
+  <!-- 원본 p.17 -->
+  <section>
+    <h2>확률변수의 기대값, 분산, 표준편차</h2>
+    <div class="body tight">
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 하나의 카드를 추출할 때
+        기대값, 분산, 표준편차는?</p>
+      <svg class="fig" id="f-box1" viewBox="0 0 260 76" style="width:230px;margin:10px 0 0 40px" role="img">
+        <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+      </svg>
+      <ul class="slim" style="margin-top:22px">
+        <li><span class="sub" style="display:inline">기대값</span>
+          $=\sum 값 * 값의\ 확률 = 1*3/4 + 5*1/4 = 2$
+          &nbsp;<span class="sub" style="display:inline">= 상자에 들어있는 값의 평균</span></li>
+        <li style="margin-top:14px"><span class="sub" style="display:inline">분산</span>
+          $=\sum(값-기대값)^{2} * 값의\ 확률
+          = (-1)^{2}\times\left(\frac{3}{4}\right)+3^{2}\times\left(\frac{1}{4}\right)=3$
+          &nbsp;<span class="sub" style="display:inline">= 편차 제곱의 평균</span></li>
+        <li style="margin-top:14px"><span class="sub" style="display:inline">표준편차</span>
+          $=\sqrt{\sum(값-기대값)^{2} * 값의\ 확률} = \sqrt{3}$
+          &nbsp;<span class="sub" style="display:inline">= 분산의 제곱근</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.18 — p.16 의 정의에 "장기적으로 얻게 되는 값" 한 줄이 붙는다.
+       사이에 p.17 의 예제가 끼어 있어 합치지 않고 원본 순서를 지켰다 -->
+  <section>
+    <h2>확률변수의 기대값, 분산, 표준편차</h2>
+    <div class="body">
+      <p class="sub" style="margin:20px 0 2px">기대값</p>
+      <p class="emph ind">특정한 확률분포를 따르는 확률변수가 가질 것으로 기대되는 값
+        <em>→ 장기적으로 얻게 되는 값</em> &nbsp;→&nbsp; $E(X)=\mu$</p>
+      <p class="sub" style="margin:34px 0 2px">분산</p>
+      <p class="emph ind">확률변수와 기대값 간의 차이, 즉 편차의 제곱이 가질 것으로 기대되는 값
+        &nbsp;→&nbsp; $VAR(X)=E\!\left[(X-\mu)^{2}\right]$</p>
+      <p class="sub" style="margin:34px 0 2px">표준편차</p>
+      <p class="emph ind">실현된 값이 기대값과 차이가 나는 정도의 표준적인 크기
+        = 기대값으로 나타낸 표준편차 = √<span class="rad">분산</span></p>
+    </div>
+  </section>
+
+  <!-- 원본 p.19 -->
+  <section>
+    <h2>베르누이 확률변수의 기대값과 분산</h2>
+    <div class="body">
+      <p class="sub">성공확률이 p인 베르누이 시행에 따른 베르누이 확률변수를 X라고 할 때</p>
+      <p class="formula-key" style="text-align:center;margin:24px 0 34px;font-size:22px">
+        $X \sim Bernouii(p)$</p>
+      <p class="emph" style="text-align:center;font-size:19px">기대값 = $E(X) = p$</p>
+      <p class="emph" style="text-align:center;font-size:19px;margin-top:14px">
+        분산 = $Var(X) = p(1-p)$</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.20 -->
+  <section>
+    <h2>이항확률변수의 평균과 분산</h2>
+    <div class="body">
+      <p class="sub">X가 성공확률이 p인 베르누이 시행을 n번 반복하여 얻은 베르누이 확률변수의 합을
+        그 값으로 갖는 확률변수이며,<br>따라서 다음과 같은 확률분포를 따른다고 할 때,</p>
+      <p class="formula-key" style="text-align:center;margin:22px 0 32px;font-size:22px">
+        $X \sim B(n,\ p)$</p>
+      <p class="emph" style="text-align:center;font-size:19px">기대값 = $E(X) = np$</p>
+      <p class="emph" style="text-align:center;font-size:19px;margin-top:14px">
+        분산 = $Var(X) = np(1-p)$</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.21 -->
+  <section>
+    <h2>기대값 및 분산과 관련한 유용한 공식</h2>
+    <div class="body tighter">
+      <p class="sub"><i>X, Y</i> : 확률변수, &nbsp;<i>c</i> : 상수, &nbsp;<i>g</i>(), <i>h</i>() : 함수</p>
+      <ul class="slim">
+        <li>$E(c) = c$</li>
+        <li>$E\!\left[c\,g(X,Y)\right] = c\,E\!\left[g(X,Y)\right]$</li>
+        <li>$E\!\left[g(X,Y) + h(X,Y)\right] = E\!\left[g(X,Y)\right] + E\!\left[h(X,Y)\right]$</li>
+        <li>$E\!\left[g_{x}(X)\cdot h_{y}(Y)\right] = E\!\left[g_{x}(X)\right]\cdot E\!\left[h_{y}(Y)\right]$
+          &nbsp;(X, Y가 서로 독립일때)</li>
+      </ul>
+      <ul class="slim" style="margin-top:14px">
+        <li>$E(X+Y) = E(X) + E(Y)$</li>
+        <li>$E(aX+b) = a\,E(X) + b$</li>
+        <li>$Var(X) = E\!\left(X - E(X)\right)^{2} = E\!\left(X^{2} - 2XE(X) + E(X)^{2}\right)
+          = E(X^{2}) - 2E(X)E(X) + E(X)^{2} = E(X^{2}) - E(X)^{2}$</li>
+        <li>$Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)$<br>
+          <span class="ind">만약 X, Y가 독립이라면 $Var(X+Y) = Var(X) + Var(Y)$</span></li>
+        <li>$\mathrm{Var}(aX+b) = a^{2}\mathrm{Var}(X)$</li>
+        <li>$E(XY) = E(X)\cdot E(Y)$ &nbsp;(X, Y가 서로 독립일 때)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- T12 섹션 구분 (원본 p.22) -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">확률변수의 조합: 대수(평균)의 법칙과 중심극한정리</p>
+  </section>
+
+  <!-- 원본 p.23 -->
+  <section>
+    <h2>상자모형</h2>
+    <div class="body tight">
+      <p class="sub">하나의 확률과정을 상자에서 숫자를 무작위로 추출하는 과정으로 묘사하는 모형</p>
+      <p class="emph">→ 복잡한 확률과정을 쉽게 이해할 수 있음</p>
+      <div class="cols fig-left" style="margin-top:4px">
+        <div class="col-l">
+          <svg class="fig" id="f-cycle1" viewBox="0 0 420 232" style="width:300px" role="img">
+            <title>왼쪽의 상자모형(모집단)에서 오른쪽의 표본으로 추출하고,
+              표본에서 다시 모집단을 추론하는 순환 그림</title>
+          </svg>
+          <img src="../assets/tb-boxmodel-cards.png" style="display:block;width:294px;margin-top:6px"
+               alt="1부터 6까지 적힌 카드가 든 상자에서 무작위로 카드를 뽑아 표본을 만들고,
+                    뽑힌 숫자 32462 35442 36412 41556 22255 의 합이 88 이 되는 그림">
+        </div>
+        <div class="col-r">
+          <p class="sub">상자모형의 구성</p>
+          <ul class="slim">
+            <li>상자 안에는 어떤 숫자 카드가 들어가야 하는가?
+              &nbsp;<span class="hl">→ 확률변수</span></li>
+            <li>각 숫자카드는 몇 장씩 들어가야하는가?
+              &nbsp;<span class="hl">→ 확률분포</span></li>
+            <li>상자로부터 몇 회 추출해야하는가?
+              &nbsp;<span class="hl">→ 시행횟수</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.24 -->
+  <section>
+    <h2>상자모형</h2>
+    <div class="body tighter">
+      <p class="sub">하나의 확률과정을 상자에서 숫자를 무작위로 추출하는 과정으로 묘사하는 모형</p>
+      <p class="emph">→ 복잡한 확률과정을 쉽게 이해할 수 있음</p>
+      <div class="cols fig-left" style="margin-top:4px">
+        <div class="col-l">
+          <svg class="fig" id="f-cycle2" viewBox="0 0 420 232" style="width:300px" role="img">
+            <title>왼쪽의 상자모형(모집단)에서 오른쪽의 표본으로 추출하고,
+              표본에서 다시 모집단을 추론하는 순환 그림</title>
+          </svg>
+          <img src="../assets/tb-boxmodel-cards.png" style="display:block;width:294px;margin-top:6px"
+               alt="1부터 6까지 적힌 카드가 든 상자에서 무작위로 카드를 뽑아 표본을 만들고,
+                    뽑힌 숫자 32462 35442 36412 41556 22255 의 합이 88 이 되는 그림">
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>1부터 6까지 적힌 카드가 한 장씩 있는 상자에서 무작위로 한 장 추출: $X_{1}$</li>
+            <li>이를 25번 반복: $X_{1},\ X_{2},\ X_{3},\cdots,X_{25}$</li>
+            <li>25개의 숫자 합을 새로운 확률변수로 구성:
+              $Y = X_{1}+X_{2}+X_{3}+\cdots+X_{25}$</li>
+          </ul>
+          <p class="emph" style="margin-top:10px">→ 특정 확률분포를 갖는 확률변수를 반복 추출하여
+            새로운 확률변수를 얻음</p>
+          <p class="emph">→ 원칙적으로 25~150까지 가능하지만,<br>
+            <span class="ind">실제로 75~100사이 대부분 값이 위치</span></p>
+          <p class="emph">→ 새로운 확률변수의 확률분포는 기존 확률분포의 영향을 받지만,<br>
+            <span class="ind">시행횟수가 늘어날수록 평균으로 수렴</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.25 -->
+  <section>
+    <h2>확률변수 합의 기대값</h2>
+    <div class="body tight">
+      <p class="caption" style="text-align:right;margin:0">(표본합)</p>
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 100회 무작위 복원추출을 하여
+        그 합을 새로운 확률변수 Y로 할 때, Y의 기대값은?</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-box2" viewBox="0 0 260 76" style="width:250px" role="img">
+            <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+          </svg>
+          <p class="emph" style="margin-top:22px">첫번째 추출에서 기대할 수 있는 기대값은</p>
+          <p class="emph">1*3/4 + 5*1/4 = 2 = 상자에 들어있는 값의 평균</p>
+          <p class="emph" style="margin-top:18px">따라서 100회 추출을 할 경우 기대값은</p>
+          <p class="emph">1회 추출의 기대값 * 시행횟수 = 2*100 = 200</p>
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>5가 나올 확률: ¼</li>
+            <li>1이 나올 확률: ¾</li>
+          </ul>
+          <p class="formula-key" style="margin-top:34px;font-size:20px">평균 = 기대값 = E(Y)</p>
+          <p class="formula-key" style="font-size:20px">$=\sum 값 * 값의\ 확률$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.26 -->
+  <section>
+    <h2>확률변수 합의 분산</h2>
+    <div class="body tight">
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 100회 무작위 복원추출을 하여
+        그 합을 새로운 확률변수 Y로 할 때, Y의 분산은?</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-box3" viewBox="0 0 260 76" style="width:250px" role="img">
+            <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="formula-key">분산 $= E\!\left((Y-E(Y))^{2}\right)
+            = \sum(값-기대값)^{2} * 값의\ 확률$</p>
+        </div>
+      </div>
+      <p class="emph" style="margin-top:20px">첫번째 추출에서 기대할 수 있는 분산은</p>
+      <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
+        + 3^{2}\times\left(\frac{1}{4}\right) = 3$</p>
+      <p class="emph" style="margin-top:20px">두번째 추출에서 기대할 수 있는 값은 2, 6, 10</p>
+      <p class="emph">2의 확률 = 9/16, 6의 확률 = 6/16, 10의 확률 = 1/16</p>
+      <p class="emph">기대값 = 4, 분산 = $(-2)^{2}\times\left(\frac{9}{16}\right)
+        + 2^{2}\times\left(\frac{6}{16}\right) + 6^{2}\times\left(\frac{1}{16}\right) = 6$</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.27 — p.26 에 표준편차 줄이 얹히지만 제목과 물음이 함께 바뀐다.
+       누적이 아니라 다음 물음이므로 원본대로 따로 둔다 -->
+  <section>
+    <h2>확률변수 합의 표준편차</h2>
+    <div class="body tight">
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 100회 무작위 복원추출을 하여
+        그 합을 새로운 확률변수 Y로 할 때, Y의 표준편차는?</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-box4" viewBox="0 0 260 76" style="width:250px" role="img">
+            <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="formula-key">분산 $= E\!\left((Y-E(Y))^{2}\right)
+            = \sum(값-기대값)^{2} * 값의\ 확률$</p>
+          <p class="formula-key">표준편차 = √<span class="rad">분산</span></p>
+        </div>
+      </div>
+      <p class="emph" style="margin-top:16px">첫번째 추출에서 기대할 수 있는 분산은</p>
+      <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
+        + 3^{2}\times\left(\frac{1}{4}\right) = 3$
+        <span class="hl">&nbsp;= 상자의 분산 → 1회 추출 합의 표준편차 = $\sqrt{3}$</span></p>
+      <p class="emph" style="margin-top:16px">두번째 추출에서 기대할 수 있는 값은 2, 6, 10</p>
+      <p class="emph">2의 확률 = 9/16, 6의 확률 = 6/16, 10의 확률 = 1/16</p>
+      <p class="emph">기대값 = 4, 분산 = $(-2)^{2}\times\left(\frac{9}{16}\right)
+        + 2^{2}\times\left(\frac{6}{16}\right) + 6^{2}\times\left(\frac{1}{16}\right) = 6$
+        <span class="hl">→ 2회 추출 합의 표준편차 = $\sqrt{6} = \sqrt{2}\cdot\sqrt{3}$</span></p>
+    </div>
+  </section>
+
+  <!-- 원본 p.28 -->
+  <section>
+    <h2>확률변수 합으로 만든 새로운 확률변수의 특징</h2>
+    <div class="body tight">
+      <p class="sub">제곱근 법칙 (square root law) = 대수의 법칙(평균의 법칙)</p>
+      <p class="emph">특정 확률분포를 따르는 확률변수(X)를 합하여 만든 새로운 확률변수(Y=X1+X2+…+Xn)의
+        표준편차는</p>
+      <p class="emph">처음 확률변수가 갖는 표준편차(SD(X))와 확률변수를 합한 횟수(n)의
+        제곱근 간의 곱으로 표현</p>
+      <p class="formula-key" style="text-align:center;margin:24px 0 6px;font-size:20px">
+        (확률변수 X의 표준편차) X √<span class="rad">합한 회수</span></p>
+      <p class="caption" style="text-align:center;color:var(--brand-crimson);margin:0">
+        Var(Y) = Var(X1+X2+X3…+Xn) = Var(X1)+Var(X2)+…+Var(Xn) = nVar(X)</p>
+      <p class="caption" style="text-align:center;color:var(--brand-crimson);margin:0">
+        (∵ X는 독립이므로)</p>
+      <p class="emph" style="margin-top:12px">→ 합한 횟수가 1이면 합의 표준편차 = 처음 확률변수의 표준편차</p>
+      <p class="sub" style="text-align:center;margin-top:24px">만약 확률변수 Y가 합이 아니라 평균이라면?</p>
+      <p class="sub" style="text-align:center;margin:0">즉, Y= (X1+X2+…+Xn)/n</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.29 -->
+  <section>
+    <h2>확률변수 평균의 기대값</h2>
+    <div class="body tight">
+      <p class="caption" style="text-align:right;margin:0">(표본평균)</p>
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 100회 무작위 복원추출을 하여
+        그 평균을 새로운 확률변수 Y로 할 때, Y의 기대값은?</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-box5" viewBox="0 0 260 76" style="width:250px" role="img">
+            <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+          </svg>
+          <p class="emph" style="margin-top:18px">첫번째 추출에서 기대할 수 있는 기대값은</p>
+          <p class="emph">1*3/4 + 5*1/4 = 2 = 상자에 들어있는 값의 평균</p>
+          <p class="emph" style="margin-top:14px">100회 추출을 할 경우 합의 기대값은</p>
+          <p class="emph">1회 추출의 합의 기대값 * 시행횟수 = 2*100 = 200</p>
+          <p class="emph" style="margin-top:14px">100회 추출의 평균은? 200/100 = 2
+            = 상자에 들어있는 값의 평균</p>
+        </div>
+        <div class="col-r">
+          <ul class="slim">
+            <li>5가 나올 확률: ¼</li>
+            <li>1이 나올 확률: ¾</li>
+          </ul>
+          <p class="formula-key" style="margin-top:34px;font-size:20px">평균 = 기대값 = E(Y)</p>
+          <p class="formula-key" style="font-size:20px">$=\sum 값 * 값의\ 확률$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.30 -->
+  <section>
+    <h2>확률변수 평균의 분산</h2>
+    <div class="body tight">
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 100회 무작위 복원추출을 하여
+        그 평균을 새로운 확률변수 Y로 할 때, Y의 분산은?</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-box6" viewBox="0 0 260 76" style="width:250px" role="img">
+            <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="formula-key">분산 $= E\!\left((Y-E(Y))^{2}\right)
+            = \sum(값-기대값)^{2} * 값의\ 확률$</p>
+        </div>
+      </div>
+      <p class="emph" style="margin-top:20px">첫번째 추출에서 기대할 수 있는 분산은</p>
+      <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
+        + 3^{2}\times\left(\frac{1}{4}\right) = 3$</p>
+      <p class="emph" style="margin-top:20px">두번째 추출에서 기대할 수 있는 값은 1, 3, 5</p>
+      <p class="emph">1의 확률 = 9/16, 3의 확률 = 6/16, 5의 확률 = 1/16</p>
+      <p class="emph">기대값 = 2, 분산 = $(-1)^{2}\times\left(\frac{9}{16}\right)
+        + 1^{2}\times\left(\frac{6}{16}\right) + 3^{2}\times\left(\frac{1}{16}\right)
+        = 1.5 = 3/2$</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.31 -->
+  <section>
+    <h2>확률변수 평균의 표준편차</h2>
+    <div class="body tight">
+      <p class="sub">Q) 5가 한 장, 1이 세 장 들어있는 상자에서 100회 무작위 복원추출을 하여
+        그 평균을 새로운 확률변수 Y로 할 때, Y의 표준편차는?</p>
+      <div class="cols" style="margin-top:6px">
+        <div class="col-l">
+          <svg class="fig" id="f-box7" viewBox="0 0 260 76" style="width:250px" role="img">
+            <title>1이 적힌 카드 세 장과 5가 적힌 카드 한 장이 든 상자</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="formula-key">분산 $= E\!\left((Y-E(Y))^{2}\right)
+            = \sum(값-기대값)^{2} * 값의\ 확률$</p>
+          <p class="formula-key">표준편차 = √<span class="rad">분산</span></p>
+        </div>
+      </div>
+      <p class="emph" style="margin-top:16px">첫번째 추출에서 기대할 수 있는 분산은</p>
+      <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
+        + 3^{2}\times\left(\frac{1}{4}\right) = 3$
+        <span class="hl">&nbsp;= 상자의 분산 → 1회 추출 평균의 표준편차 = $\sqrt{3}$</span></p>
+      <p class="emph" style="margin-top:16px">두번째 추출에서 기대할 수 있는 값은 1, 3, 5</p>
+      <p class="emph">1의 확률 = 9/16, 3의 확률 = 6/16, 5의 확률 = 1/16</p>
+      <p class="emph">기대값 = 2, 분산 = $(-1)^{2}\times\left(\frac{9}{16}\right)
+        + 1^{2}\times\left(\frac{6}{16}\right) + 3^{2}\times\left(\frac{1}{16}\right) = 1.5 = 3/2$
+        <span class="hl">→ 2회 추출 평균의 표준편차 = $\dfrac{\sqrt{3}}{\sqrt{2}}$</span></p>
+    </div>
+  </section>
+
+  <!-- 원본 p.32 -->
+  <section>
+    <h2>확률변수 평균으로 만든 새로운 확률변수의 특징</h2>
+    <div class="body tight">
+      <p class="sub">제곱근 법칙 (square root law) = 대수의 법칙(평균의 법칙)</p>
+      <p class="emph">특정 확률분포를 따르는 확률변수(X)의 합을 평균하여 만든
+        새로운 확률변수(Y=X1+X2+…+Xn/n)의 표준편차는</p>
+      <p class="emph">처음 확률변수가 갖는 표준편차(SD(X))를 확률변수를 합한 횟수(n)의
+        제곱근으로 나눈 값으로 표현</p>
+      <p class="formula-key" style="text-align:center;margin:22px 0 8px;font-size:20px">
+        $\dfrac{확률변수\ X의\ 표준편차}{\sqrt{합한\ 회수}}$</p>
+      <p class="caption" style="text-align:center;color:var(--brand-crimson);margin:0">
+        $Var(Y)=Var\!\left(\dfrac{X_{1}+X_{2}+\cdots+X_{n}}{n}\right)
+        =\dfrac{1}{n^{2}}\left[Var(X_{1})+Var(X_{2})+\cdots+Var(X_{n})\right]
+        =\dfrac{1}{n^{2}}\,n\,Var(X)=Var(X)/n$</p>
+      <p class="caption" style="text-align:center;color:var(--brand-crimson);margin:0">
+        (∵ X는 독립이므로)</p>
+      <p class="emph" style="margin-top:16px">→ 합한 횟수가 1이면 평균의 표준편차
+        = 처음 확률변수의 표준편차</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.33 -->
+  <section class="s-h22">
+    <h2>확률변수의 합과 평균을 통한 새로운 조합의 특징 (1): 대수의 법칙(평균의 법칙)</h2>
+    <div class="body">
+      <p class="sub" style="margin-bottom:2px">어떤 확률분포를 따르는지에 상관없이</p>
+      <p class="sub" style="margin-bottom:2px">특정 확률변수를 여러 번 합하거나 혹은 평균한 값을
+        새로운 확률변수로 가질 경우</p>
+      <p class="sub">새로운 확률변수의 표준편차는</p>
+      <p class="sub" style="margin:22px 0 2px">기존 확률변수가 지닌 표준편차의 n배만큼
+        증가하는 것이 아니라</p>
+      <p class="sub">$\sqrt{n}$에 비례(합)하거나 반비례(평균)한다.</p>
+      <p class="emph" style="margin-top:30px">→ Why?</p>
+      <p class="emph ind" style="margin-bottom:2px">합하면 극단적인 값이 출현할 경우의 수는 매우 적지만,
+        중간 값이 출현할 경우의 수는 커지기 때문에</p>
+      <p class="emph ind">합할수록 값의 표준편차가 합한 횟수의 속도만큼 늘어나지 않음</p>
+      <p class="emph ind" style="margin-top:16px">(예. 주사위를 2번 던졌을 때 그 합:
+        2의 확률 = 1/36, 12의 확률 = 1/36, 7의 확률 = 6/36)</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.34 -->
+  <section class="s-h24">
+    <h2>확률변수의 합과 평균을 통한 새로운 조합의 특징 (2): 중심극한정리</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:2px">어떤 확률분포를 따르는지에 상관없이</p>
+      <p class="sub" style="margin-bottom:2px">특정 확률변수를 충분히 많은 수까지 더하거나 이를 평균한 값을
+        새로운 확률변수로 만들면,</p>
+      <p class="sub" style="margin-bottom:2px">그 확률변수는 정규분포에 수렴하는 특성이 있다.</p>
+      <p class="sub" style="margin-bottom:2px">이를 중심극한정리(central limit theorem)라 한다.</p>
+      <p class="emph" style="margin-bottom:2px">단, 정규분포로 수렴해가는 속도는 초기 확률분포에 따라 다르다.</p>
+      <p class="emph">(초기 확률분포가 정규분포와 닮을 경우 n이 작아도 성립)</p>
+      <ul class="slim" style="margin-top:22px">
+        <li>$X \sim f(x)$ : 확률변수의 X의 확률분포 f(x)는 알려지지 않은 확률분포</li>
+        <li>$f(x)$로부터 $X_{1},\ X_{2},\ X_{3},\cdots,X_{n}$ 와 같이 확률변수를 N번 더함</li>
+        <li>X를 N번 더한 값을 갖는 새로운 확률변수:
+          $Y = X_{1}+X_{2}+X_{3}+\cdots+X_{n}$</li>
+        <li>N이 충분히 크다면 새로운 확률변수
+          $Y \sim N\!\left(N\mu_{x},\ N\sigma_{x}^{2}\right)$</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.35 -->
+  <section class="s-h24">
+    <h2>확률변수의 합과 평균을 통한 새로운 조합의 특징 (2): 중심극한정리</h2>
+    <div class="body tighter">
+      <p class="sub" style="margin-bottom:2px">어떤 확률분포를 따르는지에 상관없이</p>
+      <p class="sub" style="margin-bottom:2px">특정 확률변수를 충분히 많은 수까지 더하거나 이를 평균한 값을
+        새로운 확률변수로 만들면,</p>
+      <p class="sub" style="margin-bottom:2px">그 확률변수는 정규분포에 수렴하는 특성이 있다.</p>
+      <p class="sub" style="margin-bottom:2px">이를 중심극한정리(central limit theorem)라 한다.</p>
+      <p class="emph" style="margin-bottom:2px">단, 정규분포로 수렴해가는 속도는 초기 확률분포에 따라 다르다.</p>
+      <p class="emph">(초기 확률분포가 정규분포와 닮을 경우 n이 작아도 성립)</p>
+      <p class="sub" style="margin-top:12px">동전을 던질 때 앞면이 나오는 횟수(이항분포)의
+        확률 히스토그램: 이항분포의 정규근사</p>
+      <div class="imgrow">
+        <img class="fig-w" src="../assets/tb-clt-binomial-normal.jpg"
+             alt="시행횟수 n이 10, 30, 50 으로 커질수록 이항분포의 확률 히스토그램이
+                  낮고 넓은 종모양 곡선으로 바뀌어 가는 그림">
+        <img class="tb" src="../assets/tb-clt-textbook-fig321.jpg"
+             alt="교재 그림 3-21 — 모집단이 정규분포하는 경우와 하지 않는 경우 모두,
+                  표본 크기가 커질수록 표본평균의 분포가 정규분포에 가까워지는 것을 보인 그림">
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.36 -->
+  <section class="s-h24">
+    <h2>확률변수의 합과 평균을 통한 새로운 조합의 특징 (2): 중심극한정리</h2>
+    <div class="body tighter">
+      <p class="sub" style="margin-bottom:2px">어떤 확률분포를 따르는지에 상관없이</p>
+      <p class="sub" style="margin-bottom:2px">특정 확률변수를 충분히 많은 수까지 더하거나 이를 평균한 값을
+        새로운 확률변수로 만들면,</p>
+      <p class="sub" style="margin-bottom:2px">그 확률변수는 정규분포에 수렴하는 특성이 있다.</p>
+      <p class="sub" style="margin-bottom:2px">이를 중심극한정리(central limit theorem)라 한다.</p>
+      <p class="emph" style="margin-bottom:2px">단, 정규분포로 수렴해가는 속도는 초기 확률분포에 따라 다르다.</p>
+      <p class="emph">(초기 확률분포가 정규분포와 닮을 경우 n이 작아도 성립)</p>
+      <p class="sub" style="margin-top:12px">카이제곱분포(k개의 표준정규확률변수의 제곱합)의 정규근사</p>
+      <div class="imgrow">
+        <figure>
+          <img class="tb" src="../assets/tb-chisq-wikipedia.png"
+               alt="자유도 k가 1에서 5까지인 카이제곱분포의 확률밀도함수 다섯 개 —
+                    k가 커질수록 봉우리가 오른쪽으로 옮겨가며 종모양에 가까워진다">
+          <figcaption>Chi-square distributionPDF - 카이제곱 분포 - 위키백과,
+            우리 모두의 백과사전 (wikipedia.org)</figcaption>
+        </figure>
+        <img class="tb" src="../assets/tb-clt-textbook-fig321.jpg"
+             alt="교재 그림 3-21 — 모집단이 정규분포하는 경우와 하지 않는 경우 모두,
+                  표본 크기가 커질수록 표본평균의 분포가 정규분포에 가까워지는 것을 보인 그림">
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.37 -->
+  <section>
+    <h2>중심극한정리의 중요성</h2>
+    <div class="body tighter">
+      <p class="caption" style="text-align:center;margin:0">곱에 대해서는 성립하지 않음</p>
+      <p class="sub">추출횟수(n)가 증가함에 따라 <em>합이나 평균의 확률 히스토그램</em>이
+        정규분포로 수렴하는 현상</p>
+      <p class="emph" style="margin:10px 0 2px">Tip) 중심극한정리가 왜 중요할까?</p>
+      <p class="emph" style="margin-bottom:2px">우리가 모집단의 평균을 알고 싶지만
+        모집단의 분포는 모르는 경우에</p>
+      <p class="emph" style="margin-bottom:2px">표본의 개수가 충분히 많으면 모집단 분포와 상관없이
+        표본평균의 분포는 정규분포를 따르기 때문에(중심극한정리),</p>
+      <p class="sub" style="margin-bottom:2px">새로운 확률변수인 표본평균의 분포는 기대값과 표준오차로
+        쉽게 묘사되며, 구간의 확률도 파악하기 쉽다</p>
+      <p class="emph">단, 수렴의 속도는 다름 (모집단이 정규분포일 경우 빨리 수렴,
+        아닐 경우 늦게 수렴(더 많은 표본 필요))</p>
+      <p class="sub" style="margin-top:8px">모집단 분포와 상관 없이 표본평균의 분포는 n이 증가하면
+        정규분포를 따른다.</p>
+      <div class="imgrow">
+        <img class="tb" src="../assets/tb-clt-textbook-fig319.jpg"
+             alt="교재 그림 3-19 — 표본 크기가 커질수록 표본평균의 분포가 모평균 29.5 주위로
+                  좁게 모이는 것을 n=1, 4, 7, 10 의 히스토그램으로 보인 그림">
+        <img class="tb" src="../assets/tb-clt-textbook-fig321.jpg"
+             alt="교재 그림 3-21 — 모집단이 정규분포하는 경우와 하지 않는 경우 모두,
+                  표본 크기가 커질수록 표본평균의 분포가 정규분포에 가까워지는 것을 보인 그림">
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.38 -->
+  <section>
+    <h2>중심극한정리에 따른 정규분포곡선으로의 근사</h2>
+    <div class="body tight">
+      <p class="sub">Q) 동전을 100번 던질 때 앞면이 45이상 ~ 50이하로 나올 확률</p>
+      <ul class="slim" style="margin-top:12px">
+        <li>동전을 던지는 행위는 베르누이 분포를 따름: <i>X ~ Bernouii(½)</i></li>
+        <li>동전을 100번 던져 앞면이 나오는 횟수를 기록하는 것($X=\sum X_{i}$)은
+          이항분포를 따름: <i>X ~ B(100, ½)</i></li>
+        <li>이항분포에서 n이 충분히 크면(n≥30) 이항분포는 정규분포에 근사:
+          <i>X ~ N(np, &nbsp;np(1−p)) = N(50, 5^2)</i></li>
+        <li>확률변수 X를 표준정규분포로 변환하여 표준정규분포 내의 면적을 구함</li>
+      </ul>
+      <svg class="fig" id="f-approx" viewBox="0 0 780 208" style="width:730px;margin-top:8px" role="img">
+        <title>44.5~55.5 인 실제단위 구간을 −1.1~1.1 인 표준단위로 옮기고,
+          표준정규분포곡선에서 그 구간의 면적이 72.87%임을 보인 그림</title>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 원본 p.39 -->
+  <section>
+    <h2>표본 통계량: 확률변수의 조합</h2>
+    <div class="body tight">
+      <div class="samp">
+        <div class="a">
+          <svg class="fig" id="f-pop" viewBox="0 0 340 148" style="width:100%" role="img">
+            <title>모집단 X ~ f(x), E(X)=μ, Var(X)=σ² 에서 100개를 추출해 표본을 얻는 그림</title>
+          </svg>
+          <svg class="fig" id="f-two" viewBox="0 0 340 156" style="width:100%;margin-top:6px" role="img">
+            <title>넓게 퍼진 모집단 X의 분포와, 그 평균 자리에 좁게 선 표본평균의 분포를
+              겹쳐 그린 그림. 표본평균의 표준오차는 모표준편차를 √100 으로 나눈 값이다</title>
+          </svg>
+        </div>
+        <div class="b">
+          <p class="emph" style="font-weight:700">표본</p>
+          <svg class="fig" id="f-down" viewBox="0 0 40 34" style="width:40px;margin:0 auto" role="img">
+            <title>아래로 향하는 화살표</title>
+          </svg>
+          <p class="emph" style="font-weight:700">표본평균 $\overline{X}$</p>
+          <p class="emph" style="margin-top:8px">
+            $\overline{X_{1}}=\dfrac{x_{1}+x_{2}+\cdots+x_{100}}{100}$</p>
+          <p class="emph">$\overline{X_{2}}=\dfrac{x_{1}+x_{2}+\cdots+x_{100}}{100}$</p>
+          <p class="emph">$\overline{X_{3}}=\dfrac{x_{1}+x_{2}+\cdots+x_{100}}{100}$</p>
+          <p class="emph">:</p>
+        </div>
+        <div class="c">
+          <p class="sub" style="margin-bottom:2px">확률표본의 값은 확률변수</p>
+          <p class="sub" style="margin-bottom:2px">→ 모평균의 통계량인 표본평균도 확률변수</p>
+          <p class="sub" style="margin-bottom:2px">→ 확률변수의 합 혹은 평균은<br>
+            <span class="ind">중심극한정리와 대수의 법칙을 따름</span></p>
+          <p class="sub" style="margin:14px 0 2px">→ 충분한 수의 표본을 뽑아서 평균을 낼 경우<br>
+            <span class="ind">그 표본평균은 정규분포를 따르며(중심극한정리)</span><br>
+            <span class="ind">표본평균의 표준편차(오차)는 표본수의 제곱근에</span><br>
+            <span class="ind">비례하여 감소(대수의 법칙)한다.</span></p>
+          <p class="sub" style="margin-top:14px">→ 알려진 정규분포를 활용하여,<br>
+            <span class="ind">더 작은 오차로 모집단의 특성을 추론할 수 있다!</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.40 -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>확률변수는 표본공간에서 정의되는 각 사건들에 대응하는 실수 값이며,
+          확률분포는 확률변수가 출현할 가능성에 대한 분포를 의미한다.</li>
+        <li>베르누이 분포는 사건이 성공/실패로 나뉘는 베르누이 시행의 결과로서
+          성공에 1, 실패에 0을 대응하는 확률변수에 대한 확률분포이다.</li>
+        <li>이항분포는 성공확률 p를 지니는 베르누이 시행을 n번 반복한 결과로 나타난
+          성공횟수를 확률변수로 갖는 확률분포이다.</li>
+        <li>정규분포는 연속확률분포로서 이항확률변수의 n을 무한대로 늘렸을 때
+          그 값이 따르는 분포이다.</li>
+        <li>확률변수의 기대값은 특정 확률변수가 확률분포에 따라 가질 것으로 기대되는 값을 의미하며,
+          확률변수의 표준오차는 실현된 값이 기대값과 차이가 나는 정도의 표준적인 크기를 의미한다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.41 -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>특정 확률분포를 따르는 확률변수를 n번 추출하여 그 합을 새로운 확률변수로 할 경우
+          (즉, 표본합) 새로운 확률변수의 표준오차는 (기존 확률변수 표준오차*$\sqrt{n}$)이다.</li>
+        <li>특정 확률분포를 따르는 확률변수를 n번 추출하여 그 평균을 새로운 확률변수로 할 경우
+          (즉, 표본평균) 새로운 확률변수의 표준오차는 (기존 확률변수 표준오차/$\sqrt{n}$)이다.</li>
+        <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수의 상대적 표준오차가
+          추출횟수의 증가에 따라 감소하는 현상을 대수(평균)의 법칙이라 한다.</li>
+        <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수에서 추출횟수가 충분히 많을 경우
+          새로운 확률변수가 정규분포로 수렴해가는 현상을 중심극한정리라 한다.</li>
+        <li>대수의 법칙과 중심극한정리를 통해 특정 확률분포에서 충분히 많은 수의 표본을 뽑아 만든
+          표본평균을 새로운 확률변수로 만들 경우 대수의 법칙을 통해 새로운 확률변수의 표준편차를
+          구할 수 있으며, 중심극한정리를 통해 새로운 확률변수를 정규분포로 근사시켜
+          모평균에 대한 확률적 추론을 할 수 있다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- T10 마무리 (원본 p.42) -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script>
+/* ── 이 강의의 그림도 정규분포 밀도 하나에서 나온다 (design.md §6.4) ──
+ *
+ * 종모양 곡선·칠한 면적·눈금이 모두 같은 f(x)를 거치고, 표본평균 분포의
+ * 좁아짐은 표준오차 σ/√n 에서 계산한다. 눈대중으로 좁히지 않는다. */
+
+/* 표준단위 눈금이 붙은 종모양 한 판 (3강 03-정규분포.html 과 같은 도우미).
+ *   ticks: [[표준단위 값, 붙일 글자], …]   unit: 눈금 줄 위에 얹는 단위 이름 */
+function bell(sel, box, o) {
+  o = o || {};
+  const F = Fig.withBox(box);
+  const S = F.scale({ x: [-3.8, 3.8], y: [0, 0.42] });
+  const pts = S.curve(Fig.normal(0, 1, -3.8, 3.8, { through: (o.ticks || []).map((t) => t[0]) }));
+  const parts = [
+    F.raw(`<path class="axis" d="M${box.x0},${box.y0} L${box.x1},${box.y0}"/>`),
+  ];
+  parts.push(F.curve(pts, { variant: 'demand' }));
+  parts.push(F.raw(`<path class="axis" d="M${S.x(0)},${box.y0} L${S.x(0)},${S.y(0.3989)}"/>`));
+  if (o.unit) parts.push(F.annot(S.x(0), box.y1 - 26, o.unit, { anchor: 'middle', size: 11 }));
+  (o.ticks || []).forEach(([v, t]) =>
+    parts.push(F.annot(S.x(v), box.y1 - 8, t, { anchor: 'middle', size: 11 })));
+  if (sel) F.draw(sel, { parts: parts });
+  return { F: F, S: S, pts: pts, parts: parts };
+}
+
+/* ── 원본 p.4 : 확률분포의 계통도 ─────────────────────────────── */
+(function () {
+  const box = (x, y, w, h, t, dark) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" ` +
+    `fill="var(${dark ? '--brand-crimson' : '--ink-2'})"/>` +
+    `<text class="annot on-dark" x="${x + w / 2}" y="${y + h / 2 + 5}" ` +
+    `text-anchor="middle">${t}</text>`;
+
+  const CX = 424, LX = 170, RX = 678;
+  let s = box(CX - 62, 0, 124, 34, '확률분포', true);
+  s += `<path class="axis" d="M${CX},34 L${CX},62 M${LX},62 L${RX},62 ` +
+       `M${LX},62 L${LX},84 M${RX},62 L${RX},84"/>`;
+  s += box(LX - 100, 84, 200, 32, '이산확률분포');
+  s += box(RX - 100, 84, 200, 32, '연속확률분포');
+
+  const parts = [Fig.raw(s)];
+  [[LX - 90, ['· 베르누이 분포 (Bernouii distribution)',
+              '· 이항분포 (Binomial distribution)',
+              '· 포아송 분포 (Poisson distribution)',
+              '· 음이항 분포 (Negative binomial distribution)']],
+   [RX - 90, ['· 균등분포 (uniform distribution)',
+              '· 정규분포 (normal distribution)',
+              '· 지수분포 (exponential distribution)']],
+  ].forEach(([x, lines]) =>
+    parts.push(Fig.annot(x, 152, lines.join('\n'), { size: 13, lh: 24 })));
+
+  Fig.draw('#f-tree', { parts: parts, check: false });
+})();
+
+/* ── 원본 p.5 · p.6 : 종모양과 표준단위 ───────────────────────── */
+(function () {
+  const T = [[-3, 'μ−3σ'], [-2, 'μ−2σ'], [-1, 'μ−1σ'], [0, 'μ'],
+             [1, 'μ+1σ'], [2, 'μ+2σ'], [3, 'μ+3σ']];
+  bell('#f-bell1', { x0: 38, y0: 150, x1: 362, y1: 58 }, { unit: '표준단위', ticks: T });
+  bell('#f-bell2', { x0: 38, y0: 150, x1: 362, y1: 58 }, { unit: '표준단위', ticks: T });
+
+  Fig.draw('#f-arr', { parts: [Fig.arrow(30, 4, 30, 50)] });
+})();
+
+/* ── 원본 p.7 : 평균만 다른 경우 / 표준편차만 다른 경우 ────────── */
+(function () {
+  // 가) σ는 같고 μ만 다르다 — 같은 곡선이 자리만 옮긴다
+  const panels = [[10, 160, '1'], [180, 330, '2'], [350, 500, '3']];
+  const parts = [];
+  panels.forEach(([xa, xb, lab]) => {
+    const b = bell(null, { x0: xa, y0: 96, x1: xb, y1: 16 }, {});
+    b.parts.forEach((p) => parts.push(p));
+    parts.push(Fig.annot((xa + xb) / 2, 114, lab, { anchor: 'middle', size: 11 }));
+  });
+  Fig.draw('#f-mu', { parts: parts, check: false });
+
+  // 나) μ는 같고 σ만 다르다 — 좁을수록 높아진다 (면적이 1로 같아야 하므로)
+  const F = Fig.withBox({ x0: 20, y0: 138, x1: 320, y1: 20 });
+  const S = F.scale({ x: [-4, 4], y: [0, 0.52] });
+  const dn = (x, s) => Math.exp(-0.5 * Math.pow(x / s, 2)) / (s * Math.sqrt(2 * Math.PI));
+  const series = [[1.6, 'demand', '1'], [1.1, 'i2', '2'], [0.8, 'i1', '3']];
+  const p2 = [F.raw(`<path class="axis" d="M20,138 L320,138"/>`)];
+  series.forEach(([s, v]) => p2.push(F.curve(S.curve(Fig.normal(0, s, -4, 4)), { variant: v })));
+  p2.push(F.raw(`<path class="axis" d="M${S.x(0)},138 L${S.x(0)},${S.y(dn(0, 0.8))}"/>`));
+  // 라벨은 각 곡선의 반높이 지점(x = −1.1774σ)에 붙인다. 곡선마다 자리가 갈려 겹치지 않는다.
+  series.forEach(([s, , lab]) => {
+    const x = -1.1774 * s;
+    const [px, py] = S.p([x, dn(x, s)]);
+    p2.push(Fig.annot(px - 5, py - 3, lab, { anchor: 'end', size: 11 }));
+  });
+  Fig.draw('#f-sig', { parts: p2, check: false });
+})();
+
+/* ── 상자 [1 1 1 5] — 원본이 일곱 쪽에서 되풀이한다 ─────────────── */
+(function () {
+  const CARDS = [1, 1, 1, 5];                 // 상자의 내용물. 여기 한 곳에서만 정한다
+  const W = 52, H = 44, GAP = 8, PAD = 12;
+  const inner = CARDS.length * W + (CARDS.length - 1) * GAP;
+  let s = `<rect x="4" y="6" width="${inner + PAD * 2}" height="${H + PAD * 2}" ` +
+          `fill="none" stroke="var(--ink)" stroke-width="1.6"/>`;
+  CARDS.forEach((v, i) => {
+    const x = 4 + PAD + i * (W + GAP);
+    s += `<rect x="${x}" y="${6 + PAD}" width="${W}" height="${H}" ` +
+         `fill="none" stroke="var(--ink)" stroke-width="1.4"/>` +
+         `<text class="annot" x="${x + W / 2}" y="${6 + PAD + H / 2 + 7}" ` +
+         `text-anchor="middle" style="font-size:20px">${v}</text>`;
+  });
+  ['#f-box1', '#f-box2', '#f-box3', '#f-box4', '#f-box5', '#f-box6', '#f-box7']
+    .forEach((sel) => Fig.draw(sel, { parts: [Fig.raw(s)] }));
+})();
+
+/* ── 원본 p.23 · p.24 : 상자모형과 표본의 순환 ────────────────── */
+(function () {
+  const BW = 152, BH = 126, TOP = 52, LX = 12, RX = 256;
+  const cell = (x, lines) =>
+    `<rect x="${x}" y="${TOP}" width="${BW}" height="${BH}" rx="18" ` +
+    `fill="var(--chart-blue)" fill-opacity="0.22" stroke="var(--ink-2)" stroke-width="1"/>` +
+    lines.map((t, i) =>
+      `<text class="annot" x="${x + BW / 2}" y="${TOP + 44 + i * 26}" ` +
+      `text-anchor="middle">${t}</text>`).join('');
+
+  let s = cell(LX, ['상자모형(모집단)', '모평균(μ)', '모표준편차(σ)']);
+  s += cell(RX, ['표본', '표본평균(X̄)', '표본표준편차(S)']);
+  // 위: 추출(모집단 → 표본), 아래: 추론(표본 → 모집단)
+  s += `<path class="arrow" d="M${LX + 40},${TOP + 20} C${LX + 40},${TOP - 34} ` +
+       `${RX + BW - 40},${TOP - 34} ${RX + BW - 40},${TOP + 20}" ` +
+       `marker-end="url(#ah-ink)"/>`;
+  s += `<path class="arrow" d="M${RX + BW - 40},${TOP + BH - 20} C${RX + BW - 40},${TOP + BH + 38} ` +
+       `${LX + 40},${TOP + BH + 38} ${LX + 40},${TOP + BH - 20}" ` +
+       `marker-end="url(#ah-ink)"/>`;
+
+  const parts = [Fig.raw(s),
+    Fig.annot(210, 14, '추출', { anchor: 'middle', size: 12 }),
+    Fig.annot(210, 226, '추론', { anchor: 'middle', size: 12 })];
+  Fig.draw('#f-cycle1', { parts: parts, check: false });
+  Fig.draw('#f-cycle2', { parts: parts, check: false });
+})();
+
+/* ── 원본 p.38 : 44.5~55.5 를 표준화하면 −1.1~1.1 ────────────────
+ *
+ * 두 수직선의 눈금과 오른쪽 곡선의 칠한 자리를 같은 변환 z = (x − 50)/5 로 만든다.
+ * 면적 72.87% 도 표준정규분포에서 계산한 값이지 옮겨 적은 값이 아니다. */
+(function () {
+  const MU = 50, SD = 5, LO = 44.5, HI = 55.5;
+  const z = (x) => (x - MU) / SD;                       // 44.5 → −1.1, 55.5 → +1.1
+  const r1 = (v) => Math.round(v * 10) / 10;            // 화면에 찍기 전 반올림
+  /* 표준정규분포의 누적확률. 오차함수의 Abramowitz–Stegun 7.1.26 근사(오차 1.5e-7)를 쓴다.
+     대충 맞는 근사를 쓰면 화면에 찍히는 백분율이 원본과 어긋난다 — 실제로 겪었다. */
+  const ERF = (x) => {
+    const sg = x < 0 ? -1 : 1;
+    const t = 1 / (1 + 0.3275911 * Math.abs(x));
+    const y = 1 - ((((1.061405429 * t - 1.453152027) * t + 1.421413741) * t
+                   - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x);
+    return sg * y;
+  };
+  const PHI = (t) => 0.5 * (1 + ERF(t / Math.SQRT2));
+  const area = 2 * PHI(z(HI)) - 1;                      // z = ±1.1 → 0.7287
+
+  // 왼쪽: 실제단위와 표준단위의 수직선 두 줄. 같은 x 매핑을 쓴다.
+  const AX0 = 30, AX1 = 330;
+  const ax = (v) => AX0 + ((v - 40) / (60 - 40)) * (AX1 - AX0);
+  const rows = [];
+  [[64, [[LO, String(LO)], [MU, String(MU)], [HI, String(HI)]]],
+   [126, [[LO, r1(z(LO))], [MU, '0'], [HI, '+' + r1(z(HI))]]]].forEach(([y, labs]) => {
+    rows.push(Fig.raw(
+      `<rect class="area-dwl" x="${ax(LO)}" y="${y - 9}" width="${ax(HI) - ax(LO)}" height="9"/>` +
+      `<path class="axis" d="M${AX0},${y} L${AX1},${y}"/>` +
+      labs.map(([v]) => `<path class="axis" d="M${ax(v)},${y - 9} L${ax(v)},${y + 5}"/>`).join('')));
+    labs.forEach(([v, t]) => rows.push(Fig.annot(ax(v), y + 20, String(t),
+      { anchor: 'middle', size: 12 })));
+  });
+  // 원본의 붉은 강조 타원
+  rows.push(Fig.raw(`<ellipse cx="180" cy="98" rx="152" ry="62" fill="none" ` +
+                    `stroke="var(--brand-crimson)" stroke-width="2.6"/>`));
+
+  // 오른쪽: 표준정규분포곡선의 −1.1 ~ +1.1 을 칠한다
+  const F = Fig.withBox({ x0: 400, y0: 168, x1: 760, y1: 26 });
+  const S = F.scale({ x: [-3.6, 3.6], y: [0, 0.42] });
+  const ZL = z(LO), ZH = z(HI);
+  const parts = rows.concat([
+    F.under(S.curve(Fig.normal(0, 1, ZL, ZH, { n: 48 })), { cls: 'area-dwl' }),
+    F.raw(`<path class="axis" d="M400,168 L760,168"/>`),
+    F.curve(S.curve(Fig.normal(0, 1, -3.6, 3.6, { through: [ZL, ZH] })), { variant: 'demand' }),
+    F.raw(`<path class="axis" d="M${S.x(ZL)},168 L${S.x(ZL)},${S.y(0.2179)}"/>` +
+          `<path class="axis" d="M${S.x(ZH)},168 L${S.x(ZH)},${S.y(0.2179)}"/>`),
+    F.annot(S.x(ZL), 184, String(r1(ZL)), { anchor: 'middle', size: 12 }),
+    F.annot(S.x(ZH), 184, '+' + r1(ZH), { anchor: 'middle', size: 12 }),
+    F.annot(580, 202, '확률 = 음영 처리된 면적 ≒ ' + (area * 100).toFixed(2) + ' %',
+            { anchor: 'middle', size: 12 }),
+  ]);
+  Fig.draw('#f-approx', { parts: parts, check: false });
+})();
+
+/* ── 원본 p.39 : 모집단에서 100개를 뽑아 표본평균을 만든다 ────────
+ *
+ * 표본평균 분포가 좁아지는 정도는 눈대중이 아니라 표준오차 σ/√n 이다.
+ * 모집단은 "알려지지 않은" 분포이므로 오른쪽으로 치우친 왜도정규분포로 두었고,
+ * 그 평균과 표준편차도 모수식에서 계산해 쓴다. */
+(function () {
+  const N = 100;                                  // 원본의 "100개 추출"
+
+  Fig.draw('#f-pop', {
+    parts: [
+      Fig.raw(`<circle cx="86" cy="82" r="62" fill="none" ` +
+              `stroke="var(--ink)" stroke-width="1.4"/>`),
+      Fig.annot(86, 15, '모집단', { anchor: 'middle', size: 12 }),
+      Fig.annot(86, 66, 'X ~ f(x)\nE(X) = μ\nVar(X) = σ²',
+                { anchor: 'middle', size: 13, lh: 22 }),
+      Fig.raw(`<path class="arrow" style="stroke-dasharray:4 4" ` +
+              `d="M156,44 C210,24 250,20 306,20" marker-end="url(#ah-ink)"/>`),
+      Fig.annot(232, 52, '100개 추출', { anchor: 'middle', size: 11 }),
+    ],
+    check: false,
+  });
+
+  Fig.draw('#f-down', { parts: [Fig.arrow(20, 2, 20, 30)] });
+
+  /* 왜도정규분포 f(x) ∝ 2 φ(z) Φ(αz) — 모집단의 평균·표준편차를 모수에서 구한다 */
+  const XI = 0, OM = 1.6, AL = 5;
+  const dl = AL / Math.sqrt(1 + AL * AL);
+  const MU = XI + OM * dl * Math.sqrt(2 / Math.PI);
+  const SG = OM * Math.sqrt(1 - (2 * dl * dl) / Math.PI);
+  const SE = SG / Math.sqrt(N);                   // ← 대수의 법칙. 여기서만 좁아짐이 정해진다
+
+  const PHI = (t) => 0.5 * (1 + Math.tanh(0.7978845608 * t * (1 + 0.044715 * t * t)));
+  const skew = (x) => {
+    const t = (x - XI) / OM;
+    return (2 / OM) * (Math.exp(-0.5 * t * t) / Math.sqrt(2 * Math.PI)) * PHI(AL * t);
+  };
+  const X0 = -1.6, X1 = 5.0, n = 140;
+  const pop = [];
+  for (let i = 0; i <= n; i++) { const x = X0 + ((X1 - X0) * i) / n; pop.push([x, skew(x)]); }
+  const bar = Fig.normal(MU, SE, X0, X1, { n: 260, through: [MU] });
+
+  /* 두 곡선의 높이 비는 1 : √n 이라 한 눈금에 같이 담기지 않는다.
+     너비(= 표준오차)만 참으로 두고 높이는 각각 판에 맞춰 정규화한다.
+     원본 그림도 면적을 보존하지 않는다. */
+  const norm = (pts) => {
+    const m = Math.max(...pts.map((p) => p[1]));
+    return pts.map(([x, y]) => [x, y / m]);
+  };
+
+  const F = Fig.withBox({ x0: 14, y0: 130, x1: 326, y1: 30 });
+  const S = F.scale({ x: [X0, X1], y: [0, 1.06] });
+  Fig.draw('#f-two', {
+    parts: [
+      F.raw(`<path class="axis" d="M14,130 L326,130"/>`),
+      F.curve(S.curve(norm(pop)), { variant: 'demand' }),
+      F.curve(S.curve(norm(bar)), { variant: 'supply' }),
+      F.annot(S.x(MU) + 8, 44, 'X̄의 분포', { size: 12, tone: 'red' }),
+      F.annot(326, 116, '모집단 X의 분포', { anchor: 'end', size: 12 }),
+      F.annot(14, 150, '(∵ 대수의 법칙 + 중심극한정리 — 표본평균의 표준오차 = σ/√' + N + ')',
+              { size: 11, tone: 'muted' }),
+    ],
+    check: false,
+  });
+})();
+</script>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

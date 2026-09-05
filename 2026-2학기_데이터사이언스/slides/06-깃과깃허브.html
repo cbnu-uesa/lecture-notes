@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6강. 깃과 깃허브 — 기록하고 나누기</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 9px; font-size: var(--fs-body); line-height: 1.56; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+              color: var(--ink-2); letter-spacing: .04em; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 11px; line-height: 1.72; color: #4A4741; white-space: pre-wrap; }
+  .doc .h { color: var(--brand-crimson); font-weight: 700; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+  .bad { color: var(--brand-crimson); }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  .tt { width: 100%; table-layout: fixed; margin-top: 6px; }
+  .tt td, .tt th { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>6강. 깃과 깃허브<br>기록하고 나누기</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>분석_최종_진짜최종_v3.py</h2>
+    <div class="body">
+      <ul>
+        <li>어제 잘 되던 분석이 오늘 안 된다. <span class="mark">무엇을 바꿨더라</span></li>
+        <li>AI 가 파일을 고쳤는데 <span class="mark">되돌리고 싶다</span></li>
+        <li>제출한 결과를 <span class="mark">남이 그대로 재현</span>할 수 있어야 한다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 왜 지금 배우나 ════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>AI 와 함께 일할수록 더 필요해진다</h2>
+    <div class="body">
+      <p class="define">클로드는 <span class="t-red">파일을 실제로 고친다.</span><br>
+        고치기 전 상태가 어딘가 남아 있어야 마음 놓고 시킬 수 있다</p>
+      <p class="conclusion">→ 깃은 되돌릴 수 있게 해 주고,
+        깃허브는 그것을 <span class="t-red">남에게 보여 줄 수 있게</span> 한다.<br>
+        &nbsp;&nbsp;&nbsp;증거를 다루는 사람에게 이것은 편의가 아니라 <span class="t-red">요건</span>이다</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 세 가지 ══════════════════════════════════════ -->
+  <section>
+    <h2>오늘 배울 세 가지</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:26%">무엇</th><th style="width:34%">해결하는 것</th><th>이 수업에서의 쓸모</th></tr></thead>
+        <tbody>
+          <tr><td>① 깃</td><td>내 컴퓨터 안의 <span class="hl">기록과 되돌리기</span></td>
+              <td>AI 가 고친 것을 되돌린다</td></tr>
+          <tr><td>② 깃허브</td><td><span class="hl">남과 나누기</span>와 백업</td>
+              <td>분석을 제출하고 재현시킨다</td></tr>
+          <tr><td>③ 클로드 + 깃</td><td>커밋·PR 을 <span class="hl">맡기기</span></td>
+              <td>기록을 남기는 품을 줄인다</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:16px">
+        깃 명령을 외우는 수업이 아니다. <span class="hl">무엇을 왜 기록하는지</span>를 배우고
+        명령은 클로드에게 맡긴다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 5. ① 깃 원리 ════════════════════════════════════ -->
+  <section>
+    <p class="mth">① 깃</p>
+    <h2>저장한다 ≠ 기록한다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-git" viewBox="0 0 840 250" style="width:800px" role="img"
+           aria-label="파일을 덮어쓰면 이전 상태가 사라지지만 커밋을 쌓으면 각 시점으로 돌아갈 수 있음을 비교한 도식">
+        <title>덮어쓰기와 커밋의 차이</title>
+        <text x="30" y="26" font-size="13" font-weight="700" fill="#8A867E">그냥 저장하면</text>
+        <g font-size="12.5" text-anchor="middle">
+          <rect x="30"  y="40" width="120" height="42" fill="#EDE9E3"/><text x="90"  y="66">분석.py</text>
+          <rect x="200" y="40" width="120" height="42" fill="#EDE9E3"/><text x="260" y="66">분석.py</text>
+          <rect x="370" y="40" width="120" height="42" fill="#EDE9E3"/><text x="430" y="66">분석.py</text>
+        </g>
+        <g stroke="#7C7C7C" stroke-width="1.3">
+          <path d="M154,61 L196,61"/><path d="M324,61 L366,61"/>
+        </g>
+        <text x="520" y="66" font-size="12.5" fill="#8A867E">← 앞의 두 상태는 사라졌다</text>
+
+        <text x="30" y="132" font-size="13" font-weight="700" fill="#A02948">커밋을 쌓으면</text>
+        <g font-size="12.5" text-anchor="middle">
+          <rect x="30"  y="146" width="120" height="42" fill="#D8D3CB"/><text x="90"  y="166">커밋 1</text>
+          <text x="90" y="182" font-size="11">데이터 받음</text>
+          <rect x="200" y="146" width="120" height="42" fill="#D8D3CB"/><text x="260" y="166">커밋 2</text>
+          <text x="260" y="182" font-size="11">로직 확정</text>
+          <rect x="370" y="146" width="120" height="42" fill="#A02948"/>
+          <text class="on-dark" x="430" y="166" fill="#FFF" font-weight="700">커밋 3</text>
+          <text class="on-dark" x="430" y="182" fill="#FFF" font-size="11">결과 저장</text>
+        </g>
+        <g stroke="#7C7C7C" stroke-width="1.3">
+          <path d="M154,167 L196,167"/><path d="M324,167 L366,167"/>
+        </g>
+        <text x="520" y="172" font-size="12.5" fill="#A02948" font-weight="700">← 어느 시점으로든 돌아간다</text>
+        <text x="420" y="228" text-anchor="middle" font-size="13.5" fill="#4A4741">
+          커밋은 <tspan font-weight="700">"이 시점의 전부"</tspan> 를 이름과 함께 남긴다</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ 6. ① 바뀐 것만 쌓는다 ═══════════════════════════ -->
+  <section>
+    <p class="mth">① 깃</p>
+    <h2>깃은 바뀐 것만 골라 쌓는다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-only" viewBox="0 0 840 300" style="width:790px" role="img"
+           aria-label="첫 커밋에는 세 파일이 모두 담기고, 파일 하나를 고친 뒤의 커밋에는 그 파일만 새로 담기며 나머지는 앞 커밋의 것을 그대로 쓴다는 도식">
+        <title>바뀐 파일만 새로 담긴다</title>
+
+        <text x="30" y="34" font-size="11.5" font-weight="700" fill="#8A867E"
+              letter-spacing="0.06em">작업 폴더</text>
+        <text x="420" y="34" font-size="11.5" font-weight="700" fill="#8A867E"
+              letter-spacing="0.06em">커밋</text>
+
+        <g font-size="12.5">
+          <rect x="30" y="48" width="150" height="30" fill="#EDE9E3"/><text x="42" y="68">분석.py</text>
+          <rect x="30" y="86" width="150" height="30" fill="#EDE9E3"/><text x="42" y="106">정리.py</text>
+          <rect x="30" y="124" width="150" height="30" fill="#EDE9E3"/><text x="42" y="144">README.md</text>
+        </g>
+        <g stroke="#7C7C7C" stroke-width="1.2" fill="none">
+          <path d="M184,63 L240,90"/><path d="M184,101 L240,101"/><path d="M184,139 L240,112"/>
+        </g>
+
+        <rect x="244" y="48" width="176" height="106" fill="#D8D3CB"/>
+        <text x="332" y="72" text-anchor="middle" font-size="13" font-weight="700">커밋 1 · 첫 기록</text>
+        <g font-size="11.5" text-anchor="middle" fill="#4A4741">
+          <text x="332" y="96">분석.py</text><text x="332" y="116">정리.py</text><text x="332" y="136">README.md</text>
+        </g>
+
+        <text x="30" y="200" font-size="12.5" font-weight="700" fill="#A02948">정리.py 한 줄을 고치고 다시 커밋하면</text>
+        <g font-size="12.5">
+          <rect x="30" y="212" width="150" height="30" fill="#EDE9E3"/><text x="42" y="232">정리.py</text>
+        </g>
+        <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M184,227 L240,227"/></g>
+
+        <rect x="244" y="188" width="176" height="82" fill="#F6ECEF" stroke="#A02948" stroke-width="1.2"/>
+        <text x="332" y="212" text-anchor="middle" font-size="13" font-weight="700" fill="#A02948">커밋 2</text>
+        <text x="332" y="236" text-anchor="middle" font-size="11.5" fill="#A02948" font-weight="700">정리.py — 새로 담는다</text>
+        <text x="332" y="256" text-anchor="middle" font-size="11.5" fill="#4A4741">나머지 둘 — 커밋 1 의 것을 그대로</text>
+
+        <g stroke="#8A867E" stroke-width="1.1" stroke-dasharray="4 3" fill="none">
+          <path d="M424,120 L452,120 L452,222 L424,222"/>
+        </g>
+        <path d="M418,222 L428,217 L428,227 Z" fill="#8A867E"/>
+
+        <text x="486" y="100" font-size="13.5" fill="#4A4741">깃은 파일 이름이 아니라
+          <tspan font-weight="700" fill="#A02948">내용을 보고</tspan> 같은지 다른지 안다.</text>
+        <text x="486" y="128" font-size="13.5" fill="#4A4741">그래서 수천 개 파일 중 바뀐 것만 골라 담고,</text>
+        <text x="486" y="152" font-size="13.5" fill="#4A4741">나머지는 앞의 것을 다시 쓴다.</text>
+        <text x="486" y="200" font-size="12.5" fill="#8A867E">그래서 커밋이 쌓여도</text>
+        <text x="486" y="222" font-size="12.5" fill="#8A867E">저장소가 그만큼 무거워지지 않는다.</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ 6. ① 네 가지 동작 ═══════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">① 깃</p>
+    <h2>일단 이 넷이면 된다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <div class="doc">
+          <div class="bar">터미널</div>
+          <pre><span class="h">git init</span>      이 폴더를 기록 대상으로
+<span class="h">git status</span>    지금 뭐가 바뀌었나
+<span class="h">git add .</span>     기록할 것을 고른다
+<span class="h">git commit</span>    이름 붙여 남긴다
+  -m "동별 요약 로직 확정"
+
+<span class="h">git log --oneline</span>   지금까지의 기록
+<span class="h">git diff</span>            무엇이 바뀌었나</pre>
+        </div>
+        <p class="caption" style="margin-top:8px">
+          되돌리는 명령은 위험해서 여기 적지 않았다.
+          <span class="hl">필요할 때 클로드에게 물어본다</span> — 무엇이 지워지는지 설명을 듣고 승인한다.</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">커밋 메시지를 이렇게 쓴다</p>
+        <table style="width:100%;table-layout:fixed;margin-top:6px">
+          <thead><tr><th style="width:44%">이렇게 말고</th><th>이렇게</th></tr></thead>
+          <tbody>
+            <tr><td class="bad">수정</td><td>면적 하한을 60㎡ 로 정함</td></tr>
+            <tr><td class="bad">ㅁㄴㅇㄹ</td><td>취소 거래 제외 규칙 추가</td></tr>
+            <tr><td class="bad">최종</td><td>동별 요약표 생성 로직</td></tr>
+          </tbody>
+        </table>
+        <p class="emph" style="margin-top:12px">
+          <span class="hl">"무엇을 왜 바꿨는지" 를 적는다.</span>
+          석 달 뒤에 이 목록만 읽고도 분석의 흐름이 보여야 한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 7. ① 무엇을 넣지 않나 ═══════════════════════════ -->
+  <section>
+    <p class="mth">① 깃</p>
+    <h2>넣지 않을 것 — .gitignore</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:28%">넣지 않는다</th><th>왜</th></tr></thead>
+        <tbody>
+          <tr><td class="hl">인증키 · 비밀번호</td>
+              <td class="hl">한 번 올라가면 지워도 기록에 남는다. 저장소를 공개로 바꾸는 순간 노출된다</td></tr>
+          <tr><td>큰 원본 데이터</td><td>수백 MB 를 커밋하면 저장소가 감당하지 못한다.
+            <span class="mark">받는 방법을 적어 두면 된다</span></td></tr>
+          <tr><td>개인정보가 든 자료</td><td>3주차에 말한 비공개 데이터가 여기 해당한다</td></tr>
+          <tr><td>다시 만들 수 있는 것</td><td>그림·PDF 처럼 스크립트로 재생성되는 산출물</td></tr>
+        </tbody>
+      </table>
+      <div class="doc" style="margin-top:12px">
+        <div class="bar">.gitignore</div>
+        <pre>.env            <span class="h"># 인증키</span>
+data/raw/       <span class="h"># 원본 데이터 — README 에 받는 법을 적는다</span>
+output/*.png    <span class="h"># 스크립트로 다시 만든다</span></pre>
+      </div>
+      <p class="emph" style="margin-top:10px">
+        <span class="hl">첫 커밋 전에 .gitignore 부터 만든다.</span>
+        올라간 뒤에 지우는 것은 훨씬 어렵다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. ② 깃허브 ═════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">② 깃허브</p>
+    <h2>내 컴퓨터 밖에 두기</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>깃은 <span class="hl">내 컴퓨터 안</span>의 기록이다.
+          노트북이 고장 나면 함께 사라진다.</p>
+        <p style="margin-top:10px">깃허브는 그 기록을 <span class="hl">인터넷에 올려 두는 곳</span>이다.
+          백업이자, 남에게 보여 주는 창구다.</p>
+        <div class="doc" style="margin-top:12px">
+          <div class="bar">터미널 · gh 를 설치하고 로그인한 뒤</div>
+          <pre><span class="h">gh auth login</span>          한 번만
+<span class="h">gh repo create</span>         저장소 만들기
+<span class="h">git push</span>               올리기
+<span class="h">git pull</span>               내려받기</pre>
+        </div>
+      </div>
+      <div class="col-r">
+        <p class="sub">공개할 것과 하지 않을 것</p>
+        <table style="width:100%;table-layout:fixed;margin-top:6px">
+          <thead><tr><th style="width:34%"></th><th>이 수업이라면</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hl">공개(public)</span></td>
+                <td>분석 스크립트 · 로직 문서 · 결과표 · README</td></tr>
+            <tr><td><span class="hl">비공개(private)</span></td>
+                <td>확정 전 초안, 개인정보가 섞였을 가능성이 있는 것</td></tr>
+          </tbody>
+        </table>
+        <p class="emph" style="margin-top:12px">
+          <span class="hl">공개는 되돌리기 어렵다.</span> 헷갈리면 비공개로 만들고 나중에 바꾼다 —
+          반대 방향은 이미 늦다.</p>
+        <p class="caption" style="margin-top:8px">
+          COMPAS 비공개 데이터는 <span class="mark">어느 쪽에도 올리지 않는다.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 9. ② README ═════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">② 깃허브</p>
+    <h2>README — 재현의 설명서</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>남이 이 저장소를 열었을 때 <span class="hl">가장 먼저 보는 화면</span>이다.</p>
+        <p style="margin-top:10px">이 수업의 기준은 하나다 —
+          <span class="mark">이것만 읽고 내 결과를 다시 만들 수 있는가.</span></p>
+        <p class="emph" style="margin-top:12px">
+          원본 데이터를 올리지 않는 대신 <span class="hl">받는 방법을 적는다.</span>
+          그것이 3주차 "데이터 출처 문서" 가 여기로 오는 자리다.</p>
+      </div>
+      <div class="col-r">
+        <div class="doc">
+          <div class="bar">README.md</div>
+          <pre><span class="h"># 청주 상당구 실거래가 분석</span>
+
+<span class="h">## 무엇을 했나</span>
+동별 ㎡당 가격을 비교했다.
+
+<span class="h">## 데이터</span>
+국토부 실거래가 API (공공데이터포털)
+상당구 43111 · 2025.10~2026.09
+<b>받는 법</b>: 인증키를 발급받아
+`.env` 에 넣고 `python fetch.py`
+
+<span class="h">## 분석 규칙</span>
+CLAUDE.md 참조 (60㎡ 초과 · 중앙값)
+
+<span class="h">## 다시 만들려면</span>
+`python fetch.py` → `python summary.py`
+결과는 `output/` 에</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 10. ③ 클로드 + 깃 ═══════════════════════════════ -->
+  <section>
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>기록하는 품을 맡긴다</h2>
+    <div class="body tight">
+      <p class="sub">클로드 코드는 터미널에서 돌므로 깃 명령을 그대로 쓸 수 있다</p>
+      <div class="prompt-box">
+        <p class="who">이렇게 시킨다</p>
+        <p>"지금까지 바뀐 걸 <span class="mark">무엇을 왜 바꿨는지 알 수 있게</span> 커밋해 줘.
+          <b>커밋하기 전에 무엇을 담을지 목록으로 보여 줘.</b>"</p>
+        <p>"<span class="mark">.env 는 빼고</span> 커밋해."</p>
+        <p>"이 저장소의 커밋 기록을 읽고 <span class="mark">분석이 어떻게 바뀌어 왔는지</span> 정리해 줘."</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        굵게 표시한 부분이 핵심이다. <span class="hl">커밋 전에 목록을 보여 달라고 한다</span> —
+        무엇이 올라가는지 모르고 승인하면 인증키가 함께 간다.</p>
+      <p class="caption" style="margin-top:8px">
+        마지막 줄은 이 수업다운 쓰임이다 — 커밋 기록 자체가 <span class="hl">분석 과정의 증거</span>가 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 11. ③ 브랜치와 PR ═══════════════════════════════ -->
+  <section>
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>브랜치 — 망칠 각오로 해 보기</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-br" viewBox="0 0 840 235" style="width:790px" role="img"
+           aria-label="주 흐름에서 갈라져 나온 브랜치에서 실험한 뒤 좋으면 합치고 아니면 버리는 도식">
+        <title>브랜치에서 실험하고 합치기</title>
+        <path stroke="#7C7C7C" stroke-width="2" fill="none" d="M60,150 L780,150"/>
+        <g fill="#6E6A63">
+          <circle cx="120" cy="150" r="8"/><circle cx="260" cy="150" r="8"/><circle cx="700" cy="150" r="8"/>
+        </g>
+        <text x="60" y="182" font-size="12.5" fill="#4A4741">main — 되는 것만 남는 줄기</text>
+        <path stroke="#A02948" stroke-width="2" fill="none"
+              d="M260,150 C320,150 320,80 380,80 L580,80 C640,80 640,150 700,150"/>
+        <g fill="#A02948">
+          <circle cx="420" cy="80" r="8"/><circle cx="530" cy="80" r="8"/>
+        </g>
+        <text x="475" y="58" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A02948">
+          면적하한-실험</text>
+        <text x="300" y="118" font-size="12" fill="#4A4741">갈라져 나와</text>
+        <text x="660" y="118" text-anchor="end" font-size="12" fill="#4A4741">좋으면 합친다</text>
+        <text x="420" y="214" text-anchor="middle" font-size="13.5" fill="#4A4741">
+          아니면 <tspan font-weight="700">그냥 버린다</tspan> — main 은 그대로다</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ ③ 명령어 판 ═════════════════════════════════════ -->
+  <section>
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>깃에는 자리가 넷 있다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-cmd" viewBox="0 0 840 300" style="width:800px" role="img"
+           aria-label="작업 폴더, 커밋 대기, 저장소, 깃허브 네 자리를 두고 add·commit·push 가 무엇을 어느 자리로 옮기는지 단계별로 보여 주는 도식">
+        <title>네 자리와 그 사이를 옮기는 명령어</title>
+
+        <g font-size="11.5" font-weight="700" fill="#8A867E" letter-spacing="0.05em">
+          <text x="16" y="36">작업 폴더</text>
+          <text x="210" y="36">커밋 대기</text>
+          <text x="374" y="36">저장소 <tspan font-weight="400" font-size="10.5">— 내 컴퓨터</tspan></text>
+          <text x="664" y="36">깃허브 <tspan font-weight="400" font-size="10.5">— 인터넷</tspan></text>
+        </g>
+
+        <rect x="16" y="44" width="160" height="200" fill="none" stroke="#E2DED7" stroke-width="1.2"/>
+        <rect x="210" y="44" width="130" height="200" fill="none" stroke="#E2DED7"
+              stroke-width="1.2" stroke-dasharray="4 3"/>
+        <rect x="664" y="44" width="160" height="200" fill="none" stroke="#E2DED7" stroke-width="1.2"/>
+
+        <g font-size="12">
+          <rect x="26" y="60" width="140" height="26" fill="#EDE9E3"/><text x="36" y="78">분석.py</text>
+          <rect x="26" y="92" width="140" height="26" fill="#EDE9E3"/><text x="36" y="110">정리.py</text>
+          <rect x="26" y="124" width="140" height="26" fill="#EDE9E3"/><text x="36" y="142">README.md</text>
+        </g>
+
+        <g class="fragment" data-fragment-index="1">
+          <rect x="374" y="44" width="256" height="200" fill="none" stroke="#A02948" stroke-width="1.2"/>
+          <text x="384" y="66" font-size="11" fill="#8A867E">기록이 쌓이는 곳 — 폴더 안의 .git</text>
+        </g>
+
+        <g class="fragment fade-out" data-fragment-index="3">
+        <g class="fragment" data-fragment-index="2">
+          <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M180,104 L198,104"/></g>
+          <path d="M206,104 L196,99 L196,109 Z" fill="#A02948"/>
+          <text x="193" y="92" text-anchor="middle" font-size="10.5" font-weight="700" fill="#A02948">add</text>
+          <g font-size="11" fill="#4A4741" text-anchor="middle">
+            <rect x="220" y="60" width="110" height="24" fill="#F6ECEF"/><text x="275" y="76">분석.py</text>
+            <rect x="220" y="92" width="110" height="24" fill="#F6ECEF"/><text x="275" y="108">정리.py</text>
+            <rect x="220" y="124" width="110" height="24" fill="#F6ECEF"/><text x="275" y="140">README.md</text>
+          </g>
+        </g>
+        </g>
+
+        <g class="fragment" data-fragment-index="3">
+          <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M344,104 L362,104"/></g>
+          <path d="M370,104 L360,99 L360,109 Z" fill="#A02948"/>
+          <text x="357" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#A02948">commit</text>
+          <circle cx="430" cy="180" r="14" fill="#A02948"/>
+          <text class="on-dark" x="430" y="185" text-anchor="middle" font-size="11"
+                font-weight="700" fill="#FFF">c1</text>
+          <text x="430" y="212" text-anchor="middle" font-size="10.5" fill="#4A4741">첫 기록</text>
+        </g>
+        <g class="fragment fade-out" data-fragment-index="6">
+          <g class="fragment" data-fragment-index="3">
+            <rect x="404" y="222" width="52" height="19" fill="#EDE9E3"/>
+            <text x="430" y="235" text-anchor="middle" font-size="10.5" fill="#4A4741">main</text>
+          </g>
+        </g>
+
+        <g class="fragment" data-fragment-index="4">
+          <g stroke="#A02948" stroke-width="1.3" fill="none"><path d="M634,180 L652,180"/></g>
+          <path d="M660,180 L650,175 L650,185 Z" fill="#A02948"/>
+          <text x="647" y="168" text-anchor="middle" font-size="10.5" font-weight="700" fill="#A02948">push</text>
+          <circle cx="744" cy="180" r="14" fill="#6E6A63"/>
+          <text class="on-dark" x="744" y="185" text-anchor="middle" font-size="11"
+                font-weight="700" fill="#FFF">c1</text>
+          <rect x="706" y="222" width="76" height="19" fill="#EDE9E3"/>
+          <text x="744" y="235" text-anchor="middle" font-size="10" fill="#4A4741">origin/main</text>
+        </g>
+
+        <g class="fragment" data-fragment-index="5">
+          <path d="M444,180 C476,180 486,138 506,132" stroke="#A02948" stroke-width="1.6" fill="none"/>
+          <circle cx="530" cy="126" r="14" fill="#A02948"/>
+          <text class="on-dark" x="530" y="131" text-anchor="middle" font-size="11"
+                font-weight="700" fill="#FFF">c2</text>
+          <rect x="486" y="86" width="88" height="19" fill="#F6ECEF" stroke="#A02948" stroke-width="1"/>
+          <text x="530" y="99" text-anchor="middle" font-size="10" fill="#A02948"
+                font-weight="700">면적하한-실험</text>
+          <text x="530" y="158" text-anchor="middle" font-size="10.5" fill="#4A4741">실험 커밋</text>
+        </g>
+
+        <g class="fragment" data-fragment-index="6">
+          <rect x="504" y="176" width="52" height="19" fill="#EDE9E3"/>
+          <text x="530" y="189" text-anchor="middle" font-size="10.5" fill="#4A4741">main</text>
+          <path d="M462,231 L496,198" stroke="#8A867E" stroke-width="1.1" stroke-dasharray="4 3" fill="none"/>
+          <path d="M500,194 L492,198 L497,204 Z" fill="#8A867E"/>
+          <text x="374" y="264" font-size="11.5" fill="#A02948" font-weight="700">
+            main 이 실험 자리까지 따라온다 — 새 커밋 없이 포인터만 옮겨 간다</text>
+        </g>
+
+        <g font-size="13" fill="#4A4741">
+          <g class="fragment current-visible" data-fragment-index="1"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git init</tspan> — 이 폴더를 기록 대상으로 삼는다</text></g>
+          <g class="fragment current-visible" data-fragment-index="2"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git add .</tspan> — 이번 커밋에 담을 것을 골라 둔다. 파일은 그 자리에 그대로 있다</text></g>
+          <g class="fragment current-visible" data-fragment-index="3"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git commit -m "첫 기록"</tspan> — 골라 둔 것을 이름 붙여 저장소에 남긴다</text></g>
+          <g class="fragment current-visible" data-fragment-index="4"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git push</tspan> — 저장소의 커밋을 깃허브로 올린다</text></g>
+          <g class="fragment current-visible" data-fragment-index="5"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git switch -c 면적하한-실험</tspan> — main 을 두고 딴 줄기로 나가 커밋한다</text></g>
+          <g class="fragment current-visible" data-fragment-index="6"><text x="16" y="290">
+            <tspan font-family="'SFMono-Regular', Menlo, monospace" font-weight="700"
+                   fill="#A02948">git merge 면적하한-실험</tspan> — 실험이 쓸 만하면 main 으로 합친다</text></g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ 12. ③ PR 과 @claude ═════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>PR — 합치기 전에 보여 주기</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>풀 리퀘스트(PR)는 <span class="hl">"이렇게 바꾸려는데 봐 주세요"</span> 라는 요청이다.
+          바뀐 부분이 한눈에 보이고, 줄마다 의견을 달 수 있다.</p>
+        <div class="doc" style="margin-top:10px">
+          <div class="bar">터미널</div>
+          <pre>git switch -c 면적하한-실험
+<span class="h"># … 작업 …</span>
+git push -u origin 면적하한-실험
+<span class="h">gh pr create</span></pre>
+        </div>
+        <p class="caption" style="margin-top:8px">
+          클로드에게 "브랜치 만들고 PR 까지 올려 줘" 라고 해도 된다.
+          <span class="hl">올리기 전에 무엇을 담을지 확인한다.</span></p>
+      </div>
+      <div class="col-r">
+        <p class="sub">깃허브에서 클로드를 부르기</p>
+        <p><span class="code">/install-github-app</span> 을 실행해 두면
+          이슈나 PR 댓글에 <span class="hl">@claude</span> 로 부를 수 있다.</p>
+        <div class="doc" style="margin-top:8px">
+          <div class="bar">PR 댓글</div>
+          <pre>@claude 이 분석 로직에서
+빠뜨린 예외가 있는지 봐 줘</pre>
+        </div>
+        <p class="caption" style="margin-top:8px">
+          GitHub Actions 위에서 돌기 때문에 <span class="hl">저장소 관리자 권한</span>과
+          인증 설정이 필요하다. 팀으로 일할 때 쓰는 기능이라 오늘은 개념만 본다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 13. 주의 ════════════════════════════════════════ -->
+  <section>
+    <h2>주의 — 이 수업에서 실제로 겪는 사고</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:30%">사고</th><th>막는 법</th></tr></thead>
+        <tbody>
+          <tr><td class="hl">인증키를 커밋했다</td>
+              <td>첫 커밋 전에 <span class="code">.gitignore</span> 부터 만든다.
+                이미 올렸다면 <span class="hl">그 키를 폐기하고 새로 발급받는다</span> —
+                기록에서 지우는 것보다 그게 빠르고 확실하다</td></tr>
+          <tr><td>비공개 데이터를 올렸다</td><td>COMPAS 비공개분·개인정보는 저장소에 넣지 않는다.
+            <span class="mark">받는 방법만 적는다</span></td></tr>
+          <tr><td>큰 파일로 저장소가 막혔다</td><td>원본 데이터는 <span class="code">.gitignore</span> 로 뺀다</td></tr>
+          <tr><td>AI 가 고친 걸 못 되돌린다</td><td>작업을 시작하기 전에 커밋해 둔다.
+            <span class="hl">되돌릴 지점이 있어야 마음 놓고 시킨다</span></td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:12px">
+        첫 줄이 가장 흔하고 가장 아프다. <span class="hl">공개 저장소는 검색된다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 14. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">내 분석을 저장소로 만들기 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 15. 실습 개요 ═══════════════════════════════════ -->
+  <section>
+    <h2>오늘 실습의 도착점</h2>
+    <div class="body tight">
+      <p class="emph"><span class="hl">남이 README 만 보고 내 결과를 다시 만들 수 있는 저장소</span></p>
+      <table class="tt">
+        <thead><tr><th style="width:18%">시각</th><th style="width:36%">할 일</th><th>끝났다는 신호</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:25</td><td>① 기록을 시작한다</td><td>첫 커밋이 남았다</td></tr>
+          <tr><td>0:25–0:55</td><td>② 브랜치로 실험하고 되돌린다</td><td>main 이 <span class="hl">그대로</span>다</td></tr>
+          <tr><td>0:55–1:30</td><td>③ 서로 재현해 본다</td><td>남의 결과를 <span class="hl">내가</span> 만들었다</td></tr>
+        </tbody>
+      </table>
+      <p class="sub" style="margin-top:12px">시작 전 확인</p>
+      <ul>
+        <li>지난주 <span class="code">ds2026/</span> 폴더 (CLAUDE.md · 스킬 · 에이전트가 들어 있다)</li>
+        <li>깃 설치 · 깃허브 계정 · <span class="code">gh</span> 설치</li>
+      </ul>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">③은 짝이 필요하다.</span> 홀수면 셋이 한 조로 돌려 가며 한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>① 기록을 시작한다 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:25</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">gh auth login</span> 으로 로그인한다 (브라우저가 열린다) <span class="t">5분</span></li>
+        <li><span class="code">ds2026/</span> 에서 <span class="code">git init</span> <span class="t">1분</span></li>
+        <li><span class="hl">커밋하기 전에</span> <span class="code">.gitignore</span> 를 만든다 <span class="t">8분</span></li>
+        <li><span class="code">git status</span> 로 <span class="mark">올라갈 목록을 눈으로 읽는다</span> <span class="t">3분</span></li>
+        <li><span class="code">git add .</span> → <span class="code">git commit -m "…"</span> <span class="t">3분</span></li>
+      </ol>
+      <div class="prompt-box">
+        <p class="who">3번을 이렇게 시킨다</p>
+        <p>"이 폴더를 깃 저장소로 만들려고 해. 먼저
+          <span class="mark">어떤 파일이 올라가면 안 되는지 목록으로</span> 알려 주고
+          .gitignore 초안을 보여 줘. 내가 확인하면 커밋하자."</p>
+      </div>
+      <div class="ck"><b>✓ 확인 지점</b> — <span class="code">git status</span> 목록에
+        <b>인증키·원본 CSV 가 없다.</b> 보이면 <span class="code">.gitignore</span> 를 고치고 다시 본다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 17. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>② 실험하고 되돌린다 <span class="en" style="font-size:16px;color:var(--muted)">0:25–0:55</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">git switch -c 면적하한-실험</span> <span class="t">2분</span></li>
+        <li>CLAUDE.md 의 면적 하한을 <span class="hl">85㎡ 로 바꾸고</span> 분석을 다시 돌린다 <span class="t">10분</span></li>
+        <li><span class="code">git diff</span> 로 무엇이 바뀌었는지 보고 커밋한다 <span class="t">5분</span></li>
+        <li><span class="code">git switch main</span> 으로 돌아간다 <span class="t">2분</span></li>
+        <li>CLAUDE.md 를 열어 본다. 분석도 다시 돌려 본다 <span class="t">6분</span></li>
+        <li>실험을 살릴지 버릴지 정하고, 버릴 거면 브랜치를 지운다 <span class="t">5분</span></li>
+      </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 5번에서 CLAUDE.md 가 <b>60㎡ 로 돌아와 있다.</b>
+        결과표도 원래 값이다. <b>실험이 본 작업을 건드리지 않았다.</b></div>
+      <div class="stuck"><b>switch 가 거부되면</b> — 저장하지 않은 변경이 있는 것이다.
+        커밋하거나 되돌린 뒤 다시 한다. <b>무엇을 어떻게 할지는 클로드에게 물어보고 설명을 듣고 승인한다.</b></div>
+    </div>
+  </section>
+
+  <!-- ══ 18. 실습 ③ 올리기 ═══════════════════════════════ -->
+  <section>
+    <h2>③-1 올리고 설명서를 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">0:55–1:15</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">gh repo create</span> 로 저장소를 만들고 올린다.
+          <span class="hl">공개 여부를 스스로 정하고 이유를 한 줄 적는다</span> <span class="t">7분</span></li>
+        <li><span class="code">README.md</span> 를 쓴다 <span class="t">10분</span></li>
+        <li>커밋하고 올린다. <span class="mark">브라우저로 저장소를 열어 눈으로 확인한다</span> <span class="t">3분</span></li>
+      </ol>
+      <p class="sub" style="margin-top:10px">README 에 반드시 들어갈 넷</p>
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <tbody>
+          <tr><td style="width:28%">무엇을 했나</td><td>한두 문장</td></tr>
+          <tr><td class="hl">데이터 받는 법</td><td>출처 · 조건 · 인증키를 어디에 넣나 (3주차 출처 문서를 옮긴다)</td></tr>
+          <tr><td>분석 규칙</td><td>CLAUDE.md 를 가리키고 요점만</td></tr>
+          <tr><td class="hl">다시 만드는 순서</td><td>실행할 명령을 순서대로</td></tr>
+        </tbody>
+      </table>
+      <div class="ck"><b>✓ 확인 지점</b> — 브라우저에서 저장소를 열었을 때
+        <b>인증키도 원본 데이터도 보이지 않는다.</b></div>
+    </div>
+  </section>
+
+  <!-- ══ 19. 실습 ③ 교환 ═════════════════════════════════ -->
+  <section>
+    <h2>③-2 서로 재현해 본다 <span class="en" style="font-size:16px;color:var(--muted)">1:15–1:30</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>옆 사람과 저장소 주소를 바꾼다 <span class="t">1분</span></li>
+        <li>상대 저장소를 받는다 — <span class="code">git clone &lt;주소&gt;</span> <span class="t">2분</span></li>
+        <li><span class="hl">README 만 보고</span> 상대의 결과를 다시 만들어 본다.
+          <span class="mark">막히면 물어보지 말고 그 지점을 적는다</span> <span class="t">8분</span></li>
+        <li>막힌 지점을 상대에게 알려 준다. 받은 지적으로 자기 README 를 고친다 <span class="t">4분</span></li>
+      </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 상대의 결과표와 <b>같은 숫자</b>가 나온다.
+        안 나오면 README 에 빠진 것이 있다는 뜻이고, <b>그 발견이 오늘의 성과다.</b></div>
+      <div class="stuck"><b>시간이 모자라면</b> — 3번의 <b>막힌 지점 목록까지만</b> 하고 4번은 집에서.
+        <b>일찍 끝났으면</b> 상대 저장소에 브랜치를 만들어 README 를 고치고 PR 을 올려 본다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 20. 제출 ════════════════════════════════════════ -->
+  <section>
+    <h2>제출물</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:32%">무엇</th><th>어느 정도면 되나</th></tr></thead>
+        <tbody>
+          <tr><td>저장소 주소</td><td>공개 여부와 <span class="hl">그렇게 정한 이유 한 줄</span></td></tr>
+          <tr><td>커밋 기록</td><td><span class="code">git log --oneline</span> 결과.
+            <span class="hl">메시지만 읽고 흐름이 보여야 한다</span></td></tr>
+          <tr><td>README</td><td>넷이 다 있고 <span class="hl">③-2 로 고친 흔적</span>이 있을 것</td></tr>
+          <tr><td class="hl">재현 후기</td><td>상대 저장소에서 <span class="hl">어디서 막혔는지</span>와
+            내 README 를 어떻게 고쳤는지</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        마지막 줄이 이 강의의 핵심이다. <span class="hl">내가 아는 것과 적어 둔 것은 다르다</span> —
+        남이 막히는 자리에서만 그 차이가 드러난다.</p>
+      <p class="caption" style="margin-top:10px">
+        <span class="hl">다음 주부터 매주 실습 결과를 이 저장소에 커밋한다.</span>
+        14주차에는 이 기록 전체가 증거 패키지의 바탕이 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 18. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>깃 명령 — 공식 문서 <span class="code">git-scm.com/doc</span></li>
+        <li>깃허브 CLI — <span class="code">cli.github.com</span></li>
+        <li><span class="code">/install-github-app</span> 과 <span class="code">@claude</span> 멘션 —
+          클로드 코드 공식 문서 (2026. 8. 27. 확인)<br>
+          <span class="code">code.claude.com/docs/en/github-actions</span> ·
+          저장소 관리자 권한과 인증 설정이 필요하다</li>
+        <li>5·11쪽 그림은 원리를 보이는 개념도다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 19. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

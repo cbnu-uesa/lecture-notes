@@ -1,0 +1,638 @@
+<!doctype html>
+<!--
+  5강. 소비자도시와 중심지
+  교재: 오설리반의 도시경제학 제9판 — 6장 (p.110~126)
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5강. 소비자도시와 중심지</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 독점 → 복점 → 장기균형 [p.111~113] ──────────────────────
+  // 비용함수 하나에서 세 그림을 전부 유도한다 (design.md §6.5).
+  //   C(q) = k + cq,  ac(q) = k/q + c,  mc = c
+  //   수요 P = A − Bq  →  한계수입 MR = A − 2Bq (절편 같고 기울기 두 배)
+  // 진입이 잔여수요를 왼쪽으로 밀면 A 가 14 → 11 → 8 로 내려간다.
+  // A = 8 일 때 수요곡선이 평균비용곡선에 **접한다** — 장기균형의 조건이다.
+  window.MC = {
+    k: 12, c: 2, B: 0.75,
+    ac(q) { return this.k / q + this.c; },
+    stage: [
+      { A: 14, name: '독점기업',   sub: 'd₁', pts: ['b', 'c', 'a'] },
+      { A: 11, name: '복점기업',   sub: 'd₂', pts: ['f', 'e', 'd'] },
+      { A: 8,  name: '사중복점기업', sub: 'd₄', pts: ['h', null, 'g'] },
+    ],
+    demand(A, q) { return A - this.B * q; },
+    mr(A, q)     { return A - 2 * this.B * q; },
+    qStar(A)     { return (A - this.c) / (2 * this.B); },   // MR = MC
+  };
+
+  // ── 중심지이론의 예 [p.120~122] ─────────────────────────────
+  window.CPT = {
+    population: 48000, length: 48, density: 1000,
+    goods: [
+      { name: '의류',   need: 48000, count: 1 },
+      { name: '식료품', need: 12000, count: 4 },
+      { name: '이발',   need: 3000,  count: 16 },
+    ],
+    // 11개 도시: 큰 도시 1(의류1+식료품2+이발4) · 중간 2(식료품1+이발2) · 작은 8(이발1)
+    towns: [
+      { x: 4,  tier: 'small' }, { x: 8,  tier: 'mid' },   { x: 12, tier: 'small' },
+      { x: 16, tier: 'small' }, { x: 20, tier: 'small' }, { x: 24, tier: 'big' },
+      { x: 28, tier: 'small' }, { x: 32, tier: 'small' }, { x: 36, tier: 'small' },
+      { x: 40, tier: 'mid' },   { x: 44, tier: 'small' },
+    ],
+    // 높이 = 그 도시에 있는 상점·이발사의 수 (모형에서 유도한 값)
+    height: { big: 1 + 2 + 4, mid: 1 + 2, small: 1 },
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .tbl-cpt { width: 100%; table-layout: fixed; }
+  .tbl-cpt th:first-child, .tbl-cpt td:first-child { width: 26%; }
+  .tbl-cpt th:last-child, .tbl-cpt td:last-child { width: 24%; }
+  .tbl-cpt th:not(:first-child), .tbl-cpt td:not(:first-child) { text-align: right; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>5강. 소비자도시와 중심지</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 발문 (p.110) ══════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:40px">
+      이발사: 당신은 몇 살입니까, 꼬마 신사분?<br>
+      빌: 여덟살<br>
+      이발사: 머리 깎는 것을 원합니까?<br>
+      빌: 글쎄요. 저는 명백히 면도를 위해 오지는 않았습니다.</p>
+    <p class="lead t-define" style="margin-bottom:14px">이제까지는 <span class="mark">기업의 관점</span>이었다.
+      이 장에서는 <span class="mark">소비자의 관점</span>으로 전환한다</p>
+    <p class="emph">소비재와 소비자 서비스에 대한 <strong>시장으로서의 도시</strong>.
+      소비자 의사결정이 어떻게 다양한 규모와 제품 다양성을 지닌 도시들을 생성하는가</p>
+  </div>
+</section>
+
+<!-- ══ 3. 섹션 — 01 입지에서의 독점적 경쟁 ══════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 입지에서의 독점적 경쟁</p>
+  <p class="section-sub">교재 p.110~114</p>
+</section>
+
+<!-- ══ 4. 독점적 경쟁의 두 가정 (p.110~111) ═════════════════ -->
+<section>
+  <h2>독점적 경쟁 <span class="en">(monopolistic competition)</span></h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">1. 진입에 대한 인위적인 장애물의 부재</p>
+        <p>특허나 규제가 없다. 다만 시장 진입은 비용을 수반하며 이를
+          <strong>고정된 창업비용</strong>으로 모형화한다.
+          식당업에 진입하려면 공간과 시설을 구입하거나 임대해야 한다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">2. 제품 차별화</p>
+        <p>기업들은 유사하지만 <strong>완전한 대체재는 아닌</strong> 제품을 생산한다.
+          공간적 맥락에서는 <strong>입지와 접근성</strong>에서 제품을 차별화한다 —
+          중심에 위치한 식당은 변두리 식당보다 접근성이 낫다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:20px">→ 개별 기업은 좁게 차별화된 제품에 대해 <strong>지역 독점</strong>을 갖는다.
+      인근에서 유일한 이탈리안 식당일 수 있다.
+      그러나 입지나 제품에서 차별화된 다른 식당들과 <strong>경쟁</strong>한다</p>
+  </div>
+</section>
+
+<!-- ══ 5. 그림 6-1 독점의 결과 (p.111~112) ══════════════════ -->
+<section class="s-split">
+  <h2>독점의 결과</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">장기비용곡선</p>
+      <p class="formula-key" style="margin-bottom:2px">C(q) = k + cq</p>
+      <p class="formula-key" style="margin-bottom:12px">ac(q) = k/q + c</p>
+      <p style="margin-bottom:18px">k는 <strong>설립비용</strong>, c는 <strong>생산의 한계비용</strong>.
+        장기평균비용곡선은 음(−)의 기울기를 가지며 수평의 한계비용곡선에
+        <strong>점근적</strong>이다</p>
+      <p class="emph" id="k-mono" style="margin-bottom:16px"></p>
+      <p class="derive t-red">→ 진입에 장벽이 없다면 이것은 <strong>장기균형이 아니다</strong>.
+        양(+)의 경제적 이윤을 보고 다른 기업들이 들어온다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-mono" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>독점기업이 한계수입과 한계비용이 만나는 수량에서 평균비용을 웃도는 가격을 매겨 이윤을 얻는 그림</title></svg>
+      <script>
+        (function () {
+          const M = window.MC, S0 = M.stage[0];
+          const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 16] });
+          const samp = (f, a, b, n) => {
+            const o = [];
+            for (let i = 0; i <= n; i++) { const q = a + ((b - a) * i) / n; o.push([q, f(q)]); }
+            return S.curve(o);
+          };
+          const q = M.qStar(S0.A), p = M.demand(S0.A, q), ac = M.ac(q);
+          const AC = samp((x) => M.ac(x), 1.1, 15.5, 70);
+          F.draw('#f-mono', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              // 이윤 = (가격 − 평균비용) × 수량
+              F.raw(`<rect class="area-surplus" x="${S.x(0)}" y="${S.y(p)}" ` +
+                    `width="${S.x(q) - S.x(0)}" height="${S.y(ac) - S.y(p)}"/>`),
+              F.line(...S.p([0, S0.A]), ...S.p([15.5, M.demand(S0.A, 15.5)]), { variant: 'demand' }),
+              F.line(...S.p([0, S0.A]), ...S.p([9.4, M.mr(S0.A, 9.4)]), { variant: 'supply' }),
+              F.curve(AC),
+              F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
+              F.annot(S.x(14), S.y(M.demand(S0.A, 14)) + 15, S0.sub + ': ' + S0.name,
+                      { size: 11, tone: 'blue', anchor: 'end' }),
+              F.annot(S.x(8.4), S.y(M.mr(S0.A, 8.4)) - 8, '한계수입', { size: 11, tone: 'red' }),
+              F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
+              F.annot(S.x(3), S.y(M.c) - 8, '한계비용', { size: 11 }),
+              F.guide(...S.p([q, p]), { xtick: "q′", ytick: "p′" }),
+              F.guide(...S.p([q, ac]), { ytick: "ac′", only: 'y' }),
+              F.dot(...S.p([q, p]),    { label: 'b', lx: 8, ly: -8 }),
+              F.dot(...S.p([q, ac]),   { label: 'c', lx: 8, ly: -8 }),
+              F.dot(...S.p([q, M.c]),  { label: 'a', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const M = window.MC, A = M.stage[0].A;
+      const q = M.qStar(A), p = M.demand(A, q), ac = M.ac(q);
+      document.getElementById('k-mono').innerHTML =
+        `한계의 원리(MR = MC)로 수량 <strong>q′</strong>(점 a)를 고르고, ` +
+        `수요곡선의 점 b 에서 가격 <strong>p′</strong>을 부과한다. ` +
+        `경제적 이윤은 음영 직사각형 — 높이는 <strong>p′ − ac′</strong>, 폭은 <strong>q′</strong>이다`;
+    })();
+  </script>
+</section>
+
+<!-- ══ 6. 그림 6-2 진입과 독점적 경쟁 (p.112~113) — fragment ══ -->
+<section class="s-split">
+  <h2>진입과 독점적 경쟁</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">복점 — 잔여수요곡선이 왼쪽으로</p>
+      <p style="margin-bottom:20px">두 번째 기업의 진입이 전형적인 기업의
+        <strong>잔여수요곡선</strong>을 왼쪽으로 민다.
+        진입은 위(낮은 가격) · 오른쪽(기업당 작은 수량) · 아래(높은 평균비용)로부터 이윤을 줄인다</p>
+      <p class="sub t-red fragment fade-in" data-fragment-index="0" style="margin-bottom:2px">장기균형 — 경제적 이윤이 영(0)</p>
+      <p class="fragment fade-in" data-fragment-index="0" style="margin-bottom:20px">
+        진입은 경제적 이윤이 영이 될 때까지 계속된다.
+        여기서는 네 기업의 <strong>사중복점</strong>이다.
+        개별 기업에 대해 <strong>MR = MC</strong>(이윤극대화)이고
+        <strong>가격 = 평균비용</strong>(영의 이윤)이다</p>
+      <p class="derive t-red fragment fade-in" data-fragment-index="0">→ 퇴출할 유인도, 진입할 유인도 없다.
+        <strong>내쉬균형</strong>이다. 균형 기업의 수는 n* = Q*/q*</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-duo" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>진입으로 잔여수요곡선이 왼쪽으로 밀려 결국 평균비용곡선에 접하는 장기균형에 이르는 그림</title></svg>
+      <script>
+        (function () {
+          const M = window.MC;
+          const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 16] });
+          const samp = (f, a, b, n) => {
+            const o = [];
+            for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const parts = [
+            F.curve(samp((x) => M.ac(x), 1.1, 15.5, 70)),
+            F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
+            F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
+            F.annot(S.x(3), S.y(M.c) - 8, '한계비용', { size: 11 }),
+          ];
+          [1, 2].forEach((i, step) => {
+            const st = M.stage[i];
+            const q = M.qStar(st.A), p = M.demand(st.A, q), ac = M.ac(q);
+            const xEnd = st.A / M.B;
+            parts.push(F.line(...S.p([0, st.A]), ...S.p([Math.min(xEnd, 15.5), M.demand(st.A, Math.min(xEnd, 15.5))]),
+                              { variant: 'demand', fragment: step }));
+            parts.push(F.line(...S.p([0, st.A]), ...S.p([st.A / (2 * M.B), 0]),
+                              { variant: 'supply', fragment: step }));
+            parts.push(F.annot(S.x(Math.min(xEnd, 14.6)), S.y(M.demand(st.A, Math.min(xEnd, 14.6))) + 14,
+                               st.sub + ': ' + st.name,
+                               { size: 11, tone: 'blue', anchor: 'end', fragment: step }));
+            parts.push(F.guide(...S.p([q, p]), { xtick: st.pts[0] === 'f' ? 'q″' : 'q*',
+                                                 ytick: st.pts[0] === 'f' ? 'p″' : 'p*', fragment: step }));
+            parts.push(F.dot(...S.p([q, p]),   { label: st.pts[0], lx: 8, ly: -8, fragment: step }));
+            if (st.pts[1]) {
+              parts.push(F.guide(...S.p([q, ac]), { ytick: 'ac″', only: 'y', fragment: step }));
+              parts.push(F.dot(...S.p([q, ac]), { label: st.pts[1], lx: 8, ly: -8, fragment: step }));
+            }
+            parts.push(F.dot(...S.p([q, M.c]), { label: st.pts[2], lx: 8, ly: -8, fragment: step }));
+          });
+          F.draw('#f-duo', { axes: { x: '수량', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 7. 공간적 맥락 (p.114) ═══════════════════════════════ -->
+<section>
+  <h2>공간적 맥락에서의 독점적 경쟁</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:14px">도시 중심에 이문을 얻고 있는 이탈리안 식당 하나에서 출발하자.
+      두 번째 이탈리안 식당이 북부에 개업하면, 북부 사람들은 <strong>통행비용을 아끼려</strong> 새 식당으로 전환한다.
+      재화가 <strong>입지와 접근성 측면에서 차별화</strong>되는 것이다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">진입이 가져오는 세 가지</p>
+        <p>(a) 시장가격이 감소하고<br>
+          (b) 기업당 수량이 감소하며<br>
+          (c) 생산의 평균비용이 증가한다<br>
+          → 기업당 이윤이 줄어든다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">장기균형에서</p>
+        <p style="margin-bottom:10px">가격은 평균비용과 일치하고 개별 기업은 영(0)의 경제적 이윤
+          — 즉 <strong>“정상” 회계이윤</strong>을 얻는다</p>
+        <p class="caption">도시는 수십 개의 이탈리안 식당을 갖는다.
+          개별 식당은 영업을 지속하기에 충분한 돈을 벌지만
+          다른 기업의 진입을 촉발할 만큼 벌지는 못한다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 8. 섹션 — 02 엔터테인먼트 기계로서의 도시들 ══════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 엔터테인먼트 기계로서의 도시들</p>
+  <p class="section-sub">왜 큰 도시가 더 다양한 재화를 갖는가 · 교재 p.114~118</p>
+</section>
+
+<!-- ══ 9. 최소시장규모 + 그림 6-3 (p.115~116) ═══════════════ -->
+<section class="s-split">
+  <h2>최소시장규모</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">고정된 설치비용 k가 있으면 기업을 지탱하는 데
+        <strong>최소시장규모</strong>가 필요하다.
+        설치비용이 크면 장기평균비용곡선이 큰 생산량에 걸쳐 큰 음(−)의 기울기를 갖는다 —
+        <strong>큰 설치비용은 큰 규모의 경제</strong>를 뜻한다</p>
+      <p class="formula-key" style="margin-bottom:10px">도시 전체 수요 = d(p) · N</p>
+      <p style="margin-bottom:14px">총량이 크려면 <strong>높은 1인당 수요</strong>이거나
+        <strong>큰 인구</strong>여야 한다</p>
+      <p class="derive t-red">→ 시장수요가 생산에서의 규모의 경제에 비해 크다면
+        시장은 적어도 하나의 기업을 지탱한다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-min" viewBox="0 0 460 290" style="width:420px" role="img">
+        <title>큰 규모의 경제에서는 높은 수요가, 작은 규모의 경제에서는 낮은 수요도 기업을 지탱하는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 56, y0: 250, x1: 400, y1: 26 });
+          const S = F.scale({ x: [0, 10], y: [0, 10] });
+          const samp = (f, a, b) => {
+            const o = [];
+            for (let i = 0; i <= 50; i++) { const x = a + ((b - a) * i) / 50; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          // 큰 규모의 경제 = 큰 k → 높이 있는 평균비용곡선. 작은 규모의 경제 = 작은 k
+          const acBig = (q) => 1.6 + 22 / (q + 2.2);
+          const acSml = (q) => 0.6 + 5 / (q + 1.6);
+          F.draw('#f-min', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              F.curve(samp(acBig, 0.5, 9.4)),
+              F.line(...S.p([0.8, 9.4]), ...S.p([9.4, 5.0]), { variant: 'demand' }),
+              F.annot(S.x(7.4), S.y(6.6), '높은 수요', { size: 11, tone: 'blue' }),
+              F.annot(S.x(6.0), S.y(3.6), '평균비용: 큰 규모의 경제', { size: 11 }),
+              F.curve(samp(acSml, 0.5, 7.4), { variant: 'supply' }),
+              F.line(...S.p([0.8, 3.1]), ...S.p([7.4, 0.7]), { variant: 'i2' }),
+              F.annot(S.x(3.4), S.y(2.5), '낮은 수요', { size: 11, tone: 'orange' }),
+              F.annot(S.x(2.2), S.y(0.8), '평균비용: 작은 규모의 경제', { size: 11, tone: 'red' }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 10. 그림 6-4 도시규모와 제품 다양성 (p.116~117) ══════ -->
+<section class="s-split">
+  <h2>큰 도시에서는 팔리고 작은 도시에서는 안 팔리는 재화</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:16px">1인당 수요가 낮은 재화는 기업을 지탱하려면
+        <strong>큰 인구</strong>가 필요하다.
+        큰 도시의 수요곡선은 평균비용곡선 <strong>위</strong>에 놓이고,
+        작은 도시의 수요곡선은 <strong>아래</strong>에 놓인다</p>
+      <p class="derive t-red" style="margin-bottom:16px">→ 페루 음식에 대한 1인당 수요가 낮아
+        <strong>페루 식당은 큰 도시에서만 살아남는다</strong></p>
+      <p class="caption">예술 — 미술관 전시, 음악과 연극의 라이브 공연 ·
+        소매업 — 최신유행부터 중고까지 가격대 양 극단의 의류 상점 ·
+        소비자 서비스 — 의료시술과 자조(self−help) 서비스</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-city" viewBox="0 0 460 290" style="width:420px" role="img">
+        <title>큰 도시의 수요곡선만 평균비용곡선 위에 놓이는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 56, y0: 250, x1: 400, y1: 26 });
+          const S = F.scale({ x: [0, 10], y: [0, 10] });
+          const o = [];
+          for (let i = 0; i <= 50; i++) { const x = 0.5 + (8.9 * i) / 50; o.push([x, 1.3 + 16 / (x + 2.0)]); }
+          F.draw('#f-city', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              F.curve(S.curve(o)),
+              F.annot(S.x(6.2), S.y(2.6), '평균비용', { size: 11 }),
+              F.line(...S.p([0.8, 8.8]), ...S.p([9.2, 4.0]), { variant: 'demand' }),
+              F.annot(S.x(7.8), S.y(5.6), '수요: 큰 도시', { size: 11, tone: 'blue', anchor: 'end' }),
+              F.line(...S.p([0.8, 5.4]), ...S.p([7.0, 1.0]), { variant: 'i2' }),
+              F.annot(S.x(4.4), S.y(2.2), '수요: 작은 도시', { size: 11, tone: 'orange', anchor: 'end' }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11. 이발사와 뇌외과 의사 (p.117~118) ═════════════════ -->
+<section>
+  <h2>이발사와 뇌외과 의사</h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:30px">두 유형의 노동자가 신체의 거의 같은 부분에서 작업하지만,
+      그들은 <strong>생산에서의 규모의 경제에 비해 상이한 1인당 수요</strong>를 직면한다</p>
+    <div class="def-row">
+      <div class="def-tag">모든 도시의<br>이발사들</div>
+      <div>
+        <p>전형적인 사람은 매 2개월마다 이발한다 — <strong>1인당 수요가 높다</strong>.
+          창업비용도 낮다: 한 벌의 가위, 대략 12입방미터(2×2×3)의 공간, 그리고 의자</p>
+        <p class="caption">→ 단지 <strong>수천의 인구</strong>를 갖는 도시에서도 살아남는다</p>
+      </div>
+    </div>
+    <div class="def-row" style="margin-top:26px">
+      <div class="def-tag">큰 도시의<br>뇌외과 의사들</div>
+      <div>
+        <p>인구의 적은 수만이 뇌수술을 필요로 해 <strong>1인당 수요가 낮다</strong>.
+          시설과 장비는 비싸 <strong>규모의 경제가 크다</strong></p>
+        <p class="caption">→ <strong>수백만의 잠재적 고객</strong>을 갖는 도시들에 입지한다</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 12. 엔터테인먼트 기계 (p.118) ════════════════════════ -->
+<section>
+  <h2>도시는 “엔터테인먼트 기계”다</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:14px">교역도시와 생산도시가 이윤을 찾아 기업을 유인하듯이,
+      <span class="mark">소비자도시는 재화와 서비스의 호의적인 혼합을 찾아 소비자를 유인한다</span></p>
+    <p class="emph" style="margin-bottom:16px">일부 유형의 소비자 재화와 서비스를 공급하는 기업들은
+      대도시에서만 살아남는다. 결과적으로 <strong>소비자 관심은 대도시들을 보다 더 크게 만드는 경향</strong>이 있다.
+      큰 노동력과 소비자 기반은 전시관·극장·스포츠 구단·특화된 의료시설을 유인한다</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">양(+)의 상관관계</p>
+        <p>1인당 <strong>라이브−공연 장소</strong>의 수가 상대적으로 큰 도시들이 평균적으로 더 빠르게 성장했다.
+          1인당 <strong>식당</strong>의 수도 같다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">음(−)의 상관관계</p>
+        <p><strong>영화관과 볼링장</strong>의 수는 인구성장과 음의 상관관계를 보였다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:14px">→ 지난 수십 년간 가장 생산적인 엔터테인먼트 기계들 —
+      <strong>뉴욕 · 시카고 · 샌프란시스코</strong> — 이 가장 급속한 성장을 경험하였다
+      <span class="caption">(Glaeser, Kolko, and Saiz, 2001)</span></p>
+  </div>
+</section>
+
+<!-- ══ 13. 섹션 — 03 중심지이론 ═════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 중심지이론</p>
+  <p class="section-sub">지역 전체에 몇 개의 도시가, 어떤 크기로 생기는가 · 교재 p.119~126</p>
+</section>
+
+<!-- ══ 14. 중심지이론의 두 질문과 다섯 가정 (p.119~120) ═════ -->
+<section>
+  <h2>중심지이론</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:4px">독점적 경쟁모형이 <strong>하나의 지역경제</strong>를 다뤘다면,
+      중심지이론은 <strong>지역적 관점</strong>에서 두 질문에 답한다 —
+      ① 얼마나 많은 도시들이 발달할 것인가 ② 도시들이 어떻게 규모와 소비재의 다양성에서 상이할 것인가</p>
+    <ol class="dense">
+      <li><strong>고정된 인구</strong> — 지역의 인구는 고정되었다</li>
+      <li><strong>편재한 생산요소들</strong> — 모든 생산요소는 지역의 모든 입지에서 동일한 가격에 구매할 수 있다</li>
+      <li><strong>균등한 수요</strong> — 개별 제품에 대해 1인당 수요는 지역 내 모든 입지에서 동일하다</li>
+      <li><strong>완전한 대체재</strong> — 상이한 기업들의 제품은 완전한 대체재다.
+        비교구매의 이점이 없어 <strong>동일 제품 기업들의 군집 이점이 없다</strong></li>
+      <li><strong>재화들 간 보완성 부재</strong> — 상이한 재화는 보완적이지 않아
+        <strong>상이한 재화 기업들의 군집 이점도 없다</strong></li>
+    </ol>
+    <p class="derive t-red" style="margin-top:8px">→ 이 이론은 도시들의 <strong>위계적 체계</strong>를 예측한다.
+      큰 도시에서는 원하는 어느 것이나 얻을 수 있으나 작은 도시에서는 그러지 못한다</p>
+  </div>
+</section>
+
+<!-- ══ 15. 세 재화의 예 (p.120) ═════════════════════════════ -->
+<section class="s-split">
+  <h2>세 재화, 하나의 지역</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" id="k-cpt-intro" style="margin-bottom:16px"></p>
+      <p class="derive t-red">→ 세 재화는 <strong>규모의 경제에 비해 1인당 수요</strong>에서 상이하다.
+        이 차이가 도시의 크기와 다양성의 차이를 낳는다</p>
+    </div>
+    <div class="col-r">
+      <p class="caption-blue">재화별 최소시장규모와 지역 내 개수</p>
+      <table class="tbl-cpt" id="t-cpt"></table>
+      <p class="caption" style="margin-top:12px">1인당 수요가 규모의 경제에 비해
+        의류는 작고, 식료품은 중간이며, 이발은 높다</p>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const C = window.CPT;
+      document.getElementById('k-cpt-intro').innerHTML =
+        `<strong>${C.population.toLocaleString()}명</strong>의 인구를 갖는 하나의 지역. ` +
+        `소비자들은 직선을 따라 위치해 지역은 <strong>${C.length}마일</strong> 길이이고, ` +
+        `처음에는 1마일당 <strong>${C.density.toLocaleString()}명</strong>이 거주한다`;
+      document.getElementById('t-cpt').innerHTML =
+        '<thead><tr><th>재화</th><th>살아남는 데 필요한 인구</th><th>지역 내 개수</th></tr></thead><tbody>' +
+        C.goods.map((g) =>
+          `<tr><td style="text-align:left">${g.name}</td>` +
+          `<td>${g.need.toLocaleString()}명</td><td>${g.count}</td></tr>`).join('') +
+        '</tbody>';
+    })();
+  </script>
+</section>
+
+<!-- ══ 16. 그림 6-5 중심지이론 (p.121) ══════════════════════ -->
+<section>
+  <h2>중심지 위계가 생긴다</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">기업들은 고객까지의 거리를 최소화하는 <strong>중위입지</strong>를 고른다.
+      상점 근로자들이 그 인근에 살아 <strong>그곳의 인구밀도가 올라간다</strong></p>
+    <svg class="fig" id="f-cpt" viewBox="0 0 700 250" style="width:620px;margin:4px 0 0 108px" role="img">
+      <title>48마일 지역에 큰 도시 하나, 중간 도시 둘, 작은 도시 여덟이 생기는 인구밀도 막대</title></svg>
+    <script>
+      (function () {
+        const C = window.CPT, F = Fig;
+        const X0 = 80, X1 = 640, Y = 196, HMAX = 152;
+        const px = (x) => X0 + (x / C.length) * (X1 - X0);
+        const maxH = C.height.big;
+        const parts = [
+          F.raw(`<path d="M${X0 - 20},${Y} L${X1 + 16},${Y}" stroke="var(--ink)" stroke-width="1" fill="none"/>`),
+          F.annot(X0 - 30, Y - 76, '인구밀도', { anchor: 'middle', size: 11 }),
+          F.annot((X0 + X1) / 2, Y + 38, '입지 (마일)', { anchor: 'middle', size: 12 }),
+        ];
+        for (const t of C.towns) {
+          const h = (C.height[t.tier] / maxH) * HMAX, w = 20;
+          const op = t.tier === 'big' ? 0.9 : t.tier === 'mid' ? 0.6 : 0.32;
+          parts.push(F.raw(
+            `<rect x="${px(t.x) - w / 2}" y="${Y - h}" width="${w}" height="${h}" ` +
+            `fill="var(--brand-crimson)" fill-opacity="${op}" stroke="var(--brand-crimson)" stroke-width="1"/>`));
+        }
+        [8, 24, 40].forEach((x) =>
+          parts.push(F.annot(px(x), Y + 17, String(x), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(px(24), Y - HMAX - 8, '의류 1 · 식료품 2 · 이발 4',
+                           { anchor: 'middle', size: 11, tone: 'red' }));
+        parts.push(F.annot(px(8), Y - (C.height.mid / maxH) * HMAX - 8, '식료품 1 · 이발 2',
+                           { anchor: 'middle', size: 11 }));
+        parts.push(F.annot(px(40), Y - (C.height.mid / maxH) * HMAX - 8, '식료품 1 · 이발 2',
+                           { anchor: 'middle', size: 11 }));
+        F.draw('#f-cpt', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:4px">→ 이 지역은 크기와 소비자 재화의 다양성에서 상이한
+      <strong>총 11개의 도시</strong>를 갖는다.
+      큰 도시 1 + 중간 도시 2 + 작은 도시 8, 그리고 작은 도시는 이발소만 갖는다</p>
+  </div>
+</section>
+
+<!-- ══ 17. 도시위계와 수출 (p.122) ══════════════════════════ -->
+<section>
+  <h2>도시들은 아래로 수출한다</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:14px">위계의 최상위에서 가장 큰 도시는 전체 조합의 재화를 공급하고,
+      최하위에서 가장 작은 도시들은 하나의 재화만 공급한다.
+      <strong>개별 도시는 보다 낮은 순위의 도시들에 재화를 수출한다</strong></p>
+    <div class="chain">
+      <div class="node">큰 도시<span class="va">의류 · 식료품 · 이발</span></div>
+      <div class="link">→</div>
+      <div class="node">중간 도시<span class="va">식료품 · 이발</span></div>
+      <div class="link">→</div>
+      <div class="node">작은 도시<span class="va">이발</span></div>
+    </div>
+    <p class="derive t-red" style="margin-top:48px">→ 큰 도시는 중간·작은 도시에 의류를 수출하고,
+      중간 도시는 작은 도시에 식료품을 수출한다.
+      낮은 끝에서 <strong>작은 도시들은 재화를 수입한다</strong> —
+      그 소비자들은 식료품과 의류를 위해 보다 큰 도시로 통행한다</p>
+  </div>
+</section>
+
+<!-- ══ 18. 중심지이론으로부터의 통찰 (p.122~123) ════════════ -->
+<section>
+  <h2>중심지이론으로부터의 세 통찰</h2>
+  <div class="body">
+    <ol class="dense">
+      <li><strong>규모와 다양성에서의 차이</strong> — 세 재화가 규모의 경제에 비해 1인당 수요에서 다르기 때문에 생긴다.
+        만일 세 재화가 동일한 1인당 수요를 갖는다면 세 재화의 시장구역이 일치해
+        <strong>이 지역은 네 개의 동일한 도시</strong>를 가질 것이다</li>
+      <li><strong>큼은 적음을 의미한다</strong> — 큰 도시가 공급하는 추가적인 재화는 1인당 수요가 낮은 재화다.
+        그런 상점은 적은 숫자로 존재하므로 <strong>적은 수의 도시만 클 수 있다</strong>.
+        이발사는 매우 많아 작은 도시가 매우 많다</li>
+      <li><strong>쇼핑 경로</strong> — 소비자들은 <strong>보다 큰 도시로만 통행</strong>한다.
+        중간 도시 주민은 옷을 사러 큰 도시로 가지만,
+        다른 중간 도시나 작은 도시로는 가지 않는다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 19. 그림 6-6 인디애나 (p.123~124) ════════════════════ -->
+<section>
+  <h2>인디애나의 중심지역들, 2014</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:2px">인구조사표준지역을 퍼즐 조각으로 그리고
+      <strong>헥타르당 노동자수(고용밀도)</strong>만큼 밀어 올린 지도다</p>
+    <img src="../assets/tb-indiana-central-places.jpg"
+         alt="인디애나주 지도 위에 고용밀도를 높이로 세운 3차원 그림. 주의 지리적 중심 가까이 인디애나폴리스가 가장 높고 크게 솟아 있으며 여러 크기의 도시들이 주 전체에 흩어져 있다"
+         style="display:block;height:250px;width:auto;margin:6px auto 0">
+    <p class="caption" style="margin-top:4px;text-align:center">오설리반, 『오설리반의 도시경제학』 제9판, 박영사, 2022, 그림 6−6 (p.124)</p>
+    <p class="derive t-red" style="margin-top:4px">→ 가장 큰 집중은 <strong>인디애나폴리스</strong> 대도시지역이며 주의 지리적 중심에 가깝다.
+      여타 군집들은 면적이나 일자리 밀도로 표시된 다양한 크기의 도시들에 존재한다 —
+      <strong>중심지이론이 예측한 도시위계</strong>다</p>
+  </div>
+</section>
+
+<!-- ══ 20. 가정들의 완화 (p.124~126) ════════════════════════ -->
+<section>
+  <h2>가정을 완화하면</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">완전한 대체재 가정을 풀면</p>
+        <p style="margin-bottom:16px">식료품점을 <strong>자동차판매상</strong>으로 바꿔 보자.
+          불완전 대체재라면 소비자는 <strong>비교구매</strong>에서 편익을 얻고,
+          판매상들은 떨어지기보다 군집한다</p>
+        <p class="caption" style="margin-bottom:16px">→ 도시들의 균형 수를 <strong>줄이고</strong>
+          가장 큰 도시의 크기를 <strong>키운다</strong></p>
+        <p class="sub t-red" style="margin-bottom:2px">보완성 부재 가정을 풀면</p>
+        <p>식료품점을 <strong>구두가게</strong>로 바꾸고 의류와 구두가 보완재라면,
+          구두가게는 <strong>원−스톱 구매</strong>를 위해 의류상점 가까이 큰 도시에 선다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">1인당 수요가 도시 규모에 따라 달라지면</p>
+        <p style="margin-bottom:10px"><strong>전통 대중음악</strong> — 작은 도시에서 1인당 수요가 높고 큰 도시에서 낮다면,
+          큰 도시가 공연장을 지탱할 수요를 갖지 못해 <strong>도시위계가 무너질</strong> 수 있다.
+          다만 큰 도시는 큰 인구로 그 문제를 극복해 적어도 하나는 갖는다</p>
+        <p style="margin-bottom:16px"><strong>오페라</strong> — 큰 도시에서 1인당 수요가 높고 작은 도시에서 영(0)이라면,
+          큰 도시는 자연히 더 커지고 <strong>도시위계는 강화된다</strong></p>
+        <p class="derive t-red">→ 위계는 덜 정연해지지만 핵심은 지속된다.
+          <strong>보다 큰 도시들은 보다 폭넓은 다양한 재화와 서비스를 제공한다</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 21. Q & A ════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

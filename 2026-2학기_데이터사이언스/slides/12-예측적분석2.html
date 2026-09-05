@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>12강. 예측적 분석 Ⅱ — 머신러닝과 불확실성</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>12강. 예측적 분석 Ⅱ<br>머신러닝과 불확실성</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>어느 모형의 예측을 믿어야 하나?</h2>
+    <div class="body">
+      <ul>
+        <li>지난주에 선형 추세가 <span class="num">4.12%</span> 빗나갔다</li>
+        <li>더 복잡한 모형을 쓰면 <span class="mark">더 잘 맞을까</span></li>
+        <li>그리고 "약 100만명" 이라고만 말해도 되는가</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 오늘의 세 방법 ════════════════════════════════ -->
+  <section>
+    <h2>오늘 배울 세 가지</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:28%">방법</th><th style="width:34%">답하는 질문</th><th>얻는 것</th></tr></thead>
+        <tbody>
+          <tr><td>① 과적합과 복잡도</td><td>복잡하게 하면 나아지나</td><td class="hl">복잡도를 고르는 기준</td></tr>
+          <tr><td>② 머신러닝 개관</td><td>회귀와 무엇이 다른가</td><td>언제 쓰고 언제 안 쓰나</td></tr>
+          <tr><td>③ 예측구간</td><td>얼마나 빗나갈 수 있나</td><td class="hl">숫자 하나 대신 범위</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:16px">
+        ③이 이 수업에서 가장 중요하다. <span class="hl">점 하나만 내놓은 예측은 증거로 쓸 수 없다.</span></p>
+    </div>
+  </section>
+
+  <!-- ══ 4. ① 원리 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ①  과적합과 복잡도</p>
+    <h2>잘 맞히는 것과 잘 예측하는 것은 다르다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>모형을 복잡하게 하면 <span class="hl">학습 자료는 얼마든지</span> 잘 맞힐 수 있다.
+          점이 10개면 9차 다항식이 전부를 정확히 지난다.</p>
+        <p style="margin-top:10px">그런데 그 곡선은 자료의 <span class="mark">규칙이 아니라 우연까지</span>
+          따라 그린 것이다.</p>
+        <p style="margin-top:10px">그래서 학습 오차는 계속 줄어드는데
+          <span class="hl">검증 오차는 어느 지점부터 도로 커진다.</span></p>
+        <p class="emph" style="margin-top:12px">
+          그 지점이 <span class="t-red">복잡도의 적정선</span>이다.</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-of" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="모형이 복잡해질수록 학습 오차는 계속 줄지만 검증 오차는 어느 지점부터 다시 커지는 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 56, y0: 236, x1: 396, y1: 40 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const tr = [], va = [];
+        for (let x = 0.4; x <= 9.6; x += 0.2) {
+          tr.push([x, 8.4 * Math.exp(-0.32 * x) + 0.5]);
+          va.push([x, 3.2 + 7.0 * Math.exp(-0.62 * x) + 0.30 * Math.pow(x - 3.6, 2) * (x > 3.6 ? 1 : 0)]);
+        }
+        F.draw('#f-of', {
+          axes: { x: '모형의 복잡도', y: '오차' },
+          parts: [
+            F.curve(S.curve(tr), { variant: 'demand' }),
+            F.curve(S.curve(va), { variant: 'supply' }),
+            F.line(S.x(3.6), S.y(0), S.x(3.6), S.y(9.2), { variant: 'cap' }),
+            F.annot(S.x(3.6), S.y(9.7), '적정선', { anchor: 'middle', size: 12.5 }),
+            F.annot(S.x(9.4), S.y(1.2), '학습 오차', { anchor: 'end', size: 12.5 }),
+            F.annot(S.x(9.4), S.y(8.6), '검증 오차', { anchor: 'end', tone: 'red', size: 12.5 }),
+            F.annot(S.x(6.6), S.y(3.0), '과적합', { anchor: 'middle', size: 12.5 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 5. ① 예시 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  과적합과 복잡도</p>
+    <h2>화성 인구 — 네 모형을 채점한다</h2>
+    <div class="body tight">
+      <p class="sub">학습 100개월 (2014.01~2022.04) · 검증 12개월 · 실제 2023-04 = <span class="num">978,653</span>명</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:22%">모형</th><th style="width:20%">학습 MAPE</th>
+          <th style="width:20%">검증 MAPE</th><th>2023-04 예측</th></tr></thead>
+        <tbody>
+          <tr><td>선형</td><td class="num">1.38%</td><td class="num">4.12%</td><td class="num">1,021,018</td></tr>
+          <tr><td>2차</td><td class="num">1.37%</td><td class="num">3.10%</td><td class="num">1,008,456</td></tr>
+          <tr><td class="hl">3차</td><td class="hl num">0.50%</td><td class="num">2.47%</td><td class="num">928,321</td></tr>
+          <tr><td>지수</td><td class="num">1.60%</td><td class="num">7.83%</td><td class="num">1,066,323</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">모든 모형에서 검증 오차가 학습 오차보다 크다.</span>
+        3차는 학습에서 0.50%로 가장 잘 맞지만 그것이 예측력의 증거는 아니다.</p>
+      <p class="caption" style="margin-top:8px">
+        선형·지수는 <span class="hl">과대추정</span>(증가세 둔화를 놓쳤다),
+        3차는 <span class="hl">과소추정</span>(학습 구간의 굴곡을 따라가다 꺾여 내려갔다).
+        어느 모형도 "맞다" 고 할 수 없다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 6. ① 주의 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ①  과적합과 복잡도</p>
+    <h2>주의 — 복잡도를 올리고 싶어질 때</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:32%">이런 유혹</th><th>왜 위험한가</th></tr></thead>
+        <tbody>
+          <tr><td>"차수를 올리니 R²이 올랐어요"</td><td>R²은 <span class="hl">학습 성적</span>이다.
+            변수를 넣을수록 무조건 오른다</td></tr>
+          <tr><td>"모형을 여럿 돌려 가장<br>잘 맞는 걸 골랐어요"</td><td>검증 자료로 고르면
+            <span class="hl">그 순간 검증이 아니다.</span> 고르기용과 채점용을 나눠야 한다</td></tr>
+          <tr><td>"관측이 112개인데<br>변수를 20개 넣었어요"</td><td>표본이 적으면 복잡한 모형이
+            우연을 외운다. <span class="mark">표본 수가 복잡도의 상한이다</span></td></tr>
+          <tr><td>"AI가 알아서 골라 줬어요"</td><td>무엇을 기준으로 골랐는지 물어야 한다.
+            <span class="hl">학습 성적으로 골랐다면 과적합된 모형이 뽑힌다</span></td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        마지막 줄이 이 수업의 자리다. <span class="hl">AI에게 모형 선택 기준을 물어보는 것</span>이
+        로직 검증이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 7. ② 원리 ═══════════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 ②  머신러닝 개관</p>
+    <h2>회귀와 무엇이 다른가</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>회귀는 <span class="hl">사람이 꼴을 정한다</span> —
+          "직선이다", "2차식이다" 라고 미리 못 박고 계수만 찾는다.</p>
+        <p style="margin-top:10px">머신러닝은 <span class="hl">꼴도 자료에서 찾는다.</span>
+          나무를 몇 번 가를지, 어디서 가를지를 자료가 정한다.</p>
+        <p style="margin-top:10px">그래서 <span class="mark">복잡한 관계를 잡아내지만</span>,
+          같은 이유로 <span class="mark">과적합에 훨씬 쉽게 빠진다.</span></p>
+        <p class="emph" style="margin-top:12px">
+          검증이 더 중요해지지 <span class="t-red">덜 중요해지지 않는다.</span></p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-ml" viewBox="0 0 420 290" style="width:400px" role="img"
+             aria-label="회귀는 사람이 정한 직선, 의사결정나무는 자료가 정한 계단 모양으로 같은 점들을 설명하는 비교 그림"></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 48, y0: 236, x1: 396, y1: 40 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const pts = [[0.9,2.0],[1.8,2.6],[2.6,2.3],[3.4,5.2],[4.2,5.6],
+                     [5.0,5.1],[5.8,7.6],[6.6,8.0],[7.6,7.7],[8.6,8.3]];
+        // 계단 (의사결정나무가 만드는 꼴)
+        const step = [[0.6,2.3],[3.0,2.3],[3.0,5.3],[5.4,5.3],[5.4,7.9],[9.0,7.9]];
+        F.draw('#f-ml', {
+          axes: { x: 'x', y: 'y' },
+          parts: [
+            F.line(S.x(0.6), S.y(1.9), S.x(9.0), S.y(8.7), { variant: 'demand' }),
+            F.raw(`<path class="curve curve-supply" fill="none" d="${Fig.path(step.map(([x, y]) => [S.x(x), S.y(y)]))}"/>`),
+            F.dots(pts.map(([x, y]) => [S.x(x), S.y(y)])),
+            F.annot(S.x(8.8), S.y(6.4), '회귀 — 사람이 정한 꼴', { anchor: 'end', size: 12 }),
+            F.annot(S.x(2.4), S.y(9.2), '나무 — 자료가 정한 꼴', { size: 12, tone: 'red' }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 8. ② 언제 쓰나 ══════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ②  머신러닝 개관</p>
+    <h2>언제 쓰고 언제 쓰지 않나</h2>
+    <div class="body">
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:44%">쓸 만하다</th><th>회귀가 낫다</th></tr></thead>
+        <tbody>
+          <tr><td>관측이 많다 (수천~수만)</td><td>관측이 적다 — <span class="hl">화성 112개월은 적은 편이다</span></td></tr>
+          <tr><td>변수가 많고 관계가 뒤엉켜 있다</td><td>변수가 몇 개뿐이다</td></tr>
+          <tr><td>맞히는 것 자체가 목적이다</td><td class="hl">왜 그런지 설명해야 한다</td></tr>
+          <tr><td>규칙을 미리 알기 어렵다</td><td>이론이 이미 꼴을 알려 준다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">
+        <span class="hl">정책 근거를 만드는 일에서는 오른쪽 세 번째가 자주 결정적이다.</span>
+        "왜 이 지역인가" 를 설명하지 못하면 예산을 못 받는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 9. ③ 원리 ═══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  예측구간</p>
+    <h2>숫자 하나 대신 범위를 낸다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-pi" viewBox="0 0 700 275" style="width:680px" role="img"
+           aria-label="예측선 둘레로 미래로 갈수록 넓어지는 띠를 그린 예측구간 그림"></svg>
+      <p class="caption" style="text-align:center;margin-top:2px">
+        <span class="hl">멀리 갈수록 띠가 넓어진다.</span> 넓어지지 않는 예측구간은 잘못 만든 것이다.</p>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 62, y0: 220, x1: 660, y1: 34 });
+        const S = F.scale({ x: [0, 20], y: [0, 260] });
+        const fit = [], up = [], lo = [], obs = [];
+        for (let t = 0; t <= 20; t += 0.5) {
+          const y = 60 + 7.4 * t;
+          fit.push([t, y]);
+          const w = t <= 10 ? 8 : 8 + 4.6 * (t - 10);
+          up.push([t, y + w]); lo.push([t, y - w]);
+        }
+        for (let t = 0; t <= 10; t += 1) obs.push([t, 60 + 7.4 * t + (t % 3 - 1) * 5]);
+        const band = up.map(([x, y]) => [S.x(x), S.y(y)])
+          .concat(lo.slice().reverse().map(([x, y]) => [S.x(x), S.y(y)]));
+        F.draw('#f-pi', {
+          axes: { x: '시간', y: '값' },
+          parts: [
+            F.raw(`<rect x="${S.x(10)}" y="${S.y(260)}" width="${S.x(20) - S.x(10)}"
+                     height="${S.y(0) - S.y(260)}" fill="#F7F5F2"/>`),
+            F.raw(`<path d="${Fig.path(band)} Z" fill="#A02948" fill-opacity=".16"/>`),
+            F.curve(S.curve(fit), { variant: 'supply' }),
+            F.dots(obs.map(([x, y]) => [S.x(x), S.y(y)])),
+            F.annot(S.x(15), S.y(248), '예측 구간', { anchor: 'middle', size: 12 }),
+            F.annot(S.x(19.6), S.y(214), '위쪽 한계', { anchor: 'end', size: 12 }),
+            F.annot(S.x(19.6), S.y(120), '아래쪽 한계', { anchor: 'end', size: 12 }),
+            F.annot(S.x(19.6), S.y(172), '점 예측', { anchor: 'end', tone: 'red', size: 12 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 10. ③ 예시 ══════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>같은 예측을 두 가지 방식으로 쓰면</h2>
+    <div class="body">
+      <p class="define" style="font-size:19px">
+        ㉠ "2025년 4월 화성 인구는 <span class="t-red">102만명</span>이다"<br><br>
+        ㉡ "선형 추세로 보면 <span class="t-red">약 102만명</span>이다.
+        다만 최근 3년의 검증 오차가 4% 수준이므로<br>
+        <span class="t-red">98만 ~ 106만</span>으로 보는 편이 안전하다"</p>
+      <p class="conclusion" style="margin-top:12px">
+        → ㉠은 반박당하면 무너진다. ㉡은 <span class="t-red">틀릴 수 있다는 것까지 포함</span>해
+        말한 것이라 무너지지 않는다</p>
+    </div>
+  </section>
+
+  <!-- ══ 11. ③ 주의 ══════════════════════════════════════ -->
+  <section>
+    <p class="mth">방법 ③  예측구간</p>
+    <h2>주의 — 구간이 담지 못하는 불확실성</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:30%">종류</th><th>구간에 들어가나</th></tr></thead>
+        <tbody>
+          <tr><td>자료의 흩어짐</td><td>들어간다 — 이것이 예측구간이 재는 것이다</td></tr>
+          <tr><td>계수를 잘못 잰 정도</td><td>들어간다</td></tr>
+          <tr><td class="hl">모형을 잘못 고른 것</td><td class="hl">들어가지 않는다.
+            선형이 틀렸다면 선형의 구간도 함께 틀린다</td></tr>
+          <tr><td class="hl">구조가 바뀌는 것</td><td class="hl">들어가지 않는다.
+            신도시 입주가 끝나면 추세 자체가 달라진다</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        아래 둘은 <span class="hl">시나리오</span>로 다룬다 —
+        "이렇게 되면 이 값, 저렇게 되면 저 값". 다음 주 처방적 분석의 첫 방법이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 12. 정리 ════════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>예측을 증거로 쓰는 조건</h2>
+    <div class="body">
+      <p class="define">① 학습에 쓰지 않은 기간으로 <span class="t-red">채점했는가</span><br>
+        ② 복잡도를 <span class="t-red">검증 오차로</span> 골랐는가<br>
+        ③ 점이 아니라 <span class="t-red">범위로</span> 말했는가<br>
+        ④ 무엇이 어긋나면 틀리는지 <span class="t-red">적었는가</span></p>
+      <p class="conclusion">→ 넷 중 하나라도 빠지면 그 예측은 정책 근거로 쓸 수 없다</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">화성 인구예측모델 비교와 예측구간 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 14. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 네 모형을 채점한다 <span class="en" style="font-size:16px;color:var(--muted)">30분</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>지난주 학습/검증 분리를 그대로 쓴다 (마지막 12개월)</li>
+        <li>선형·2차·3차·지수 네 모형의 <span class="hl">학습 MAPE 와 검증 MAPE 를 모두</span> 낸다</li>
+        <li>표로 정리하고 강의의 값과 맞춰 본다</li>
+        <li>차수를 더 올려 본다 (5차, 8차). <span class="mark">학습 오차와 검증 오차가 각각 어떻게 되는가</span></li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        4번에서 <span class="hl">4쪽의 그림이 실제로 재현된다.</span>
+        학습 오차는 계속 줄고 검증 오차는 어느 지점부터 커진다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 구간을 만든다 <span class="en" style="font-size:16px;color:var(--muted)">35분</span></h2>
+    <div class="body tight">
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"검증 MAPE 가 가장 낮은 모형으로 <b>24개월 앞</b>을 예측하고,
+          <span class="mark">예측구간도 함께</span> 내 줘.</p>
+        <p>구간을 <span class="mark">어떤 방법으로 어떤 가정 위에서 만들었는지 먼저 설명</span>해 주고,
+          내가 확인하면 계산해.</p>
+        <p>그래프에는 실제값·예측선·구간을 함께 그리고,
+          <b>학습 구간과 예측 구간을 색으로 구분</b>해 줘."</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        구간 만드는 방법은 여러 가지다.
+        <span class="hl">어떤 방법을 썼는지 모르면 그 구간은 해석할 수 없다.</span></p>
+      <p class="caption" style="margin-top:8px">
+        멀리 갈수록 넓어지는지 확인한다. 넓어지지 않으면 만드는 방식이 잘못된 것이다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ③ ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 정책 문장으로 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <p class="sub">10쪽의 ㉡ 꼴로 쓴다</p>
+      <ol class="steps">
+        <li>고른 모형과 <span class="hl">고른 이유</span> (검증 MAPE 를 근거로)</li>
+        <li>예측값과 <span class="hl">구간</span></li>
+        <li>이 예측이 전제하는 가정 — <span class="mark">무엇이 계속된다고 보았나</span></li>
+        <li>무엇이 어긋나면 틀리는가 — 화성이라면 신도시 입주 일정</li>
+      </ol>
+      <p class="emph" style="margin-top:16px">
+        제출: <span class="t-red">모형 비교표 + 구간 그래프 + 정책 문장 네 줄</span> + 로직 문서</p>
+      <p class="caption" style="margin-top:8px">
+        COMPAS 이 과제의 수상작들은 ARIMA·LSTM 등을 썼다. 분석 결과 탭에서 볼 수 있다 —
+        <span class="hl">자기 결과와 견주어 보면 좋다.</span><br>
+        가정 과제: 자기 프로젝트 예측에도 구간을 붙인다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>5쪽 모형 비교 — COMPAS 「AI기법에 의한 인구예측모델 정확도 비교 분석」<br>
+          (화성시, SBJ_2307_001) 공개 데이터 · 월별 총인구 112개월 (2014-01 ~ 2023-04)<br>
+          학습 100개월 / 검증 12개월 · MAPE 로 채점</li>
+        <li>산출 방법 — <span class="code">analysis/11-화성인구.py</span>,
+          판단 근거는 <span class="code">analysis/11-화성인구-로직.md</span></li>
+        <li>10쪽의 "98만 ~ 106만" 은 검증 오차 4% 를 그대로 적용해 본 <span class="hl">예시</span>다.
+          정식 예측구간이 아니다 — 실습에서 제대로 만든다</li>
+        <li>4·7·9쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 18. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>11강. 표본추출과 모수 추정</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols { align-items: flex-start; }
+
+  /* 상자 안의 흰 글자 — 기본 svg text 의 흰 테두리(3px)가 흰 글자에 얹히면
+     획이 뭉개진다. 상자 라벨에서만 테두리를 끈다. */
+  .reveal svg.fig text.inbox { stroke: none; fill: #FFF; }
+  .reveal svg.fig text.inbox.b { font-size: 14px; font-weight: 700; }
+  .reveal svg.fig text.inbox.s { font-size: 11px; font-weight: 400; }
+  .reveal svg.fig text.inbox.o { font-size: 11px; font-weight: 700; fill: #FFD68A; }
+  .reveal svg.fig text.tag { font-size: 11px; font-weight: 500; fill: var(--ink-2); }
+  .reveal svg.fig text.tag-b { font-size: 13px; font-weight: 700; fill: var(--brand-crimson); }
+  .reveal svg.fig .thin { stroke: var(--ink-2); stroke-width: 1.1; fill: none; }
+  .reveal svg.fig .dash { stroke: var(--ink-2); stroke-width: 1.2; fill: none; stroke-dasharray: 5 4; }
+  .reveal svg.fig .brace { stroke: var(--ink-2); stroke-width: 1.1; fill: none; }
+  .reveal svg.fig .fat { stroke: var(--chart-blue); stroke-width: 5; fill: none; }
+  .reveal svg.fig .dbox { fill: var(--brand-crimson); }
+  .reveal svg.fig .obox { fill: none; stroke: var(--ink); stroke-width: 1.1; }
+
+  /* 모집단 원 — 원본의 손그림 원을 그대로 옮긴다. 안의 식은 MathJax 라
+     SVG 가 아니라 HTML 로 둔다 (SVG 안에서는 수식이 조판되지 않는다). */
+  .popc {
+    width: 176px; height: 176px; flex: 0 0 176px;
+    border: 1.6px solid var(--ink); border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px;
+  }
+  .popc p { margin: 0; font-size: 14px; color: var(--ink); }
+  .popc p + p { margin-top: 4px; }
+  .popwrap { display: flex; flex-direction: column; align-items: center; }
+  .popwrap > .ttl { margin: 0 0 6px; font-size: 14px; font-weight: 700; color: var(--ink-2); }
+
+  .samp { display: flex; align-items: center; gap: 12px; }
+  .samp .rows p { margin: 0 0 6px; font-size: 14px; }
+  .samp .rows p.dots { margin: 0 0 6px; text-align: center; }
+  .samp .stats p { margin: 0 0 6px; font-size: 14px; }
+  .samp .stats .hd { font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .samp .stats .fr { display: flex; align-items: center; gap: 10px; }
+  .samp .stats .fr > span:first-child { flex: 0 0 96px; }
+
+  /* 신뢰구간 판 — 원본의 둥근 모서리 상자 */
+  .ci-card {
+    border: 1.4px solid var(--rule); border-radius: 20px;
+    padding: 10px 16px 6px; text-align: center;
+  }
+  .ci-card .formula-key { margin: 0; font-size: 17px; }
+  .ci-card .why { margin: 2px 0 0; font-size: 11px; font-weight: 700; color: var(--brand-crimson); }
+
+  /* 순서도 아래에 붙는 두 개의 구간추정 식 */
+  .flow-eq { display: flex; gap: 60px; justify-content: center; margin: 0; }
+  .flow-eq > span { font-size: 15px; }
+
+  /* 우상단 보조 노트 (원본 p.21) */
+  .corner-note {
+    position: absolute; right: 0; top: -46px; width: 330px; margin: 0;
+    font-size: 13px; font-weight: 700; line-height: 1.5;
+    color: var(--brand-crimson); text-align: left;
+  }
+
+  /* t-분포표 캡처 위에 원본의 빨간 표시 상자를 겹친다 */
+  .ov { position: relative; display: inline-block; }
+  .ov > svg.fig { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  .ttbl { display: block; height: 322px; width: auto; }
+  .tpair { display: flex; gap: 18px; align-items: flex-end; justify-content: center; margin: 0; }
+  .tpair figure { margin: 0; }
+  .tpair img { display: block; height: 168px; width: auto; }
+  .tpair figcaption { font-size: 12px; color: var(--ink-2); margin-top: 2px; display: flex; gap: 24px; }
+  .cimg { display: block; height: 196px; width: auto; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- T1 표지 (원본 p.1) -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>11강. 표본추출과<br>모수 추정</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- 원본 p.2 -->
+  <section>
+    <h2>지난 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>확률변수는 표본공간에서 정의되는 각 사건들에 대응하는 실수 값이며,
+          확률분포는 확률변수가 출현할 가능성에 대한 분포를 의미한다.</li>
+        <li>베르누이 분포는 사건이 성공/실패로 나뉘는 베르누이 시행의 결과로서
+          성공에 1, 실패에 0을 대응하는 확률변수에 대한 확률분포이다.</li>
+        <li>이항분포는 성공확률 p를 지니는 베르누이 시행을 n번 반복한 결과로
+          나타난 성공횟수를 확률변수로 갖는 확률분포이다.</li>
+        <li>정규분포는 연속확률분포로서 이항확률변수의 n을 무한대로 늘렸을 때
+          그 값이 따르는 분포이다.</li>
+        <li>확률변수의 기대값은 특정 확률변수가 확률분포에 따라 가질 것으로 기대되는 값을 의미하며,
+          확률변수의 표준편차는 확률변수 값이 기대값과 차이가 나는 정도의 표준적인 크기를 의미한다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.3 -->
+  <section>
+    <h2>지난 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>특정 확률분포를 따르는 확률변수를 n번 추출하여 그 합을 새로운 확률변수로 할 경우
+          (즉, 표본합) 새로운 확률변수의 표준편차는 (기존 확률변수 표준편차 $*\sqrt{n}$)이다.</li>
+        <li>특정 확률분포를 따르는 확률변수를 n번 추출하여 그 평균을 새로운 확률변수로 할 경우
+          (즉, 표본평균) 새로운 확률변수의 표준편차는 (기존 확률변수 표준편차 $/\sqrt{n}$)이다.</li>
+        <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수의 상대적 표준편차가
+          추출횟수의 증가에 따라 감소하는 현상을 대수(평균)의 법칙이라 한다.</li>
+        <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수에서 추출횟수가 충분히 많을 경우
+          새로운 확률변수가 정규분포로 수렴해가는 현상을 중심극한정리라 한다.</li>
+        <li>대수의 법칙과 중심극한정리를 통해 특정 확률분포에서 충분히 많은 수의 표본을 뽑아 만든
+          표본평균을 새로운 확률변수로 만들 경우 대수의 법칙을 통해 새로운 확률변수의 표준편차를
+          구할 수 있으며, 중심극한정리를 통해 새로운 확률변수를 정규분포로 근사시켜
+          모평균에 대한 확률적 추론을 할 수 있다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- T12 섹션 (원본 p.4) -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">표본추출, 표본통계량, 표준오차</p>
+  </section>
+
+  <!-- 원본 p.5~10 — 같은 그림에 상자와 화살표가 하나씩 얹히는 누적판이다.
+       한 장의 fragment 다섯 단계로 합쳤다 (design.md §8) -->
+  <section>
+    <h2>우리가 밝히려는 것: 모집단의 특성</h2>
+    <div class="body tight">
+      <div class="fragment" data-fragment-index="3">
+        <p class="lead" style="font-size:17px;margin-bottom:2px">Q) 표본평균은 우리가 알고 싶은
+          모집단의 특성인 모평균을 얼마나 정확하게 반영하고 있을까?</p>
+        <p class="sub" style="margin-bottom:0">→ 모평균 그 자체를 정확히 추정하는 것은 불가!</p>
+        <p class="emph" style="margin:0 0 4px 14px">단, 표본평균이 모평균과 차이가 날 가능성이
+          얼마나 될지를 함께 제시해주어야 한다.</p>
+      </div>
+      <svg class="fig" id="f-pop" viewBox="0 0 780 308"
+           style="width:598px;margin:0 auto" role="img">
+        <title>모집단에서 표본을 추출해 통계량을 만들고, 그 통계량으로 모수를 추론하는 관계도</title>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 원본 p.11 -->
+  <section>
+    <h2>표본추출의 원칙</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서의 표본추출은 가급적 무작위 추출 (random sampling)을 따라야 하며,
+        체계적인 편의(bias)가 없어야 한다!</p>
+      <div class="samp" style="margin-top:26px">
+        <div class="popwrap">
+          <p class="ttl">모집단</p>
+          <div class="popc">
+            <p>$X \sim f(x)$</p>
+            <p>$E(X)=\mu$</p>
+            <p>$Var(X)=\sigma^{2}$</p>
+          </div>
+        </div>
+        <svg class="fig" id="f-arr11" viewBox="0 0 120 120" style="width:120px" role="img">
+          <title>모집단에서 표본을 추출하는 점선 화살표</title>
+        </svg>
+        <div class="rows">
+          <p>표본 1:</p>
+          <p>표본 2:</p>
+          <p>표본 3:</p>
+          <p class="dots">⋮</p>
+          <p>표본 n:</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.12 -->
+  <section>
+    <h2>확률변수로서의 표본</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 추출한 표본은 그 값이 확정되지 않는 한
+        모집단의 확률분포를 따르는 확률변수이다.</p>
+      <div class="samp" style="margin-top:22px">
+        <div class="popwrap">
+          <p class="ttl">모집단</p>
+          <div class="popc">
+            <p>$X \sim f(x)$</p>
+            <p>$E(X)=\mu$</p>
+            <p>$Var(X)=\sigma^{2}$</p>
+          </div>
+        </div>
+        <svg class="fig" id="f-arr12" viewBox="0 0 120 120" style="width:120px" role="img">
+          <title>모집단에서 표본을 추출하는 점선 화살표</title>
+        </svg>
+        <div class="rows">
+          <p>표본 1: &nbsp;$X_{1} \sim f(x)$</p>
+          <p>표본 2: &nbsp;$X_{2} \sim f(x)$</p>
+          <p>표본 3: &nbsp;$X_{3} \sim f(x)$</p>
+          <p class="dots">⋮</p>
+          <p>표본 n: &nbsp;$X_{n} \sim f(x)$</p>
+        </div>
+        <svg class="fig" id="f-br12" viewBox="0 0 24 200" style="width:24px" role="img">
+          <title>표본 전체를 묶는 중괄호</title>
+        </svg>
+        <div class="stats">
+          <p class="hd">확률변수</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.13 -->
+  <section>
+    <h2>표본통계량: 확률변수의 조합으로 만들어진 새로운 확률변수</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 추출한 표본으로 만들어진 표본통계량(예. 표본평균) 또한
+        그 값이 확정되지 않았으므로 확률변수이다.</p>
+      <div class="samp" style="margin-top:10px;gap:8px">
+        <div class="popwrap">
+          <p class="ttl">모집단</p>
+          <div class="popc">
+            <p>$X \sim f(x)$</p>
+            <p>$E(X)=\mu$</p>
+            <p>$Var(X)=\sigma^{2}$</p>
+          </div>
+        </div>
+        <svg class="fig" id="f-arr13" viewBox="0 0 100 120" style="width:100px" role="img">
+          <title>모집단에서 표본을 추출하는 점선 화살표</title>
+        </svg>
+        <div class="rows" style="font-size:13px">
+          <p>표본 1: &nbsp;$X_{1} \sim f(x)$</p>
+          <p>표본 2: &nbsp;$X_{2} \sim f(x)$</p>
+          <p>표본 3: &nbsp;$X_{3} \sim f(x)$</p>
+          <p class="dots">⋮</p>
+          <p>표본 n: &nbsp;$X_{n} \sim f(x)$</p>
+        </div>
+        <svg class="fig" id="f-br13" viewBox="0 0 24 210" style="width:24px" role="img">
+          <title>표본 전체를 묶는 중괄호</title>
+        </svg>
+        <div class="stats" style="font-size:13px">
+          <p class="hd">확률변수</p>
+          <p class="fr"><span>표본평균 $\bar{X}$</span>
+            <span>$\bar{X}=\dfrac{X_{1}+X_{2}+\cdots+X_{n}}{n} \sim f(\bar{X})$</span></p>
+          <p class="fr"><span>표본분산 $S^{2}$</span>
+            <span>$S^{2}=\dfrac{\sum (X_{i}-\bar{X})^{2}}{n-1} \sim f(S^{2})$</span></p>
+          <p class="fr"><span>표본표준편차 $S$</span>
+            <span>$S=\sqrt{\dfrac{\sum (X_{i}-\bar{X})^{2}}{n-1}} \sim f(S)$</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.14 -->
+  <section>
+    <h2>표본통계량: 확률변수의 조합으로 만들어진 새로운 확률변수</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 추출한 표본으로 만들어진 표본통계량(예. 표본평균) 또한
+        그 값이 확정되지 않았으므로 확률변수이다.</p>
+      <div class="samp" style="margin-top:6px;gap:8px;align-items:flex-start">
+        <div class="popwrap" style="margin-top:44px">
+          <p class="ttl">모집단</p>
+          <div class="popc">
+            <p>$X \sim f(x)$</p>
+            <p>$E(X)=\mu$</p>
+            <p>$Var(X)=\sigma^{2}$</p>
+          </div>
+        </div>
+        <svg class="fig" id="f-arr14" viewBox="0 0 110 130" style="width:110px;margin-top:44px" role="img">
+          <title>모집단에서 100개를 추출하는 점선 화살표</title>
+        </svg>
+        <div class="rows" style="font-size:13px">
+          <p style="text-align:center;font-weight:700">표본</p>
+          <p style="text-align:center;margin:-2px 0 2px">↓</p>
+          <p>표본평균 $\bar{X}=\dfrac{x_{1}+x_{2}+\cdots+x_{n}}{n} \sim f(\bar{X})$
+            &nbsp;⟶&nbsp; <span style="font-weight:700">표본통계량</span></p>
+          <p style="margin-top:10px">첫번째 100개: &nbsp;$\overline{X_{1}}=\dfrac{x_{1}+x_{2}+\cdots+x_{100}}{100}$
+            &nbsp;⟶&nbsp; <span style="font-weight:700">표본통계치</span></p>
+          <p>두번째 100개: &nbsp;$\overline{X_{2}}=\dfrac{x_{1}+x_{2}+\cdots+x_{100}}{100}$</p>
+          <p>세번째 100개: &nbsp;$\overline{X_{3}}=\dfrac{x_{1}+x_{2}+\cdots+x_{100}}{100}$</p>
+          <p class="dots">⋮</p>
+        </div>
+      </div>
+      <p class="sub" style="margin:0 0 0 300px;font-size:14px">추출할 때마다 표본 내 100개 숫자가 달라짐<br>
+        → 표본평균이 달라짐<br>
+        → 표본평균의 기대값과 분산을 구하면 표본평균의 분포를 추론할 수 있음</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.15 -->
+  <section>
+    <h2>표본통계량: 확률변수의 조합으로 만들어진 새로운 확률변수</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 추출한 표본으로 만들어진 표본통계량(예. 표본평균) 또한
+        그 값이 확정되지 않았으므로 확률변수이다.</p>
+      <p class="lead" style="font-size:18px;margin:16px 0 10px">· 표본통계량(확률변수)으로서
+        표본평균 $\bar{X}$ 의 기대값</p>
+      <div class="cols" style="align-items:center">
+        <div class="col-l" style="flex:0 0 210px">
+          <div class="popwrap">
+            <p class="ttl">모집단</p>
+            <div class="popc">
+              <p>$X \sim f(x)$</p>
+              <p>$E(X)=\mu$</p>
+              <p>$Var(X)=\sigma^{2}$</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-r">
+          <p class="formula-key" style="margin:0;font-size:16px">
+            $E(\bar{X})=E\!\left(\dfrac{x_{1}+x_{2}+\cdots+x_{n}}{n}\right)
+            =\dfrac{E(X)+E(X)+\cdots+E(X)}{n}$</p>
+          <p class="formula-key" style="margin:4px 0 0;font-size:16px">
+            $=\dfrac{nE(X)}{n}=E(X)=\mu$</p>
+          <p class="sub" style="margin-top:18px">→ 표본평균은 모평균에 대한
+            불편추정량(unbiased estimator)이다.</p>
+          <p class="caption" style="margin:0">* 불편의성(unbiasedness)
+            추정량의 기대값이 추정하려는 모수와 정확하게 일치하는지의 여부</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.16 -->
+  <section>
+    <h2>표본통계량: 확률변수의 조합으로 만들어진 새로운 확률변수</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 추출한 표본으로 만들어진 표본통계량(예. 표본평균) 또한
+        그 값이 확정되지 않았으므로 확률변수이다.</p>
+      <p class="lead" style="font-size:18px;margin:12px 0 8px">· 표본통계량(확률변수)으로서
+        표본평균 $\bar{X}$ 의 분산</p>
+      <div class="cols" style="align-items:center">
+        <div class="col-l" style="flex:0 0 210px">
+          <div class="popwrap">
+            <p class="ttl">모집단</p>
+            <div class="popc">
+              <p>$X \sim f(x)$</p>
+              <p>$E(X)=\mu$</p>
+              <p>$Var(X)=\sigma^{2}$</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-r">
+          <p class="formula-key" style="margin:0;font-size:15px">
+            $Var(\bar{X})=Var\!\left(\dfrac{x_{1}+x_{2}+\cdots+x_{n}}{n}\right)
+            =\dfrac{1}{n^{2}}\left[Var(x_{1})+Var(x_{2})+\cdots+Var(x_{n})\right]$</p>
+          <p class="formula-key" style="margin:2px 0 0;font-size:15px">
+            $=\dfrac{1}{n^{2}}\,nVar(X)=Var(X)/n=\sigma^{2}/n$</p>
+          <p class="sub" style="margin-top:14px;margin-bottom:2px">→ 표본평균의 분산은
+            모집단의 분산에 비례하고 표본개수에 반비례한다.</p>
+          <p class="sub" style="margin:0 0 8px 16px">(∵ 확률변수들의 평균을 새로운 확률변수로 할 경우
+            대수의 법칙이 성립)</p>
+          <p class="sub" style="margin-bottom:2px">→ 표본평균의 분산에 대한 제곱근
+            = 표본평균의 표준오차</p>
+          <p class="sub" style="margin-bottom:0">→ 표본평균이 모평균에 비해
+            얼마나 떨어져 있을지를 나타냄</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.17 -->
+  <section>
+    <h2>표본통계량: 확률변수의 조합으로 만들어진 새로운 확률변수</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 추출한 표본으로 만들어진 표본통계량(예. 표본평균) 또한
+        그 값이 확정되지 않았으므로 확률변수이다.</p>
+      <p class="lead" style="font-size:18px;margin:16px 0 10px">· 표본통계량(확률변수)으로서
+        표본평균의 분포</p>
+      <div class="cols" style="align-items:center;gap:16px">
+        <div class="col-l" style="flex:0 0 200px">
+          <div class="popwrap">
+            <p class="ttl">모집단</p>
+            <div class="popc">
+              <p>$X \sim f(x)$</p>
+              <p>$E(X)=\mu$</p>
+              <p>$Var(X)=\sigma^{2}$</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-r" style="flex:1 1 auto">
+          <p class="formula-key" style="margin:0 0 6px;font-size:19px">$\bar{X}$의 평균 $=\mu$</p>
+          <p class="formula-key" style="margin:0;font-size:19px">$\bar{X}$의 분산 $=\sigma^{2}/n$</p>
+          <p style="text-align:center;margin:2px 0 0;font-size:18px">↓</p>
+          <p class="formula-key" style="margin:0;font-size:21px">
+            $\bar{X} \sim N(\mu,\ \sigma^{2}/n)$</p>
+        </div>
+        <div class="col-r" style="flex:0 0 268px">
+          <p class="emph" style="margin:0">만약 n이 충분히 크다면</p>
+          <p class="emph" style="margin:0">X의 확률분포인 f(x)에 상관없이</p>
+          <p class="emph" style="margin:0">$\bar{X}$는 정규분포에 근사</p>
+          <p class="emph" style="margin:6px 0 0">→ 중심극한정리</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- T12 섹션 (원본 p.18) -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">통계적 추론: 추정과 가설검정</p>
+  </section>
+
+  <!-- 원본 p.19 — p.20 과 그림이 교체되므로 합치지 않는다 -->
+  <section>
+    <h2>통계적 추론</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 임의의 표본을 추출하여 이를 바탕으로
+        모집단의 특성을 찾아내는 통계적 과정</p>
+      <svg class="fig" id="f-est" viewBox="0 0 420 168" style="width:420px;margin:6px auto 0" role="img">
+        <title>실제 추정량을 중심으로 좌우로 뻗은 구간추정을 표시한 정규분포 곡선</title>
+      </svg>
+      <ul style="margin-top:18px">
+        <li><em>추정</em>: 표본을 이용하여 만든 표본통계량을 모수추정량으로 삼아
+          모집단의 모수를 예측하는 방법</li>
+        <li><em>가설검정</em>: 모집단(모수)에 대한 예상결론을 세우고 그 타당성을 확인하여
+          예상결론을 채택 또는 기각하는 것</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.20 -->
+  <section>
+    <h2>통계적 추론</h2>
+    <div class="body tight">
+      <p class="sub">모집단에서 임의의 표본을 추출하여 이를 바탕으로
+        모집단의 특성을 찾아내는 통계적 과정</p>
+      <svg class="fig" id="f-hyp" viewBox="0 0 420 168" style="width:420px;margin:6px auto 0" role="img">
+        <title>귀무가설 하의 추정량 기대값을 중심으로 한 분포와 실제 추정량 바깥쪽 꼬리를 칠한 그림</title>
+      </svg>
+      <ul style="margin-top:18px">
+        <li><em>추정</em>: 표본을 이용하여 만든 표본통계량을 모수추정량으로 삼아
+          모집단의 모수를 예측하는 방법</li>
+        <li><em>가설검정</em>: 모집단(모수)에 대한 예상결론을 세우고 그 타당성을 확인하여
+          예상결론을 채택 또는 기각하는 것</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.21 -->
+  <section>
+    <h2>좋은 (모수) 추정량의 조건</h2>
+    <div class="body tighter">
+      <p class="corner-note">표본평균, 표본분산은 각각 모평균, 모분산에 대한<br>
+        불편, 유효, 일치, 충분추정량임</p>
+      <ul>
+        <li><em>불편의성(unbiasedness)</em><br>
+          추정량의 기대값이 추정하려는 모수와 정확하게 일치하는지의 여부<br>
+          <span style="margin-left:14px">→ $E(\hat{\theta})=\theta$ 일 경우
+            $\hat{\theta}$는 $\theta$의 불편추정량</span></li>
+        <li><em>효율성(efficiency)</em><br>
+          두 추정량이 모두 불편추정량일 경우 분산이 작은 추정량(즉, 표준오차가 작은 추정량)일수록 더 효율적<br>
+          <span style="margin-left:14px">→ $\hat{\theta}_{1}$와 $\hat{\theta}_{2}$ 모두 불편추정량일 때,
+            $Var(\hat{\theta}_{1}) &lt; Var(\hat{\theta}_{2})$라면 $\hat{\theta}_{1}$이 유효추정량</span></li>
+        <li><em>일치성(consistency)</em><br>
+          표본의 크기가 증가함에 따라 표본오차의 크기가 감소하여 모수에 가까워지는 특성<br>
+          <span style="margin-left:14px">→ $\lim\limits_{n \to \infty} P\!\left(\left|\hat{\theta}_{n}-\theta\right| &lt; \varepsilon\right)=1$일 경우
+            $\hat{\theta}_{n}$는 $\theta$의 일치추정량</span></li>
+        <li><em>충분성(sufficiency)</em><br>
+          모집단으로부터 추출한 표본의 정보를 모두 사용하여 표본이 가진 모수에 대한 정보를
+          포괄적으로 나타내는 특성<br>
+          <span style="color:var(--muted)">(예. 표본분산: X1~Xn까지의 정보를 모두 사용,
+            범위: 포본의 일부만을 사용)</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.22 -->
+  <section>
+    <h2>추정 <span class="en">(estimation)</span></h2>
+    <div class="body tight">
+      <p class="sub">표본을 이용하여 만든 표본통계량을 모수추정량으로 삼아
+        모집단의 모수를 예측하는 방법</p>
+      <ul style="margin-top:20px">
+        <li>추정해야할 모수: 모평균, 모분산, 모표준편차 등</li>
+      </ul>
+      <p class="emph" style="margin-left:4px">→ 모수추정량(estimator): 표본통계량 /
+        모수추정치(estimate): 표본통계치</p>
+      <ol class="dense" style="margin-top:34px">
+        <li><em>점추정 (point estimation)</em>: 모수추정치를 모수에 대한 추정 값으로 삼는 것</li>
+        <li><em>구간추정 (interval estimation)</em>: 모수추정치를 중심으로 표준오차를 활용하여
+          모수가 포함될 일정구간을 추정</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 원본 p.23 -->
+  <section>
+    <h2>추정 <span class="en">(estimation)</span></h2>
+    <div class="body tight">
+      <p class="sub">표본을 이용하여 만든 표본통계량을 모수추정량으로 삼아
+        모집단의 모수를 예측하는 방법</p>
+      <ul style="margin-top:12px">
+        <li>추정해야할 모수: 모평균, 모분산, 모표준편차 등</li>
+      </ul>
+      <p class="emph" style="margin-left:4px">→ 모수추정량(estimator): 표본통계량 /
+        모수추정치(estimate): 표본통계치</p>
+      <ol class="dense" style="margin-top:20px">
+        <li>모수추정량의 <em>표준오차</em>를 유추
+          <div style="margin-left:14px">– 모집단의 표준편차를 아는 경우: 모집단의 분산을 활용해서 계산</div>
+          <div style="margin-left:14px">– 모집단의 표준편차를 모르는 경우: 표본 분산을 활용해서 계산</div></li>
+        <li>표준오차를 활용하여 관심을 갖는 <em>모수추정량의 분포</em>를 유추
+          <div style="margin-left:14px">– 모집단의 분포 특성을 반영할 수도
+            모집단의 분포와 관계 없이 나타날 수도 있음</div></li>
+        <li style="color:var(--brand-crimson);font-weight:700">추정실시: 모수추정량의 추정치와
+          표준오차를 고려해서 모수에 대한 신뢰도(confidence level)와 구간(interval) 을 제시</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 원본 p.24 -->
+  <section>
+    <h2>추정의 신뢰도와 신뢰구간</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:12px"><span style="text-decoration:underline">신뢰구간</span>:
+        점 추정치를 중심으로 특정한 신뢰도만큼 모수를 포함할 것이라고 예상되는 구간</p>
+      <p class="sub" style="margin-bottom:2px"><span style="text-decoration:underline">신뢰도</span>:
+        100개의 서로 다른 표본을 통해 구한 신뢰구간 내에 모수가 포함될 빈도</p>
+      <p class="emph" style="margin:0 0 2px 18px;font-size:14px">(예. 표본평균의 95% 신뢰도 →
+        100개의 서로 다른 표본세트에서 구한 신뢰구간의 95% 내에 모수가 포함될 것)</p>
+      <p class="sub" style="margin:0 0 8px 18px">→ (정확하진 않지만) 1개의 표본세트를 통해 구한
+        신뢰구간 내에 모수가 포함될 확률이 0.95라고 이해해도 됨</p>
+      <div class="cols" style="align-items:center;gap:22px">
+        <div class="col-l" style="flex:0 0 280px">
+          <img class="cimg" src="../assets/ci-coverage-100.png"
+               alt="모비율 80%인 모집단에서 100개의 표본으로 구한 95% 신뢰구간 100개 — 94개가 수직선(모비율)을 가로지른다">
+        </div>
+        <div class="col-r">
+          <p class="emph" style="margin:0">모비율이 80%일 때</p>
+          <p class="emph" style="margin:0">100개의 서로 다른 표본에서 구한 95% 신뢰구간 중</p>
+          <p class="emph" style="margin:0 0 10px">94개의 신뢰구간이 모비율(수직선)을 포함</p>
+          <p class="emph" style="margin:0">→ 신뢰구간 내에 모수가 포함되는 건 0 혹은 1</p>
+          <p class="emph" style="margin:0">→ 여러 번 표본을 뽑아 신뢰구간을 반복 계산하면</p>
+          <p class="emph" style="margin:0 0 0 14px">그 중 95%는 모수를 신뢰구간 내 포함할 것이라고 예상</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.25 -->
+  <section>
+    <h2>표본평균을 활용한 모평균의 점추정과 구간추정</h2>
+    <div class="body tight">
+      <p class="lead" style="font-size:17px;margin-bottom:14px">Q) 모집단의 분포를 모르지만
+        100개의 표본을 뽑아 만든 표본평균이 25일 때 모평균에 대한 95% 신뢰구간은?</p>
+      <ol class="dense">
+        <li>모수추정량의 <em>표준오차</em>를 유추
+          <div style="margin-left:14px">→ 대수의 법칙에 따라 표본평균의 표준오차는
+            관측치 수(n)의 제곱근에 반비례</div>
+          <div style="margin-left:14px">– 모집단의 분산을 아는 경우: 모집단의 분산 활용
+            → $\sqrt{\sigma^{2}/n}$</div>
+          <div style="margin-left:14px">– 모집단의 분산을 모르는 경우: 표본의 분산 활용
+            → $\sqrt{S^{2}/n}$</div></li>
+        <li>관심을 갖는 <em>모수추정량의 분포</em>를 유추
+          <div style="margin-left:14px">→ 100개의 관측치(n)가 충분하다고 가정했을 경우
+            중심극한정리에 따라 표본평균은 정규분포에 근사</div>
+          <div style="margin-left:14px">– 모집단의 분산을 아는 경우:
+            표본평균의 분포가 정규분포를 따른다고 가정</div>
+          <div style="margin-left:14px">– 모집단의 분산을 모르는 경우: 표본평균의 분포가
+            정규분포와 유사하지만 꼬리가 더 두꺼운 T분포를 따른다고 가정</div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 원본 p.26 -->
+  <section>
+    <h2>표본평균을 활용한 모평균의 점추정과 구간추정</h2>
+    <div class="body tight">
+      <p class="lead" style="font-size:16px;margin-bottom:8px">Q) 모집단의 분포를 모르지만
+        100개의 표본을 뽑아 만든 표본평균이 25일 때 모평균에 대한 95% 신뢰구간은?</p>
+      <div class="cols" style="gap:20px">
+        <div class="col-l" style="flex:0 0 54%">
+          <p class="sub" style="margin-bottom:6px">3. 추정실시</p>
+          <ul style="margin:0 0 8px 10px">
+            <li><em>점추정</em>: 모평균 $\mu$ = 표본평균 = 25</li>
+            <li><em>구간추정</em>
+              <div style="margin-left:10px;margin-top:4px">– 모집단의 분산을 알고 있을 경우:
+                정규분포를 가정</div>
+              <div style="margin-left:24px">: $\bar{X} \pm z_{0.025} * \sigma/\sqrt{n}$
+                &nbsp;(∵ $z_{0.025}=1.96$)</div>
+              <div style="margin-left:10px;margin-top:6px">– 모집단의 분산을 모를 경우:
+                자유도가 n−1인 t분포를 가정</div>
+              <div style="margin-left:24px">: $\bar{X} \pm t_{(0.025,\,n-1)} * S/\sqrt{n}$</div></li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <div class="ci-card">
+            <p class="formula-key">표본평균 $\bar{X} \sim N\!\left(\mu,\ \dfrac{\sigma^{2}}{n}\right)$</p>
+            <p class="why">(∵ 대수의 법칙과 중심극한정리)</p>
+            <svg class="fig" id="f-ci26" viewBox="0 0 320 132" style="width:320px" role="img">
+              <title>표본평균의 분포에서 양쪽 꼬리 2.5%씩을 칠하고 a·b 를 표시한 그림</title>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <p class="formula-key" style="margin:8px 0 0;text-align:right;font-size:16px">
+        $P(\bar{X} \ge b)=P\!\left(\dfrac{\bar{X}-E(\bar{X})}{\sqrt{\sigma^{2}/n}} \ge
+        \dfrac{b-E(\bar{X})}{\sqrt{\sigma^{2}/n}}\right)=0.025$</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.27 — 두 그림은 외부 자료라 pptx 에서 그대로 뽑았다 (tb- 접두사) -->
+  <section>
+    <h2>스튜던트 t 분포</h2>
+    <div class="body tight">
+      <div class="cols" style="gap:22px">
+        <div class="col-l">
+          <p class="sub" style="margin-bottom:2px">표준정규확률변수 X를 카이제곱분포를 따르는<br>
+            자유도 v인 확률변수 Y로 다음과 같이 나눈 값이 따르는 확률분포</p>
+          <p class="formula-key" style="margin:4px 0 12px;text-align:center;font-size:17px">
+            $T=X\big/\sqrt{Y/v} \sim t(v)$ &nbsp;(v는 자유도)</p>
+          <p class="sub" style="text-decoration:underline;margin-bottom:0">정규분포와 유사하지만
+            정규분포에 비해 꼬리가 두꺼움</p>
+        </div>
+        <div class="col-r">
+          <p class="emph" style="margin:0 0 4px">t−분포를 사용하는 경우</p>
+          <ul style="margin:0 0 6px">
+            <li><span style="color:var(--brand-crimson);font-weight:700">추정량이 정규분포를 따르거나(소표본)
+              혹은 근사하면서(대표본)</span></li>
+            <li><span style="color:var(--brand-crimson);font-weight:700">모표준편차를 몰라
+              표본표준편차를 사용해야 할 경우</span></li>
+          </ul>
+          <p class="emph" style="margin:0">→ 표본의 크기가 충분히 크면 z분포로 간주해도 무방</p>
+          <p class="emph" style="margin:0">→ 애매해서 표본 표준편차를 사용한다면</p>
+          <p class="emph" style="margin:0 0 0 14px">그만큼 보수적으로 판단해야 함
+            (꼬리가 두꺼운 t분포 사용)</p>
+        </div>
+      </div>
+      <div class="tpair" style="margin-top:10px">
+        <figure>
+          <img src="../assets/tb-tdist-vs-normal.jpg"
+               alt="t분포와 정규분포를 겹쳐 그린 그림 — t분포의 2.5% 지점이 Z분포의 2.5% 지점보다 바깥에 있다">
+          <figcaption><span>t분포의 2.5%</span><span>Z분포의 2.5%</span></figcaption>
+        </figure>
+        <figure>
+          <img src="../assets/tb-tdist-z-compare.png"
+               alt="표준정규분포와 자유도가 다른 두 t분포를 겹쳐 그린 그림 — 자유도가 작을수록 꼬리가 두껍다">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.28 -->
+  <section>
+    <h2>표본평균과 표본비율</h2>
+    <div class="body tight">
+      <p class="sub">일반적인 표본평균과 표본비율은 같다.
+        다만 모집단 혹은 모집단의 확률변수화 과정이 다를 뿐.</p>
+      <div class="cols" style="margin-top:44px;align-items:center;gap:16px">
+        <div class="col-l" style="flex:0 0 42%">
+          <ul style="margin:0">
+            <li style="margin-bottom:40px">(일반적인) 표본평균의 모집단: 여러 숫자로 이루어짐</li>
+            <li style="margin-bottom:0">표본비율의 모집단: 0과 1로만 이루어짐</li>
+          </ul>
+        </div>
+        <div class="col-r">
+          <p style="margin:0 0 26px">$\overline{X_{1}}=\dfrac{2+3+\cdots+8}{100}$ = 표본평균</p>
+          <p style="margin:0">$\overline{X_{1}}=\dfrac{1+0+\cdots+1}{100}$ = 표본비율
+            = 0과 1로 이루어진 표본평균</p>
+        </div>
+      </div>
+      <p class="sub" style="margin-top:46px">일반적인 표본평균의 분포나 표본비율의 분포는
+        모두 표본평균의 분포와 같다.</p>
+    </div>
+  </section>
+
+  <!-- 원본 p.29 -->
+  <section>
+    <h2>추정 <span class="en">(estimation)</span></h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:6px">표본을 이용하여 만든 표본통계량을 모수추정량으로 삼아
+        모집단의 모수를 예측하는 방법</p>
+      <p class="emph" style="margin:0 0 2px;font-weight:700;color:var(--ink)">
+        〈표본평균을 활용한 모평균의 구간추정 절차〉</p>
+      <svg class="fig" id="f-flow" viewBox="0 0 800 292" style="width:672px;margin:0 auto" role="img">
+        <title>모집단의 정규성·표본 크기·모분산 정보에 따라 표준정규분포와 T분포를 갈라 쓰는 구간추정 절차 순서도</title>
+      </svg>
+      <p class="flow-eq">
+        <span>$\bar{X} \pm z_{\alpha/2} * \sigma \big/ \sqrt{n}$</span>
+        <span>$\bar{X} \pm t_{\left(\frac{\alpha}{2},\,n-1\right)} * S \big/ \sqrt{n}$</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- 원본 p.30 -->
+  <section>
+    <h2>예제 1</h2>
+    <div class="body tight">
+      <p class="lead" style="font-size:16px;margin-bottom:16px">2013년 전국에서 성인 여자(19~24세)
+        <em>25명</em>을 무작위 추출하여 몸무게를 조사한 결과 <em>평균 몸무게는 54.9kg</em> 이다.
+        통계청이 제공하는 지난 몇 년간의 자료를 종합하면 성인 여자의 몸무게 분포는
+        <em>정규분포</em>를 따르고 <em>표준편차는 5kg</em>이라고 한다.
+        전국의 성인 여자 몸무게의 <em>90% 신뢰구간</em>을 구하시오.</p>
+      <ol class="dense">
+        <li>모수추정량의 <em>표준오차</em>를 유추
+          <div style="margin-left:14px">→ 모집단의 표준편차가 5kg인 것을 알고 있으므로 이를 활용
+            → $\sqrt{\sigma^{2}/n}=\sqrt{5^{2}/25}=1$</div></li>
+        <li>관심을 갖는 <em>모수추정량의 분포</em>를 유추: 표본평균은 정규분포를 따르는가?
+          <div style="margin-left:14px">→ 관측치는 25개로 적지만, 여자 몸무게 분포가 정규분포를 따르므로
+            표본평균도 정규분포를 따를 것</div></li>
+        <li>추정실시
+          <div style="margin-left:14px">→ 모집단의 분산을 알고 있으므로 정규분포를 가정</div>
+          <div style="margin-left:14px">→ $\bar{X} \pm z_{0.05} * \sigma/\sqrt{n} = 54.9 \pm 1.645 * 1$</div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 원본 p.31 — 원본의 표준오차·최종식이 √300 으로 적혀 있다. 문구는 원본 그대로 둔다. -->
+  <section>
+    <h2>예제 2</h2>
+    <div class="body tight">
+      <p class="lead" style="font-size:16px;margin-bottom:20px">2013년 전국에서 성인 여자(19~24세)
+        <em>225명</em>을 무작위 추출하여 몸무게를 조사한 결과 <em>평균 몸무게는 54.9kg</em>이고
+        <em>표준편차는 7kg</em>이다. 전국의 성인 여자 몸무게의 <em>95% 신뢰구간</em>을 구하시오.</p>
+      <ol class="dense">
+        <li>모수추정량의 <em>표준오차</em>를 유추
+          <div style="margin-left:14px">→ 모집단의 표준편차를 모르므로 표본의 표준편차 7kg을 활용
+            → $\sqrt{S^{2}/n}=\sqrt{7^{2}/300}=7/\sqrt{300}$</div></li>
+        <li>관심을 갖는 <em>모수추정량의 분포</em>를 유추: 표본평균은 정규분포를 따르는가?
+          <div style="margin-left:14px">→ 관측치가 225개로 <em>중심극한정리</em>에 따라
+            여자 몸무게의 표본평균도 정규분포에 근사할 것</div>
+          <div style="margin-left:14px">→ 다만 모집단의 표준편차를 모르므로
+            <em>표본평균은 T분포</em>를 따른다고 가정</div></li>
+        <li>추정실시
+          <div style="margin-left:14px">→ 모집단의 분산을 모르므로 <em>자유도가 n−1인 T분포</em>를 가정</div>
+          <div style="margin-left:14px">→ $\bar{X} \pm t_{0.025,\,n-1} * S/\sqrt{n}
+            = 54.9 \pm 1.971 * 7/\sqrt{300}$</div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 원본 p.32 — 표는 숫자 캡처라 pptx 에서 그대로 뽑았다 (tb- 접두사).
+       원본이 표 위에 얹어 둔 빨간 표시 상자는 SVG 로 겹쳐 그린다. -->
+  <section>
+    <h2>t−분포표 보는 법</h2>
+    <div class="body tight">
+      <div class="cols" style="align-items:flex-start;gap:26px">
+        <div class="col-l" style="flex:0 0 316px">
+          <div class="ov">
+            <img class="ttbl" src="../assets/tb-t-table.png"
+                 alt="자유도(행)와 α(열)로 t값을 찾는 t분포표 — 자유도 9, α 0.025 자리의 2.262가 표시되어 있다">
+            <svg class="fig" id="f-thl" viewBox="0 0 724 768" role="img" aria-hidden="true">
+              <title>자유도 9, α 0.025 칸을 둘러싼 표시 상자</title>
+            </svg>
+          </div>
+        </div>
+        <div class="col-r">
+          <svg class="fig" id="f-talpha" viewBox="0 0 300 132" style="width:300px;margin:0 auto" role="img">
+            <title>t분포의 오른쪽 꼬리 면적 α와 그 경계값 t(df, α)를 표시한 그림</title>
+          </svg>
+          <ol class="dense" style="margin-top:16px">
+            <li>표본수를 통해 자유도(df)를 파악한다.</li>
+            <li>“구하려는 T값 ~ ∞사이의 값이 나타날 확률”인 $\alpha$를 정한다.</li>
+            <li>특정 자유도(행)에서 찾으려는 $\alpha$(열)에 해당하는 T값을 찾는다.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 원본 p.33 -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>모집단의 특성인 모수를 파악하기 위해서 표본을 뽑아 모수와 닮도록 만든 통계량이
+          바로 표본통계량이다.</li>
+        <li>표본통계량은 특정 표본을 통해 그 값이 정해지지 않았기 때문에 확률변수이다.</li>
+        <li>확률변수인 표본의 합 혹은 평균으로 표현된 표본통계량은 대수의 법칙과 중심극한정리를
+          따르므로, 이를 활용해 모집단의 분포와 상관없이 충분한 수의 표본을 뽑아
+          표본평균의 분포를 추론할 수 있다.</li>
+        <li>추정은 표본을 이용하여 만든 표본통계량을 모수추정량으로 삼아
+          모집단의 모수를 예측하는 방법이다.</li>
+        <li>좋은 모수추정량은 불편성, 효율성, 일치성, 충분성을 만족해야하며,
+          표본평균과 표본분산은 이와 같은 특성을 만족하는 모수추정량이다.</li>
+        <li>점추정은 모수추정치 그 자체를 모수에 대한 추정 값으로 삼는 추정방식이며,
+          구간추정은 모수추정치와 모수추정치의 표준오차를 일정 간격으로 삼아
+          모수가 속할 구간을 추정하는 방식이다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 원본 p.34 -->
+  <section>
+    <h2>오늘 강의 요약</h2>
+    <div class="body tight">
+      <ul>
+        <li>신뢰도는 100개의 서로 다른 표본을 통해 구한 신뢰구간 내에 모수가 포함될 빈도를 의미한다.</li>
+        <li>구간추정은 1) 추론하고자 하는 모수에 적합한 모수추정량을 선택하고,
+          2) 모수추정량의 표준오차를 유추한 뒤,
+          3) 관측치의 개수 및 모집단 분산에 대한 정보유무에 따라 모수 추정량의 분포를 추론하여,
+          3) 모수 추정량이 해당 분포를 따른다고 가정했을 때 신뢰도만큼을 확보할 수 있는
+          구간 값을 찾는다.</li>
+      </ul>
+      <div class="ci-card" style="width:330px;margin-top:10px">
+        <p class="formula-key">표본평균 $\bar{X} \sim N\!\left(\mu,\ \dfrac{\sigma^{2}}{n}\right)$</p>
+        <p class="why">(∵ 대수의 법칙과 중심극한정리)</p>
+        <svg class="fig" id="f-ci34" viewBox="0 0 300 122" style="width:296px" role="img">
+          <title>표본평균의 분포에서 가운데 95%를 칠하고 a·μ·b 를 표시한 그림</title>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- T10 마무리 (원본 p.35) -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script>
+/* ── 이 강의의 곡선은 전부 표준오차 하나에서 나온다 (design.md §6.4·§6.5) ──
+ *
+ * 신뢰구간 그림의 가로축은 "표본평균의 표준오차 σ/√n" 단위다. 그래서 95% 구간의
+ * 반폭이 z(=1.96) 눈금과 정확히 같은 자리에 놓이고, 칠한 면적도 같은 정규밀도에서
+ * 잘라 낸 것이라 "면적 = 확률"이 그림에서 저절로 맞는다.
+ * 눈대중으로 폭을 정하지 않는다. */
+const SE = {
+  z95: 1.959964,     // 양쪽 2.5% 를 남기는 표준정규 분위수
+  xbar: 25,          // 원본 p.26 의 표본평균
+};
+
+/* 종모양 한 판. 가로축은 표준오차 단위, ticks 는 [표준오차 배수, 붙일 글자]. */
+function bell(sel, box, o) {
+  o = o || {};
+  const F = Fig.withBox(box);
+  const S = F.scale({ x: [-3.7, 3.7], y: [0, 0.42] });
+  const through = (o.ticks || []).map((t) => t[0]).concat(o.cuts || []);
+  const pts = S.curve(Fig.normal(0, 1, -3.7, 3.7, { through: through }));
+  const parts = [];
+  (o.before || function () { return []; })(F, S).forEach((p) => parts.push(p));
+  parts.push(F.raw('<path class="axis" d="M' + box.x0 + ',' + box.y0 +
+                   ' L' + box.x1 + ',' + box.y0 + '"/>'));
+  parts.push(F.curve(pts, { variant: 'demand' }));
+  (o.ticks || []).forEach(function (t) {
+    parts.push(F.raw('<path class="axis" d="M' + S.x(t[0]) + ',' + box.y0 +
+                     ' L' + S.x(t[0]) + ',' + S.y(0.4 * Math.exp(-0.5 * t[0] * t[0])) + '"/>'));
+  });
+  (o.after || function () { return []; })(F, S).forEach((p) => parts.push(p));
+  if (sel) Fig.draw(sel, { parts: parts, check: false });
+  return { F: F, S: S, parts: parts };
+}
+
+/* ── 원본 p.5~10 : 모집단 → 표본 → 통계량 → 모수 ────────────── */
+(function () {
+  const F = Fig;
+  const CR = 'var(--brand-crimson)', GY = '#6E6A63';
+  function box(x, y, w, h, fill, l1, l2, o) {
+    return F.raw(
+      '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '"/>' +
+      '<text class="inbox b" x="' + (x + w / 2) + '" y="' + (y + 22) + '" text-anchor="middle">' + l1 + '</text>' +
+      (l2 ? '<text class="inbox s" x="' + (x + w / 2) + '" y="' + (y + 40) + '" text-anchor="middle">' + l2 + '</text>' : ''),
+      o || {});
+  }
+  const cap = (x, y, t, o) =>
+    F.raw('<text class="tag" x="' + x + '" y="' + y + '" text-anchor="middle">' + t + '</text>', o || {});
+  const vArrow = (x, y1, y2, o) =>
+    F.raw('<path class="thin" d="M' + x + ',' + y1 + ' L' + x + ',' + y2 +
+          '" marker-end="url(#ah-ink)"/>', o || {});
+
+  const parts = [
+    /* ── 기본판 (원본 p.5) ── */
+    box(28, 56, 178, 52, CR, '모집단', '(population)'),
+    cap(117, 124, '관심의 대상이 되는 전체'),
+    box(28, 190, 178, 52, CR, '모수', '(parameter)'),
+    cap(117, 256, '모집단의 특성'),
+    vArrow(117, 132, 186),
+    F.raw('<text class="tag-b" x="255" y="228" text-anchor="middle">모평균</text>'),
+
+    /* ── p.6 : 표본과 표본추출 ── */
+    box(428, 56, 158, 52, GY, '표본', '(sample)', { fragment: 0 }),
+    cap(507, 124, '모집단의 관측된 일부', { fragment: 0 }),
+    F.raw('<path class="thin" d="M65,52 C65,32 560,32 560,52" marker-end="url(#ah-ink)"/>',
+          { fragment: 0 }),
+    F.annot(312, 16, '표본추출\n(sampling)',
+            { anchor: 'middle', size: 11, tone: 'red', lh: 13, fragment: 0 }),
+
+    /* ── p.7 : 통계량 ── */
+    box(428, 190, 158, 52, GY, '통계량', '', { fragment: 1 }),
+    '<g class="g-raw fragment fade-out" data-fragment-index="4">' +
+      '<text class="inbox s" x="507" y="230" text-anchor="middle">(statistics)</text></g>',
+    cap(507, 256, '표본의 특성', { fragment: 1 }),
+    vArrow(507, 132, 186, { fragment: 1 }),
+    F.raw('<text class="tag-b" x="392" y="228" text-anchor="middle">표본평균</text>',
+          { fragment: 1 }),
+
+    /* ── p.8 : 추론과 확률 ── */
+    F.raw('<path class="thin" d="M428,242 C428,282 206,282 206,242" marker-end="url(#ah-ink)"/>',
+          { fragment: 2 }),
+    F.annot(317, 288, '추론\n(inference)',
+            { anchor: 'middle', size: 11, tone: 'red', lh: 13, fragment: 2 }),
+    F.raw('<path class="fat" d="M408,150 C400,215 250,230 190,158" marker-end="url(#ah-blue)"/>',
+          { fragment: 2 }),
+    F.raw('<text class="tag-b" x="450" y="152" text-anchor="middle">요약</text>', { fragment: 2 }),
+    F.raw('<text class="tag-b" x="330" y="190" text-anchor="middle">확률</text>', { fragment: 2 }),
+
+    /* ── p.10 : 통계량은 확률변수, 통계치는 실현된 값 ── */
+    F.raw('<text class="inbox o" x="507" y="231" text-anchor="middle">– 확률변수</text>',
+          { fragment: 4 }),
+    box(622, 190, 146, 52, GY, '통계치', '', { fragment: 4 }),
+    F.raw('<text class="inbox o" x="695" y="231" text-anchor="middle">– 실현된 값</text>',
+          { fragment: 4 }),
+    F.raw('<path class="thin" d="M590,216 L618,216" marker-end="url(#ah-ink)"/>', { fragment: 4 }),
+  ];
+  Fig.draw('#f-pop', { parts: parts, check: false });
+})();
+
+/* ── 원본 p.11~14 : 모집단에서 표본을 뽑는 점선 화살표와 중괄호 ───── */
+(function () {
+  /* 점선 화살표 한 벌. w·h 는 viewBox 크기, label 은 화살표 위에 붙는 글자 */
+  function drawPull(sel, w, h, label) {
+    const y0 = h - 18, y1 = 26;
+    Fig.draw(sel, {
+      parts: [
+        Fig.raw('<path class="dash" d="M6,' + y0 + ' C' + (w * 0.34) + ',' + y0 +
+                ' ' + (w * 0.36) + ',' + y1 + ' ' + (w - 8) + ',' + y1 +
+                '" marker-end="url(#ah-ink)"/>'),
+        Fig.annot(w / 2 + 6, y1 - 8, label, { anchor: 'middle', size: 11 }),
+      ],
+      check: false,
+    });
+  }
+  drawPull('#f-arr11', 120, 120, '추출');
+  drawPull('#f-arr12', 120, 120, '추출');
+  drawPull('#f-arr13', 100, 120, '추출');
+  drawPull('#f-arr14', 110, 130, '100개 추출');
+
+  /* 오른쪽으로 열린 중괄호 */
+  function brace(sel, h) {
+    const m = h / 2, r = 8;
+    Fig.draw(sel, {
+      parts: [Fig.raw(
+        '<path class="brace" d="M4,4 C14,4 4,' + (m - r) + ' 20,' + m +
+        ' C4,' + (m + r) + ' 14,' + (h - 4) + ' 4,' + (h - 4) + '"/>')],
+      check: false,
+    });
+  }
+  brace('#f-br12', 200);
+  brace('#f-br13', 210);
+})();
+
+/* ── 원본 p.19 : (구간)추정 ─────────────────────────────────── */
+(function () {
+  const BOX = { x0: 60, y0: 128, x1: 360, y1: 24 };
+  bell('#f-est', BOX, {
+    ticks: [[0, '']],
+    cuts: [-SE.z95, SE.z95],
+    after: function (F, S) {
+      const y = BOX.y0 - 16;
+      return [
+        F.raw('<path class="axis" d="M' + S.x(-SE.z95) + ',' + BOX.y0 +
+              ' L' + S.x(-SE.z95) + ',' + (y - 8) + '"/>' +
+              '<path class="axis" d="M' + S.x(SE.z95) + ',' + BOX.y0 +
+              ' L' + S.x(SE.z95) + ',' + (y - 8) + '"/>'),
+        F.arrow(S.x(-SE.z95), y, S.x(SE.z95), y, { tone: 'blue' }),
+        F.arrow(S.x(SE.z95), y, S.x(-SE.z95), y, { tone: 'blue' }),
+        F.annot(S.x(0), 12, '실제\n추정량', { anchor: 'middle', size: 11, lh: 13 }),
+        F.annot(S.x(0), 158, '(구간)추정', { anchor: 'middle', size: 13, tone: 'blue' }),
+      ];
+    },
+  });
+})();
+
+/* ── 원본 p.20 : 가설검정 ───────────────────────────────────── */
+(function () {
+  const BOX = { x0: 60, y0: 128, x1: 360, y1: 24 };
+  bell('#f-hyp', BOX, {
+    ticks: [[0, '']],
+    cuts: [SE.z95],
+    before: function (F, S) {
+      // 실제 추정량 바깥쪽 꼬리 — 같은 밀도함수에서 잘라 내므로 면적이 2.5%다
+      return [F.under(S.curve(Fig.normal(0, 1, SE.z95, 3.7)), { cls: 'area-loss' })];
+    },
+    after: function (F, S) {
+      return [
+        F.raw('<path class="axis" d="M' + S.x(SE.z95) + ',' + BOX.y0 +
+              ' L' + S.x(SE.z95) + ',' + (BOX.y1 + 14) + '"/>'),
+        F.annot(S.x(0), 12, '귀무가설 하의\n추정량 기대값', { anchor: 'middle', size: 11, lh: 13 }),
+        F.annot(S.x(SE.z95), 12, '실제\n추정량', { anchor: 'middle', size: 11, lh: 13 }),
+        F.raw('<path class="arrow red" d="M' + (S.x(SE.z95) + 14) + ',' + (BOX.y0 - 2) +
+              ' C' + (S.x(SE.z95) + 40) + ',' + (BOX.y0 - 6) +
+              ' ' + (S.x(SE.z95) + 38) + ',' + (BOX.y0 - 40) +
+              ' ' + (S.x(SE.z95) + 62) + ',' + (BOX.y0 - 44) + '" marker-end="url(#ah-red)"/>'),
+        F.annot(S.x(SE.z95) + 68, BOX.y0 - 40, '가설검정', { size: 13, tone: 'red' }),
+      ];
+    },
+  });
+})();
+
+/* ── 원본 p.26 · p.34 : 신뢰구간 판 ──────────────────────────
+ * 칠한 자리의 경계가 ±z(=1.96) 눈금과 같은 표준오차 단위에서 나오므로
+ * "구간의 반폭 = 1.96 × σ/√n" 이 그림에서 실제로 성립한다. */
+(function () {
+  const z = SE.z95;
+
+  // p.26 — 양쪽 꼬리 2.5% 씩
+  bell('#f-ci26', { x0: 44, y0: 96, x1: 268, y1: 18 }, {
+    cuts: [-z, z],
+    ticks: [[0, '']],
+    before: function (F, S) {
+      return [
+        F.under(S.curve(Fig.normal(0, 1, -3.7, -z)), { cls: 'area-dwl' }),
+        F.under(S.curve(Fig.normal(0, 1, z, 3.7)), { cls: 'area-dwl' }),
+      ];
+    },
+    after: function (F, S) {
+      return [
+        F.annot(S.x(-z), 112, 'a', { anchor: 'middle', size: 13 }),
+        F.annot(S.x(0), 112, String(SE.xbar), { anchor: 'middle', size: 13 }),
+        F.annot(S.x(z), 112, 'b', { anchor: 'middle', size: 13 }),
+        F.raw('<circle cx="' + S.x(z) + '" cy="108" r="11" fill="none" ' +
+              'stroke="var(--chart-blue)" stroke-width="1.2"/>'),
+        F.annot(30, 44, '2.5%', { anchor: 'middle', size: 12 }),
+        F.annot(288, 44, '2.5%', { anchor: 'middle', size: 12 }),
+        F.arrow(38, 52, S.x(-z) - 10, 88),
+        F.arrow(280, 52, S.x(z) + 10, 88),
+        F.raw('<path class="thin" d="M' + S.x(z) + ',132 L' + S.x(z) +
+              ',122" marker-end="url(#ah-ink)"/>'),
+      ];
+    },
+  });
+
+  // p.34 — 가운데 95%
+  bell('#f-ci34', { x0: 54, y0: 92, x1: 246, y1: 18 }, {
+    cuts: [-z, z],
+    ticks: [[0, '']],
+    before: function (F, S) {
+      return [F.under(S.curve(Fig.normal(0, 1, -z, z, { n: 120 })), { cls: 'area-dwl' })];
+    },
+    after: function (F, S) {
+      return [
+        F.annot(S.x(-z), 108, 'a', { anchor: 'middle', size: 13 }),
+        F.annot(S.x(0), 108, 'μ', { anchor: 'middle', size: 13, tone: 'red' }),
+        F.annot(S.x(z), 108, 'b', { anchor: 'middle', size: 13 }),
+        F.annot(296, 34, '95% 신뢰도', { anchor: 'end', size: 12 }),
+        F.raw('<path class="thin" d="M232,40 C214,54 206,34 ' + S.x(0.6) + ',34"/>'),
+      ];
+    },
+  });
+})();
+
+/* ── 원본 p.29 : 구간추정 절차 순서도 ───────────────────────── */
+(function () {
+  const F = Fig;
+  /* 마름모 — cx·cy 중심, hw·hh 반폭·반높이 */
+  function dia(cx, cy, hw, hh, lines) {
+    let s = '<path class="dbox" d="M' + cx + ',' + (cy - hh) + ' L' + (cx + hw) + ',' + cy +
+            ' L' + cx + ',' + (cy + hh) + ' L' + (cx - hw) + ',' + cy + ' Z"/>';
+    const top = cy - ((lines.length - 1) * 15) / 2 + 4;
+    lines.forEach(function (t, i) {
+      s += '<text class="inbox s" x="' + cx + '" y="' + (top + i * 15) +
+           '" text-anchor="middle" style="font-size:12px;font-weight:700">' + t + '</text>';
+    });
+    return F.raw(s);
+  }
+  function obox(cx, cy, w, h, t) {
+    return F.raw(
+      '<rect class="obox" x="' + (cx - w / 2) + '" y="' + (cy - h / 2) + '" width="' + w +
+      '" height="' + h + '"/>' +
+      '<text class="tag" x="' + cx + '" y="' + (cy + 5) + '" text-anchor="middle" ' +
+      'style="font-size:13px">' + t + '</text>');
+  }
+  const arr = (x1, y1, x2, y2) =>
+    F.raw('<path class="thin" d="M' + x1 + ',' + y1 + ' L' + x2 + ',' + y2 +
+          '" marker-end="url(#ah-ink)"/>');
+  const lab = (x, y, t) => F.annot(x, y, t, { anchor: 'middle', size: 12 });
+
+  Fig.draw('#f-flow', {
+    parts: [
+      dia(196, 46, 106, 40, ['모집단이', '정규분포를 따르는가?']),
+      dia(500, 46, 106, 40, ['표본의 개수가', '충분히 많은가?']),
+      obox(724, 46, 132, 30, '추정 불가'),
+      dia(360, 172, 118, 42, ['모집단의 분산을', '알고 있는가?']),
+      obox(220, 268, 176, 30, '표준정규분포 활용'),
+      obox(500, 268, 152, 30, 'T분포 활용'),
+
+      arr(304, 46, 392, 46), lab(348, 34, 'NO'),
+      arr(608, 46, 656, 46), lab(632, 34, 'NO'),
+      arr(214, 88, 340, 128), lab(268, 108, 'YES'),
+      arr(490, 88, 382, 128), lab(432, 108, 'YES'),
+      arr(322, 208, 250, 250), lab(272, 232, 'YES'),
+      arr(398, 208, 470, 250), lab(452, 232, 'NO'),
+
+      F.annot(618, 118, '* 중심극한정리', { anchor: 'middle', size: 11, tone: 'red' }),
+      F.annot(680, 268, '* 대수의 법칙', { anchor: 'middle', size: 11, tone: 'red' }),
+    ],
+    check: false,
+  });
+})();
+
+/* ── 원본 p.32 : t-분포표의 표시 상자와 오른쪽 꼬리 α ────────── */
+(function () {
+  /* 상자 자리는 pptx 의 도형·그림 좌표(EMU)에서 그대로 환산했다.
+     그림 (425450, 832612) 크기 (5327650, 5650737) / 상자 (2849880, 2385060) 크기 (373380, 191909) */
+  const x = ((2849880 - 425450) / 5327650) * 724;
+  const y = ((2385060 - 832612) / 5650737) * 768;
+  const w = (373380 / 5327650) * 724;
+  const h = (191909 / 5650737) * 768;
+  Fig.draw('#f-thl', {
+    parts: [Fig.raw('<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
+                    '" height="' + h.toFixed(1) + '" fill="none" ' +
+                    'stroke="var(--brand-crimson)" stroke-width="3"/>')],
+    check: false,
+  });
+
+  const a = 2.262;   // 표에서 짚은 자리: 자유도 9, α = 0.025
+  bell('#f-talpha', { x0: 34, y0: 92, x1: 236, y1: 18 }, {
+    cuts: [a],
+    ticks: [[0, '']],
+    before: function (F, S) {
+      return [F.under(S.curve(Fig.normal(0, 1, a, 3.7)), { cls: 'area-dwl' })];
+    },
+    after: function (F, S) {
+      return [
+        F.annot(252, 92, 't', { size: 13 }),
+        F.raw('<text class="annot" x="' + S.x(a) + '" y="114" text-anchor="middle" ' +
+              'style="font-size:13px;font-style:italic">t' +
+              '<tspan dy="4" style="font-size:9px">df, α</tspan></text>'),
+        F.annot(268, 40, 'α', { anchor: 'middle', size: 14 }),
+        F.raw('<path class="thin" d="M264,48 C252,64 246,74 ' + (S.x(a) + 8) + ',80" ' +
+              'marker-end="url(#ah-ink)"/>'),
+      ];
+    },
+  });
+})();
+</script>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
