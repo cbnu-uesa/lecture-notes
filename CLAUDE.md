@@ -257,9 +257,17 @@ git push --force https://github.com/cbnu-uesa/lecture-notes.git gh-pages
 ```
 
 `pdf/` 는 git 에 없으므로 **배포 전에 `build-pdf.sh` 를 돌려 두어야** 다운로드 버튼이 산다.
-**배포본에는 `check-links.sh` 를 쓸 수 없다.** Cloudflare Access 가 로그인 없는 요청을
-403 으로 막아 스크립트가 첫 줄에서 멈춘다 (2026-09-05 확인). 링크 확인은 배포 **전에**
-로컬로 돌리고, 배포 뒤에는 브라우저로 한두 개만 눈으로 연다.
+**링크 검사는 배포 전에 로컬로 돌린다.** Cloudflare Access 가 로그인 없는 요청을
+403 으로 막아 배포본을 그냥은 못 본다 (2026-09-05 확인). 배포 뒤에는 브라우저로
+한두 개만 눈으로 연다.
+
+배포본을 기계로 확인해야 하면 Zero Trust → Access → Service Auth 에서 서비스 토큰을
+만들고, 그 토큰을 Access 정책 Include 에 넣은 뒤 환경변수로 넘긴다.
+
+```bash
+CF_ACCESS_CLIENT_ID=... CF_ACCESS_CLIENT_SECRET=... \
+  _scripts/check-links.sh https://lecture-notes.kks1104.workers.dev
+```
 
 ### 겪은 것
 

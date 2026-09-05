@@ -2,7 +2,15 @@
 # 링크 검사 — 강의 목록이 가리키는 슬라이드·PDF 가 실제로 열리는지 본다
 #
 #   _scripts/check-links.sh                                   로컬 (임시 서버를 띄운다)
-#   _scripts/check-links.sh https://cbnu-uesa.github.io/lecture-notes   배포본
+#
+# **배포 전에 로컬로 돌린다.** 배포본은 Cloudflare Access 가 로그인 없는 요청을
+# 403 으로 막아 그냥은 못 본다 (2026-09-05 확인). 그래도 배포본을 확인해야 하면
+# Zero Trust 에서 서비스 토큰을 만들어 환경변수로 넘긴다.
+#
+#   CF_ACCESS_CLIENT_ID=... CF_ACCESS_CLIENT_SECRET=... \
+#     _scripts/check-links.sh https://lecture-notes.kks1104.workers.dev
+#
+# 토큰을 쓰려면 Access 정책에 그 토큰을 Include 로 넣어 두어야 한다.
 #
 # 왜 필요한가. 2026-08-26 에 도시교통통계학 course.json 만 lectures 에 file 이
 # 없어서, 과목 index 의 `l.file.replace(...)` 에서 TypeError 가 나고 렌더링 루프가
@@ -35,10 +43,20 @@ BASE = os.environ['BASE'].rstrip('/')
 ROOT = sys.argv[1]
 LOCAL = BASE.startswith('http://127.0.0.1')
 
-def fetch(path):
+# Cloudflare Access 서비스 토큰. 없으면 헤더를 붙이지 않는다 (로컬은 필요 없다).
+CF = {}
+if os.environ.get('CF_ACCESS_CLIENT_ID') and os.environ.get('CF_ACCESS_CLIENT_SECRET'):
+    CF = {'CF-Access-Client-Id': os.environ['CF_ACCESS_CLIENT_ID'],
+          'CF-Access-Client-Secret': os.environ['CF_ACCESS_CLIENT_SECRET']}
+
+def request(path, method='GET'):
     url = f"{BASE}/{urllib.parse.quote(path)}"
+    return urllib.request.urlopen(
+        urllib.request.Request(url, headers=CF, method=method), timeout=30)
+
+def fetch(path):
     try:
-        with urllib.request.urlopen(url, timeout=30) as r:
+        with request(path) as r:
             return r.status, r.read()
     except urllib.error.HTTPError as e:
         return e.code, b''
@@ -46,10 +64,8 @@ def fetch(path):
         return str(e), b''
 
 def head(path):
-    url = f"{BASE}/{urllib.parse.quote(path)}"
     try:
-        return urllib.request.urlopen(
-            urllib.request.Request(url, method='HEAD'), timeout=30).status
+        return request(path, 'HEAD').status
     except urllib.error.HTTPError as e:
         return e.code
     except Exception as e:
@@ -59,6 +75,20 @@ errors, warns = [], []
 
 # ── 루트 허브의 COURSES 배열 ────────────────────────────────
 status, body = fetch('index.html')
+if status == 403 and not LOCAL:
+    print("중단: Cloudflare Access 가 막았습니다 (403).", file=sys.stderr)
+    print("      배포본은 로그인해야 열립니다. 링크 검사는 배포 전에 인자 없이 돌리세요:",
+          file=sys.stderr)
+    print("        _scripts/check-links.sh", file=sys.stderr)
+    if not CF:
+        print("      배포본을 꼭 봐야 하면 Zero Trust 서비스 토큰을",
+              file=sys.stderr)
+        print("      CF_ACCESS_CLIENT_ID · CF_ACCESS_CLIENT_SECRET 로 넘기세요 (스크립트 앞머리 참조).",
+              file=sys.stderr)
+    else:
+        print("      토큰을 넘겼는데도 막혔습니다. Access 정책 Include 에 그 토큰이 있는지 확인하세요.",
+              file=sys.stderr)
+    sys.exit(2)
 if status != 200:
     print(f"중단: 루트 index.html 을 열 수 없습니다 ({status})", file=sys.stderr)
     sys.exit(2)
