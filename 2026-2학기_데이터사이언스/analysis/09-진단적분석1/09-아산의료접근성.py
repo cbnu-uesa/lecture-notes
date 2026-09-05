@@ -10,8 +10,9 @@
 import csv, collections, math, pathlib, statistics as st, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
-BASE = (HERE / 'data' if (HERE / 'data' / '21.아산시_병원정보.csv').exists()
+DATA = HERE.parent / 'data'      # 원자료는 주차 폴더 밖, analysis/data/ 에 함께 둔다
+# 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+BASE = (DATA if (DATA / '21.아산시_병원정보.csv').exists()
         else pathlib.Path.home() / 'data/compas/asan-medical')
 # 온양 시가지의 법정동. 인구 파일은 행정동(온양1~6동), 병원 파일은 법정동을 쓴다.
 # 그대로 이으면 온양 지역 병원이 0개가 된다 — 9강에서 다루는 함정이다.

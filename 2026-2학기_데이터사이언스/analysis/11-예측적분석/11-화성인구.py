@@ -10,9 +10,10 @@
 import datetime, math, pathlib, statistics as st, sys, xml.etree.ElementTree as ET, zipfile
 
 HERE = pathlib.Path(__file__).resolve().parent
+DATA = HERE.parent / 'data'      # 원자료는 주차 폴더 밖, analysis/data/ 에 함께 둔다
 FILE = '1.화성시_인구데이터.xlsx'
-# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
-SRC = (HERE / 'data' / FILE if (HERE / 'data' / FILE).exists()
+# 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+SRC = (DATA / FILE if (DATA / FILE).exists()
        else pathlib.Path.home() / 'data/compas/hwaseong-population' / FILE)
 NS = '{http://schemas.openxmlformats.org/spreadsheetml/2006/main}'
 HOLDOUT = 12          # 마지막 12개월은 검증용으로 떼어 둔다

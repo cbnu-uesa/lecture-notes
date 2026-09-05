@@ -10,9 +10,10 @@
 import csv, pathlib, statistics as st, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
+DATA = HERE.parent / 'data'      # 원자료는 주차 폴더 밖, analysis/data/ 에 함께 둔다
 FILE = '3.세종시_아파트(매매)_실거래가.csv'
-# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
-SRC = (HERE / 'data' / FILE if (HERE / 'data' / FILE).exists()
+# 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+SRC = (DATA / FILE if (DATA / FILE).exists()
        else pathlib.Path.home() / 'data/compas/sejong-housing' / FILE)
 AREA_MIN = 60
 

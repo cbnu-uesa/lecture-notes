@@ -9,8 +9,9 @@
 import csv, json, math, pathlib, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-# 원자료는 data/ 에 함께 둔다. 없으면 내려받아 둔 곳(~/data/compas)을 본다.
-BASE = (HERE / 'data' if (HERE / 'data' / '01.광양시_충전기설치현황.csv').exists()
+DATA = HERE.parent / 'data'      # 원자료는 주차 폴더 밖, analysis/data/ 에 함께 둔다
+# 없으면 내려받아 둔 곳(~/data/compas)을 본다.
+BASE = (DATA if (DATA / '01.광양시_충전기설치현황.csv').exists()
         else pathlib.Path.home() / 'data/compas/gwangyang-ev')
 RADIUS_KM = 0.5      # 걸어서 갈 만한 거리로 잡은 기준. 바꾸면 답이 달라진다
 K = 8                # 추가로 놓을 개수
