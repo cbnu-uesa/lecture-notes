@@ -589,9 +589,48 @@ claude mcp add &lt;이름&gt; -- &lt;실행 명령&gt;
         세 번째가 오늘의 핵심 증거다. <span class="hl">검증은 사람이 정하고 AI 가 수행한다</span> 를
         화면으로 보여 주는 것이다.</p>
       <p class="caption" style="margin-top:10px">
-        가정 과제 — 만든 것 중 남과 나눠 쓸 만한 것이 있으면 플러그인 구조로 묶어 본다
+        더 해 볼 것 — 만든 것 중 남과 나눠 쓸 만한 것이 있으면 플러그인 구조로 묶어 본다
         (<span class="code">.claude-plugin/plugin.json</span> + <span class="code">skills/</span> + <span class="code">agents/</span>).
-        <span class="hl">6주차에 이 폴더를 저장소로 만든다.</span></p>
+        <span class="hl">6주차에 이 폴더를 저장소로 만든다.</span>
+        <b>가정 과제는 다음 장에 있다.</b></p>
+    </div>
+  </section>
+
+  <!-- ══ 20-b. 가정 과제 ═════════════════════════════════ -->
+  <section class="s-split">
+    <h2>가정 과제 — SGIS 스킬을 만들어 온다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">오늘 만든 것은 내 위키를 다뤘다. 이번엔 바깥 데이터다</p>
+        <p>SGIS(통계지리정보서비스)는 오픈API <span class="hl">93종</span>을 연다 —
+          인구·가구·주택·사업체 통계, 행정구역 경계, 지오코딩, 격자, 자연재해.</p>
+        <p class="emph" style="margin-top:10px">감쌀 것은 <span class="hl">두세 개</span>면 된다</p>
+        <ol class="steps" style="margin-top:6px">
+          <li><span class="hl">인증키를 오늘 신청한다</span>
+            <span class="t">sgis.mods.go.kr · 사용기간을 학기 끝까지 덮게</span></li>
+          <li>자기 문제에 필요한 API 를 두세 개 고른다</li>
+          <li>클로드에게 스킬을 만들게 한다</li>
+          <li>실제로 받아 보고 <span class="mark">자릿수가 그럴듯한지</span> 본다</li>
+        </ol>
+      </div>
+      <div class="col-r">
+        <p class="sub">보는 것 넷 — 분량은 세지 않는다</p>
+        <ol class="steps">
+          <li><span class="hl">스스로 꺼내지는가</span>
+            <span class="t">description 이 「언제 쓰는지」를 말하는가</span></li>
+          <li><span class="hl">인증키가 어느 파일에도 없는가</span>
+            <span class="t">6주차에 깃허브에 올린다. 여기서 새면 키가 공개된다</span></li>
+          <li><span class="hl">출처가 붙어 있는가</span>
+            <span class="t">API 이름 · 기관 · 조회 날짜</span></li>
+          <li><span class="hl">토큰 4시간을 사람이 안 만지는가</span></li>
+        </ol>
+        <div class="ck"><b>마감은 5주차 수업 시작.</b> 두 주를 주는 이유가 있다 —
+          <b>키 발급에 시간이 걸리고,</b> 어느 API 가 필요한지는 4주차에 연구질문을
+          정해야 안다.</div>
+        <p class="caption" style="margin-top:8px">
+          자세한 것은 <span class="code">과제-SGIS스킬.md</span> 에 있다.
+          <span class="hl">5주차에 이 스킬로 자기 데이터를 받는다.</span></p>
+      </div>
     </div>
   </section>
 
@@ -609,6 +648,8 @@ claude mcp add &lt;이름&gt; -- &lt;실행 명령&gt;
           (2026. 7. 16. 개정). 2026. 9. 6. 에 직접 붙여 확인했다</li>
         <li>QGIS MCP — jjsantos01/qgis_mcp (공식 플러그인 저장소 <span class="code">qgis_mcp_plugin</span>).
           <span class="hl">인용한 경고 문구는 그 저장소 README 원문이다</span></li>
+        <li>SGIS 오픈API — 통계지리정보서비스 개발지원센터 (2026. 9. 6. 확인).
+          API 93종 · 인증키당 하루 50,000회 · <span class="hl">키는 공유할 수 없다</span></li>
         <li><span class="hl">명령과 화면은 버전마다 달라진다.</span>
           막히면 공식 문서를 먼저 보고, 그다음 오류 메시지를 그대로 클로드에게 준다</li>
       </ul>
