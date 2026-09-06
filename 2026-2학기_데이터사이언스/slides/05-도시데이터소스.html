@@ -147,6 +147,65 @@
     </div>
   </section>
 
+  <!-- ══ 5-b. MCP 로 받아 본 것 ═══════════════════════════ -->
+  <section class="s-split">
+    <h2>③ AI 위임은 이렇게 생겼다 — KOSIS MCP</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">3주차에 붙인 그 서버다</p>
+        <p>KOSIS 가 <span class="hl">MCP 서버를 시범 운영</span>한다. 인증키가 없고 주소 하나로 붙는다.
+          1,360여 종 국가승인통계, 26만여 통계표가 대상.</p>
+        <div class="prompt-box" style="margin-top:10px">
+          <p class="who">이렇게 묻는다</p>
+          <p>"청주시 총인구를 <b>2020년부터 연도별로</b> 알려 줘."</p>
+        </div>
+        <p class="caption" style="margin-top:8px">
+          <span class="hl">통계표 번호를 미리 알 필요가 없다.</span>
+          <span class="code">kosis_search</span> 가 표를 찾아 주고
+          <span class="code">kosis_region_code</span> 가 청주시 = <span class="code">43110</span> 을 돌려준다.
+          그 둘을 <span class="code">kosis_get_data</span> 에 넣으면 숫자가 온다.</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">돌아온 값 — 청주시 주민등록인구</p>
+        <table style="width:100%;table-layout:fixed;margin-top:6px">
+          <thead><tr><th style="width:34%">연도</th><th>총인구(명)</th></tr></thead>
+          <tbody>
+            <tr><td>2020</td><td>844,993</td></tr>
+            <tr><td>2021</td><td>848,482</td></tr>
+            <tr><td>2022</td><td>849,573</td></tr>
+            <tr><td>2023</td><td>852,189</td></tr>
+            <tr><td>2024</td><td>854,537</td></tr>
+            <tr><td>2025</td><td class="hl">856,152</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:8px">
+          출처: KOSIS 「행정구역(시군구)별/1세별 주민등록인구」(행정안전부, <span class="code">DT_1B04006</span>),
+          KOSIS MCP 로 2026-09-06 조회</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5-c. 그래서 확인할 것 ════════════════════════════ -->
+  <section>
+    <h2>맡겼으면 확인한다</h2>
+    <div class="body tight">
+      <p class="sub">앞의 여섯 줄을 받고 <span class="hl">바로 쓰지 않았다.</span> 세 가지를 봤다</p>
+      <ol class="steps">
+        <li><span class="hl">어느 통계표에서 왔나</span> — 표 이름·기관·통계표ID 를 되물었다.
+          <span class="t">대지 못하면 그 숫자는 쓰지 않는다</span></li>
+        <li><span class="hl">자릿수가 그럴듯한가</span> — 청주시는 85만 규모다.
+          <span class="t">처음 합산에서 167만이 나왔다. 「계」 행을 한 번 더 더한 것이었다</span></li>
+        <li><span class="hl">KOSIS 화면과 같은가</span> — 통계표 바로가기를 열어 한 해를 대조한다</li>
+      </ol>
+      <div class="ck"><b>두 번째가 실제로 있었던 일이다.</b> 받아 온 표에 「계」 행과
+        연령별 행이 함께 있었고, 그것을 모르고 다 더하면 <b>인구가 두 배</b>가 된다.
+        <span class="hl">틀린 줄 몰랐다면 그대로 슬라이드에 실렸을 숫자다.</span></div>
+      <p class="caption" style="margin-top:8px">
+        시범서비스이며 국가데이터처의 공식 입장이 아니다 — 중요한 판단 전에는 KOSIS 원자료를 확인한다
+        (KOSIS 공지, 2026-07-08).</p>
+    </div>
+  </section>
+
   <!-- ══ 6. 형식과 함정 ═══════════════════════════════════ -->
   <section>
     <h2>받고 나서 겪는 것들</h2>
@@ -258,6 +317,9 @@
         그래야 ①에서 센 건수와 맞춰 볼 수 있다.</p>
       <p class="caption" style="margin-top:8px">
         건수가 다르면 멈춘다. 기간 해석이 다른지, 취소 거래를 포함했는지 물어본다.</p>
+      <div class="ck" style="margin-top:8px"><b>MCP 로도 한 번 받아 본다.</b>
+        3주차에 붙인 <span class="hl">KOSIS MCP</span> 로 자기 연구질문에 필요한 통계표를 하나 받는다.
+        인증키가 없어 바로 된다. <b>받은 뒤 통계표ID 와 기관을 되묻는 것까지가 실습이다.</b></div>
     </div>
   </section>
 
