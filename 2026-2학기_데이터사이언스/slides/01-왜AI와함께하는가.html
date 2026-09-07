@@ -45,6 +45,8 @@
   .screen .inner ol { margin: 0; padding-left: 17px; }
   .screen .inner li { margin-bottom: 5px; }
   .screen .kw { color: var(--brand-crimson); font-weight: 700; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
   .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
         padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
   .ck b { color: var(--brand-crimson); }
@@ -439,33 +441,37 @@ out.to_csv("result.csv")</div>
   <section>
     <h2>분석은 네 개의 질문으로 나뉜다</h2>
     <div class="body stack">
-      <svg class="fig" id="f-four" viewBox="0 0 840 290" style="width:810px" role="img"
-           aria-label="기술적·진단적·예측적·처방적 분석이 왼쪽에서 오른쪽으로 한 칸씩 높아지는 계단 도식">
+      <svg class="fig" id="f-four" viewBox="0 0 840 250" style="width:810px" role="img"
+           aria-label="기술적·진단적·예측적·처방적 분석 네 칸이 나란히 놓이고, 오른쪽으로 갈수록 정책 결정에 가까워진다는 축이 아래에 그려진 도식">
         <title>분석의 네 단계 — 기술적, 진단적, 예측적, 처방적</title>
-        <!-- 계단 4칸: 왼쪽이 낮고 오른쪽이 높다 -->
-        <rect x="30"  y="188" width="186" height="56" fill="#EDE9E3"/>
-        <rect x="228" y="152" width="186" height="92" fill="#DCD7CF"/>
-        <rect x="426" y="116" width="186" height="128" fill="#C9C3B9"/>
-        <rect x="624" y="80"  width="186" height="164" fill="#A02948"/>
+        <!-- 네 칸의 높이는 같다. 단계에 위아래가 없고 묻는 질문만 다르다 -->
+        <rect x="30"  y="62" width="186" height="94" fill="#EDE9E3"/>
+        <rect x="228" y="62" width="186" height="94" fill="#E2DDD6"/>
+        <rect x="426" y="62" width="186" height="94" fill="#D6D1C8"/>
+        <rect x="624" y="62" width="186" height="94" fill="#CAC4BA"/>
+        <!-- 주차 -->
+        <text x="123" y="50" text-anchor="middle" font-size="12" fill="#8A867E">6–7주차</text>
+        <text x="321" y="50" text-anchor="middle" font-size="12" fill="#8A867E">9–10주차</text>
+        <text x="519" y="50" text-anchor="middle" font-size="12" fill="#8A867E">11–12주차</text>
+        <text x="717" y="50" text-anchor="middle" font-size="12" fill="#8A867E">13주차</text>
         <!-- 단계 이름 -->
-        <text x="123" y="222" text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">기술적</text>
-        <text x="321" y="204" text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">진단적</text>
-        <text x="519" y="186" text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">예측적</text>
-        <text class="on-dark" x="717" y="168" text-anchor="middle" font-size="17" font-weight="700" fill="#FFFFFF">처방적</text>
+        <g text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">
+          <text x="123" y="117">탐색적</text>
+          <text x="321" y="117">진단적</text>
+          <text x="519" y="117">예측적</text>
+          <text x="717" y="117">처방적</text>
+        </g>
         <!-- 각 단계의 질문 -->
-        <text x="123" y="270" text-anchor="middle" font-size="13.5" fill="#4A4741">무슨 일이 일어났는가?</text>
-        <text x="321" y="270" text-anchor="middle" font-size="13.5" fill="#4A4741">왜 일어났는가?</text>
-        <text x="519" y="270" text-anchor="middle" font-size="13.5" fill="#4A4741">앞으로 어떻게 될까?</text>
-        <text x="717" y="270" text-anchor="middle" font-size="13.5" font-weight="700" fill="#A02948">무엇을 해야 하는가?</text>
-        <!-- 세로 화살표 — 라벨은 축을 따라 세워 계단 위 라벨과 겹치지 않게 한다 -->
-        <path class="axis" d="M16,244 L16,64" stroke-width="1.2"/>
-        <path d="M16,64 L11,74 L21,74 Z" fill="#16181C"/>
-        <text x="34" y="58" font-size="12.5" fill="#4A4741">정책 결정에 가까워진다</text>
-        <!-- 주차 표시 — 각 계단 바로 위 -->
-        <text x="123" y="176" text-anchor="middle" font-size="12" fill="#8A867E">7주차</text>
-        <text x="321" y="140" text-anchor="middle" font-size="12" fill="#8A867E">9–10주차</text>
-        <text x="519" y="104" text-anchor="middle" font-size="12" fill="#8A867E">11–12주차</text>
-        <text x="717" y="68"  text-anchor="middle" font-size="12" fill="#8A867E">13주차</text>
+        <g text-anchor="middle" font-size="13.5" fill="#4A4741">
+          <text x="123" y="184">무슨 일이 일어났는가?</text>
+          <text x="321" y="184">왜 일어났는가?</text>
+          <text x="519" y="184">앞으로 어떻게 될까?</text>
+          <text x="717" y="184">무엇을 해야 하는가?</text>
+        </g>
+        <!-- 가로 축 — 왼쪽에서 오른쪽으로 -->
+        <path class="axis" d="M30,212 L804,212" stroke-width="1.2"/>
+        <path d="M810,212 L798,207 L798,217 Z" fill="#16181C"/>
+        <text x="420" y="236" text-anchor="middle" font-size="13" fill="#4A4741">정책 결정에 가까워진다</text>
       </svg>
     </div>
   </section>
@@ -475,79 +481,24 @@ out.to_csv("result.csv")</div>
     <h2>실습 데이터는 어디서 오나</h2>
     <div class="body tight">
       <p class="sub">COMPAS <span class="en">(compas.lh.or.kr)</span> — LH가 운영하는 도시문제 데이터 분석 공모 플랫폼</p>
-      <p>실습은 이 과제들의 <span class="hl">공개 데이터</span>를 씀</p>
-      <p>각자 회원가입해 직접 내려받는다.</p>
+      <p>실습은 이 과제들의 <span class="hl">공개 데이터</span>를 씀. 각자 회원가입해 직접 내려받음</p>
       <p>비공개로 표시된 데이터(유동인구·카드매출 등)는 쓰지 않음</p>
-      <figure class="shot" style="width:700px;margin:10px auto 0">
-        <img src="../assets/cc-compas-list.png"
-             alt="COMPAS 아이디어 공모전 목록 화면. 과제 카드 세 장에 제목, 종료 여부, 상금, 참가 팀 수, 기간이 적혀 있다">
-        <figcaption style="text-align:center">
-          출처: COMPAS 국토도시 데이터 분석 플랫폼, 한국토지주택공사(LH) ·
-          compas.lh.or.kr · 2026. 8. 26. 갈무리</figcaption>
-      </figure>
-    </div>
-  </section>
-
-  <!-- ══ 14-b. 매주 과제 ═════════════════════════════════ -->
-  <section class="s-split">
-    <h2>매주 과제가 있다</h2>
-    <div class="body tight">
-      <div class="col-l">
-        <p class="sub">앞 여섯 주 — 도구를 하나씩 자기 것으로</p>
-        <table style="width:100%;table-layout:fixed">
-          <thead><tr><th style="width:22%">주차</th><th>내고 오는 것</th></tr></thead>
-          <tbody>
-            <tr><td>2주</td><td>내 지식 위키를 연다</td></tr>
-            <tr><td>3주</td><td>SGIS 스킬 만들기 <span class="t">마감 5주</span></td></tr>
-            <tr><td>4주</td><td>문제정의서 한 쪽</td></tr>
-            <tr><td>5주</td><td>내 문제의 데이터 + 출처 문서</td></tr>
-            <tr><td>6주</td><td>깃허브 비공개 저장소</td></tr>
-          </tbody>
-        </table>
-        <p class="caption" style="margin-top:8px">
-          7주차부터는 오른쪽 분석 과제가 이어진다. 앞 여섯 주에 만든 도구로 푼다.</p>
-      </div>
-      <div class="col-r">
-        <p class="sub">3주차부터 — 잘된 과제를 함께 봄</p>
-        <p>수업을 시작할 때 <span class="hl">지난주 과제 중 잘된 것</span>을 몇 개 골라
-          화면에 띄우고 이야기한 뒤 그날 강의로 들어감</p>
-        <p class="emph" style="margin-top:12px">잘된 것의 기준은 완성도가 아님</p>
-        <ul>
-          <li>남이 <span class="hl">따라 할 수 있게</span> 적었는가</li>
-          <li>막힌 자리를 <span class="hl">숨기지 않고</span> 적었는가</li>
-          <li>받은 것을 <span class="hl">그대로 믿지 않고</span> 확인했는가</li>
-        </ul>
-        <div class="ck"><b>막힌 과제도 뽑는다.</b> 어디서 왜 막혔는지가 잘 적힌 것은
-          매끄럽게 끝난 과제보다 배울 것이 많다.</div>
-        <p class="caption" style="margin-top:8px">
-          <span class="hl">14주차에는 그동안의 과제 중 잘된 것을 뽑아 발표</span></p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ 15. 주차별 실습 과제 ════════════════════════════ -->
-  <section>
-    <h2>주차별 실습 과제</h2>
-    <div class="body">
-      <table style="width:100%;table-layout:fixed;margin-top:8px">
-        <thead>
-          <tr><th style="width:15%">주차</th><th style="width:20%">분석 단계</th>
-              <th style="width:45%">COMPAS 과제</th><th>지역</th></tr>
-        </thead>
+      <table style="width:100%;table-layout:fixed;margin-top:10px">
+        <thead><tr><th style="width:16%">주차</th><th style="width:56%">COMPAS 과제</th><th>지역</th></tr></thead>
         <tbody>
-          <tr><td>7주</td><td>기술적</td><td>주택 시장 특성분석</td><td>세종시</td></tr>
-          <tr><td>9–10주</td><td>진단적</td><td>보건의료 불균형 — 의료 취약지역 도출</td><td>아산시</td></tr>
-          <tr><td>11–12주</td><td>예측적</td><td>AI기법에 의한 인구예측모델 정확도 비교</td><td>화성시</td></tr>
-          <tr><td>13주</td><td>처방적</td><td>전기자동차 충전소 최적입지 선정</td><td>광양시</td></tr>
+          <tr><td>6–7주</td><td>주택 시장 특성분석</td><td>세종시</td></tr>
+          <tr><td>9–10주</td><td>보건의료 불균형 — 의료 취약지역 도출</td><td>아산시</td></tr>
+          <tr><td>11–12주</td><td>AI기법에 의한 인구예측모델 정확도 비교</td><td>화성시</td></tr>
+          <tr><td>13주</td><td>전기자동차 충전소 최적입지 선정</td><td>광양시</td></tr>
         </tbody>
       </table>
-      <p class="caption" style="margin-top:16px">
-        네 과제 모두 수상작의 보고서와 소스코드가 공개되어 있다. 자기 분석을 끝낸 뒤 견주어 보면,
-        같은 데이터로 어디까지 갈 수 있는지 알 수 있음</p>
+      <p class="caption" style="margin-top:8px">
+        네 과제 모두 수상작의 보고서와 소스코드가 공개돼 있음 —
+        자기 분석을 끝낸 뒤 견주면 같은 데이터로 어디까지 갈 수 있는지 보임</p>
     </div>
   </section>
 
-  <!-- ══ 16. 주별 강의 내용 ══════════════════════════════ -->
+  <!-- ══ 14-b. 주별 강의 내용 ══════════════════════════ -->
   <section>
     <h2>주별 강의 내용</h2>
     <div class="body">
@@ -556,139 +507,169 @@ out.to_csv("result.csv")</div>
         <div class="row"><span class="d">(9/14)</span><span>2주차. 클로드 코드와 지식 위키</span></div>
         <div class="row"><span class="d">(9/21)</span><span>3주차. 스킬 · 플러그인 · MCP · 에이전트</span></div>
         <div class="row"><span class="d">(9/28)</span><span>4주차. 연구질문 — AI와 함께 도시 문제 정의하기</span></div>
-        <div class="row"><span class="d">(10/5)</span><span>5주차. 도시 데이터는 어디에 있는가</span></div>
-        <div class="row"><span class="d">(10/12)</span><span>6주차. 깃과 깃허브 — 기록하고 나누기</span></div>
-        <div class="row"><span class="d">(10/19)</span><span>7주차. 기술적 분석 — 무슨 일이 일어났는가</span></div>
+        <div class="row"><span class="d">(10/5)</span><span>5주차. 도시 데이터 수집과 기록 — git · github</span></div>
+        <div class="row"><span class="d">(10/12)</span><span>6주차. 탐색적 분석 Ⅰ — 비공간 데이터</span></div>
+        <div class="row"><span class="d">(10/19)</span><span>7주차. 탐색적 분석 Ⅱ — 공간 데이터</span></div>
         <div class="row exam"><span class="d">(10/26)</span><span>8주차. 중간고사</span></div>
         <div class="row"><span class="d">(11/2)</span><span>9주차. 진단적 분석 Ⅰ — 상관과 인과</span></div>
         <div class="row"><span class="d">(11/9)</span><span>10주차. 진단적 분석 Ⅱ — 회귀와 혼란변수</span></div>
         <div class="row"><span class="d">(11/16)</span><span>11주차. 예측적 분석 Ⅰ — 추세와 회귀 예측</span></div>
         <div class="row"><span class="d">(11/23)</span><span>12주차. 예측적 분석 Ⅱ — 머신러닝과 불확실성</span></div>
         <div class="row"><span class="d">(11/30)</span><span>13주차. 처방적 분석 — 무엇을 해야 하는가</span></div>
-        <div class="row"><span class="d">(12/7)</span><span>14주차. 종합 — 잘된 과제 발표와 자기 프로젝트</span></div>
+        <div class="row"><span class="d">(12/7)</span><span>14주차. 개인 프로젝트 발표</span></div>
         <div class="row exam"><span class="d">(12/14)</span><span>15주차. 기말고사</span></div>
       </div>
     </div>
   </section>
 
-  <!-- ══ 17. 수업 운영과 평가 ════════════════════════════ -->
+  <!-- ══ 14-c. 과제 (homework) ═══════════════════════════ -->
+  <section>
+    <h2>과제는 수업 뒤에 각자 한다</h2>
+    <div class="body tight">
+      <p class="sub">수업 시간은 실습, 그 뒤가 과제. 매주 있음</p>
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead>
+          <tr><th style="width:13%">주차</th><th style="width:42%">내고 오는 것</th>
+              <th>어느 정도면 되나</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>2주</td><td>내 지식 위키를 연 기록</td>
+              <td>계획서 빈칸 · CLAUDE.md · 페이지 세 장</td></tr>
+          <tr><td>3주</td><td>SGIS 스킬 <span class="t">마감 5주</span></td>
+              <td>부르지 않아도 꺼내지고, 인증키가 파일에 없을 것</td></tr>
+          <tr><td>4주</td><td>문제정의서 한 쪽</td><td>주장 · 증거 · 분석내용까지</td></tr>
+          <tr><td>5주</td><td>내 문제의 데이터와 출처 문서</td><td>어디서 어떻게 받았는지 적힐 것</td></tr>
+          <tr><td>6–13주</td><td>그 주 분석을 자기 데이터로 다시</td>
+              <td>로직 문서 + 결과표. <span class="hl">막힌 기록도 제출물</span></td></tr>
+          <tr><td>14주</td><td><span class="hl">개인 프로젝트 발표</span></td>
+              <td>그동안의 과제를 엮어 한 편으로</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:12px">
+        분량은 세지 않음. <span class="hl">남이 따라 할 수 있게 적혔는지</span>,
+        <span class="hl">막힌 자리를 숨기지 않았는지</span>,
+        <span class="hl">받은 것을 확인했는지</span>를 봄</p>
+    </div>
+  </section>
+
+  <!-- ══ 14-d. 잘된 과제를 함께 본다 ═════════════════════ -->
+  <section>
+    <h2>3주차부터 잘된 과제를 함께 본다</h2>
+    <div class="body stack">
+      <p class="define">수업을 시작할 때 <span class="t-red">지난주 과제 중 잘된 것</span>을
+        몇 개 골라 화면에 띄우고 이야기한 뒤 그날 강의로 들어감</p>
+      <p class="conclusion">→ <span class="hl">막힌 과제도 뽑음.</span>
+        어디서 왜 막혔는지가 잘 적힌 것은 매끄럽게 끝난 과제보다 배울 것이 많음</p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 수업 운영과 평가 ═══════════════════════════ -->
   <section>
     <h2>수업 운영과 평가</h2>
-    <div class="body tighter">
-      <p class="sub">2주차부터 매주 이 순서로 진행</p>
-      <p class="emph">강의 약 1시간 + <span class="hl">실습 약 1시간 30분</span></p>
-      <p>3주차부터는 그 앞에 <span class="hl">지난주 과제 중 잘된 것을 함께 보는 시간</span>을 둔다
-        <span class="t">15분 내외</span></p>
-      <div class="grade-bar" style="margin-top:18px">
+    <div class="body stack">
+      <p class="sub">한 주 90분 — 강의 약 1시간 + 실습 약 1시간 30분</p>
+      <div class="grade-bar" style="margin-top:26px">
         <div class="seg s1" style="flex:0 0 10%">출석<br>(10%)</div>
-        <div class="seg s2" style="flex:0 0 20%">중간<br>(20%)</div>
-        <div class="seg s3" style="flex:0 0 20%">기말<br>(20%)</div>
+        <div class="seg s2" style="flex:0 0 20%">중간고사<br>(20%)</div>
+        <div class="seg s3" style="flex:0 0 20%">기말고사<br>(20%)</div>
         <div class="seg s4" style="flex:0 0 50%">과제<br>(50%)</div>
       </div>
-      <p class="caption" style="margin-top:6px">
-        <span class="hl">과제가 절반</span>. 매주 있고 14주차 발표와 자기 프로젝트의 재료가 됨</p>
-      <p class="sub" style="margin-top:16px">다음 주까지 준비할 것</p>
-      <ul>
-        <li>노트북 — 2주차부터 매주 실습에 씀</li>
-        <li>클로드(Claude) 계정 — 실습은 <span class="hl">Pro 구독</span> 기준</li>
-        <li>COMPAS(compas.lh.or.kr) 회원가입 — 실습 데이터를 여기서 받는다</li>
-        <li><span class="hl">클로드 코드 설치</span> — 2주차는 설치가 끝난 상태에서 시작 (다음 장)</li>
-        <li>연구실·집 컴퓨터를 <span class="hl">원격으로 쓸 사람만</span> — 리모트 컨트롤 (다음 장)</li>
-      </ul>
+      <p class="caption" style="margin-top:18px">
+        중간고사 8주차 — 1~7주차. 기말고사 15주차 — 전 범위 동일 비중</p>
     </div>
   </section>
 
-  <!-- ══ 사전 과제 — 클로드 코드 설치 ═════════════════════ -->
-  <section>
-    <h2>다음 주까지 — 클로드 코드를 설치해 온다</h2>
-    <div class="body tight">
-      <p class="emph"><span class="hl">수업 시간에 설치하지 않음</span> —
-        2주차는 설치가 끝난 상태에서 시작</p>
-      <ol class="steps">
-        <li>터미널 열기 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
-        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 그대로 따름</li>
-        <li>위키 폴더 만들기 — <span class="code">mkdir my-wiki &amp;&amp; cd my-wiki</span></li>
-        <li>자기 강의노트 한두 개를 그 폴더에 넣기</li>
-        <li><span class="code">claude</span> 를 실행하고 로그인한 뒤
-          <span class="mark">"이 폴더에 뭐가 있어?"</span> 라고 물어보기</li>
-      </ol>
-      <div class="ck"><b>✓ 되었는지 확인하는 법</b> — 클로드가
-        <span class="code">강의노트 파일</span> 을 <b>이름으로 말함</b>.
-        그 화면을 캡처해 오는 것이 사전 과제 제출물</div>
-      <div class="stuck"><b>안 되면 그대로 가져옴</b> — 오류 메시지를 캡처해 오면 수업 시작 때 함께 봄.
-        <b>혼자 두 시간 붙들지 않음</b> — 30분 해 보고 안 되면 멈춤.
-        설치가 끝내 안 되어도 2주차 실습의 대부분은 웹 대화창으로 따라올 수 있음</div>
-      <p class="caption" style="margin-top:10px">
-        왜 미리 하나 — 설치는 환경마다 걸리는 시간이 크게 다르다.
-        <span class="hl">수업 시간은 설치가 아니라 "로직을 요구하는 법" 에 씀</span></p>
-      <p class="caption">
-        <b>연구실·집 컴퓨터를 원격으로 쓸 사람만</b> — 그 컴퓨터에서
-        <span class="code">claude --remote-control</span> 로 켜 두면
-        <span class="code">claude.ai/code</span> 나 폰의 클로드 앱에서 이어서 씀
-        (VS Code 확장은 <span class="code">/remote-control</span>).
-        코드 실행과 파일은 그 컴퓨터에 그대로 남음. <span class="hl">필수 아님</span></p>
-    </div>
-  </section>
-
-
-  <!-- ══ 17-b. 그랜트 ① 학생들 ═════════════════════════ -->
+  <!-- ══ 16. 다음 주까지 ① 설치 ══════════════════════════ -->
   <section class="s-split">
+    <h2>다음 주까지 ① 클로드 설치</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">① 데스크톱 앱</p>
+        <ol class="steps">
+          <li><span class="code">claude.com/download</span> 에서 받기</li>
+          <li>설치하고 <span class="hl">로그인</span>
+            <span class="t">Pro 구독 계정</span></li>
+        </ol>
+        <p class="caption" style="margin-top:10px">
+          평소 대화창으로 씀. 수업의 절반은 여기서 따라올 수 있음</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">② 클로드 코드 (터미널)</p>
+        <ol class="steps">
+          <li>터미널 열기
+            <span class="t">맥 · 리눅스는 터미널, 윈도우는 PowerShell</span></li>
+          <li>설치 명령 한 줄<br>
+            <span class="code">맥 · 리눅스 — curl -fsSL https://claude.ai/install.sh | bash</span><br>
+            <span class="code">윈도우 — irm https://claude.ai/install.ps1 | iex</span></li>
+          <li>확인 — <span class="code">claude --version</span>
+            <span class="t">버전 뒤에 (Claude Code) 가 찍히면 됨</span></li>
+          <li><span class="code">claude</span> 실행 → 브라우저에서 로그인</li>
+        </ol>
+        <p class="caption" style="margin-top:8px">
+          출처: 공식 문서 <span class="code">code.claude.com/docs</span> 「Quickstart」.
+          <span class="hl">30분 해 보고 안 되면 멈추고</span> 오류 화면을 캡처해 옴</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 17. 다음 주까지 ② 준비 ══════════════════════════ -->
+  <section>
+    <h2>다음 주까지 ② 작업 폴더 준비</h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="hl">폴더 만들기</span> —
+          <span class="code">mkdir my-wiki</span>
+          <span class="t">이름은 my-wiki 로 통일. 2주차에 이 폴더에서 시작함</span></li>
+        <li><span class="hl">지난 학기 강의노트 두세 개 넣기</span>
+          <span class="t">어느 과목이든 상관없음. PDF 여도 됨</span></li>
+        <li><span class="hl">그 폴더에서 클로드 열기</span> —
+          <span class="code">cd my-wiki</span> → <span class="code">claude</span></li>
+        <li><span class="mark">"이 폴더에 뭐가 있어?"</span> 라고 물어보기</li>
+      </ol>
+      <div class="ck"><b>✓ 되었는지 확인.</b> 클로드가 <b>넣어 둔 강의노트를 이름으로 말함.</b>
+        그 화면을 캡처해 오는 것이 사전 과제 제출물</div>
+      <div class="stuck"><b>원격으로 쓸 사람만</b> — 연구실·집 컴퓨터에서
+        <span class="code">claude --remote-control</span> 로 켜 두면
+        <span class="code">claude.ai/code</span> 나 폰의 클로드 앱에서 이어서 씀.
+        코드 실행과 파일은 그 컴퓨터에 그대로 남음. <b>필수 아님</b></div>
+    </div>
+  </section>
+
+  <!-- ══ 18. 그랜트 ① 학생과 직업인 ════════════════════ -->
+  <section>
     <h2>학생들은 그것을 잘못이라 여기지 않았다</h2>
     <div class="body tight">
-      <div class="col-l">
-        <p class="sub">와튼스쿨에서 있었던 일</p>
-        <ul>
-          <li>수강생 몇이 <span class="hl">동급생의 AI 부정행위 계획을 제보</span></li>
-          <li>시험을 <span class="mark">「부정행위를 어떻게 막을 것인가」</span> 에세이로 교체</li>
-          <li>95명 답안 대부분이 <span class="hl">정직성 위반으로 보지 않음</span></li>
-        </ul>
-        <p class="sub" style="margin-top:20px">학생들의 논리</p>
-        <p class="emph">가끔 했을 뿐 <span class="hl">나는 부정행위자가 아님</span></p>
-        <p class="emph">성공에 필요한 것을 했을 뿐</p>
+      <div style="display:flex;gap:26px;align-items:flex-start">
+        <div style="flex:0 0 46%">
+          <p class="sub">와튼스쿨에서 있었던 일</p>
+          <ul>
+            <li>수강생 몇이 <span class="hl">동급생의 AI 부정행위 계획을 제보</span></li>
+            <li>시험을 <span class="mark">「부정행위를 어떻게 막을 것인가」</span> 에세이로 교체</li>
+            <li>95명 답안 대부분이 <span class="hl">정직성 위반으로 보지 않음</span></li>
+          </ul>
+          <p class="sub" style="margin-top:18px">학생들의 논리</p>
+          <p class="emph">가끔 했을 뿐 <span class="hl">나는 부정행위자가 아님</span></p>
+          <p class="emph">성공에 필요한 것을 했을 뿐</p>
+        </div>
+        <div style="flex:1 1 auto">
+          <p class="sub">금융자문사 100만 명 이상 분석</p>
+          <ul>
+            <li>라이선스 시험의 <span class="hl">윤리 문항 비중이 높던 해</span>에 응시한 집단</li>
+            <li>이후 연간 위법행위율 <span class="hl">25% 낮음</span>. 3년 뒤에도 격차 유지</li>
+          </ul>
+          <p class="sub" style="margin-top:18px">이런 결과의 이유</p>
+          <ul>
+            <li>규칙을 외운 것이 아니라 <span class="hl">시간을 들여 씨름한 결과</span></li>
+            <li>자기 직업에서 옳고 그른 것이 <span class="hl">자기 것이 됨</span></li>
+            <li>회사가 스캔들에 휘말리면 <span class="mark">그만두는 쪽을 택함</span></li>
+          </ul>
+        </div>
       </div>
-      <div class="col-r">
-        <p class="sub">막는 쪽이 잘 안 되는 이유</p>
-        <ul>
-          <li>정직 서약 — <span class="hl">역효과가 나기도 함</span>.
-            서약의 존재 자체가 「다들 함」이라는 신호</li>
-          <li>한 실험에서 <span class="mark">시험 전 서약 서명이 부정행위를 두 배로</span></li>
-          <li>감시와 처벌은 <span class="hl">손익 계산만 바꿈</span></li>
-        </ul>
-        <div class="ck"><b>AI 가 바꾼 것.</b> 부정행위를 잡기 어렵게 만든 것에 그치지 않고,
-          <b>그것이 잘못이 아니라고 믿게 만든 것</b></div>
-        <p class="caption" style="margin-top:10px">
-          출처: Adam Grant, The New York Times Opinion, 2026. 8. 26.
-          <span class="hl">논평이며</span> 95명 사례는 필자 자신의 미공개 자료</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ 17-c. 그랜트 ② 금융자문사 ══════════════════════ -->
-  <section class="s-split">
-    <h2>학생 때 배운 것이 10년 뒤 직업인을 만든다</h2>
-    <div class="body tight">
-      <div class="col-l">
-        <p class="sub">금융자문사 100만 명 이상 분석</p>
-        <ul>
-          <li>라이선스 시험의 <span class="hl">윤리 문항 비중이 높던 해</span>에 응시한 집단</li>
-          <li>이후 연간 위법행위율 <span class="hl">25% 낮음</span></li>
-          <li><span class="mark">3년 뒤에도 그 격차가 유지</span></li>
-        </ul>
-        <p class="caption" style="margin-top:14px">
-          그랜트가 자기 주장의 가장 강한 근거로 든 연구.
-          <span class="hl">대상이 성인 금융업 종사자</span>이므로 학생 표본과 같지 않음</p>
-      </div>
-      <div class="col-r">
-        <p class="sub">규칙을 외운 것이 아님</p>
-        <ul>
-          <li>시간을 들여 <span class="hl">씨름한 결과</span></li>
-          <li>자기 직업에서 옳고 그른 것이 <span class="hl">자기 것이 됨</span></li>
-          <li>회사가 스캔들에 휘말리면 <span class="mark">그만두는 쪽을 택함</span> —
-            자기 가치와 어긋나는 곳에서 일하지 않으려고</li>
-        </ul>
-        <p class="emph" style="margin-top:20px">
-          학생 때 무엇을 붙들었느냐가 <span class="hl">몇 년 뒤 어떤 직업인인지를 가름</span></p>
-      </div>
+      <p class="caption" style="margin-top:14px">
+        출처: Adam Grant, "There's Really Only One Way to Stop Students From Cheating",
+        The New York Times Opinion, 2026. 8. 26. <span class="hl">논평이며</span>
+        95명 사례는 필자 자신의 미공개 자료. 금융자문사 연구는 그 글이 근거로 든 것으로
+        <span class="hl">대상이 성인 금융업 종사자</span>라 학생 표본과 같지 않음</p>
     </div>
   </section>
 
@@ -702,8 +683,6 @@ out.to_csv("result.csv")</div>
         <p class="caption" style="margin-top:2px">— Adam Grant</p>
         <p class="emph" style="margin-top:28px">
           AI 를 막는 것보다 <span class="hl">10년 뒤 자기 모습을 그려 보는 일</span>이 훨씬 중요</p>
-        <p class="emph" style="margin-top:18px">
-          숙제를 대신 시키면 과제는 끝남. <span class="hl">그 자리에 아무도 자라지 않음</span></p>
       </div>
       <div class="col-r">
         <p class="sub">이 수업이 AI 를 쓰는 원칙</p>
@@ -713,11 +692,6 @@ out.to_csv("result.csv")</div>
           <li>배운 것을 <span class="hl">쌓아 둠</span> — 2주차 위키</li>
           <li>막힌 자리를 <span class="hl">숨기지 않고 적음</span></li>
         </ul>
-        <p class="emph" style="margin-top:22px">
-          AI 는 숙제 대리자가 아니라 <span class="hl">함께 자라는 상대</span></p>
-        <p class="emph" style="margin-top:16px">
-          한 학기 뒤 남는 것은 점수가 아니라
-          <span class="hl">도시 문제를 데이터로 다루는 사람</span></p>
       </div>
     </div>
   </section>
