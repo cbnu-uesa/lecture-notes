@@ -240,6 +240,82 @@
     </div>
   </section>
 
+  <!-- ══ 유의수준을 바꿔 가며 보기 (동적) ═══════════════════ -->
+  <section>
+    <h2>유의수준을 바꾸면 판정이 바뀐다</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:2px">같은 자료에서 검정통계량이
+        <em>z = 2.10</em> 으로 나왔을 때. 양측검정</p>
+      <svg class="fig" id="f-alpha-anim" viewBox="0 0 840 292" style="width:800px" role="img"
+           aria-label="유의수준 10퍼센트, 5퍼센트, 1퍼센트에서 양쪽 기각역이 점점 좁아지고,
+                       z가 2.10 인 관측값이 앞의 둘에서는 기각역 안에 있으나 1퍼센트에서는 벗어나는 그림">
+        <title>유의수준 10·5·1%에서의 기각역과 z = 2.10 의 위치</title>
+      </svg>
+      <p class="emph" style="margin-top:2px">자료는 그대로인데 <em>유의수준을 어디에 두느냐</em>로
+        기각과 채택이 갈린다. <em>그래서 유의수준은 자료를 보기 전에 정한다</em></p>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      // 양측검정의 임계값 — 눈대중으로 칠하지 않는다 (design.md §6.4)
+      const CASES = [
+        { a: '10%', z: 1.644854 },
+        { a: '5%',  z: 1.959964 },
+        { a: '1%',  z: 2.575829 },
+      ];
+      const ZOBS = 2.10;                       // 관측된 검정통계량
+      const XMIN = -3.4, XMAX = 3.4;
+      const PW = 246, GAP = 30, X0 = 26, TOP = 46, BASE = 216;
+      const pdf = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+      const PEAK = pdf(0);
+      const F = Fig.withBox({ x0: X0, y0: BASE, x1: X0 + PW, y1: TOP });
+      const parts = [];
+
+      CASES.forEach((c, k) => {
+        const ox = X0 + k * (PW + GAP);
+        const px = (x) => ox + ((x - XMIN) / (XMAX - XMIN)) * PW;
+        const py = (d) => BASE - (d / PEAK) * (BASE - TOP) * 0.92;
+        const path = (x0, x1, close) => {
+          let d = '';
+          for (let i = 0; i <= 80; i++) {
+            const x = x0 + (x1 - x0) * (i / 80);
+            d += (i ? ' L' : 'M') + px(x).toFixed(1) + ',' + py(pdf(x)).toFixed(1);
+          }
+          return close ? d + ` L${px(x1).toFixed(1)},${BASE} L${px(x0).toFixed(1)},${BASE} Z` : d;
+        };
+        const reject = ZOBS >= c.z;
+        const panel =
+          `<path d="M${ox},${BASE} L${ox + PW},${BASE}" stroke="var(--ink)" stroke-width="1"/>` +
+          `<path d="${path(-c.z, XMIN, true)}" fill="var(--brand-crimson)" fill-opacity="0.22"/>` +
+          `<path d="${path(c.z, XMAX, true)}" fill="var(--brand-crimson)" fill-opacity="0.22"/>` +
+          `<path d="${path(XMIN, XMAX)}" fill="none" stroke="var(--ink)" stroke-width="1.6"/>` +
+          `<path d="M${px(-c.z)},${BASE} L${px(-c.z)},${py(pdf(c.z))}" ` +
+          `stroke="var(--brand-crimson)" stroke-width="1" stroke-dasharray="3 3"/>` +
+          `<path d="M${px(c.z)},${BASE} L${px(c.z)},${py(pdf(c.z))}" ` +
+          `stroke="var(--brand-crimson)" stroke-width="1" stroke-dasharray="3 3"/>` +
+          `<path d="M${px(ZOBS)},${BASE + 4} L${px(ZOBS)},${py(pdf(ZOBS)) - 26}" ` +
+          `stroke="var(--chart-blue)" stroke-width="2"/>` +
+          `<text x="${px(ZOBS)}" y="${py(pdf(ZOBS)) - 32}" text-anchor="middle" font-size="11.5" ` +
+          `font-weight="700" fill="var(--chart-blue)">z = 2.10</text>` +
+          `<text x="${ox + PW / 2}" y="${TOP - 16}" text-anchor="middle" font-size="14" ` +
+          `font-weight="700" fill="#16181C">유의수준 ${c.a}</text>` +
+          `<text x="${px(c.z)}" y="${BASE + 18}" text-anchor="middle" font-size="11" ` +
+          `fill="#A02948">${c.z.toFixed(3)}</text>` +
+          `<text x="${px(-c.z)}" y="${BASE + 18}" text-anchor="middle" font-size="11" ` +
+          `fill="#A02948">−${c.z.toFixed(3)}</text>` +
+          `<text x="${ox + PW / 2}" y="${BASE + 46}" text-anchor="middle" font-size="14" ` +
+          `font-weight="700" fill="${reject ? 'var(--brand-crimson)' : '#4A4741'}">` +
+          `${reject ? '기각역 안 → 귀무가설 기각' : '기각역 밖 → 기각 못 함'}</text>`;
+        parts.push(k === 0 ? F.raw(panel) : F.raw(panel, { fragment: k - 1 }));
+      });
+
+      parts.push(F.annot(X0, 282,
+        '칠한 부분이 기각역. 유의수준이 낮아질수록 기각역이 좁아져 기각이 어려워진다', { size: 12 }));
+      F.draw('#f-alpha-anim', { parts });
+    })();
+  </script>
+
   <!-- 원본 p.9 — 교재의 표 캡처였다. 표와 세 개의 꼬리 그림을 다시 짰다.
        임계치는 유의수준 5%에서 양측 1.96 / 단측 1.645 로, 칠한 면적이 실제로 그 확률이 되게 했다. -->
   <section>

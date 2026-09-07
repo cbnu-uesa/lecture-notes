@@ -844,6 +844,103 @@
     </div>
   </section>
 
+  <!-- ══ 중심극한정리 — 표본크기를 키워 가며 보기 (동적) ═══ -->
+  <section>
+    <h2>표본이 커지면 어떤 모집단이든 정규로 모인다</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:2px">한쪽으로 크게 치우친 모집단에서 출발.
+        표본크기 <em>n</em> 을 키우며 <em>표본평균</em>의 분포를 그린 것</p>
+      <svg class="fig" id="f-clt-anim" viewBox="0 0 840 300" style="width:800px" role="img"
+           aria-label="치우친 모집단에서 표본크기를 1, 2, 5, 30 으로 키우면 표본평균의 분포가
+                       점점 좁아지면서 좌우대칭의 종 모양으로 바뀌는 것을 네 칸으로 보인 그림">
+        <title>표본크기 1·2·5·30 에서의 표본평균 분포와 정규곡선</title>
+      </svg>
+      <script>
+        (function () {
+          // 모집단 — 값 0·1·2·3 을 각각 60·25·10·5% 로 뽑는 이산분포. 오른쪽으로 치우쳐 있다.
+          const VAL = [0, 1, 2, 3];
+          const PR  = [0.60, 0.25, 0.10, 0.05];
+          const MU  = VAL.reduce((a, v, i) => a + v * PR[i], 0);
+          const VAR = VAL.reduce((a, v, i) => a + (v - MU) ** 2 * PR[i], 0);
+
+          // n 번 더한 합의 분포를 합성곱으로 정확히 구한다 (난수를 쓰지 않는다)
+          function sumDist(n) {
+            let d = new Map([[0, 1]]);
+            for (let k = 0; k < n; k++) {
+              const e = new Map();
+              for (const [s0, p0] of d)
+                VAL.forEach((v, i) => e.set(s0 + v, (e.get(s0 + v) || 0) + p0 * PR[i]));
+              d = e;
+            }
+            return d;
+          }
+
+          const STEPS = [1, 2, 5, 30];
+          const XMIN = -0.6, XMAX = 3.2;            // 네 칸 모두 같은 가로 범위. 첫 칸 막대가 잘리지 않게 왼쪽을 넓혔다
+          const PW = 190, GAP = 20, X0 = 24, TOP = 52, BASE = 236;
+          const parts = [];
+          const F = Fig.withBox({ x0: X0, y0: BASE, x1: X0 + PW, y1: TOP });
+
+          STEPS.forEach((n, k) => {
+            const ox = X0 + k * (PW + GAP);
+            const px = (v) => ox + ((v - XMIN) / (XMAX - XMIN)) * PW;
+            const dist = sumDist(n);
+            // 합 → 평균. 막대 하나의 폭은 1/n
+            const pts = [...dist.entries()].map(([s0, pr]) => [s0 / n, pr])
+              .filter(([m]) => m >= XMIN - 1e-9 && m <= XMAX + 1e-9)
+              .sort((a, b) => a[0] - b[0]);
+            const hmax = Math.max(...pts.map((q) => q[1]));
+            const H = BASE - TOP;
+            const bw = Math.max(2.2, (PW / (XMAX - XMIN)) / n);
+
+            const rects = pts.map(([m, pr]) => {
+              const h = (pr / hmax) * H * 0.92;
+              return `<rect x="${(px(m) - bw / 2).toFixed(1)}" y="${(BASE - h).toFixed(1)}" ` +
+                     `width="${bw.toFixed(1)}" height="${h.toFixed(1)}" ` +
+                     `fill="var(--chart-blue)" fill-opacity="0.30"/>`;
+            }).join('');
+
+            // 같은 평균, 표준편차는 σ/√n 인 정규곡선을 겹쳐 그린다
+            const sd = Math.sqrt(VAR / n);
+            const peak = 1 / (sd * Math.sqrt(2 * Math.PI));
+            const curveH = (v) => {
+              const z = (v - MU) / sd;
+              return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI)) / peak;
+            };
+            let d = '';
+            for (let i = 0; i <= 120; i++) {
+              const v = XMIN + (XMAX - XMIN) * (i / 120);
+              const y = BASE - curveH(v) * H * 0.92;
+              d += (i ? ' L' : 'M') + px(v).toFixed(1) + ',' + y.toFixed(1);
+            }
+
+            const panel =
+              `<path d="M${ox},${BASE} L${ox + PW},${BASE}" stroke="var(--ink)" stroke-width="1"/>` +
+              rects +
+              `<path d="${d}" fill="none" stroke="var(--brand-crimson)" stroke-width="1.6"/>` +
+              `<text x="${ox + PW / 2}" y="${TOP - 16}" text-anchor="middle" font-size="14" ` +
+              `font-weight="700" fill="#16181C">n = ${n}</text>` +
+              `<text x="${ox + PW / 2}" y="${BASE + 20}" text-anchor="middle" font-size="11" ` +
+              `fill="#8A867E">표본평균</text>` +
+              `<text x="${px(MU)}" y="${BASE + 36}" text-anchor="middle" font-size="11" ` +
+              `fill="#A02948">${MU.toFixed(2)}</text>` +
+              `<path d="M${px(MU)},${BASE} L${px(MU)},${BASE + 6}" stroke="var(--brand-crimson)" stroke-width="1"/>`;
+
+            parts.push(k === 0 ? F.raw(panel) : F.raw(panel, { fragment: k - 1 }));
+          });
+
+          parts.push(F.annot(X0, 292, 'n = 1 은 모집단 그 자체 — 크게 치우쳐 있음', { size: 12 }));
+          parts.push(F.annot(X0 + 2 * (PW + GAP), 292,
+            '크림슨 곡선은 평균 ' + MU.toFixed(2) + ', 표준편차 σ/√n 인 정규분포',
+            { size: 12, tone: 'red', fragment: 2 }));
+          F.draw('#f-clt-anim', { parts });
+        })();
+      </script>
+      <p class="emph" style="margin-top:2px">모집단이 정규가 아니어도
+        <em>표본평균</em>의 분포는 <em>정규</em>로 간다. 동시에 표준오차가 σ/√n 으로 줄어 폭이 좁아진다</p>
+    </div>
+  </section>
+
   <!-- 원본 p.37 -->
   <section>
     <h2>중심극한정리의 중요성</h2>
