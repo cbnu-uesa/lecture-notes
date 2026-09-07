@@ -45,6 +45,9 @@
   .screen .inner ol { margin: 0; padding-left: 17px; }
   .screen .inner li { margin-bottom: 5px; }
   .screen .kw { color: var(--brand-crimson); font-weight: 700; }
+  /* 표지 제목을 한 줄로 — 공용 값(right:240px)으로는 「하 / 는가」에서 접힌다.
+     로고는 위쪽(y≈100px)에 있어 이 높이에서는 겹치지 않는다 */
+  section.s-cover h1 { right: 110px; }
   .pending { border: 1px dashed #B4B0A9; background: #F7F5F2; color: #8A867E;
              display: flex; align-items: center; justify-content: center;
              font-size: 13px; border-radius: 3px; }
@@ -79,7 +82,7 @@
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <h1>1강. 왜 데이터 분석을<br>AI와 함께 하는가</h1>
+    <h1>1강. 왜 데이터 분석을 AI와 함께 하는가</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
