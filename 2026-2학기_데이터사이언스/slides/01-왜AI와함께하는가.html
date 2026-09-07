@@ -45,6 +45,13 @@
   .screen .inner ol { margin: 0; padding-left: 17px; }
   .screen .inner li { margin-bottom: 5px; }
   .screen .kw { color: var(--brand-crimson); font-weight: 700; }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
   .verdict { display: flex; gap: 22px; margin-top: 12px; }
   .verdict > div { flex: 1 1 0; font-size: 13px; text-align: center; color: var(--ink-2); }
 
@@ -135,7 +142,7 @@
     <div class="body">
       <p class="define">도시가 직면한 문제를 해결하기 위하여<br>
         도시 데이터를 분석하여 정책과 의사결정에 필요한 <span class="t-red">증거(evidence)</span>를 제시하는 능력</p>
-      <p class="conclusion">→ 분석 그 자체가 아니라, 분석으로 <span class="t-red">주장을 뒷받침하는 것</span>이 목적이다</p>
+      <p class="conclusion">→ 분석 그 자체가 아니라, 분석으로 <span class="t-red">주장을 뒷받침하는 것</span>이 목적</p>
     </div>
   </section>
 
@@ -163,7 +170,7 @@
         <text x="567" y="112" text-anchor="middle" font-size="14" font-weight="700" fill="#A02948">논거</text>
         <!-- 아래 설명 -->
         <text x="123" y="196" text-anchor="middle" font-size="13" fill="#4A4741">수집한 숫자 그 자체</text>
-        <text x="123" y="216" text-anchor="middle" font-size="13" fill="#4A4741">아직 아무 말도 못 한다</text>
+        <text x="123" y="216" text-anchor="middle" font-size="13" fill="#4A4741">아직 아무 말도 못 함</text>
         <text x="420" y="196" text-anchor="middle" font-size="13" fill="#4A4741">요약·비교·검정을 거쳐</text>
         <text x="420" y="216" text-anchor="middle" font-size="13" fill="#4A4741">뜻이 생긴 결과</text>
         <text x="717" y="196" text-anchor="middle" font-size="13" fill="#4A4741">"이렇게 해야 한다"</text>
@@ -193,7 +200,7 @@
           <text x="130" y="93" text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">R</text>
           <text x="130" y="176" text-anchor="middle" font-size="13" font-weight="700" fill="#4A4741">2022</text>
           <text x="130" y="204" text-anchor="middle" font-size="12.5" fill="#4A4741">코드를 직접</text>
-          <text x="130" y="222" text-anchor="middle" font-size="12.5" fill="#4A4741">작성한다</text>
+          <text x="130" y="222" text-anchor="middle" font-size="12.5" fill="#4A4741">작성</text>
         </g>
         <g>
           <circle cx="335" cy="140" r="6" fill="#B4B0A9"/>
@@ -204,7 +211,7 @@
           <text x="335" y="93" text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">파이썬</text>
           <text x="335" y="176" text-anchor="middle" font-size="13" font-weight="700" fill="#4A4741">2023~24</text>
           <text x="335" y="204" text-anchor="middle" font-size="12.5" fill="#4A4741">코드를 직접</text>
-          <text x="335" y="222" text-anchor="middle" font-size="12.5" fill="#4A4741">작성한다</text>
+          <text x="335" y="222" text-anchor="middle" font-size="12.5" fill="#4A4741">작성</text>
         </g>
         <g>
           <circle cx="540" cy="140" r="6" fill="#B4B0A9"/>
@@ -215,7 +222,7 @@
           <text x="540" y="93" text-anchor="middle" font-size="17" font-weight="700" fill="#16181C">코랩 + Gemini</text>
           <text x="540" y="176" text-anchor="middle" font-size="13" font-weight="700" fill="#4A4741">2025</text>
           <text x="540" y="204" text-anchor="middle" font-size="12.5" fill="#4A4741">AI에게 요청하고</text>
-          <text x="540" y="222" text-anchor="middle" font-size="12.5" fill="#4A4741">읽고 이해한다</text>
+          <text x="540" y="222" text-anchor="middle" font-size="12.5" fill="#4A4741">읽고 이해</text>
         </g>
         <g>
           <circle cx="745" cy="140" r="7.5" fill="#A02948"/>
@@ -226,11 +233,11 @@
           <text class="on-dark" x="745" y="93" text-anchor="middle" font-size="17" font-weight="700" fill="#FFFFFF">에이전틱 AI</text>
           <text x="745" y="176" text-anchor="middle" font-size="13" font-weight="700" fill="#A02948">2026</text>
           <text x="745" y="204" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A02948">분석을 위임하고</text>
-          <text x="745" y="222" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A02948">로직을 검증한다</text>
+          <text x="745" y="222" text-anchor="middle" font-size="12.5" font-weight="700" fill="#A02948">로직 검증</text>
         </g>
       </svg>
       <p class="emph" style="text-align:center;margin-top:2px">
-        도구가 바뀔 때마다 <span class="hl">"사람이 해야 하는 일"의 정의가 바뀌었다.</span></p>
+        도구가 바뀔 때마다 <span class="hl">"사람이 해야 하는 일"의 정의가 바뀜</span></p>
       <p class="caption" style="text-align:center;margin-top:6px">
         출처: R · Python · Gemini · Claude 로고 — Simple Icons, CC0 1.0 (simpleicons.org).
         각 상표는 해당 기업의 것이며 제품을 가리키는 용도로만 썼다</p>
@@ -247,7 +254,7 @@
                 aria-label="SWE-bench Verified 점수가 2024년 3월 22퍼센트에서 2025년 11월 80.9퍼센트로 오른 꺾은선그래프"></canvas>
       </div>
       <p class="caption" style="text-align:center;margin-top:2px">
-        주: Anthropic 이 자사 모델에 대해 공개한 값이며, 측정 방식과 도구 설정이 판마다 달라 절대 비교에는 한계가 있다</p>
+        주: Anthropic 이 자사 모델에 대해 공개한 값이며, 측정 방식과 도구 설정이 판마다 달라 절대 비교에는 한계가 있음</p>
       <p class="caption" style="text-align:center;margin-top:3px">
         출처: Anthropic 공개 자료 <span class="u">anthropic.com</span>
         (3 Opus · 3.5 Sonnet · Opus 4 · Opus 4.5 시스템 카드) · 벤치마크 정의 <span class="u">swebench.com</span></p>
@@ -309,8 +316,8 @@
     <h2>2025년까지: AI가 짠 코드를 왜 읽어야 했나</h2>
     <div class="body stack">
       <p class="ask">AI에게 코드를 요청하면 —</p>
-      <p class="ask fragment">요청한 내용과 <span class="mark">정확히 맞지 않는 코드</span>가 나오는 경우가 있었다</p>
-      <p class="ask fragment">실행하면 <span class="mark">오류가 나는</span> 경우도 있었다</p>
+      <p class="ask fragment">요청한 내용과 <span class="mark">정확히 맞지 않는 코드</span>가 나오는 경우가 있었음</p>
+      <p class="ask fragment">실행하면 <span class="mark">오류가 나는</span> 경우도 있었음</p>
       <p class="ask fragment">그래서 이렇게 가르쳤다 —<br>
         <span class="t-red">"직접 쓰지는 않더라도, 읽고 이해할 수는 있어야 한다."</span></p>
     </div>
@@ -322,7 +329,7 @@
     <div class="body">
       <p class="define">에이전틱 AI(클로드 코드, Codex 등)의 등장으로<br>
         코드 오류는 거의 사라졌고,<br>
-        규칙화하기 힘든 요청이 아니라면 대부분 수행한다</p>
+        규칙화하기 힘든 요청이 아니라면 대부분 수행함</p>
       <p class="conclusion">→ 사람이 코드를 짜거나, AI가 만든 코드의 오류를 검토할 필요가 사실상 없어졌다</p>
     </div>
   </section>
@@ -361,7 +368,7 @@ out.to_csv("result.csv")</div>
           </div>
         </div>
         <p class="caption" style="margin-top:8px">
-          판단이 필요한 자리가 전부 문장으로 드러난다.<br>여기는 <span class="hl">사람이 읽고 따질 수 있다.</span></p>
+          판단이 필요한 자리가 전부 문장으로 드러남. 여기는 <span class="hl">사람이 읽고 따질 수 있음</span></p>
       </div>
     </div>
   </section>
@@ -383,14 +390,14 @@ out.to_csv("result.csv")</div>
         </div>
         <div class="cell">
           <div class="tag">로직 이해와 검증</div>
-          <p>분석의 논리가 맞는지<br>문서로 확인한다</p>
+          <p>분석의 논리가 맞는지 문서로 확인</p>
           <p class="yr">2026~</p>
         </div>
       </div>
       <p class="emph fragment" style="text-align:center;margin-top:34px">
-        코드는 이제 AI의 일이다. <span class="t-red">로직은 여전히 사람의 일이다.</span></p>
+        코드는 이제 AI의 일. <span class="t-red">로직은 여전히 사람의 일</span></p>
       <p class="emph fragment" style="text-align:center;margin-top:10px">
-        그리고 <span class="t-red">문제정의도 여전히 사람의 일이다.</span></p>
+        그리고 <span class="t-red">문제정의도 여전히 사람의 일</span></p>
     </div>
   </section>
 
@@ -398,8 +405,8 @@ out.to_csv("result.csv")</div>
   <section class="s-definition">
     <h2>이 수업의 원칙</h2>
     <div class="body">
-      <p class="define">코드 대신 <span class="t-red">로직을 문서로</span> 요구하고, 그 로직을 이해하고 검증한다</p>
-      <p class="conclusion">→ "무엇을, 왜, 어떻게 계산했는가"를 설명하지 못하는 분석은 증거가 될 수 없다</p>
+      <p class="define">코드 대신 <span class="t-red">로직을 문서로</span> 요구하고, 그 로직을 이해하고 검증</p>
+      <p class="conclusion">→ "무엇을, 왜, 어떻게 계산했는가"를 설명하지 못하는 분석은 증거가 될 수 없음</p>
     </div>
   </section>
 
@@ -407,7 +414,7 @@ out.to_csv("result.csv")</div>
   <section>
     <h2>이 수업의 작업 모델</h2>
     <div class="body">
-      <p class="sub">한 학기 동안 이 여섯 단계를 자기 문제로 완주한다</p>
+      <p class="sub">한 학기 동안 이 여섯 단계를 자기 문제로 완주</p>
       <div class="flow6">
         <div class="node">문제 정의</div>
         <div class="arr"></div>
@@ -422,9 +429,9 @@ out.to_csv("result.csv")</div>
         <div class="node">주장</div>
       </div>
       <p class="caption fragment" style="text-align:center;margin-top:30px">
-        회색 상자 하나만 AI의 일이다. 나머지 다섯은 사람의 일이고, 이 수업이 가르치는 것이다.</p>
+        회색 상자 하나만 AI의 일. 나머지 다섯은 사람의 일이자 이 수업이 가르치는 것</p>
       <p class="caption fragment" style="text-align:center;margin-top:8px">
-        단, <span class="hl">나머지 다섯도 AI와 함께 한다.</span></p>
+        단, <span class="hl">나머지 다섯도 AI와 함께 함</span></p>
     </div>
   </section>
 
@@ -468,9 +475,9 @@ out.to_csv("result.csv")</div>
     <h2>실습 데이터는 어디서 오나</h2>
     <div class="body tight">
       <p class="sub">COMPAS <span class="en">(compas.lh.or.kr)</span> — LH가 운영하는 도시문제 데이터 분석 공모 플랫폼</p>
-      <p>실습은 이 과제들의 <span class="hl">공개 데이터</span>를 쓴다.</p>
+      <p>실습은 이 과제들의 <span class="hl">공개 데이터</span>를 씀</p>
       <p>각자 회원가입해 직접 내려받는다.</p>
-      <p>비공개로 표시된 데이터(유동인구·카드매출 등)는 쓰지 않는다.</p>
+      <p>비공개로 표시된 데이터(유동인구·카드매출 등)는 쓰지 않음</p>
       <figure class="shot" style="width:700px;margin:10px auto 0">
         <img src="../assets/cc-compas-list.png"
              alt="COMPAS 아이디어 공모전 목록 화면. 과제 카드 세 장에 제목, 종료 여부, 상금, 참가 팀 수, 기간이 적혀 있다">
@@ -491,7 +498,7 @@ out.to_csv("result.csv")</div>
           <thead><tr><th style="width:22%">주차</th><th>내고 오는 것</th></tr></thead>
           <tbody>
             <tr><td>2주</td><td>내 지식 위키를 연다</td></tr>
-            <tr><td>3주</td><td>SGIS 스킬을 만든다 <span class="t">마감 5주</span></td></tr>
+            <tr><td>3주</td><td>SGIS 스킬 만들기 <span class="t">마감 5주</span></td></tr>
             <tr><td>4주</td><td>문제정의서 한 쪽</td></tr>
             <tr><td>5주</td><td>내 문제의 데이터 + 출처 문서</td></tr>
             <tr><td>6주</td><td>깃허브 비공개 저장소</td></tr>
@@ -501,10 +508,10 @@ out.to_csv("result.csv")</div>
           7주차부터는 오른쪽 분석 과제가 이어진다. 앞 여섯 주에 만든 도구로 푼다.</p>
       </div>
       <div class="col-r">
-        <p class="sub">3주차부터 — 잘된 과제를 함께 본다</p>
+        <p class="sub">3주차부터 — 잘된 과제를 함께 봄</p>
         <p>수업을 시작할 때 <span class="hl">지난주 과제 중 잘된 것</span>을 몇 개 골라
-          화면에 띄우고 이야기한 뒤 그날 강의로 들어간다.</p>
-        <p class="emph" style="margin-top:12px">잘된 것의 기준은 완성도가 아니다</p>
+          화면에 띄우고 이야기한 뒤 그날 강의로 들어감</p>
+        <p class="emph" style="margin-top:12px">잘된 것의 기준은 완성도가 아님</p>
         <ul>
           <li>남이 <span class="hl">따라 할 수 있게</span> 적었는가</li>
           <li>막힌 자리를 <span class="hl">숨기지 않고</span> 적었는가</li>
@@ -513,7 +520,7 @@ out.to_csv("result.csv")</div>
         <div class="ck"><b>막힌 과제도 뽑는다.</b> 어디서 왜 막혔는지가 잘 적힌 것은
           매끄럽게 끝난 과제보다 배울 것이 많다.</div>
         <p class="caption" style="margin-top:8px">
-          <span class="hl">14주차에는 그동안의 과제 중 잘된 것을 뽑아 발표한다.</span></p>
+          <span class="hl">14주차에는 그동안의 과제 중 잘된 것을 뽑아 발표</span></p>
       </div>
     </div>
   </section>
@@ -536,7 +543,7 @@ out.to_csv("result.csv")</div>
       </table>
       <p class="caption" style="margin-top:16px">
         네 과제 모두 수상작의 보고서와 소스코드가 공개되어 있다. 자기 분석을 끝낸 뒤 견주어 보면,
-        같은 데이터로 어디까지 갈 수 있는지 알 수 있다.</p>
+        같은 데이터로 어디까지 갈 수 있는지 알 수 있음</p>
     </div>
   </section>
 
@@ -568,7 +575,7 @@ out.to_csv("result.csv")</div>
   <section>
     <h2>수업 운영과 평가</h2>
     <div class="body tighter">
-      <p class="sub">2주차부터 매주 이 순서로 진행한다</p>
+      <p class="sub">2주차부터 매주 이 순서로 진행</p>
       <p class="emph">강의 약 1시간 + <span class="hl">실습 약 1시간 30분</span></p>
       <p>3주차부터는 그 앞에 <span class="hl">지난주 과제 중 잘된 것을 함께 보는 시간</span>을 둔다
         <span class="t">15분 내외</span></p>
@@ -579,13 +586,13 @@ out.to_csv("result.csv")</div>
         <div class="seg s4" style="flex:0 0 50%">과제<br>(50%)</div>
       </div>
       <p class="caption" style="margin-top:6px">
-        <span class="hl">과제가 절반이다.</span> 매주 있고, 14주차 발표와 자기 프로젝트의 재료가 된다.</p>
+        <span class="hl">과제가 절반</span>. 매주 있고 14주차 발표와 자기 프로젝트의 재료가 됨</p>
       <p class="sub" style="margin-top:16px">다음 주까지 준비할 것</p>
       <ul>
-        <li>노트북 — 2주차부터 매주 실습에 쓴다</li>
-        <li>클로드(Claude) 계정 — 실습은 <span class="hl">Pro 구독</span> 기준으로 설계된다</li>
+        <li>노트북 — 2주차부터 매주 실습에 씀</li>
+        <li>클로드(Claude) 계정 — 실습은 <span class="hl">Pro 구독</span> 기준</li>
         <li>COMPAS(compas.lh.or.kr) 회원가입 — 실습 데이터를 여기서 받는다</li>
-        <li><span class="hl">클로드 코드 설치</span> — 2주차는 설치가 끝난 상태에서 시작한다 (다음 장)</li>
+        <li><span class="hl">클로드 코드 설치</span> — 2주차는 설치가 끝난 상태에서 시작 (다음 장)</li>
         <li>연구실·집 컴퓨터를 <span class="hl">원격으로 쓸 사람만</span> — 리모트 컨트롤 (다음 장)</li>
       </ul>
     </div>
@@ -595,68 +602,122 @@ out.to_csv("result.csv")</div>
   <section>
     <h2>다음 주까지 — 클로드 코드를 설치해 온다</h2>
     <div class="body tight">
-      <p class="emph"><span class="hl">수업 시간에 설치하지 않는다.</span>
-        2주차는 설치가 끝난 상태에서 시작한다</p>
+      <p class="emph"><span class="hl">수업 시간에 설치하지 않음</span> —
+        2주차는 설치가 끝난 상태에서 시작</p>
       <ol class="steps">
-        <li>터미널을 연다 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
-        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 그대로 따른다</li>
-        <li>위키 폴더를 만든다 — <span class="code">mkdir my-wiki &amp;&amp; cd my-wiki</span></li>
-        <li>자기 강의노트 한두 개를 그 폴더에 넣는다</li>
+        <li>터미널 열기 (맥 <span class="code">터미널</span> · 윈도우 <span class="code">PowerShell</span>)</li>
+        <li>공식 문서 <span class="code">code.claude.com/docs</span> 의 설치 안내를 그대로 따름</li>
+        <li>위키 폴더 만들기 — <span class="code">mkdir my-wiki &amp;&amp; cd my-wiki</span></li>
+        <li>자기 강의노트 한두 개를 그 폴더에 넣기</li>
         <li><span class="code">claude</span> 를 실행하고 로그인한 뒤
-          <span class="mark">"이 폴더에 뭐가 있어?"</span> 라고 물어본다</li>
+          <span class="mark">"이 폴더에 뭐가 있어?"</span> 라고 물어보기</li>
       </ol>
       <div class="ck"><b>✓ 되었는지 확인하는 법</b> — 클로드가
-        <span class="code">강의노트 파일</span> 를 <b>이름으로 말한다.</b>
-        그 화면을 캡처해 온다. 이것이 사전 과제 제출물이다.</div>
-      <div class="stuck"><b>안 되면 그대로 가져온다.</b> 오류 메시지를 캡처해 오면 수업 시작 때 함께 본다.
-        <b>혼자 두 시간 붙들고 있지 않는다</b> — 30분 해 보고 안 되면 멈춘다.
-        설치가 끝내 안 되어도 2주차 실습의 대부분은 웹 대화창으로 따라올 수 있다.</div>
+        <span class="code">강의노트 파일</span> 을 <b>이름으로 말함</b>.
+        그 화면을 캡처해 오는 것이 사전 과제 제출물</div>
+      <div class="stuck"><b>안 되면 그대로 가져옴</b> — 오류 메시지를 캡처해 오면 수업 시작 때 함께 봄.
+        <b>혼자 두 시간 붙들지 않음</b> — 30분 해 보고 안 되면 멈춤.
+        설치가 끝내 안 되어도 2주차 실습의 대부분은 웹 대화창으로 따라올 수 있음</div>
       <p class="caption" style="margin-top:10px">
         왜 미리 하나 — 설치는 환경마다 걸리는 시간이 크게 다르다.
-        <span class="hl">수업 시간은 설치가 아니라 "로직을 요구하는 법" 에 쓴다.</span></p>
+        <span class="hl">수업 시간은 설치가 아니라 "로직을 요구하는 법" 에 씀</span></p>
       <p class="caption">
         <b>연구실·집 컴퓨터를 원격으로 쓸 사람만</b> — 그 컴퓨터에서
         <span class="code">claude --remote-control</span> 로 켜 두면
-        <span class="code">claude.ai/code</span> 나 폰의 클로드 앱에서 이어서 쓴다
+        <span class="code">claude.ai/code</span> 나 폰의 클로드 앱에서 이어서 씀
         (VS Code 확장은 <span class="code">/remote-control</span>).
-        코드 실행과 파일은 그 컴퓨터에 그대로 남는다. <span class="hl">필수는 아니다.</span></p>
+        코드 실행과 파일은 그 컴퓨터에 그대로 남음. <span class="hl">필수 아님</span></p>
     </div>
   </section>
 
 
-  <!-- ══ 17-b. 10년 뒤 어떤 전문가인가 ══════════════════ -->
+  <!-- ══ 17-b. 그랜트 ① 학생들 ═════════════════════════ -->
+  <section class="s-split">
+    <h2>학생들은 그것을 잘못이라 여기지 않았다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">와튼스쿨에서 있었던 일</p>
+        <ul>
+          <li>수강생 몇이 <span class="hl">동급생의 AI 부정행위 계획을 제보</span></li>
+          <li>시험을 <span class="mark">「부정행위를 어떻게 막을 것인가」</span> 에세이로 교체</li>
+          <li>95명 답안 대부분이 <span class="hl">정직성 위반으로 보지 않음</span></li>
+        </ul>
+        <p class="sub" style="margin-top:20px">학생들의 논리</p>
+        <p class="emph">가끔 했을 뿐 <span class="hl">나는 부정행위자가 아님</span></p>
+        <p class="emph">성공에 필요한 것을 했을 뿐</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">막는 쪽이 잘 안 되는 이유</p>
+        <ul>
+          <li>정직 서약 — <span class="hl">역효과가 나기도 함</span>.
+            서약의 존재 자체가 「다들 함」이라는 신호</li>
+          <li>한 실험에서 <span class="mark">시험 전 서약 서명이 부정행위를 두 배로</span></li>
+          <li>감시와 처벌은 <span class="hl">손익 계산만 바꿈</span></li>
+        </ul>
+        <div class="ck"><b>AI 가 바꾼 것.</b> 부정행위를 잡기 어렵게 만든 것에 그치지 않고,
+          <b>그것이 잘못이 아니라고 믿게 만든 것</b></div>
+        <p class="caption" style="margin-top:10px">
+          출처: Adam Grant, The New York Times Opinion, 2026. 8. 26.
+          <span class="hl">논평이며</span> 95명 사례는 필자 자신의 미공개 자료</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 17-c. 그랜트 ② 금융자문사 ══════════════════════ -->
+  <section class="s-split">
+    <h2>학생 때 배운 것이 10년 뒤 직업인을 만든다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">금융자문사 100만 명 이상 분석</p>
+        <ul>
+          <li>라이선스 시험의 <span class="hl">윤리 문항 비중이 높던 해</span>에 응시한 집단</li>
+          <li>이후 연간 위법행위율 <span class="hl">25% 낮음</span></li>
+          <li><span class="mark">3년 뒤에도 그 격차가 유지</span></li>
+        </ul>
+        <p class="caption" style="margin-top:14px">
+          그랜트가 자기 주장의 가장 강한 근거로 든 연구.
+          <span class="hl">대상이 성인 금융업 종사자</span>이므로 학생 표본과 같지 않음</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">규칙을 외운 것이 아님</p>
+        <ul>
+          <li>시간을 들여 <span class="hl">씨름한 결과</span></li>
+          <li>자기 직업에서 옳고 그른 것이 <span class="hl">자기 것이 됨</span></li>
+          <li>회사가 스캔들에 휘말리면 <span class="mark">그만두는 쪽을 택함</span> —
+            자기 가치와 어긋나는 곳에서 일하지 않으려고</li>
+        </ul>
+        <p class="emph" style="margin-top:20px">
+          학생 때 무엇을 붙들었느냐가 <span class="hl">몇 년 뒤 어떤 직업인인지를 가름</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 17-d. 그랜트 ③ 이 수업의 방향 ══════════════════ -->
   <section class="s-split">
     <h2>10년 뒤 당신은 어떤 전문가인가</h2>
     <div class="body">
       <div class="col-l">
-        <p class="sub">막는 쪽은 잘 안 된다</p>
-        <ul>
-          <li>정직 서약은 <span class="hl">역효과가 나기도 한다</span> —
-            서약이 있다는 것 자체가 「다들 한다」는 신호다</li>
-          <li>학생들은 이렇게 말한다 — <span class="mark">나는 부정행위자가 아니다.
-            성공하려고 필요한 걸 했을 뿐이다</span></li>
-        </ul>
-        <p class="sub" style="margin-top:20px">대신 통한 것</p>
-        <p>금융자문사 100만 명 분석. <span class="hl">학생 때 윤리를 더 공부한 사람들</span>이
-          몇 년 뒤 위법행위율 <span class="hl">25% 낮았다.</span></p>
-        <p style="margin-top:10px">규칙을 외워서가 아니다.
-          <span class="hl">자기 직업에서 무엇이 옳은지가 자기 것이 됐다.</span>
-          회사가 스캔들에 휘말리면 <span class="hl">그만두는 쪽</span>을 택했다.</p>
+        <p class="emph">"What we achieve may define our success.
+          How we achieve it determines our character."</p>
+        <p class="caption" style="margin-top:2px">— Adam Grant</p>
+        <p class="emph" style="margin-top:28px">
+          AI 를 막는 것보다 <span class="hl">10년 뒤 자기 모습을 그려 보는 일</span>이 훨씬 중요</p>
+        <p class="emph" style="margin-top:18px">
+          숙제를 대신 시키면 과제는 끝남. <span class="hl">그 자리에 아무도 자라지 않음</span></p>
       </div>
       <div class="col-r">
-        <p class="emph" style="margin-top:6px">"What we achieve may define our success.
-          How we achieve it determines our character."</p>
-        <p class="caption" style="margin-top:2px">
-          — Adam Grant, The New York Times, 2026. 8. 26.</p>
-        <p class="emph" style="margin-top:26px">
-          AI를 막는 것보다 <span class="hl">10년 뒤 자기 모습을 그려 보는 일</span>이
-          훨씬 중요하다</p>
-        <p style="margin-top:16px">숙제를 대신 시키면 과제는 끝난다.
-          <span class="hl">그 자리에 아무도 자라지 않는다.</span></p>
+        <p class="sub">이 수업이 AI 를 쓰는 원칙</p>
+        <ul>
+          <li><span class="hl">판단은 사람, 수행은 AI</span></li>
+          <li>받은 것을 <span class="hl">확인하는 눈</span>을 기름</li>
+          <li>배운 것을 <span class="hl">쌓아 둠</span> — 2주차 위키</li>
+          <li>막힌 자리를 <span class="hl">숨기지 않고 적음</span></li>
+        </ul>
+        <p class="emph" style="margin-top:22px">
+          AI 는 숙제 대리자가 아니라 <span class="hl">함께 자라는 상대</span></p>
         <p class="emph" style="margin-top:16px">
-          이 수업은 AI를 <span class="hl">함께 자라는 상대</span>로 쓴다</p>
-        <p style="margin-top:16px">한 학기 뒤 남는 것은 점수가 아니라
-          <span class="hl">도시 문제를 데이터로 다루는 사람</span>이다</p>
+          한 학기 뒤 남는 것은 점수가 아니라
+          <span class="hl">도시 문제를 데이터로 다루는 사람</span></p>
       </div>
     </div>
   </section>
