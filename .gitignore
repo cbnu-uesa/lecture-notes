@@ -18,6 +18,7 @@ desktop.ini
 # 배포본에는 들어가야 하지만(다운로드 버튼이 가리킨다) git에 둘 필요는 없다.
 # 배포 시 GitHub Actions나 build-site.sh 가 생성한다.
 */pdf/
+*/drafts/*.pdf
 dist/
 
 # 임시
