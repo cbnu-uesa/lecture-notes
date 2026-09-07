@@ -281,8 +281,10 @@
     <h2>회귀의 표준오차 (standard error)</h2>
     <div class="body tight">
       <p class="sub">추정오차(estimation error) = 잔차(residual) = 실제값 − 추정치</p>
-      <p class="sub" style="margin-bottom:2px">표준오차(standard error): 잔차 제곱의 평균에 제곱근을
-        취한 것 (Root Mean Squared Error, RMSE)</p>
+      <p class="sub" style="margin-bottom:2px">표준오차(standard error): 잔차 제곱합을 자유도(n−2)로
+        나눈 뒤 제곱근을 취한 것</p>
+      <p class="side-note" style="margin:0 0 2px 14px">잔차 제곱의 <em>평균</em>에 제곱근을 취한
+        RMSE 와는 나누는 수만 다르다 (n 대신 n−2)</p>
       <p class="sub">→ 표준오차가 작을수록 회귀직선이 자료를 잘 요약</p>
       <div class="cols top" style="margin-top:2px">
         <div class="col-l">
@@ -539,10 +541,10 @@
           </div>
           <p class="emph" style="margin:14px 0 4px">상관계수는 $-1 \le r \le +1$ 이므로</p>
           <ul class="slim">
-            <li>중간고사에서 평균보다 높은 점수를 받은 학생은 기말고사에서 표준단위 증가보다
-              못미치게 증가했고,</li>
-            <li>중간고사에서 평균보다 낮은 점수를 받은 학생은 기말고사에서 표준단위 증가보다
-              더 크게 증가함</li>
+            <li>중간고사에서 평균보다 높았던 학생은 기말고사에서 그만큼 높지 않아
+              <em>평균 쪽으로 당겨지고</em>,</li>
+            <li>중간고사에서 평균보다 낮았던 학생도 기말고사에서 그만큼 낮지 않아
+              <em>평균 쪽으로 당겨진다</em></li>
           </ul>
           <p class="sub" style="margin:10px 0 2px">→ 하나의 극단적인 값은 실력과 더불어 운이 작용</p>
           <p class="sub" style="margin:0">→ 운은 확률적이기 때문에 다음번에 나타나지 않을 가능성이 높음</p>
@@ -565,7 +567,7 @@
               $\varepsilon_i$ = 오차. 확률변수</p>
           </div></li>
         <li style="margin-top:8px"><span class="sub" style="display:inline">자료수집 및 모수 추정</span>:
-          주어진 자료를 활용하여 적절한 추정법(예. 최소제곱법)으로 모수($\beta_0, \beta_1, \varepsilon_i$)를 추정
+          주어진 자료를 활용하여 적절한 추정법(예. 최소제곱법)으로 모수($\beta_0, \beta_1$)를 추정
           <div class="fx-row" style="justify-content:flex-start;gap:20px;margin-top:2px">
             <div class="fx">$Y_i = b_0 + b_1 X_i + e_i$</div>
             <p class="side-note" style="margin:0">$b_0, b_1$ = 회귀모수의 추정량. 확률변수<br>

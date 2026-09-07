@@ -176,7 +176,7 @@
         <li>확률은 0~1 사이의 값을 가지며, 각 사건의 확률은 시행을 무한 반복하거나
           사건의 특성을 보고 개념적으로 계산할 수 있다.</li>
         <li>사건이란 특정 시행이나 실험에서 관찰가능한 결과를 의미하며,
-          표본공간은 발생 가능한 모든 사건의 집합을 의미한다.</li>
+          표본공간은 발생 가능한 모든 결과(근원사건)의 집합을 의미한다.</li>
         <li>표본공간에서 발생하는 각 사건들에 대응한 실수 값을 확률변수라 하며,
           각 확률변수가 나타날 가능성에 대한 분포가 바로 확률분포이다.</li>
         <li>이산확률변수에 대한 확률분포함수를 확률질량함수, 연속확률변수에 대한 확률분포함수를
@@ -377,7 +377,7 @@
           <ol class="dense" style="margin-top:8px">
             <li>B가 일어났다는 것을 알았을 때 A가 일어날 확률은</li>
             <li style="margin-top:14px">B가 일어날 확률에서</li>
-            <li style="margin-top:14px">B가 일어났을 때 A가 일어날 확률이 차지하는 비중</li>
+            <li style="margin-top:14px">A와 B가 함께 일어날 확률이 차지하는 비중</li>
           </ol>
           <p class="formula-key" style="text-align:center;margin-top:16px">
             $$P(A|B) = \frac{P(A \cap B)}{P(B)}$$</p>
@@ -512,7 +512,7 @@
             <li>B가 일어났다는 것을 알았을 때 A가 일어날 확률은</li>
             <li style="margin-top:10px">B가 일어났을 때 A가 일어날 확률과<br>
               B가 일어났을 때 A가 일어나지 않을 확률의 합에서</li>
-            <li style="margin-top:10px">B가 일어났을 때 A가 일어날 확률이 차지하는 비중</li>
+            <li style="margin-top:10px">A와 B가 함께 일어날 확률이 차지하는 비중</li>
           </ol>
           <p class="formula-key" style="text-align:center;margin-top:12px">
             $$P(A|B) = \frac{P(A \cap B)}{P(B)}
@@ -580,7 +580,7 @@
         <div class="col-r">
           <p style="margin:0;font-size:13px">
             $P(A|B) = \dfrac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}
-            = \dfrac{0.5 * 1}{0.5 * 1 + 0.5 * 0.25} = 0.75$</p>
+            = \dfrac{0.5 * 1}{0.5 * 1 + 0.5 * 0.25} = 0.8$</p>
         </div>
       </div>
     </div>
@@ -670,7 +670,7 @@
           <p class="sub" style="margin-bottom:2px">1. 사건은 무엇인가?</p>
           <ul class="slim" style="font-size:14px">
             <li>1번에 자동차(A), 2번에 자동차(B), 3번에 자동차(C)가 있는 사건</li>
-            <li>나의 선택 후 사회자가 자동차가 없는 문을 하나 여는 사건(D)</li>
+            <li>나의 선택 후 사회자가 C를 여는 사건(D)</li>
           </ul>
           <p class="sub" style="margin:12px 0 2px">2. 사건의 가능성은 무엇인가?</p>
           <ul class="slim" style="font-size:14px">
@@ -796,7 +796,7 @@
       <p class="derive" style="margin-top:6px">→ 비행기가 세계무역센터에 충돌한 사건(B)가 발생했을 때
         테러리스트가 뉴욕을 공격했다고 판단할 확률은?</p>
       <p style="text-align:center;margin:0;font-size:14px">
-        $0.005 * 100 \,/\, \{(0.005 * 100) + (1 - 0.005) * 0.008\} = 38\%$</p>
+        $0.005 * 100 \,/\, \{(0.005 * 100) + (100 - 0.005) * 0.008\} = 38\%$</p>
     </div>
   </section>
 

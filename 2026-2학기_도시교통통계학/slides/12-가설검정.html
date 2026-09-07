@@ -213,13 +213,13 @@
       <p class="emph" style="margin-left:14px">버릴 것을 예상하는 가설, 차이는 우연이다.</p>
       <p class="sub">대립가설 (alternative hypothesis):</p>
       <p class="emph" style="margin-left:14px">우리가 증명하고자 하는 가설, 차이는 실질적이다.</p>
-      <p class="sub">유의수준 (significant level)</p>
+      <p class="sub">유의수준 (significance level)</p>
       <p class="emph" style="margin-left:14px">귀무가설이 옳다는 가정 하에서 귀무가설의 기각여부를
         결정하는데 사용할 기준 확률</p>
       <p class="sub">임계치 (critical value) / 기각역(rejection region)</p>
       <p class="emph" style="margin-left:14px">유의수준 하에서 귀무가설을 기각하게 하는 임계 값 및 그 구간(기각역)</p>
       <p class="sub">유의확률 (p-value)</p>
-      <p class="emph" style="margin-left:14px">귀무가설이 옳다는 가정 하에서 계산된 검정 통계량이 도출될 확률</p>
+      <p class="emph" style="margin-left:14px">귀무가설이 옳다는 가정 하에서 관측된 검정통계량 이상으로 극단적인 값이 나올 확률</p>
     </div>
   </section>
 
@@ -235,7 +235,7 @@
         <li>유의수준 5%</li>
         <li>임계치 (양측검정일 경우): 분포의 양쪽 면적이 각각 2.5%에 해당하는 지점</li>
         <li>기각역 (양측검정일 경우): 임계치에서 분포의 양쪽 끝까지의 구간</li>
-        <li style="margin-top:10px">유의확률: 귀무가설 하에서 표본통계량(검정통계량)이 도출될 확률</li>
+        <li style="margin-top:10px">유의확률: 귀무가설 하에서 관측된 검정통계량 이상으로 극단적인 값이 나올 확률</li>
       </ul>
     </div>
   </section>
@@ -291,7 +291,7 @@
     <h2>가설검정</h2>
     <div class="body tight">
       <p class="lead">표본통계량이 귀무가설 하의 분포에서 도출되었다고 가정한 상태에서<br>
-        실제 통계치가 귀무가설 하에서 도출될 확률을 계산하여 귀무가설을 검증하는 것</p>
+        실제 통계치 이상으로 극단적인 값이 귀무가설 하에서 나올 확률을 계산하여 귀무가설을 검증하는 것</p>
       <ol class="dense" style="margin-top:10px">
         <li>귀무가설과 대립가설을 설정: 연구자가 입증하려는 가설을 대립가설로,
           그 반대를 귀무가설로 설정</li>
@@ -380,8 +380,8 @@
       <ol class="dense">
         <li>가설설정
           <ul class="slim">
-            <li>귀무가설: 칼에게는 특별한 능력이 없다. (표본평균은 0.5일 것)</li>
-            <li>대립가설: 칼에게는 특별한 능력이 있다. (표본평균은 0.5가 아닐 것)</li>
+            <li>귀무가설: 칼에게는 특별한 능력이 없다. (모비율은 0.5일 것)</li>
+            <li>대립가설: 칼에게는 특별한 능력이 있다. (모비율은 0.5가 아닐 것)</li>
           </ul></li>
         <li>표본통계량 설정: 표본평균 = 65/100</li>
         <li>표본평균의 표준오차
@@ -456,7 +456,7 @@
             <li>표본평균 간 차이의 표준오차
               <ul class="slim">
                 <li>$Var(\bar{X}-\bar{Y}) = Var(\bar{X})+Var(\bar{Y})-2Cov(\bar{X},\bar{Y})$</li>
-                <li>두 표본평균은 독립이므로 $Var(\bar{X}+\bar{Y}) = Var(\bar{X})+Var(\bar{Y})$</li>
+                <li>두 표본평균은 독립이므로 $Var(\bar{X}-\bar{Y}) = Var(\bar{X})+Var(\bar{Y})$</li>
                 <li>두 표본평균 차이의 표준오차 =
                   $\sqrt{Var(\bar{X})+Var(\bar{Y})}=\sqrt{Var(X)/n_x+Var(Y)/n_y}=\sqrt{9+16}=5$</li>
               </ul></li>
@@ -536,22 +536,22 @@
         <div class="col-l">
           <p class="eqline"><span class="mark">$E(b_1)$</span>
             $=E\!\left(\dfrac{\sum(X_i-\bar{X})(Y_i-\bar{Y})}{\sum(X_i-\bar{X})^{2}}\right)
-             =\mathrm{E}\!\left(\dfrac{\sum(X_i-\bar{X})Y_i}{SST}\right)$</p>
-          <p class="eqline">$=\mathrm{E}\!\left(\dfrac{\sum(X_i-\bar{X})(\beta_0+\beta_1X_i+\varepsilon_i)}{SST}\right)
-             =E\!\left(\beta_1+\left(\dfrac{1}{SST}\right)\sum(X_i-\bar{X})\varepsilon_i\right)$</p>
-          <p class="eqline">$=\beta_1+\left(\dfrac{1}{SST}\right)\sum(X_i-\bar{X})E(\varepsilon_i)=$
+             =\mathrm{E}\!\left(\dfrac{\sum(X_i-\bar{X})Y_i}{S_{xx}}\right)$</p>
+          <p class="eqline">$=\mathrm{E}\!\left(\dfrac{\sum(X_i-\bar{X})(\beta_0+\beta_1X_i+\varepsilon_i)}{S_{xx}}\right)
+             =E\!\left(\beta_1+\left(\dfrac{1}{S_{xx}}\right)\sum(X_i-\bar{X})\varepsilon_i\right)$</p>
+          <p class="eqline">$=\beta_1+\left(\dfrac{1}{S_{xx}}\right)\sum(X_i-\bar{X})E(\varepsilon_i)=$
             <span class="mark">$\beta_1$</span></p>
 
           <p class="eqline" style="margin-top:16px"><span class="mark">$Var(b_1)$</span>
-            $=\mathrm{Var}\!\left(\beta_1+\left(\tfrac{1}{SST}\right)\sum(X_i-\bar{X})\varepsilon_i\right)$</p>
-          <p class="eqline">$=\left(\dfrac{1}{SST}\right)^{2}\mathrm{Var}\!\left(\sum(X_i-\bar{X})\varepsilon_i\right)
-             =\left(\dfrac{1}{SST}\right)^{2}\sum(X_i-\bar{X})^{2}\mathrm{Var}(\varepsilon_i)$</p>
-          <p class="eqline">$=\left(\dfrac{1}{SST}\right)^{2}\sum(X_i-\bar{X})^{2}\ \ \sigma^{2}=$
+            $=\mathrm{Var}\!\left(\beta_1+\left(\tfrac{1}{S_{xx}}\right)\sum(X_i-\bar{X})\varepsilon_i\right)$</p>
+          <p class="eqline">$=\left(\dfrac{1}{S_{xx}}\right)^{2}\mathrm{Var}\!\left(\sum(X_i-\bar{X})\varepsilon_i\right)
+             =\left(\dfrac{1}{S_{xx}}\right)^{2}\sum(X_i-\bar{X})^{2}\mathrm{Var}(\varepsilon_i)$</p>
+          <p class="eqline">$=\left(\dfrac{1}{S_{xx}}\right)^{2}\sum(X_i-\bar{X})^{2}\ \ \sigma^{2}=$
             <span class="mark">$\dfrac{\sigma^{2}}{\sum(X_i-\bar{X})^{2}}$</span></p>
         </div>
         <div class="col-r">
           <p class="eqline">$\sum(X_i-\bar{X})(Y_i-\bar{Y})=\sum(X_i-\bar{X})Y_i$</p>
-          <p class="eqline">$\sum(X_i-\bar{X})^{2}=\mathrm{SST}$</p>
+          <p class="eqline">$\sum(X_i-\bar{X})^{2}=S_{xx}$</p>
         </div>
       </div>
     </div>
@@ -694,10 +694,10 @@
     <div class="body tight">
       <ul>
         <li>가설검정은 표본통계량이 귀무가설 하의 분포에서 도출되었다고 가정한 상태에서
-          실제 통계치가 귀무가설 하에서 도출될 확률을 계산하여 귀무가설을 검증하는 것이다.</li>
+          실제 통계치 이상으로 극단적인 값이 귀무가설 하에서 나올 확률을 계산하여 귀무가설을 검증하는 것이다.</li>
         <li>귀무가설은 버릴 것을 예상하는 가설이고, 대립가설은 우리가 실제 밝히고자 하는 가설이다.</li>
         <li>유의수준은 귀무가설이 옳다는 가정 하에서 귀무가설의 기각여부를 결정하는데 사용할
-          기준 확률이며, 유의확률은 귀무가설이 옳다는 가정 하에서 계산된 통계치가 도출될 확률로서
+          기준 확률이며, 유의확률은 귀무가설이 옳다는 가정 하에서 관측된 통계치 이상으로 극단적인 값이 나올 확률로서
           유의확률이 유의수준 내에 있을 경우 계산된 통계치는 희귀한 현상이므로
           귀무가설을 기각할 수 있다.</li>
         <li>가설검정은 1) 밝히려는 내용에 적합한 귀무가설과 대립가설을 제시한 후,
@@ -779,13 +779,13 @@
     <h2>[부록] 표본평균의 구간추정</h2>
     <div class="body tighter">
       <p class="sub" style="margin-bottom:4px">Q) 표본평균이 25일 때 모평균에 대한
-        95% 신뢰구간(모평균이 존재할 확률이 0.95인 구간)은?</p>
+        95% 신뢰구간(같은 방식으로 구간을 여러 번 만들면 그중 95%가 모평균을 포함하는 구간)은?</p>
       <div class="cols top w62">
         <div class="col-l">
           <p style="margin:0 0 2px">모집단에서 뽑은 표본평균은 기대 값이 $\mu$이고
             분산이 $\sigma^{2}/\mathrm{n}$ 인 정규분포로 출현할 것</p>
-          <p class="derive" style="margin:0 0 8px">→ 따라서 정규분포의 95% 구간 내에서
-            모평균이 존재할 것</p>
+          <p class="derive" style="margin:0 0 8px">→ 따라서 표본평균에서 그 분포의 95% 폭만큼
+            잡은 구간이 모평균을 포함할 것</p>
           <p class="sub" style="margin:0 0 2px;font-size:14px">모집단의 분산($\sigma^{2}=25$)을
             알고 있을 경우</p>
           <ul class="slim">
@@ -826,7 +826,7 @@
     <div class="body tight">
       <p class="sub" style="margin-bottom:6px">Q) 총 세수는 같지만 세 부담은 효율적으로 조정하는
         목적으로 새로운 세법을 시행하였다. 시행 이후 무작위로 100개의 표본을 뽑아 조사한 결과
-        시행 전후 차이의 평균이 -21만원으로 나왔다. 표본 표준편차도 73만원이었다.
+        시행 전후 차이의 평균이 -21만 9천원으로 나왔다. 표본 표준편차도 73만원이었다.
         새로운 세법 시행에 따른 세수 감소는 표본에 따른 우연인가? 유의미한 현상인가?</p>
       <ol class="dense">
         <li>귀무가설(H0): 세법 시행에 따른 세수변화는 0(즉 모평균 0)<br>

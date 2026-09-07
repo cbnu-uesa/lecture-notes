@@ -135,7 +135,7 @@
         <ul>
           <li>저울의 측정오차</li>
           <li>키와 몸무게의 분포</li>
-          <li>식물의 꽃잎 개수</li>
+          <li>같은 공정에서 만든 부품의 치수</li>
         </ul>
         <p class="emph" style="margin-left:26px">:</p>
       </div>
@@ -202,16 +202,16 @@
 
   <!-- 원본 p.8 -->
   <section>
-    <h2>베르누이 분포 <span class="en">(Bernouii distribution)</span></h2>
+    <h2>베르누이 분포 <span class="en">(Bernoulli distribution)</span></h2>
     <div class="body">
       <p class="sub">P의 성공확률로 결과가 둘(성공/실패)로 나뉘는 사건, 즉 0과 1을 확률변수로 갖는 확률분포</p>
       <p class="formula-key" style="text-align:center;margin:24px 0 30px;font-size:22px">
-        $X \sim Bernouii(p)$</p>
-      <p class="sub" style="margin-bottom:2px">베르누이 시행 <span class="en">(Bernouii trial)</span></p>
+        $X \sim Bernoulli(p)$</p>
+      <p class="sub" style="margin-bottom:2px">베르누이 시행 <span class="en">(Bernoulli trial)</span></p>
       <p class="emph ind">결과가 둘(성공/실패, 합격/불합격)로 나뉘는 시행 (예. 동전의 앞면/뒷면)
         → 성공확률 p가 존재</p>
       <p class="sub" style="margin:20px 0 2px">베르누이 확률변수
-        <span class="en">(Bernouii random variable)</span></p>
+        <span class="en">(Bernoulli random variable)</span></p>
       <p class="emph ind">베르누이 시행에서 성공에 1, 실패에 0을 대응시킨 확률변수</p>
     </div>
   </section>
@@ -224,7 +224,7 @@
       <p class="formula-key" style="text-align:center;margin:26px 0 34px;font-size:20px">
         $P(X_{1}=x)=p^{x}(1-p)^{1-x}$</p>
       <p class="sub" style="margin-bottom:2px">베르누이 확률변수
-        <span class="en">(Bernouii random variable)</span></p>
+        <span class="en">(Bernoulli random variable)</span></p>
       <p class="emph ind">베르누이 시행에서 성공에 1, 실패에 0을 대응시킨 확률변수</p>
     </div>
   </section>
@@ -415,7 +415,7 @@
     <div class="body">
       <p class="sub">성공확률이 p인 베르누이 시행에 따른 베르누이 확률변수를 X라고 할 때</p>
       <p class="formula-key" style="text-align:center;margin:24px 0 34px;font-size:22px">
-        $X \sim Bernouii(p)$</p>
+        $X \sim Bernoulli(p)$</p>
       <p class="emph" style="text-align:center;font-size:19px">기대값 = $E(X) = p$</p>
       <p class="emph" style="text-align:center;font-size:19px;margin-top:14px">
         분산 = $Var(X) = p(1-p)$</p>
@@ -526,7 +526,7 @@
           <p class="emph">→ 원칙적으로 25~150까지 가능하지만,<br>
             <span class="ind">실제로 75~100사이 대부분 값이 위치</span></p>
           <p class="emph">→ 새로운 확률변수의 확률분포는 기존 확률분포의 영향을 받지만,<br>
-            <span class="ind">시행횟수가 늘어날수록 평균으로 수렴</span></p>
+            <span class="ind">뽑는 장수가 늘어날수록 정규분포에 가까워진다 (중심극한정리)</span></p>
         </div>
       </div>
     </div>
@@ -581,7 +581,7 @@
       <p class="emph" style="margin-top:20px">첫번째 추출에서 기대할 수 있는 분산은</p>
       <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
         + 3^{2}\times\left(\frac{1}{4}\right) = 3$</p>
-      <p class="emph" style="margin-top:20px">두번째 추출에서 기대할 수 있는 값은 2, 6, 10</p>
+      <p class="emph" style="margin-top:20px">두 번 추출한 합으로 기대할 수 있는 값은 2, 6, 10</p>
       <p class="emph">2의 확률 = 9/16, 6의 확률 = 6/16, 10의 확률 = 1/16</p>
       <p class="emph">기대값 = 4, 분산 = $(-2)^{2}\times\left(\frac{9}{16}\right)
         + 2^{2}\times\left(\frac{6}{16}\right) + 6^{2}\times\left(\frac{1}{16}\right) = 6$</p>
@@ -611,7 +611,7 @@
       <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
         + 3^{2}\times\left(\frac{1}{4}\right) = 3$
         <span class="hl">&nbsp;= 상자의 분산 → 1회 추출 합의 표준편차 = $\sqrt{3}$</span></p>
-      <p class="emph" style="margin-top:16px">두번째 추출에서 기대할 수 있는 값은 2, 6, 10</p>
+      <p class="emph" style="margin-top:16px">두 번 추출한 합으로 기대할 수 있는 값은 2, 6, 10</p>
       <p class="emph">2의 확률 = 9/16, 6의 확률 = 6/16, 10의 확률 = 1/16</p>
       <p class="emph">기대값 = 4, 분산 = $(-2)^{2}\times\left(\frac{9}{16}\right)
         + 2^{2}\times\left(\frac{6}{16}\right) + 6^{2}\times\left(\frac{1}{16}\right) = 6$
@@ -623,7 +623,7 @@
   <section>
     <h2>확률변수 합으로 만든 새로운 확률변수의 특징</h2>
     <div class="body tight">
-      <p class="sub">제곱근 법칙 (square root law) = 대수의 법칙(평균의 법칙)</p>
+      <p class="sub">제곱근 법칙 (square root law) → 대수의 법칙(평균의 법칙)의 근거</p>
       <p class="emph">특정 확률분포를 따르는 확률변수(X)를 합하여 만든 새로운 확률변수(Y=X1+X2+…+Xn)의
         표준편차는</p>
       <p class="emph">처음 확률변수가 갖는 표준편차(SD(X))와 확률변수를 합한 횟수(n)의
@@ -691,7 +691,7 @@
       <p class="emph" style="margin-top:20px">첫번째 추출에서 기대할 수 있는 분산은</p>
       <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
         + 3^{2}\times\left(\frac{1}{4}\right) = 3$</p>
-      <p class="emph" style="margin-top:20px">두번째 추출에서 기대할 수 있는 값은 1, 3, 5</p>
+      <p class="emph" style="margin-top:20px">두 번 추출한 평균으로 기대할 수 있는 값은 1, 3, 5</p>
       <p class="emph">1의 확률 = 9/16, 3의 확률 = 6/16, 5의 확률 = 1/16</p>
       <p class="emph">기대값 = 2, 분산 = $(-1)^{2}\times\left(\frac{9}{16}\right)
         + 1^{2}\times\left(\frac{6}{16}\right) + 3^{2}\times\left(\frac{1}{16}\right)
@@ -721,7 +721,7 @@
       <p class="emph">$(-1)^{2}\times\left(\frac{3}{4}\right)
         + 3^{2}\times\left(\frac{1}{4}\right) = 3$
         <span class="hl">&nbsp;= 상자의 분산 → 1회 추출 평균의 표준편차 = $\sqrt{3}$</span></p>
-      <p class="emph" style="margin-top:16px">두번째 추출에서 기대할 수 있는 값은 1, 3, 5</p>
+      <p class="emph" style="margin-top:16px">두 번 추출한 평균으로 기대할 수 있는 값은 1, 3, 5</p>
       <p class="emph">1의 확률 = 9/16, 3의 확률 = 6/16, 5의 확률 = 1/16</p>
       <p class="emph">기대값 = 2, 분산 = $(-1)^{2}\times\left(\frac{9}{16}\right)
         + 1^{2}\times\left(\frac{6}{16}\right) + 3^{2}\times\left(\frac{1}{16}\right) = 1.5 = 3/2$
@@ -733,9 +733,9 @@
   <section>
     <h2>확률변수 평균으로 만든 새로운 확률변수의 특징</h2>
     <div class="body tight">
-      <p class="sub">제곱근 법칙 (square root law) = 대수의 법칙(평균의 법칙)</p>
+      <p class="sub">제곱근 법칙 (square root law) → 대수의 법칙(평균의 법칙)의 근거</p>
       <p class="emph">특정 확률분포를 따르는 확률변수(X)의 합을 평균하여 만든
-        새로운 확률변수(Y=X1+X2+…+Xn/n)의 표준편차는</p>
+        새로운 확률변수(Y=(X1+X2+…+Xn)/n)의 표준편차는</p>
       <p class="emph">처음 확률변수가 갖는 표준편차(SD(X))를 확률변수를 합한 횟수(n)의
         제곱근으로 나눈 값으로 표현</p>
       <p class="formula-key" style="text-align:center;margin:22px 0 8px;font-size:20px">
@@ -877,14 +877,15 @@
   <section>
     <h2>중심극한정리에 따른 정규분포곡선으로의 근사</h2>
     <div class="body tight">
-      <p class="sub">Q) 동전을 100번 던질 때 앞면이 45이상 ~ 50이하로 나올 확률</p>
+      <p class="sub">Q) 동전을 100번 던질 때 앞면이 45이상 ~ 55이하로 나올 확률</p>
       <ul class="slim" style="margin-top:12px">
-        <li>동전을 던지는 행위는 베르누이 분포를 따름: <i>X ~ Bernouii(½)</i></li>
+        <li>동전을 던지는 행위는 베르누이 분포를 따름: <i>X ~ Bernoulli(½)</i></li>
         <li>동전을 100번 던져 앞면이 나오는 횟수를 기록하는 것($X=\sum X_{i}$)은
           이항분포를 따름: <i>X ~ B(100, ½)</i></li>
-        <li>이항분포에서 n이 충분히 크면(n≥30) 이항분포는 정규분포에 근사:
+        <li>이항분포에서 np ≥ 5 이고 n(1−p) ≥ 5 이면 이항분포는 정규분포에 근사:
           <i>X ~ N(np, &nbsp;np(1−p)) = N(50, 5^2)</i></li>
         <li>확률변수 X를 표준정규분포로 변환하여 표준정규분포 내의 면적을 구함</li>
+        <li>이산인 값을 연속분포로 바꾸므로 45~55 를 <em>44.5~55.5</em> 로 넓힌다 (연속성 수정)</li>
       </ul>
       <svg class="fig" id="f-approx" viewBox="0 0 780 208" style="width:730px;margin-top:8px" role="img">
         <title>44.5~55.5 인 실제단위 구간을 −1.1~1.1 인 표준단위로 옮기고,
@@ -946,10 +947,10 @@
           성공에 1, 실패에 0을 대응하는 확률변수에 대한 확률분포이다.</li>
         <li>이항분포는 성공확률 p를 지니는 베르누이 시행을 n번 반복한 결과로 나타난
           성공횟수를 확률변수로 갖는 확률분포이다.</li>
-        <li>정규분포는 연속확률분포로서 이항확률변수의 n을 무한대로 늘렸을 때
-          그 값이 따르는 분포이다.</li>
+        <li>정규분포는 좌우대칭의 종모양을 갖는 연속확률분포이며, 이항확률변수를 표준화한 값은
+          n이 커질수록 표준정규분포에 가까워진다.</li>
         <li>확률변수의 기대값은 특정 확률변수가 확률분포에 따라 가질 것으로 기대되는 값을 의미하며,
-          확률변수의 표준오차는 실현된 값이 기대값과 차이가 나는 정도의 표준적인 크기를 의미한다.</li>
+          확률변수의 표준편차는 실현된 값이 기대값과 차이가 나는 정도의 표준적인 크기를 의미한다.</li>
       </ul>
     </div>
   </section>
@@ -960,10 +961,10 @@
     <div class="body tight">
       <ul>
         <li>특정 확률분포를 따르는 확률변수를 n번 추출하여 그 합을 새로운 확률변수로 할 경우
-          (즉, 표본합) 새로운 확률변수의 표준오차는 (기존 확률변수 표준오차*$\sqrt{n}$)이다.</li>
+          (즉, 표본합) 새로운 확률변수의 표준편차는 (기존 확률변수 표준편차*$\sqrt{n}$)이다.</li>
         <li>특정 확률분포를 따르는 확률변수를 n번 추출하여 그 평균을 새로운 확률변수로 할 경우
-          (즉, 표본평균) 새로운 확률변수의 표준오차는 (기존 확률변수 표준오차/$\sqrt{n}$)이다.</li>
-        <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수의 상대적 표준오차가
+          (즉, 표본평균) 새로운 확률변수의 표준편차는 (기존 확률변수 표준편차/$\sqrt{n}$)이다.</li>
+        <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수의 상대적 표준편차가
           추출횟수의 증가에 따라 감소하는 현상을 대수(평균)의 법칙이라 한다.</li>
         <li>특정 확률변수의 합 혹은 평균으로 만든 새로운 확률변수에서 추출횟수가 충분히 많을 경우
           새로운 확률변수가 정규분포로 수렴해가는 현상을 중심극한정리라 한다.</li>
@@ -1026,7 +1027,7 @@ function bell(sel, box, o) {
   s += box(RX - 100, 84, 200, 32, '연속확률분포');
 
   const parts = [Fig.raw(s)];
-  [[LX - 90, ['· 베르누이 분포 (Bernouii distribution)',
+  [[LX - 90, ['· 베르누이 분포 (Bernoulli distribution)',
               '· 이항분포 (Binomial distribution)',
               '· 포아송 분포 (Poisson distribution)',
               '· 음이항 분포 (Negative binomial distribution)']],
