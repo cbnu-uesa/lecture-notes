@@ -45,3 +45,13 @@ R · Python · Gemini · Claude 로고는 [Simple Icons](https://simpleicons.org
 
 CC0 라 표시 의무는 없지만 1강 마지막 '자료 출처' 장에 적어 두었다.
 상표권은 각 기업에 있으며, 제품을 가리키는 용도로만 쓴다.
+
+### tb-nyt-grant-2026.png
+- 뉴욕타임스 오피니언 게스트 에세이 지면 상단 — 제목·날짜·삽화
+- 출처: Adam Grant, "There's Really Only One Way to Stop Students From Cheating",
+  The New York Times Opinion, 2026-08-26.
+  nytimes.com/2026/08/26/opinion/students-cheating-ai.html · 2026-09-07 갈무리
+- 쓰는 곳: **1강 29쪽** 학생들은 그것을 잘못이라 여기지 않았다
+- 크기: 639×876. 슬라이드에서 왼쪽 열 폭 23%
+- **`tb-` 이므로 대외 배포 전 저작권 판단 대상.** 신문사 저작물이며 삽화가 함께 들어 있다.
+  슬라이드에 매체·필자·날짜·갈무리 날짜를 적어 두었다
