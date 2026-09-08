@@ -1,0 +1,55 @@
+{
+  "id": "2026-2-urban-regional-econ",
+  "title": "도시 및 지역경제학",
+  "titleEn": "Urban and Regional Economics",
+  "term": "2026-2학기",
+  "termEn": "Fall 2026",
+  "instructor": "KWON",
+  "label": "2026-2학기 도시 및 지역경제학",
+  "footer": "Urban and Regional Economics / Fall 2026 / KWON",
+  "_note": "교재: 오설리반의 도시경제학 제9판 (Arthur O'Sullivan 저, 이번송·홍성효·김석영 공역, 박영사 2022). 2026-09-07 에 덱을 주차 단위로 다시 묶었다 — 1강 5쪽 강의계획서가 한 주에 여러 장을 배정하는데 덱은 장 하나씩이었다. 2주차 Ch.1~3 · 3주차 Ch.4~6 (Ch.4 집적의 경제는 2026-09-08 에 2주차에서 3주차로 옮겼다) · 4주차 Ch.7 · 5주차 Ch.8 · 6주차 Ch.10. 날짜는 강의계획서 표를 그대로 옮겼다. Ch.9(최초의 도시들)는 강의계획서에 없어 보관/ 으로 옮겼다 — 배포본에서 빠지고 목록에도 안 뜬다. 6주차의 Ch.11·12 와 7주차 이후는 source/ 에 스캔이 없어 아직 만들지 않았다.",
+  "lectures": [
+    {
+      "no": 1,
+      "title": "강의소개",
+      "file": "01-강의소개.html",
+      "date": "2026. 9. 2.",
+      "status": "done"
+    },
+    {
+      "no": 2,
+      "title": "도시경제학의 주요개념 및 도시의 생성",
+      "file": "02-주요개념과도시의생성.html",
+      "date": "2026. 9. 9.",
+      "status": "done"
+    },
+    {
+      "no": 3,
+      "title": "도시의 생성 (2)",
+      "file": "03-도시의생성2.html",
+      "date": "2026. 9. 16.",
+      "status": "done"
+    },
+    {
+      "no": 4,
+      "title": "지역경제에서의 도시들",
+      "file": "04-지역경제에서의도시들.html",
+      "date": "2026. 9. 23.",
+      "status": "done"
+    },
+    {
+      "no": 5,
+      "title": "도시노동시장",
+      "file": "05-도시노동시장.html",
+      "date": "2026. 9. 30.",
+      "status": "done"
+    },
+    {
+      "no": 6,
+      "title": "도시토지이용과 분포",
+      "file": "06-도시토지이용과분포.html",
+      "date": "2026. 10. 7.",
+      "status": "done"
+    }
+  ]
+}

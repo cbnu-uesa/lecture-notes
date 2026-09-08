@@ -1,0 +1,19 @@
+/* PDF 출력 보정 — design.md §9
+   Reveal의 print-pdf 모드와 decktape 양쪽에서 쓰인다. */
+
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .deck-download { display: none !important; }
+}
+
+/* Reveal print-pdf 모드 (?print-pdf) */
+.reveal.print-pdf .deck-download,
+body.print-pdf .deck-download { display: none !important; }
+
+/* 푸터바·표 헤더의 배경색이 인쇄에서 빠지지 않게 */
+.reveal .deck-footer,
+.reveal table th,
+.reveal table td {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
