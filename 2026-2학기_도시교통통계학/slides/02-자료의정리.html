@@ -31,6 +31,17 @@
           color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: justify; }
   .nums.mini { font-size: 4.8px; line-height: 1.3; word-spacing: 1.8px; }
 
+  /* ─── 모집단·모수·표본·통계량의 사례 (원본 p.3 옆칸) ─── */
+  .case-ttl { font-size: var(--fs-sub); font-weight: 700; color: var(--brand-crimson);
+              margin: 0 0 8px; }
+  .tbl-case { font-size: 13.5px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-case th { width: 74px; text-align: center; font-weight: 700;
+                         color: var(--brand-crimson); padding: 6px 6px;
+                         border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .reveal .tbl-case td { padding: 6px 8px; line-height: 1.42; vertical-align: top; }
+  .case-note { font-size: var(--fs-caption); color: var(--ink-2); line-height: 1.45;
+               margin: 12px 0 0; }
+
   /* ─── 두 갈래 요약 방법 (원본 p.5) ─── */
   .branch { display: flex; gap: 24px; align-items: center; }
   .branch .nums { flex: 1 1 auto; }
@@ -54,9 +65,10 @@
   .reveal .tbl-smoke th, .reveal .tbl-smoke td { padding: 3px 8px; text-align: center; }
   .tbl-rep { font-size: 12px; width: 100%; table-layout: fixed; }
   .reveal .tbl-rep th, .reveal .tbl-rep td { padding: 4px 8px; vertical-align: top; }
-  .reveal .tbl-rep th:first-child, .reveal .tbl-rep td:first-child { width: 20%; text-align: center; }
-  .tbl-scale { font-size: 10.5px; width: 100%; table-layout: fixed; }
-  .reveal .tbl-scale th, .reveal .tbl-scale td { padding: 3px 5px; text-align: center; line-height: 1.3; }
+  /* 「통계학에서 가장 많이 활용되는 대표값」·「정량적, 정성적 데이터 모두 사용 가능」이
+     끝의 두 글자만 다음 줄로 흘리던 것을 막는다 — 종류 칸을 줄이고 장점 칸을 넓혔다. */
+  .reveal .tbl-rep th:first-child, .reveal .tbl-rep td:first-child { width: 16%; text-align: center; }
+  .reveal .tbl-rep th:nth-child(2), .reveal .tbl-rep td:nth-child(2) { width: 46%; }
   .tbl-rep ul { margin: 0; padding-left: 14px; }
   .tbl-rep li { margin-bottom: 2px; }
   .tbl-rep li::before { left: -11px; }
@@ -107,11 +119,13 @@
   .notes-sm { font-size: 11.5px; line-height: 1.4; }
   .notes-sm > li { margin-bottom: 3px; }
 
-  /* 우상단 보조 상자 (원본 p.22 정규분포 설명) */
-  .side-note { position: absolute; right: 0; top: 6px; width: 268px;
-               background: #F2F0EC; padding: 12px 14px; }
-  .side-note p { margin: 0 0 4px; font-size: 12px; }
-  .side-note .ttl { font-size: 13px; font-weight: 700; color: var(--ink); }
+  /* 자유도 예시 목록 (원본 p.21 을 다시 쓴 것) */
+  .dof-list { margin: 0; padding-left: 20px; }
+  .dof-list li { margin-bottom: 5px; line-height: 1.45; }
+
+  /* 왜도·첨도 수식 한 줄 (원본 p.23) — 한 줄에 다 들어가야 해서 작게 잡는다 */
+  .shape-eq { text-align: center; margin: 6px 0; }
+  .reveal .shape-eq mjx-container { font-size: 92% !important; }
 </style>
 <script>
   /* 히스토그램 하나를 그리는 공용 함수.
@@ -168,12 +182,11 @@
 </head>
 <body>
 <div class="reveal"><div class="slides">
-
   <!-- ══ 1. T1 표지 (원본 p.1) ═══════════════════════════════ -->
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <h1>2강. 통계학과<br>자료의 정리</h1>
+    <h1>2강. 통계학과 자료의 정리</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
@@ -196,11 +209,28 @@
   <!-- ══ 3. 모집단과 표본 (원본 p.3) ═════════════════════════ -->
   <section>
     <h2>모집단과 표본</h2>
-    <div class="body stack">
+    <div class="body">
       <p class="lead t-define">통계학은 표본을 수집, 정리, 요약하고 이를 토대로 모집단을 추측해보는 작업</p>
-      <svg class="fig" id="f-pop" viewBox="0 0 700 300" style="width:600px" role="img">
-        <title>모집단·모수에서 표본추출로 표본·통계량이 나오고 다시 추론으로 돌아가는 순환도</title>
-      </svg>
+      <div class="cols fig-left">
+        <div class="col-l">
+          <svg class="fig" id="f-pop" viewBox="0 0 700 300" role="img">
+            <title>모집단·모수에서 표본추출로 표본·통계량이 나오고 다시 추론으로 돌아가는 순환도</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="case-ttl">사례. 청주시 시내버스 승객의 통행시간</p>
+          <table class="tbl-case">
+            <tbody>
+              <tr><th>모집단</th><td>청주시 시내버스를 이용하는 <b>모든</b> 승객</td></tr>
+              <tr><th>모수</th><td>그 전체 승객의 평균 통행시간 <i>μ</i></td></tr>
+              <tr><th>표본</th><td>무작위로 고른 승객 500명</td></tr>
+              <tr><th>통계량</th><td>그 500명의 평균 통행시간 <i>x̄</i></td></tr>
+            </tbody>
+          </table>
+          <p class="case-note">모수는 하나로 정해져 있으나 알 수 없고,
+            통계량은 계산할 수 있으나 표본을 다시 뽑으면 값이 달라진다.</p>
+        </div>
+      </div>
     </div>
     <script>
       (function () {
@@ -265,7 +295,6 @@
           <div class="tag">숫자 하나로 만들기</div>
         </div>
       </div>
-      <p class="caption t-red" style="margin-top:6px">X ~ N(170, 5^2) / 500개 랜덤추출</p>
     </div>
   </section>
 
@@ -281,27 +310,19 @@
         <div class="def-tag">히스토그램<br><span class="en">(histogram)</span></div>
         <div><p>도수분포표를 그래프로 나타낸 것</p></div>
       </div>
-      <div class="cols" style="margin-top:12px">
-        <div class="col-l" style="flex:0 0 40%">
+      <div class="cols" style="margin-top:12px;align-items:flex-start">
+        <div class="col-l" style="flex:0 0 46%">
           <p class="sub" style="font-size:13px;margin-bottom:4px">도수분포표</p>
           <table class="tbl-freq">
             <thead><tr><th>계급</th><th>(절대)빈도</th><th>상대빈도</th><th>밀도</th></tr></thead>
             <tbody id="tb-freq"></tbody>
           </table>
         </div>
-        <div class="col-r" style="display:flex;gap:14px">
-          <div style="flex:1 1 0">
-            <p class="sub" style="font-size:13px;margin-bottom:2px">히스토그램(절대빈도)</p>
-            <svg class="fig" id="f-h-abs" viewBox="0 0 250 180" role="img">
-              <title>키 자료 500개의 절대빈도 히스토그램</title>
-            </svg>
-          </div>
-          <div style="flex:1 1 0">
-            <p class="sub" style="font-size:13px;margin-bottom:2px">히스토그램(밀도)</p>
-            <svg class="fig" id="f-h-den" viewBox="0 0 250 180" role="img">
-              <title>키 자료 500개의 밀도 히스토그램</title>
-            </svg>
-          </div>
+        <div class="col-r">
+          <p class="sub" style="font-size:13px;margin-bottom:2px">히스토그램(밀도)</p>
+          <svg class="fig" id="f-h-den" viewBox="0 0 250 180" style="width:300px" role="img">
+            <title>키 자료 500개의 밀도 히스토그램</title>
+          </svg>
         </div>
       </div>
     </div>
@@ -312,13 +333,7 @@
         document.getElementById('tb-freq').innerHTML = T.map((b) =>
           `<tr><td>${b.lo}-${b.hi}</td><td>${b.f}</td><td>${Number(b.rel.toFixed(3))}</td>` +
           `<td>${b.f === 0 ? 0 : r4(b.den).toFixed(4)}</td></tr>`).join('');
-        const bins = T.map((b) => [b.lo, b.hi, b.f]);
         const dbins = T.map((b) => [b.lo, b.hi, b.den]);
-        Hist('#f-h-abs', {
-          box: { x0: 42, y0: 146, x1: 226, y1: 22 }, x: [150, 190], yMax: 175,
-          yTicks: [0, 50, 100, 150], xTicks: [150, 160, 170, 180, 190],
-          bins, yLabel: '빈도',
-        });
         Hist('#f-h-den', {
           box: { x0: 42, y0: 146, x1: 226, y1: 22 }, x: [150, 190], yMax: 0.072,
           yTicks: [0, 0.02, 0.04, 0.06], yFmt: (v) => v.toFixed(2),
@@ -411,7 +426,7 @@
             </div>
           </div>
           <div class="blk">
-            <p class="q">Q3) 키가 156인 사람은 전체의 몇 %로 짐작되는가?</p>
+            <p class="q">Q3) 키가 대략 156인 사람은 전체의 몇 % 정도를 차지할까?</p>
             <div class="fragment">
               <p class="a">− 155-160 구간의 상대빈도: 3.4% (=0.034*100)</p>
               <p class="a">− 156인 사람의 비중(%): 3.4% / 5 = 약 0.68%</p>
@@ -463,11 +478,14 @@
     <script>
       (function () {
         const S = window.SMOKE;
-        document.getElementById('tb-smoke').innerHTML = S.map((b) =>
+        // 채우는 순서는 푸는 순서다 — 히스토그램에 적힌 밀도가 먼저 주어지고,
+        // 거기서 상대빈도(밀도×구간폭), 다시 절대빈도(상대빈도×200)를 유도한다.
+        // DOM 은 표의 열 순서를 지켜야 하므로 순서는 data-fragment-index 로 준다.
+        document.getElementById('tb-smoke').innerHTML = S.map((b, i) =>
           `<tr><td>${b.lo}-${b.hi}</td>` +
-          `<td><span class="fragment">${b.f}</span></td>` +
-          `<td><span class="fragment">${b.rel}</span></td>` +
-          `<td><span class="fragment">${b.den}</span></td></tr>`).join('');
+          `<td><span class="fragment" data-fragment-index="${8 + i}">${b.f}</span></td>` +
+          `<td><span class="fragment" data-fragment-index="${4 + i}">${b.rel}</span></td>` +
+          `<td><span class="fragment" data-fragment-index="${i}">${b.den}</span></td></tr>`).join('');
         Hist('#f-smoke', {
           box: { x0: 46, y0: 154, x1: 306, y1: 26 }, x: [0, 80], yMax: 4.3,
           yTicks: [1, 2, 3, 4], xTicks: [0, 10, 20, 40, 80],
@@ -689,7 +707,7 @@
     <h2>자료요약 (2) 숫자 하나로 만들기: 대표값의 선정 순서와 특성</h2>
     <div class="body tight">
       <div class="cols" style="align-items:flex-start">
-        <div class="col-l" style="flex:0 0 40%">
+        <div class="col-l" style="flex:0 0 36%">
           <svg class="fig" id="f-pick" viewBox="0 0 360 350" style="width:300px" role="img">
             <title>범주형인가 · 그룹 전체에 관심이 있는가 · 분포가 비대칭인가에 따라
               최빈값·산술평균·중앙값을 고르는 흐름도</title>
@@ -758,8 +776,8 @@
     <div class="body stack">
       <p class="sub">예) 그랜드 포크스 범람</p>
       <ul>
-        <li>1997년 2월 미국 국립기상청은 노스레드 강의 수위를 평균 49피트(약 14.9m)로 예상
-          당시 그랜드 포크스의 제방은 당시 51피트(약 15.5m)여서 문제가 없을 것으로 판단함</li>
+        <li>1997년 2월 미국 국립기상청은 노스레드 강의 수위를 평균 49피트(약 14.9m)로 예상</li>
+        <li>당시 그랜드 포크스의 제방은 51피트(약 15.5m)여서 문제가 없을 것으로 판단함</li>
         <li>1997년 4월 노스레드 강의 수위가 54피트(약 16.5m)로 증가하여 홍수 발생</li>
       </ul>
       <p class="lead t-define" style="margin-top:18px">왜 이런 일이 발생했을까?</p>
@@ -817,103 +835,66 @@
     </div>
   </section>
 
-  <!-- ══ 18. 자유도 (원본 p.21) ══════════════════════════════ -->
+  <!-- ══ 18. 자유도 (원본 p.21) ══════════════════════════════
+       원본은 "n 으로 나누는 이유 / n−1 로 나누는 이유"를 나란히 두었으나
+       두 이야기가 한 화면에서 엉켜 어려웠다. 숫자를 먼저 보이는 순서로 바꾸고
+       원본의 6 / −6 예는 같은 이야기라 뺐다 (2026-09-08). -->
   <section>
     <h2>평균과 불확실성: 표준편차의 중요성</h2>
     <div class="body tight">
       <div class="def-row slim">
         <div class="def-tag">자유도<br><span class="en">(degree of freedom)</span></div>
-        <div><p>자료 내에서 <em>실질적으로 독립인 값</em>의 개수</p></div>
+        <div><p><em>내 마음대로 정할 수 있는 값</em>이 몇 개인가</p></div>
       </div>
-      <div class="cols" style="margin-top:14px;align-items:center">
-        <div class="col-l" style="flex:0 0 66%">
-          <p class="sub" style="font-size:14px;margin-bottom:2px">표본 평균을 n으로 나누는 이유:</p>
-          <p style="margin-left:16px">모집단에서 n개의 표본을 뽑을 경우<br>
-            표본의 평균은 모집단에서 어떤 표본을 뽑느냐에 따라 늘 달라지므로 독립인 값은 n개</p>
+      <div class="cols" style="margin-top:12px;align-items:center">
+        <div class="col-l" style="flex:0 0 52%">
+          <p class="sub" style="font-size:14px;margin-bottom:4px">예. 세 사람의 키.
+            평균이 170임을 이미 알고 있다.</p>
+          <ul class="dof-list">
+            <li><b>첫 사람 165</b> — 마음대로 정한다</li>
+            <li><b>둘째 175</b> — 마음대로 정한다</li>
+            <li><b>셋째 170</b> — 앞의 둘이 정해지는 순간 자동으로 결정된다</li>
+          </ul>
+          <p class="derive t-red" style="margin-top:8px">→ 마음대로 정한 것은 3개가 아니라 2개.
+            자유도 = n − 1</p>
         </div>
-        <div class="col-r" style="text-align:center">
-          <p class="formula-key" style="margin:0">$\bar{X} = \dfrac{\sum X_i}{n}$</p>
-        </div>
-      </div>
-      <div class="cols" style="margin-top:10px;align-items:center">
-        <div class="col-l" style="flex:0 0 66%">
-          <p class="sub" style="font-size:14px;margin-bottom:2px">표본 표준편차는 n−1로 나누는 이유:</p>
-          <p style="margin-left:16px">표본의 표준편차는 모집단에서 어떤 표본을 뽑는지에 상관없이<br>
-            계산을 위해 평균이 반드시 사전에 정의되어야 하므로 자유도 1을 소비</p>
-        </div>
-        <div class="col-r" style="text-align:center">
-          <p class="formula-key" style="margin:0">$s = \sqrt{\dfrac{\sum (X_i - \bar{X})^2}{n-1}}$</p>
+        <div class="col-r">
+          <svg class="fig" id="f-dof" viewBox="0 0 380 210" role="img">
+            <title>세 칸 중 앞 두 칸은 자유롭게 고르고 셋째 칸은 평균에 묶여 자동으로 정해지는 그림</title>
+          </svg>
         </div>
       </div>
-      <p style="margin-top:12px">예. 표본을 2개 뽑으려고 할 때<br>
-        하나의 표본이 6이고 2개 표본의 평균이 0임을 알고 있다면<br>
-        다른 하나의 표본은 뽑을 필요없이 반드시 −6이 되어야 함</p>
-      <p class="derive">→ 즉 표본을 뽑는 행위를 시행할 필요도 없음</p>
-    </div>
-  </section>
-
-  <!-- ══ 19. 68-95 법칙 (원본 p.22) ══════════════════════════ -->
-  <section>
-    <h2>평균과 불확실성: 표준편차의 중요성</h2>
-    <div class="body tight">
-      <div class="def-row slim">
-        <div class="def-tag">표준편차<br><span class="en">(standard deviation)</span></div>
-        <div><p>관측치들이 평균으로부터 얼마나 떨어져 있는지를 나타내는 정도</p></div>
-      </div>
-      <div class="side-note" style="top:58px">
-        <p class="ttl">* 정규분포 (normal distribution)</p>
-        <p>− 평균을 중심으로 좌우대칭인 종모양의 분포</p>
-        <svg class="fig" id="f-norm" viewBox="0 0 240 110" style="width:236px" role="img">
-          <title>평균을 중심으로 좌우대칭인 종모양의 정규분포 곡선</title>
-        </svg>
-      </div>
-      <p class="sub" style="margin:16px 0 6px 0;text-decoration:underline;text-underline-offset:4px">
-        (자료가 정규분포를 따른다면) 경험에 기초한 68-95 법칙</p>
-      <ul style="margin-right:290px">
-        <li>관측치의 약 68%가 평균에서 1표준편차 이내로 떨어져있다.</li>
-        <li>관측치의 약 95%가 평균에서 2표준편차 이내로 떨어져있다.</li>
-      </ul>
-      <svg class="fig" id="f-6895" viewBox="0 0 620 160" style="width:520px;margin:10px 0 0" role="img">
-        <title>평균 ±1표준편차 구간에 약 68%, ±2표준편차 구간에 약 95%가 들어간다는 그림</title>
-      </svg>
+      <p style="margin-top:10px">표준편차는 평균을 먼저 쓴다.
+        평균을 쓰는 순간 값 하나가 묶이므로, 남은 <b>n − 1</b> 로 나눈다.</p>
+      <p class="formula-key" style="text-align:center;margin:6px 0 0">$s = \sqrt{\dfrac{\sum (X_i - \bar{X})^2}{n-1}}$</p>
     </div>
     <script>
       (function () {
-        // 정규분포 곡선 — 좌표를 찍지 않고 함수에서 뽑는다
-        const B = { x0: 16, y0: 96, x1: 224, y1: 16 };
-        const f = (z) => Math.exp(-(z * z) / 2);
-        const pts = [];
-        for (let i = 0; i <= 160; i++) {
-          const z = -3.4 + (6.8 * i) / 160;
-          pts.push([B.x0 + ((z + 3.4) / 6.8) * (B.x1 - B.x0), B.y0 - f(z) * (B.y0 - B.y1)]);
-        }
-        let s = `<path class="curve curve-demand" d="M${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' L')}"/>`;
-        s += `<path class="axis" d="M${B.x0},${B.y0} L${B.x1},${B.y0}"/>`;
-        const cx = (B.x0 + B.x1) / 2;
-        s += `<path class="mark-line" d="M${cx},${B.y0} L${cx},${B.y1}"/>`;
-        s += `<text class="tick" x="${cx}" y="${B.y1 - 4}" text-anchor="middle">평균</text>`;
-        document.getElementById('f-norm').innerHTML = s;
-
-        // 68-95 두 줄
-        const rows = [{ y: 44, k: 1, pct: '68%' }, { y: 122, k: 2, pct: '95%' }];
-        const X0 = 20, X1 = 600, C = (X0 + X1) / 2, SD = 128;   // 1표준편차 = 128px
-        let t = `<defs><marker id="ah-sd" viewBox="0 0 10 10" refX="9" refY="5"
+        // 표에 적은 세 값(165 · 175 · 170)에서 도형을 유도한다 — 좌표를 따로 찍지 않는다
+        const V = [
+          { v: 165, free: true,  tag: '마음대로' },
+          { v: 175, free: true,  tag: '마음대로' },
+          { v: 170, free: false, tag: '자동으로 결정' },
+        ];
+        const W = 96, H = 58, GAP = 22, Y = 44;
+        const X0 = (380 - (V.length * W + (V.length - 1) * GAP)) / 2;
+        let s = `<defs><marker id="ah-dof" viewBox="0 0 10 10" refX="9" refY="5"
                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--accent-blue)" stroke-width="1.6"/>
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
                  </marker></defs>`;
-        rows.forEach((r) => {
-          const a = C - r.k * SD, b = C + r.k * SD;
-          t += `<path class="axis" d="M${X0},${r.y} L${X1},${r.y}"/>`;
-          t += `<rect class="band" x="${a}" y="${r.y - 6}" width="${b - a}" height="6"/>`;
-          [a, C, b].forEach((x) => { t += `<path class="axis" d="M${x},${r.y - 8} L${x},${r.y + 4}"/>`; });
-          t += `<path class="arrow blue" d="M${a},${r.y - 18} L${b},${r.y - 18}"
-                  marker-start="url(#ah-sd)" marker-end="url(#ah-sd)"/>`;
-          t += `<text class="annot blue" x="${C}" y="${r.y - 22}" text-anchor="middle">${r.pct}</text>`;
-          t += `<text class="tick" x="${a}" y="${r.y + 18}" text-anchor="middle">평균−${r.k}SD</text>`;
-          t += `<text class="tick" x="${C}" y="${r.y + 18}" text-anchor="middle">평균</text>`;
-          t += `<text class="tick" x="${b}" y="${r.y + 18}" text-anchor="middle">평균 + ${r.k}SD</text>`;
+        V.forEach((c, i) => {
+          const x = X0 + i * (W + GAP);
+          s += `<rect class="${c.free ? 'boxfill' : 'boxfill2'}" x="${x}" y="${Y}" width="${W}" height="${H}"/>`;
+          s += `<text class="boxlab" x="${x + W / 2}" y="${Y + 36}" text-anchor="middle">${c.v}</text>`;
+          s += `<text class="tick" x="${x + W / 2}" y="${Y + H + 18}" text-anchor="middle">${c.tag}</text>`;
         });
-        document.getElementById('f-6895').innerHTML = t;
+        // 평균 170 이 셋째 칸을 묶는다
+        const lastX = X0 + 2 * (W + GAP) + W / 2;
+        s += `<text class="annot red" x="190" y="176" text-anchor="middle">세 값의 평균 = 170 (이미 알고 있다)</text>`;
+        s += `<path class="arrow" d="M190,166 L${lastX},${Y + H + 30}" marker-end="url(#ah-dof)"/>`;
+        s += `<text class="tick" x="190" y="26" text-anchor="middle">마음대로 정할 수 있는 값 2개 = 자유도</text>`;
+        s += `<path class="arrow" d="M${X0},${Y - 12} L${X0 + 2 * W + GAP},${Y - 12}"/>`;
+        document.getElementById('f-dof').innerHTML = s;
       })();
     </script>
   </section>
@@ -923,12 +904,14 @@
     <h2>분포의 형태(shape): 왜도와 첨도</h2>
     <div class="body stack">
       <p class="emph">편차의 승수 이유: 1) 편차를 증폭, 2) 필요에 따라 양수, 음수로 전환</p>
-      <div style="margin-top:26px">
+      <div style="margin-top:18px">
         <p class="sub">왜도(skewness): 분포가 좌우로 비대칭적인 정도</p>
+        <p class="shape-eq">$\frac{1}{n-1}\left[\left(\frac{X_1-\bar{X}}{S}\right)^{3}+\left(\frac{X_2-\bar{X}}{S}\right)^{3}+\cdots+\left(\frac{X_n-\bar{X}}{S}\right)^{3}\right]=\frac{1}{n-1}\sum_{i=1}^{n}\left(X_i-\bar{X}\right)^{3}/S^{3}$</p>
         <p class="derive">→ 0: 대칭분포, +: 오른쪽으로 늘어짐, −: 왼쪽으로 늘어짐</p>
       </div>
-      <div style="margin-top:26px">
+      <div style="margin-top:18px">
         <p class="sub">첨도(kurtosis): 분포의 꼬리가 두꺼운 정도, 양극단 자료가 얼마나 많은지를 측정</p>
+        <p class="shape-eq">$\frac{1}{n-1}\left[\left(\frac{X_1-\bar{X}}{S}\right)^{4}+\left(\frac{X_2-\bar{X}}{S}\right)^{4}+\cdots+\left(\frac{X_n-\bar{X}}{S}\right)^{4}\right]=\frac{1}{n-1}\sum_{i=1}^{n}\left(X_i-\bar{X}\right)^{4}/S^{4}$</p>
         <p class="derive">→ 3: 정규분포, 3 초과: 정규분포보다 뾰족함(꼬리가 두꺼움),
           3 미만: 정규분포보다 완만함(꼬리가 얇음)</p>
       </div>
@@ -957,7 +940,8 @@
   <section>
     <h2>오늘 강의 요약</h2>
     <div class="body tight">
-      <ol class="dense" style="padding-left:24px">
+      <!-- 21 장에서 이어지는 번호다 (거기가 5 번까지 쓴다) -->
+      <ol class="dense" start="6" style="padding-left:24px">
         <li>자료를 숫자로 요약하는 가장 간단한 방법은 자료가 어떤 지점을 중심으로 분포하고 있는지를 나타내는
           중심경향성 통계량을 사용하는 방법이며 대표적인 것이 평균, 중앙값, 최빈값이다.</li>
         <li>평균은 자료의 총합을 자료 개수로 나눈 것으로서 자료의 무게중심을 의미하며,
@@ -980,193 +964,6 @@
       <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
   </section>
 
-  <!-- ══ 24. 섹션 — 부록 ═════════════════════════════════════
-       원본 p.27~31 은 pptx 에서 숨김 처리된 슬라이드다 (배포 pdf 26쪽에 없다).
-       내용을 버리지 않되 본 강의와 구분되도록 이 칸막이를 앞에 둔다. -->
-  <section class="s-section">
-    <div class="section-rule"></div>
-    <p class="section-label">부록</p>
-    <p class="section-sub">원본에서 숨김 처리된 슬라이드 (p.27~31)</p>
-  </section>
-
-  <!-- ══ 25. 심슨의 역설 (원본 p.27) ═════════════════════════ -->
-  <section>
-    <h2>심슨의 역설<span class="en">(Simpson's paradox)</span></h2>
-    <div class="body stack">
-      <p class="lead t-define">하위집단에서 관찰된 관계가 하위집단을 합치면 사라지거나 반대로 나타나는 현상</p>
-      <p class="derive t-red">→ 혼동요인(confounding factor)의 통제 필요성</p>
-      <svg class="fig" id="f-simpson" viewBox="0 0 700 260" style="width:640px;margin-top:8px" role="img">
-        <title>A학과 합격률 23%, B학과 합격률 53%인데 남성 총 합격률 44%가 여성 총 합격률 35%보다 높게 나오는 그림</title>
-      </svg>
-      <p class="caption" style="text-align:center;margin-top:4px">
-        주: 학과별 합격률은 남녀가 같은데도 합치면 남성이 높게 나온다 —
-        지원한 학과의 구성이 다르기 때문이다</p>
-    </div>
-    <script>
-      (function () {
-        /* 지원자 수만 인쇄된 값이고, 눈금의 위치는 그 수에서 유도한다.
-           선의 왼쪽 끝 = A학과, 오른쪽 끝 = B학과이고 눈금은 두 학과 지원자 수의 가중점이다. */
-        const rows = [
-          { y: 62, a: 2533, b: 5909, tot: '약 44%', who: '남성 지원자', up: true },
-          { y: 198, a: 2593, b: 1728, tot: '약 35%', who: '여성 지원자', up: false },
-        ];
-        const X0 = 190, X1 = 510;
-        let s = '';
-        rows.forEach((r) => {
-          const t = r.a / (r.a + r.b);          // A쪽 비중 → 눈금 위치
-          const x = X0 + t * (X1 - X0);
-          s += `<path class="axis" d="M${X0},${r.y} L${X1},${r.y}" stroke-width="2"/>`;
-          s += `<path class="axis" d="M${x},${r.y - 11} L${x},${r.y + 11}" stroke-width="2"/>`;
-          s += `<text class="annot" x="${X0 - 12}" y="${r.y - 4}" text-anchor="end">${r.who}</text>`;
-          s += `<text class="annot" x="${X0 - 12}" y="${r.y + 13}" text-anchor="end">${r.a.toLocaleString()}명</text>`;
-          s += `<text class="annot" x="${X1 + 12}" y="${r.y - 4}">${r.who}</text>`;
-          s += `<text class="annot" x="${X1 + 12}" y="${r.y + 13}">${r.b.toLocaleString()}명</text>`;
-          const ly = r.up ? r.y - 46 : r.y + 30;
-          s += `<text class="annot red" x="${x}" y="${ly}" text-anchor="middle">${r.who}</text>`;
-          s += `<text class="annot red" x="${x}" y="${ly + 15}" text-anchor="middle">총 합격률 ${r.tot}</text>`;
-        });
-        [['A 학과', '합격률: 23%', 78], ['B 학과', '합격률: 53%', 480]].forEach(([n, p, bx]) => {
-          s += `<rect class="frame" x="${bx}" y="106" width="142" height="48"/>`;
-          s += `<text class="annot" x="${bx + 71}" y="126" text-anchor="middle">${n}</text>`;
-          s += `<text class="annot" x="${bx + 71}" y="144" text-anchor="middle">${p}</text>`;
-        });
-        document.getElementById('f-simpson').innerHTML = s;
-      })();
-    </script>
-  </section>
-
-  <!-- ══ 26. 자유도 — 표본이 하나일 때 (원본 p.28) ═══════════ -->
-  <section>
-    <h2>평균과 불확실성: 표준편차의 중요성</h2>
-    <div class="body tighter">
-      <div class="def-row slim">
-        <div class="def-tag">자유도<br><span class="en">(degree of freedom)</span></div>
-        <div><p>자료 내에서 <em>실질적으로 독립인 값</em>의 개수</p></div>
-      </div>
-      <div class="cols" style="margin-top:8px;align-items:flex-start">
-        <div class="col-l" style="flex:0 0 46%">
-          <svg class="fig" id="f-df" viewBox="0 0 400 130" style="width:300px" role="img">
-            <title>모집단 3, −6, 6 에서 표본 하나 3 을 뽑는 그림</title>
-          </svg>
-          <p class="formula-ink" style="font-size:13px;margin:4px 0 0">
-            $(\text{모})\text{평균} = \dfrac{3+(-6)+6}{3} = 1$</p>
-          <p class="formula-ink" style="font-size:13px;margin:2px 0 0">
-            $(\text{모})\text{표준편차} = \sqrt{\dfrac{(3-1)^2+((-6)-1)^2+(6-1)^2}{3}} = 5.1$</p>
-        </div>
-        <div class="col-r">
-          <p class="formula-ink" style="font-size:13px;margin:0">
-            $\text{표본의 평균} = 3/1 = 3$</p>
-          <p class="formula-ink" style="font-size:13px;margin:2px 0 0">
-            $\text{표본의 표준편차} = \sqrt{\dfrac{(3-3)^2}{1}} = \dfrac{0}{1} = 0$</p>
-          <p class="derive" style="margin-top:6px">→ 한 개의 표본에서 편차를 정의할 수 있는가?</p>
-          <p class="derive t-red">→ 정의할 수 없다는 의미의 부정형인 0/0으로 계산 필요</p>
-        </div>
-      </div>
-      <ul class="notes-sm" style="margin-top:8px">
-        <li>모집단에서 n개의 표본을 뽑을 경우 표본의 평균은 모집단에서 어떤 표본을 뽑느냐에 따라
-          늘 달라지므로 자유도가 n</li>
-        <li>표본의 표준편차는 모집단에서 어떤 표본을 뽑는지에 상관없이 계산을 위해 평균이 반드시
-          사전에 정의되어야 하므로 자유도 1을 소비</li>
-        <li>표본을 2개 뽑으려고 할 때 하나의 표본이 6이고 2개 표본의 평균이 0임을 알고 있다면
-          다른 하나의 표본은 뽑을 필요없이 반드시 −6이 되어야 함. 즉 표본을 뽑는 행위를 시행할 필요도 없음
-          <br>(* 자유도는 다른 의미로 독립적인 게임의 시행횟수로도 생각할 수 있다)</li>
-        <li>표준편차는 불확실성을 의미. 표본 표준편차에서 평균 또한 추정된 값인 표본평균으로
-          계산했다는 것은 불확실성이 더욱 증가했다고 볼 수 있음. 그에 대한 벌점으로서
-          자유도를 하나 차감하는 것</li>
-      </ul>
-    </div>
-    <script>
-      (function () {
-        let s = `<defs><marker id="ah-df" viewBox="0 0 10 10" refX="9" refY="5"
-                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
-                 </marker></defs>`;
-        s += `<ellipse class="frame" cx="96" cy="72" rx="86" ry="44"/>`;
-        s += `<text class="annot" x="96" y="20" text-anchor="middle">모집단</text>`;
-        s += `<text class="annot" x="96" y="78" text-anchor="middle">3, −6, 6</text>`;
-        s += `<ellipse class="frame" cx="322" cy="72" rx="46" ry="34"/>`;
-        s += `<text class="annot" x="322" y="20" text-anchor="middle">표본</text>`;
-        s += `<text class="annot" x="322" y="78" text-anchor="middle">3</text>`;
-        s += `<path class="arrow" d="M188,72 L270,72" marker-end="url(#ah-df)"/>`;
-        s += `<text class="tick" x="229" y="62" text-anchor="middle">표본추출</text>`;
-        document.getElementById('f-df').innerHTML = s;
-      })();
-    </script>
-  </section>
-
-  <!-- ══ 27. 자료의 종류 (원본 p.29) ═════════════════════════ -->
-  <section>
-    <h2>자료의 종류</h2>
-    <div class="body tight">
-      <ul>
-        <li>횡단면 자료(cross-sectional data): 한 시점에서 여러 개체를 관측한 자료</li>
-        <li>시계열 자료(time-series data): 하나의 동일 개체를 여러 시점에서 관측한 자료</li>
-        <li>패널 자료(panel data): 여러 동일 개체를 여러 시점에서 관측한 자료</li>
-      </ul>
-      <div class="datagrid">
-        <div class="c hd"></div>
-        <div class="c hd">2018년</div><div class="c hd">2019년</div>
-        <div class="c hd">2020년</div><div class="c hd">2021년</div>
-        <div class="c rw">서울 GDP</div>
-        <div class="c ts cs"></div><div class="c ts"></div><div class="c ts"></div><div class="c ts"></div>
-        <div class="c rw">부산 GDP</div>
-        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
-        <div class="c rw">대구 GDP</div>
-        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
-        <div class="c rw">광주 GDP</div>
-        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
-        <div class="c rw">⋮</div>
-        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
-      </div>
-      <div class="gridkey">
-        <span><span class="k ts">가로 한 줄</span> = 시계열 자료</span>
-        <span><span class="k cs">세로 한 줄</span> = 횡단면자료</span>
-      </div>
-      <p class="big-say" style="font-size:19px;margin-top:10px">분석목적에 부합하는 자료의 선택이 가장 중요</p>
-    </div>
-  </section>
-
-  <!-- ══ 28. 척도에 따른 자료의 분류 (원본 p.30) ═════════════ -->
-  <section>
-    <h2>척도(scale)에 따른 자료의 분류</h2>
-    <div class="body tight">
-      <table class="tbl-scale">
-        <thead>
-          <tr><th>속성에 따른 분류</th><th>명칭</th><th>예시</th><th>내용</th>
-            <th>사칙연산</th><th>특성</th><th>변량적 특성</th><th>통계량</th></tr>
-        </thead>
-        <tbody>
-          <tr><td rowspan="2">질적/정성적<br>(qualitative)</td>
-            <td>명목척도<br>(nominal)</td><td>성별, 직업, 토지이용</td>
-            <td>대상을 다른 것들과 구분</td><td>불가</td><td>범주</td><td>이산</td><td>빈도, 백분율</td></tr>
-          <tr><td>서열척도<br>(ordinal)</td><td>학력, 비옥도, 선호도</td>
-            <td>대상의 우선순위가 있는 경우</td><td>불가</td><td>범주, 순위</td><td>이산</td><td>빈도, 백분율</td></tr>
-          <tr><td rowspan="2">양적/정량적<br>(quantitative)</td>
-            <td>등간척도<br>(interval)</td><td>온도, 주가지수<br>(리커트 척도)</td>
-            <td>대상을 같은 간격으로 표현</td><td>덧셈, 뺄셈</td><td>범주, 순위, 등간</td>
-            <td>이산, 연속</td><td>평균, 표준편차</td></tr>
-          <tr><td>비율척도<br>(ratio)</td><td>거리, 소득</td>
-            <td>대상에 대한 값의 비율이 의미가 있는 경우</td><td>덧셈, 뺄셈,<br>곱셈, 나눗셈</td>
-            <td>범주, 순위, 등간,<br>절대영점</td><td>이산, 연속</td><td>평균, 표준편차</td></tr>
-        </tbody>
-      </table>
-      <p class="emph" style="margin-top:16px">변수(variable): 숫자로 표현된 측정치</p>
-      <p class="derive">→ 질적(숫자로 표현하기 어려운 경우) 속성도 변수화 과정을 거쳐
-        숫자로 표현함으로써 변수로 측정</p>
-    </div>
-  </section>
-
-  <!-- ══ 29. 자료의 대표성 (원본 p.31) ═══════════════════════ -->
-  <section>
-    <h2>자료의 대표성</h2>
-    <div class="body stack">
-      <img src="../assets/tb-joongang-2022-bitcoin.png"
-           alt="비트코인 50배 수익을 냈다는 방송인 기욤 패트리의 투자 비결을 다룬 2022년 중앙일보 기사"
-           style="display:block;height:330px;width:auto;margin:0 auto">
-      <p class="caption" style="text-align:center;margin-top:6px">
-        "늦지 않았다" 비트코인 50배 대박…기욤 패트리 투자 비결 | 중앙일보 (joongang.co.kr)</p>
-    </div>
-  </section>
 
 </div></div>
 

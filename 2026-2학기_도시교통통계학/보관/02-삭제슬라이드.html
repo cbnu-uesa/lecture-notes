@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2강에서 뺀 슬라이드 (보관용)</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* ─── 1강과 같은 흐름도 (원본 p.2) ─── */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 40px; }
+  .flow .node { width: 168px; padding: 18px 6px; text-align: center;
+                background: var(--brand-crimson); color: #FFF; font-weight: 700;
+                font-size: var(--fs-body); line-height: 1.35; }
+  .flow .arr { flex: 0 0 86px; text-align: center; position: relative; }
+  .flow .arr::after { content: ''; position: absolute; left: 8px; right: 8px; top: 50%;
+                      border-top: 1.4px solid #7C7C7C; }
+  .big-say { font-size: 26px; font-weight: 700; color: var(--brand-crimson);
+             text-align: center; margin: 38px 0 0; }
+
+  /* ─── 정리되지 않은 원자료 500개 (원본 p.5 · p.9) ───
+     숫자 자체가 "정리되지 않은 자료"라는 메시지이므로 줄이거나 요약하지 않는다. */
+  .nums { font-size: 6.6px; line-height: 1.34; word-spacing: 2.4px;
+          color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: justify; }
+  .nums.mini { font-size: 4.8px; line-height: 1.3; word-spacing: 1.8px; }
+
+  /* ─── 모집단·모수·표본·통계량의 사례 (원본 p.3 옆칸) ─── */
+  .case-ttl { font-size: var(--fs-sub); font-weight: 700; color: var(--brand-crimson);
+              margin: 0 0 8px; }
+  .tbl-case { font-size: 13.5px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-case th { width: 74px; text-align: center; font-weight: 700;
+                         color: var(--brand-crimson); padding: 6px 6px;
+                         border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .reveal .tbl-case td { padding: 6px 8px; line-height: 1.42; vertical-align: top; }
+  .case-note { font-size: var(--fs-caption); color: var(--ink-2); line-height: 1.45;
+               margin: 12px 0 0; }
+
+  /* 크림슨 라벨 + 설명을 여러 줄 얹을 때 쓰는 좁은 판 */
+  .def-row.slim + .def-row.slim { margin-top: 14px; }
+  .def-row.slim .def-tag { flex: 0 0 186px; padding: 8px 8px; font-size: 13px; line-height: 1.35; }
+  .def-row.slim > div > p { font-size: var(--fs-body); }
+
+  /* ─── 도수분포표 계열 ─── */
+  .tbl-freq { font-size: 12px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-freq th, .reveal .tbl-freq td { padding: 2px 6px; text-align: center;
+                                               white-space: nowrap; }
+  .tbl-freq-sm { font-size: 10px; }
+  .reveal .tbl-freq-sm th, .reveal .tbl-freq-sm td { padding: 1px 2px; }
+  .tbl-smoke { font-size: 13px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-smoke th, .reveal .tbl-smoke td { padding: 3px 8px; text-align: center; }
+  .tbl-rep { font-size: 12px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-rep th, .reveal .tbl-rep td { padding: 4px 8px; vertical-align: top; }
+  .reveal .tbl-rep th:first-child, .reveal .tbl-rep td:first-child { width: 20%; text-align: center; }
+  .tbl-scale { font-size: 10.5px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-scale th, .reveal .tbl-scale td { padding: 3px 5px; text-align: center; line-height: 1.3; }
+  .tbl-rep ul { margin: 0; padding-left: 14px; }
+  .tbl-rep li { margin-bottom: 2px; }
+  .tbl-rep li::before { left: -11px; }
+
+  /* ─── 단계 목록 (원본 p.8) ─── */
+  .steps .step { display: flex; gap: 14px; margin-bottom: 9px; }
+  .steps .n { flex: 0 0 56px; font-weight: 700; color: var(--brand-crimson); }
+  .steps .t { flex: 1 1 auto; }
+  .steps .t p { margin: 0 0 2px; }
+
+  /* ─── 문답 (원본 p.9~10) ─── */
+  .qcol .q { font-size: 13px; font-weight: 700; color: var(--brand-crimson);
+             margin: 0 0 3px; line-height: 1.4; }
+  .qcol .a { font-size: 12px; margin: 0 0 1px 12px; line-height: 1.4; }
+  .qcol .blk { margin-bottom: 12px; }
+
+  /* 히스토그램 막대는 면 채움이 아니라 데이터라 진하게 둔다 (1강과 같다) */
+  .reveal svg.fig .area-bar { fill-opacity: 0.5; }
+
+  /* ─── 상대빈도로 그리면 과장되는 두 구간 (원본 p.13 주황) ─── */
+  .reveal svg.fig .area-over { fill: var(--chart-orange); fill-opacity: 0.55;
+                               stroke: #FFF; stroke-width: 1; }
+  .reveal svg.fig .area-move { fill: var(--chart-orange); fill-opacity: 0.32;
+                               stroke: var(--chart-orange); stroke-width: 1.4; }
+  .reveal svg.fig .boxfill  { fill: var(--brand-crimson); }
+  .reveal svg.fig .boxfill2 { fill: var(--muted); }
+  .reveal svg.fig .boxlab   { fill: #FFF; font-size: 13px; font-weight: 700;
+                              stroke: none; paint-order: normal; }
+  .reveal svg.fig .boxlab.sm { font-size: 11px; font-weight: 500; }
+  .reveal svg.fig .frame    { fill: none; stroke: var(--ink); stroke-width: 1.2; }
+  .reveal svg.fig .band     { fill: var(--accent-blue); fill-opacity: 0.28; }
+  .reveal svg.fig .mark-line { stroke: var(--ink-2); stroke-width: 1.2; fill: none; }
+
+  /* ─── 횡단면·시계열·패널 (부록 원본 p.29) ─── */
+  .datagrid { display: grid; grid-template-columns: 118px repeat(4, 1fr);
+              gap: 5px; margin-top: 10px; font-size: 13px; }
+  .datagrid .c { padding: 4px 4px; text-align: center; border: 1px solid var(--rule); }
+  .datagrid .hd { font-weight: 700; color: var(--ink); border: none; }
+  .datagrid .rw { font-weight: 700; color: var(--ink); border: none; text-align: left; }
+  .datagrid .ts { background: rgba(160, 41, 72, 0.14); border-color: var(--brand-crimson); }
+  .datagrid .cs { background: rgba(31, 92, 139, 0.14); border-color: var(--accent-blue); }
+  .gridkey { display: flex; gap: 26px; margin-top: 10px; font-size: 12px; }
+  .gridkey .k { font-weight: 700; }
+  .gridkey .k.ts { color: var(--brand-crimson); }
+  .gridkey .k.cs { color: var(--accent-blue); }
+
+  .reveal .formula-ink { color: var(--ink); }
+  .notes-sm { font-size: 11.5px; line-height: 1.4; }
+  .notes-sm > li { margin-bottom: 3px; }
+
+  /* 우상단 보조 상자 (원본 p.22 정규분포 설명) */
+  .side-note { position: absolute; right: 0; top: 6px; width: 268px;
+               background: #F2F0EC; padding: 12px 14px; }
+  .side-note p { margin: 0 0 4px; font-size: 12px; }
+  .side-note .ttl { font-size: 13px; font-weight: 700; color: var(--ink); }
+</style>
+<script>
+  /* 히스토그램 하나를 그리는 공용 함수.
+     구간 폭이 다른 계급(0-10, 10-20, 20-40, 40-80)을 그대로 다루기 위해
+     막대 폭은 x축 눈금에서 계산한다 — 폭을 손으로 찍지 않는다. */
+  window.Hist = function (sel, o) {
+    const el = document.querySelector(sel);
+    const B = o.box;
+    const px = (v) => B.x0 + ((v - o.x[0]) / (o.x[1] - o.x[0])) * (B.x1 - B.x0);
+    const py = (v) => B.y0 - (v / o.yMax) * (B.y0 - B.y1);
+    let s = '';
+    (o.yTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${B.x0 - 7}" y="${py(t) + 4}" text-anchor="end">${o.yFmt ? o.yFmt(t) : t}</text>`;
+      s += `<path class="axis" d="M${B.x0 - 4},${py(t)} L${B.x0},${py(t)}"/>`;
+    });
+    o.bins.forEach((b, i) => {
+      const [lo, hi, v] = b;
+      if (v > 0) {
+        const cls = (o.barClass && o.barClass(i)) || 'area-bar';
+        s += `<rect class="${cls}" x="${px(lo)}" y="${py(v)}" width="${px(hi) - px(lo)}" height="${B.y0 - py(v)}"/>`;
+      }
+      if (o.barLabel) {
+        const t = o.barLabel(i);
+        if (t) s += `<text class="annot" x="${(px(lo) + px(hi)) / 2}" y="${py(v) - 6}" text-anchor="middle">${t}</text>`;
+      }
+    });
+    s += `<path class="axis" d="M${B.x0},${B.y1 - 4} L${B.x0},${B.y0} L${B.x1 + 8},${B.y0}"/>`;
+    (o.xTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${px(t)}" y="${B.y0 + 15}" text-anchor="middle">${t}</text>`;
+    });
+    if (o.xLabel) s += `<text class="axis-name" x="${B.x1 + 12}" y="${B.y0 + 15}">${o.xLabel}</text>`;
+    if (o.yLabel) s += `<text class="axis-name" x="${B.x0 - 6}" y="${B.y1 - 8}" text-anchor="end">${o.yLabel}</text>`;
+    el.innerHTML = s;
+  };
+
+  /* 원본 p.6·p.9 의 도수분포표. 표와 히스토그램이 같은 숫자에서 나오게
+     여기 한 번만 적고 표 HTML 과 그림 좌표를 모두 여기서 유도한다 (design.md §6.5). */
+  window.HEIGHT_TABLE = [
+    [150, 155, 0], [155, 160, 17], [160, 165, 63], [165, 170, 170],
+    [170, 175, 168], [175, 180, 70], [180, 185, 11], [185, 190, 1],
+  ].map(([lo, hi, f]) => {
+    const rel = f / 500;
+    return { lo, hi, f, rel, den: rel / (hi - lo) };
+  });
+
+  /* 원본 p.11~14 의 흡연량 자료. 인쇄된 것은 밀도(%)와 조사대상 200명뿐이므로
+     빈도·상대빈도는 밀도에서 되돌려 구한다. */
+  window.SMOKE = [[0, 10, 1.5], [10, 20, 3.5], [20, 40, 1.5], [40, 80, 0.5]]
+    .map(([lo, hi, den]) => {
+      const rel = den * (hi - lo);          // 상대빈도(%)
+      return { lo, hi, den, rel, f: (rel / 100) * 200 };
+    });
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <!-- ══ 표지 — 이 파일의 성격 ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>2강에서 뺀 슬라이드</h1>
+    <p class="cover-date">2026-09-08 보관</p>
+  </section>
+
+  <!-- ══ 무엇을 왜 뺐나 ═══════════════════════════════════════ -->
+  <section>
+    <h2>이 파일은 무엇인가</h2>
+    <div class="body stack">
+      <p class="lead t-define">2강 「통계학과 자료의 정리」에서 뺀 슬라이드를 버리지 않고 모아 둔 것</p>
+      <ul>
+        <li>68-95 법칙 (원본 p.22) — 본 강의에서 제외</li>
+        <li>부록 6장 (칸막이 + 원본 p.27~31) — 원본 pptx 에서 숨김 처리돼 있던 것을 되살렸다가 다시 뺐다</li>
+      </ul>
+      <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+      <p class="caption" style="margin-top:14px">PDF 내려받기 단추는 이 파일에서 동작하지 않는다
+        (pdf/02-삭제슬라이드.pdf 를 만들지 않기 때문이다).</p>
+    </div>
+  </section>
+
+  <!-- ══ 19. 68-95 법칙 (원본 p.22) ══════════════════════════ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body tight">
+      <div class="def-row slim">
+        <div class="def-tag">표준편차<br><span class="en">(standard deviation)</span></div>
+        <div><p>관측치들이 평균으로부터 얼마나 떨어져 있는지를 나타내는 정도</p></div>
+      </div>
+      <div class="side-note" style="top:58px">
+        <p class="ttl">* 정규분포 (normal distribution)</p>
+        <p>− 평균을 중심으로 좌우대칭인 종모양의 분포</p>
+        <svg class="fig" id="f-norm" viewBox="0 0 240 110" style="width:236px" role="img">
+          <title>평균을 중심으로 좌우대칭인 종모양의 정규분포 곡선</title>
+        </svg>
+      </div>
+      <p class="sub" style="margin:16px 0 6px 0;text-decoration:underline;text-underline-offset:4px">
+        (자료가 정규분포를 따른다면) 경험에 기초한 68-95 법칙</p>
+      <ul style="margin-right:290px">
+        <li>관측치의 약 68%가 평균에서 1표준편차 이내로 떨어져있다.</li>
+        <li>관측치의 약 95%가 평균에서 2표준편차 이내로 떨어져있다.</li>
+      </ul>
+      <svg class="fig" id="f-6895" viewBox="0 0 620 160" style="width:520px;margin:10px 0 0" role="img">
+        <title>평균 ±1표준편차 구간에 약 68%, ±2표준편차 구간에 약 95%가 들어간다는 그림</title>
+      </svg>
+    </div>
+    <script>
+      (function () {
+        // 정규분포 곡선 — 좌표를 찍지 않고 함수에서 뽑는다
+        const B = { x0: 16, y0: 96, x1: 224, y1: 16 };
+        const f = (z) => Math.exp(-(z * z) / 2);
+        const pts = [];
+        for (let i = 0; i <= 160; i++) {
+          const z = -3.4 + (6.8 * i) / 160;
+          pts.push([B.x0 + ((z + 3.4) / 6.8) * (B.x1 - B.x0), B.y0 - f(z) * (B.y0 - B.y1)]);
+        }
+        let s = `<path class="curve curve-demand" d="M${pts.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' L')}"/>`;
+        s += `<path class="axis" d="M${B.x0},${B.y0} L${B.x1},${B.y0}"/>`;
+        const cx = (B.x0 + B.x1) / 2;
+        s += `<path class="mark-line" d="M${cx},${B.y0} L${cx},${B.y1}"/>`;
+        s += `<text class="tick" x="${cx}" y="${B.y1 - 4}" text-anchor="middle">평균</text>`;
+        document.getElementById('f-norm').innerHTML = s;
+
+        // 68-95 두 줄
+        const rows = [{ y: 44, k: 1, pct: '68%' }, { y: 122, k: 2, pct: '95%' }];
+        const X0 = 20, X1 = 600, C = (X0 + X1) / 2, SD = 128;   // 1표준편차 = 128px
+        let t = `<defs><marker id="ah-sd" viewBox="0 0 10 10" refX="9" refY="5"
+                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--accent-blue)" stroke-width="1.6"/>
+                 </marker></defs>`;
+        rows.forEach((r) => {
+          const a = C - r.k * SD, b = C + r.k * SD;
+          t += `<path class="axis" d="M${X0},${r.y} L${X1},${r.y}"/>`;
+          t += `<rect class="band" x="${a}" y="${r.y - 6}" width="${b - a}" height="6"/>`;
+          [a, C, b].forEach((x) => { t += `<path class="axis" d="M${x},${r.y - 8} L${x},${r.y + 4}"/>`; });
+          t += `<path class="arrow blue" d="M${a},${r.y - 18} L${b},${r.y - 18}"
+                  marker-start="url(#ah-sd)" marker-end="url(#ah-sd)"/>`;
+          t += `<text class="annot blue" x="${C}" y="${r.y - 22}" text-anchor="middle">${r.pct}</text>`;
+          t += `<text class="tick" x="${a}" y="${r.y + 18}" text-anchor="middle">평균−${r.k}SD</text>`;
+          t += `<text class="tick" x="${C}" y="${r.y + 18}" text-anchor="middle">평균</text>`;
+          t += `<text class="tick" x="${b}" y="${r.y + 18}" text-anchor="middle">평균 + ${r.k}SD</text>`;
+        });
+        document.getElementById('f-6895').innerHTML = t;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 24. 섹션 — 부록 ═════════════════════════════════════
+       원본 p.27~31 은 pptx 에서 숨김 처리된 슬라이드다 (배포 pdf 26쪽에 없다).
+       내용을 버리지 않되 본 강의와 구분되도록 이 칸막이를 앞에 둔다. -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">부록</p>
+    <p class="section-sub">원본에서 숨김 처리된 슬라이드 (p.27~31)</p>
+  </section>
+
+  <!-- ══ 25. 심슨의 역설 (원본 p.27) ═════════════════════════ -->
+  <section>
+    <h2>심슨의 역설<span class="en">(Simpson's paradox)</span></h2>
+    <div class="body stack">
+      <p class="lead t-define">하위집단에서 관찰된 관계가 하위집단을 합치면 사라지거나 반대로 나타나는 현상</p>
+      <p class="derive t-red">→ 혼동요인(confounding factor)의 통제 필요성</p>
+      <svg class="fig" id="f-simpson" viewBox="0 0 700 260" style="width:640px;margin-top:8px" role="img">
+        <title>A학과 합격률 23%, B학과 합격률 53%인데 남성 총 합격률 44%가 여성 총 합격률 35%보다 높게 나오는 그림</title>
+      </svg>
+      <p class="caption" style="text-align:center;margin-top:4px">
+        주: 학과별 합격률은 남녀가 같은데도 합치면 남성이 높게 나온다 —
+        지원한 학과의 구성이 다르기 때문이다</p>
+    </div>
+    <script>
+      (function () {
+        /* 지원자 수만 인쇄된 값이고, 눈금의 위치는 그 수에서 유도한다.
+           선의 왼쪽 끝 = A학과, 오른쪽 끝 = B학과이고 눈금은 두 학과 지원자 수의 가중점이다. */
+        const rows = [
+          { y: 62, a: 2533, b: 5909, tot: '약 44%', who: '남성 지원자', up: true },
+          { y: 198, a: 2593, b: 1728, tot: '약 35%', who: '여성 지원자', up: false },
+        ];
+        const X0 = 190, X1 = 510;
+        let s = '';
+        rows.forEach((r) => {
+          const t = r.a / (r.a + r.b);          // A쪽 비중 → 눈금 위치
+          const x = X0 + t * (X1 - X0);
+          s += `<path class="axis" d="M${X0},${r.y} L${X1},${r.y}" stroke-width="2"/>`;
+          s += `<path class="axis" d="M${x},${r.y - 11} L${x},${r.y + 11}" stroke-width="2"/>`;
+          s += `<text class="annot" x="${X0 - 12}" y="${r.y - 4}" text-anchor="end">${r.who}</text>`;
+          s += `<text class="annot" x="${X0 - 12}" y="${r.y + 13}" text-anchor="end">${r.a.toLocaleString()}명</text>`;
+          s += `<text class="annot" x="${X1 + 12}" y="${r.y - 4}">${r.who}</text>`;
+          s += `<text class="annot" x="${X1 + 12}" y="${r.y + 13}">${r.b.toLocaleString()}명</text>`;
+          const ly = r.up ? r.y - 46 : r.y + 30;
+          s += `<text class="annot red" x="${x}" y="${ly}" text-anchor="middle">${r.who}</text>`;
+          s += `<text class="annot red" x="${x}" y="${ly + 15}" text-anchor="middle">총 합격률 ${r.tot}</text>`;
+        });
+        [['A 학과', '합격률: 23%', 78], ['B 학과', '합격률: 53%', 480]].forEach(([n, p, bx]) => {
+          s += `<rect class="frame" x="${bx}" y="106" width="142" height="48"/>`;
+          s += `<text class="annot" x="${bx + 71}" y="126" text-anchor="middle">${n}</text>`;
+          s += `<text class="annot" x="${bx + 71}" y="144" text-anchor="middle">${p}</text>`;
+        });
+        document.getElementById('f-simpson').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 26. 자유도 — 표본이 하나일 때 (원본 p.28) ═══════════ -->
+  <section>
+    <h2>평균과 불확실성: 표준편차의 중요성</h2>
+    <div class="body tighter">
+      <div class="def-row slim">
+        <div class="def-tag">자유도<br><span class="en">(degree of freedom)</span></div>
+        <div><p>자료 내에서 <em>실질적으로 독립인 값</em>의 개수</p></div>
+      </div>
+      <div class="cols" style="margin-top:8px;align-items:flex-start">
+        <div class="col-l" style="flex:0 0 46%">
+          <svg class="fig" id="f-df" viewBox="0 0 400 130" style="width:300px" role="img">
+            <title>모집단 3, −6, 6 에서 표본 하나 3 을 뽑는 그림</title>
+          </svg>
+          <p class="formula-ink" style="font-size:13px;margin:4px 0 0">
+            $(\text{모})\text{평균} = \dfrac{3+(-6)+6}{3} = 1$</p>
+          <p class="formula-ink" style="font-size:13px;margin:2px 0 0">
+            $(\text{모})\text{표준편차} = \sqrt{\dfrac{(3-1)^2+((-6)-1)^2+(6-1)^2}{3}} = 5.1$</p>
+        </div>
+        <div class="col-r">
+          <p class="formula-ink" style="font-size:13px;margin:0">
+            $\text{표본의 평균} = 3/1 = 3$</p>
+          <p class="formula-ink" style="font-size:13px;margin:2px 0 0">
+            $\text{표본의 표준편차} = \sqrt{\dfrac{(3-3)^2}{1}} = \dfrac{0}{1} = 0$</p>
+          <p class="derive" style="margin-top:6px">→ 한 개의 표본에서 편차를 정의할 수 있는가?</p>
+          <p class="derive t-red">→ 정의할 수 없다는 의미의 부정형인 0/0으로 계산 필요</p>
+        </div>
+      </div>
+      <ul class="notes-sm" style="margin-top:8px">
+        <li>모집단에서 n개의 표본을 뽑을 경우 표본의 평균은 모집단에서 어떤 표본을 뽑느냐에 따라
+          늘 달라지므로 자유도가 n</li>
+        <li>표본의 표준편차는 모집단에서 어떤 표본을 뽑는지에 상관없이 계산을 위해 평균이 반드시
+          사전에 정의되어야 하므로 자유도 1을 소비</li>
+        <li>표본을 2개 뽑으려고 할 때 하나의 표본이 6이고 2개 표본의 평균이 0임을 알고 있다면
+          다른 하나의 표본은 뽑을 필요없이 반드시 −6이 되어야 함. 즉 표본을 뽑는 행위를 시행할 필요도 없음
+          <br>(* 자유도는 다른 의미로 독립적인 게임의 시행횟수로도 생각할 수 있다)</li>
+        <li>표준편차는 불확실성을 의미. 표본 표준편차에서 평균 또한 추정된 값인 표본평균으로
+          계산했다는 것은 불확실성이 더욱 증가했다고 볼 수 있음. 그에 대한 벌점으로서
+          자유도를 하나 차감하는 것</li>
+      </ul>
+    </div>
+    <script>
+      (function () {
+        let s = `<defs><marker id="ah-df" viewBox="0 0 10 10" refX="9" refY="5"
+                   markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                   <path d="M0,1 L10,5 L0,9" fill="none" stroke="var(--ink-2)" stroke-width="1.6"/>
+                 </marker></defs>`;
+        s += `<ellipse class="frame" cx="96" cy="72" rx="86" ry="44"/>`;
+        s += `<text class="annot" x="96" y="20" text-anchor="middle">모집단</text>`;
+        s += `<text class="annot" x="96" y="78" text-anchor="middle">3, −6, 6</text>`;
+        s += `<ellipse class="frame" cx="322" cy="72" rx="46" ry="34"/>`;
+        s += `<text class="annot" x="322" y="20" text-anchor="middle">표본</text>`;
+        s += `<text class="annot" x="322" y="78" text-anchor="middle">3</text>`;
+        s += `<path class="arrow" d="M188,72 L270,72" marker-end="url(#ah-df)"/>`;
+        s += `<text class="tick" x="229" y="62" text-anchor="middle">표본추출</text>`;
+        document.getElementById('f-df').innerHTML = s;
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 27. 자료의 종류 (원본 p.29) ═════════════════════════ -->
+  <section>
+    <h2>자료의 종류</h2>
+    <div class="body tight">
+      <ul>
+        <li>횡단면 자료(cross-sectional data): 한 시점에서 여러 개체를 관측한 자료</li>
+        <li>시계열 자료(time-series data): 하나의 동일 개체를 여러 시점에서 관측한 자료</li>
+        <li>패널 자료(panel data): 여러 동일 개체를 여러 시점에서 관측한 자료</li>
+      </ul>
+      <div class="datagrid">
+        <div class="c hd"></div>
+        <div class="c hd">2018년</div><div class="c hd">2019년</div>
+        <div class="c hd">2020년</div><div class="c hd">2021년</div>
+        <div class="c rw">서울 GDP</div>
+        <div class="c ts cs"></div><div class="c ts"></div><div class="c ts"></div><div class="c ts"></div>
+        <div class="c rw">부산 GDP</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c rw">대구 GDP</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c rw">광주 GDP</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c rw">⋮</div>
+        <div class="c cs"></div><div class="c"></div><div class="c"></div><div class="c"></div>
+      </div>
+      <div class="gridkey">
+        <span><span class="k ts">가로 한 줄</span> = 시계열 자료</span>
+        <span><span class="k cs">세로 한 줄</span> = 횡단면자료</span>
+      </div>
+      <p class="big-say" style="font-size:19px;margin-top:10px">분석목적에 부합하는 자료의 선택이 가장 중요</p>
+    </div>
+  </section>
+
+  <!-- ══ 28. 척도에 따른 자료의 분류 (원본 p.30) ═════════════ -->
+  <section>
+    <h2>척도(scale)에 따른 자료의 분류</h2>
+    <div class="body tight">
+      <table class="tbl-scale">
+        <thead>
+          <tr><th>속성에 따른 분류</th><th>명칭</th><th>예시</th><th>내용</th>
+            <th>사칙연산</th><th>특성</th><th>변량적 특성</th><th>통계량</th></tr>
+        </thead>
+        <tbody>
+          <tr><td rowspan="2">질적/정성적<br>(qualitative)</td>
+            <td>명목척도<br>(nominal)</td><td>성별, 직업, 토지이용</td>
+            <td>대상을 다른 것들과 구분</td><td>불가</td><td>범주</td><td>이산</td><td>빈도, 백분율</td></tr>
+          <tr><td>서열척도<br>(ordinal)</td><td>학력, 비옥도, 선호도</td>
+            <td>대상의 우선순위가 있는 경우</td><td>불가</td><td>범주, 순위</td><td>이산</td><td>빈도, 백분율</td></tr>
+          <tr><td rowspan="2">양적/정량적<br>(quantitative)</td>
+            <td>등간척도<br>(interval)</td><td>온도, 주가지수<br>(리커트 척도)</td>
+            <td>대상을 같은 간격으로 표현</td><td>덧셈, 뺄셈</td><td>범주, 순위, 등간</td>
+            <td>이산, 연속</td><td>평균, 표준편차</td></tr>
+          <tr><td>비율척도<br>(ratio)</td><td>거리, 소득</td>
+            <td>대상에 대한 값의 비율이 의미가 있는 경우</td><td>덧셈, 뺄셈,<br>곱셈, 나눗셈</td>
+            <td>범주, 순위, 등간,<br>절대영점</td><td>이산, 연속</td><td>평균, 표준편차</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:16px">변수(variable): 숫자로 표현된 측정치</p>
+      <p class="derive">→ 질적(숫자로 표현하기 어려운 경우) 속성도 변수화 과정을 거쳐
+        숫자로 표현함으로써 변수로 측정</p>
+    </div>
+  </section>
+
+  <!-- ══ 29. 자료의 대표성 (원본 p.31) ═══════════════════════ -->
+  <section>
+    <h2>자료의 대표성</h2>
+    <div class="body stack">
+      <img src="../assets/tb-joongang-2022-bitcoin.png"
+           alt="비트코인 50배 수익을 냈다는 방송인 기욤 패트리의 투자 비결을 다룬 2022년 중앙일보 기사"
+           style="display:block;height:330px;width:auto;margin:0 auto">
+      <p class="caption" style="text-align:center;margin-top:6px">
+        "늦지 않았다" 비트코인 50배 대박…기욤 패트리 투자 비결 | 중앙일보 (joongang.co.kr)</p>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
