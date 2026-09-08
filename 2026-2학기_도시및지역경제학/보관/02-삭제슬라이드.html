@@ -1,0 +1,224 @@
+<!doctype html>
+<!--
+  2주차. 도시경제학의 주요개념 및 도시의 생성
+  교재: 오설리반의 도시경제학 제9판 — 1장 서론 (p.3~11) · 2장 주요 개념들 (p.13~33)
+        · 3장 교역도시와 공장도시 (p.41~53) · 4장 집적의 경제 (p.59~82)
+
+  각 <section> 앞 주석의 [p.N] 이 교재 쪽수다.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2주차에서 뺀 슬라이드 (보관용)</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 이 강의를 관통하는 두 벌의 숫자 ─────────────────────────
+  // 표와 그림을 각각 손으로 적으면 반드시 어긋난다. 여기 한 번만 적고
+  // 표 HTML 과 도형 좌표를 모두 이 값에서 만든다 (design.md §6.5).
+
+  // 표 3-1 · 그림 3-1 — 스티치와 스퀴즈의 생산성 [p.43]
+  window.ISLE = {
+    stitch:  { shoes: 12, milk: 2 },   // 시간당 산출량
+    squeeze: { shoes: 1,  milk: 1 },
+    // 기회비용은 산출량에서 유도한다 — 표에 따로 적지 않는다
+    oc(who, good) {
+      const p = this[who];
+      return good === 'shoes' ? p.milk / p.shoes : p.shoes / p.milk;
+    },
+  };
+
+  // 그림 3-2 · 3-3 — 공장 구두의 평균비용과 순가격 [p.49~51]
+  window.FACTORY = {
+    q: 10,            // 공장 노동자의 시간당 구두 산출량
+    wFarm: 1.00,      // 낙농 임금 = 노동의 기회비용 (갤런/시간)
+    wCity: 0.80,      // 도시 거주·통근에 대한 보상 (갤런/시간)
+    rent: 1.2,        // 자본 임대료 (갤런/시간)
+    t: 0.10,          // 왕복 1마일당 통행의 기회비용 (갤런)
+    cHome: 1.00,      // 가내생산 구두의 비용 (갤런)
+    // 유도값은 반올림해서 내보낸다. 1.8/10 은 0.18000000000000002 이라
+    // 그대로 두면 시장구역 반경이 6.999999999999999 로 인쇄된다.
+    r(v, n = 2)  { return Math.round(v * 10 ** n) / 10 ** n; },
+    get wage()   { return this.r(this.wFarm + this.wCity); },   // 1.80
+    get acLabor(){ return this.r(this.wage / this.q); },        // 0.18
+    get acCap()  { return this.r(this.rent / this.q); },        // 0.12
+    get price()  { return this.r(this.acLabor + this.acCap); }, // 0.30
+    get radius() { return this.r((this.cHome - this.price) / this.t, 3); }, // 7
+    net(x)       { return this.r(this.price + this.t * x); },
+  };
+
+  /* ── 아래는 03-집적의경제 에서 옮겨 온 상수 ── */
+  // ── 이 강의를 관통하는 숫자 ────────────────────────────────
+  // 표와 그림을 따로 적으면 어긋난다. 여기 한 번만 적는다 (design.md §6.5).
+
+  // 그림 4-2 — 노동풀링 [p.63~65]
+  window.POOL = {
+    wage: 144,        // 고립된 기업의 임금
+    switchCost: 44,   // 전직비용
+    u(w) { return Math.sqrt(w); },              // 효용함수 u(w) = w^(1/2)
+    get lost()  { return this.wage - this.switchCost; },        // 100
+    get uHigh() { return this.u(this.wage); },                  // 12
+    get uLow()  { return this.u(this.lost); },                  // 10
+    get uExp()  { return (this.uHigh + this.uLow) / 2; },       // 11  (해고확률 50%)
+    get certEq(){ return Math.round(this.uExp ** 2); },         // 121 = 확실성 등가
+  };
+
+  // 그림 4-3 — 숙련매칭 [p.66~68]
+  window.MATCH = {
+    trainUnit: 30,                                  // 한 단위 기술격차를 없애는 훈련비용
+    m(n) { return 1 / (2 * (n - 1)); },             // 평균기술불일치
+    cost(n) { return this.trainUnit * this.m(n); }, // 노동자 1명당 훈련비용
+    workers(n) { return Array.from({ length: n }, (_, i) => i / (n - 1)); },
+    firms(n) { return Array.from({ length: n / 2 }, (_, i) => (2 * i + 1) / (2 * (n - 1)) * 2 / 2 + 0); },
+  };
+
+  // 그림 4-4 · 4-5 — 이윤과 군집규모 [p.72~73]
+  // 교재 그림의 x축 눈금은 1 · z^E · z* 뿐이고 숫자는 본문에만 나온다.
+  // a(1, π₁) 과 c(z*, π₁) 이 정확히 같은 높이여야 하므로 정점을 (1+z*)/2 에 둔다.
+  window.CLUSTER = {
+    zStar: 30, p1: 5, pE: 12,
+    get zE() { return (1 + this.zStar) / 2; },
+    get k()  { return (this.pE - this.p1) / (this.zE - 1) ** 2; },
+    profit(z) { return this.pE - this.k * (z - this.zE) ** 2; },
+  };
+</script>
+
+<style>
+  /* components.css 는 .cols 를 align-items:center 로 둔다 — 그림과 글을 나란히 놓을 때의 설정이다.
+     이 강의의 2단은 전부 글이라 가운데 정렬이면 짧은 칸이 아래로 밀린다. 위로 맞춘다. */
+  .body > .cols { align-items: flex-start; }
+  /* 1강에서 옮겨 온 슬라이드(Ch.1·2)가 쓰는 표와 인용 (2026-09-01) */
+  .tbl-def { width: 100%; table-layout: fixed; }
+  .tbl-def th:first-child, .tbl-def td:first-child { width: 168px; }
+  .tbl-def td { vertical-align: top; }
+  .tbl-cost { width: 100%; table-layout: fixed; }
+  .tbl-cost th:first-child, .tbl-cost td:first-child { width: 132px; }
+  .tbl-cost td:last-child, .tbl-cost th:last-child { text-align: right; width: 150px; font-variant-numeric: tabular-nums; }
+  .epigraph { font-style: normal; color: var(--ink-2); }
+
+  .tbl-oc { width: 100%; table-layout: fixed; }
+  .tbl-oc th:first-child, .tbl-oc td:first-child { width: 236px; }
+  .tbl-oc th:not(:first-child), .tbl-oc td:not(:first-child) { text-align: center; }
+  .tbl-innov { width: 100%; table-layout: fixed; }
+  .tbl-innov th:first-child, .tbl-innov td:first-child { width: 156px; }
+  .tbl-innov td { vertical-align: top; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+
+  /* ── 아래는 03-집적의경제 에서 옮겨 온 것 ── */
+/* 표 4-1 은 한 장에 12줄까지 들어간다. components.css 의 .reveal table td(0,1,2)를
+     이기려면 .reveal 을 붙여 (0,2,1) 로 만들어야 한다. */
+  /* components.css 는 .cols 를 align-items:center 로 둔다 — 그림과 글을 나란히 놓을 때의 설정이다.
+     이 강의의 2단은 전부 글이라 가운데 정렬이면 짧은 칸이 아래로 밀린다. 위로 맞춘다. */
+  .body > .cols { align-items: flex-start; }
+  .tbl-cluster { width: 100%; table-layout: fixed; font-size: 13px; }
+  .tbl-cluster th:first-child, .tbl-cluster td:first-child { width: 190px; }
+  .tbl-cluster td:not(:first-child), .tbl-cluster th:not(:first-child) { text-align: right; }
+  .reveal .tbl-cluster td { padding: 2px 10px; line-height: 1.35; }
+  .reveal .tbl-cluster th { padding: 3px 10px 5px; }
+  .tbl-elast { width: 100%; table-layout: fixed; }
+  .tbl-elast th:nth-child(2), .tbl-elast td:nth-child(2) { width: 92px; text-align: right; }
+  .tbl-elast td { vertical-align: top; }
+  .tbl-num { width: 100%; table-layout: fixed; }
+  .tbl-num td:not(:first-child), .tbl-num th:not(:first-child) { text-align: center; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+  .pending { border: 1.4px dashed var(--rule); border-radius: 12px;
+    padding: 22px 26px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 표지 — 이 파일의 성격 ═══════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>2주차에서 뺀 슬라이드</h1>
+  <p class="cover-date">2026-09-08 보관</p>
+</section>
+
+<!-- ══ 무엇을 왜 뺐나 ═══════════════════════════════════════ -->
+<section>
+  <h2>이 파일은 무엇인가</h2>
+  <div class="body stack">
+    <p class="lead t-define">2주차 「도시경제학의 주요개념 및 도시의 생성」에서 뺀 슬라이드를
+      버리지 않고 모아 둔 것</p>
+    <ul>
+      <li>중심−기반 통계지역 (CBSA) — 내용은 「지리적·경제적 시의 정의」 슬라이드의
+        네 단계 도해로 흡수했다</li>
+    </ul>
+    <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+  </div>
+</section>
+
+<!-- ══ 12. CBSA (p.10~11) ═══════════════════════════════════ -->
+<section>
+  <h2>중심−기반 통계지역 <span class="en">(CBSA)</span></h2>
+  <div class="body stack">
+    <svg class="fig" id="f-cbsa" viewBox="0 0 840 300" style="width:800px" role="img"
+         aria-label="중심의 군에 통근 기준을 만족하는 변두리 군이 더해져 중심-기반 통계지역이 되고, 인구 규모에 따라 대도시지역과 소도시지역으로 나뉘는 도식">
+      <title>군에서 출발해 CBSA 가 되는 구조</title>
+
+      <text x="20" y="30" font-size="11.5" font-weight="700" fill="#8A867E"
+            letter-spacing="0.06em">기초 단위는 군 (county)</text>
+
+      <rect x="20" y="46" width="250" height="62" fill="#A02948"/>
+      <text class="on-dark" x="145" y="72" text-anchor="middle" font-size="15"
+            font-weight="700" fill="#FFF">중심의 군</text>
+      <text class="on-dark" x="145" y="94" text-anchor="middle" font-size="11" fill="#FFF">central county</text>
+      <text x="145" y="128" text-anchor="middle" font-size="12" fill="#4A4741">5,000명 이상, 또는 인구의 50%가</text>
+      <text x="145" y="146" text-anchor="middle" font-size="12" fill="#4A4741">인구 1만 명 이상의 도시지역에 거주</text>
+
+      <rect x="360" y="46" width="250" height="62" fill="#DCD7CF"/>
+      <text x="485" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="#16181C">변두리 군</text>
+      <text x="485" y="94" text-anchor="middle" font-size="11" fill="#8A867E">outlying county</text>
+      <text x="485" y="128" text-anchor="middle" font-size="12" fill="#4A4741">노동자의 25% 이상이 중심의 군에서 일하거나,</text>
+      <text x="485" y="146" text-anchor="middle" font-size="12" fill="#4A4741">일자리의 25% 이상을 중심의 군 주민이 채울 것</text>
+
+      <g stroke="#A02948" stroke-width="1.6" fill="none"><path d="M276,77 L348,77"/></g>
+      <path d="M354,77 L344,72 L344,82 Z" fill="#A02948"/>
+      <text x="312" y="64" text-anchor="middle" font-size="11" font-weight="700" fill="#A02948">통근</text>
+
+      <g stroke="#7C7C7C" stroke-width="1.4" fill="none"><path d="M616,77 L678,77"/></g>
+      <path d="M684,77 L674,72 L674,82 Z" fill="#16181C"/>
+      <rect x="690" y="46" width="130" height="62" fill="#6E6A63"/>
+      <text class="on-dark" x="755" y="72" text-anchor="middle" font-size="15"
+            font-weight="700" fill="#FFF">CBSA</text>
+      <text class="on-dark" x="755" y="94" text-anchor="middle" font-size="11" fill="#FFF">중심−기반 통계지역</text>
+
+      <path class="guide" d="M755,116 L755,168"/>
+      <path class="guide" d="M300,168 L610,168"/>
+      <path class="guide" d="M300,168 L300,190"/>
+      <path class="guide" d="M610,168 L610,190"/>
+      <path class="guide" d="M610,168 L755,168"/>
+
+      <rect x="170" y="196" width="260" height="56" fill="#EDE9E3"/>
+      <text x="300" y="221" text-anchor="middle" font-size="15" font-weight="700" fill="#16181C">대도시지역</text>
+      <text x="300" y="240" text-anchor="middle" font-size="11" fill="#8A867E">metropolitan area</text>
+      <text x="300" y="272" text-anchor="middle" font-size="12.5" fill="#4A4741">도시지역 인구 5만 명 이상</text>
+
+      <rect x="480" y="196" width="260" height="56" fill="#EDE9E3"/>
+      <text x="610" y="221" text-anchor="middle" font-size="15" font-weight="700" fill="#16181C">소도시지역</text>
+      <text x="610" y="240" text-anchor="middle" font-size="11" fill="#8A867E">micropolitan area</text>
+      <text x="610" y="272" text-anchor="middle" font-size="12.5" fill="#4A4741">1만 ~ 5만 명</text>
+    </svg>
+    <p class="derive t-red" style="text-align:center;margin-top:4px">
+      → CBSA 전체가 국가 인구의 94% (대도시 84% + 소도시 10%) — 군 전체를 포괄하는 까닭</p>
+  </div>
+</section>
+
+</div></div>
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
