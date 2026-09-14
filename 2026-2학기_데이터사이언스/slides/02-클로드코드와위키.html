@@ -67,26 +67,14 @@
     <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
-  <!-- ══ 2. 발문 ═════════════════════════════════════════ -->
-  <section class="s-question">
-    <h2>지난 학기 강의노트, 지금 어디 있나?</h2>
-    <div class="body">
-      <ul>
-        <li>대여섯 과목의 노트가 다운로드 폴더에 흩어져 있다</li>
-        <li>시험 때 한 번 열고 다시 열지 않는다</li>
-        <li>과목끼리 어떻게 이어지는지는 <span class="mark">아무도 이어 주지 않는다</span></li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ══ 3. 1부 구분 ══════════════════════════════════════ -->
+  <!-- ══ 2. 1부 구분 ══════════════════════════════════════ -->
   <section class="s-section">
     <div class="section-rule"></div>
     <p class="section-label">클로드 코드</p>
     <p class="section-sub">무엇이고, 어떻게 움직이나</p>
   </section>
 
-  <!-- ══ 4. 무엇인가 ═══════════════════════════════════════ -->
+  <!-- ══ 3. 무엇인가 ═══════════════════════════════════════ -->
   <section class="s-definition">
     <h2>클로드 코드</h2>
     <div class="body">
@@ -97,7 +85,7 @@
     </div>
   </section>
 
-  <!-- ══ 5. 대화창 vs 클로드 코드 ══════════════════════════════ -->
+  <!-- ══ 4. 대화창 vs 클로드 코드 ══════════════════════════════ -->
   <section>
     <h2>같은 일을 시키면 이렇게 갈린다</h2>
     <div class="body">
@@ -116,7 +104,7 @@
     </div>
   </section>
 
-  <!-- ══ 6. 데스크탑 앱 vs 터미널 ══════════════════════════════ -->
+  <!-- ══ 5. 데스크탑 앱 vs 터미널 ══════════════════════════════ -->
   <section>
     <h2>데스크탑 앱에서 열까, 터미널에서 열까</h2>
     <div class="body tight">
@@ -143,14 +131,98 @@
         <b>이 수업은 터미널을 기준으로 한다.</b> 터미널에서 <b>/desktop</b> 을 치면
         그 세션을 데스크탑 앱에서 이어 볼 수 있다.
       </div>
-      <p class="caption" style="margin-top:8px">
-        <span class="hl">원격은 양쪽 다 된다</span> — 앱도 SSH·클라우드로 남의 컴퓨터에서 돌린다.
-        갈리는 것은 <span class="hl">「매일 아침 7시에 사람 없이 한 번 돌기」</span> 같은 일이다.
-        앱은 사람이 보고 누르는 창이라 그 자리가 없다</p>
     </div>
   </section>
 
-  <!-- ══ 7. 에이전트 루프 ════════════════════════════════════ -->
+  <!-- ══ 6. 작업 폴더 ══════════════════════════════════════ -->
+  <section>
+    <h2>작업 폴더</h2>
+    <div class="body tight">
+      <p class="sub">클로드를 연 그 폴더가 이번 작업의 전부다</p>
+      <div class="term">
+        <div class="bar">터미널</div>
+        <pre><span class="p">$</span> mkdir my-wiki
+<span class="p">$</span> cd my-wiki
+<span class="p">$</span> claude</pre>
+      </div>
+      <ul style="margin-top:12px">
+        <li>이 폴더 안을 읽고 쓴다. <span class="hl">밖은 보지 않는다</span></li>
+        <li><span class="code">CLAUDE.md</span> · 설정 · 스킬이 모두 <span class="hl">이 폴더 기준</span></li>
+        <li>폴더 하나 = <span class="mark">프로젝트 하나</span>
+          — 과목마다 따로 두면 규칙도 따로 간다</li>
+        <li>사고가 나도 이 폴더 안에서 끝난다</li>
+      </ul>
+      <div class="ck">
+        <b>바탕화면이나 문서 폴더 전체에서 열지 않는다.</b>
+        중요한 파일이 있는 곳에서 시작하면 되돌릴 수 없다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 7. 대화창 vs 에이전트 ════════════════════════════════ -->
+  <section>
+    <h2>대화창은 한 번 답하고, 에이전트는 돈다</h2>
+    <div class="body tight">
+      <svg viewBox="0 0 880 246" style="width:100%;display:block;margin-top:4px"
+           xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="lp-ar" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 z" fill="var(--brand-crimson)"/>
+          </marker>
+        </defs>
+
+        <!-- 대화창 -->
+        <text x="0" y="14" font-size="13" font-weight="700" fill="var(--brand-crimson)"
+              letter-spacing=".04em">대화창</text>
+        <rect x="0" y="26" width="150" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="75" y="53" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">내 질문</text>
+        <line x1="152" y1="48" x2="186" y2="48" stroke="var(--brand-crimson)"
+              stroke-width="1.4" marker-end="url(#lp-ar)"/>
+        <rect x="190" y="26" width="150" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="265" y="53" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">클로드</text>
+        <line x1="342" y1="48" x2="376" y2="48" stroke="var(--brand-crimson)"
+              stroke-width="1.4" marker-end="url(#lp-ar)"/>
+        <rect x="380" y="26" width="150" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="455" y="53" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">답 하나</text>
+        <text x="556" y="43" font-size="13" fill="var(--muted)">여기서 끝난다.</text>
+        <text x="556" y="61" font-size="13" fill="var(--muted)">파일을 스스로 찾지 않고, 한 일을 확인하지도 않는다</text>
+
+        <!-- 에이전트 루프 -->
+        <text x="0" y="118" font-size="13" font-weight="700" fill="var(--brand-crimson)"
+              letter-spacing=".04em">에이전트 루프</text>
+        <rect x="0" y="128" width="130" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="65" y="155" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">지시</text>
+        <line x1="132" y1="150" x2="166" y2="150" stroke="var(--brand-crimson)"
+              stroke-width="1.4" marker-end="url(#lp-ar)"/>
+        <rect x="170" y="128" width="140" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="240" y="155" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">맥락 수집</text>
+        <line x1="312" y1="150" x2="346" y2="150" stroke="var(--brand-crimson)"
+              stroke-width="1.4" marker-end="url(#lp-ar)"/>
+        <rect x="350" y="128" width="140" height="44" rx="3" fill="#FBF3F5" stroke="var(--brand-crimson)"/>
+        <text x="420" y="155" font-size="14.5" text-anchor="middle" font-weight="700"
+              fill="var(--brand-crimson)">도구 실행</text>
+        <line x1="492" y1="150" x2="526" y2="150" stroke="var(--brand-crimson)"
+              stroke-width="1.4" marker-end="url(#lp-ar)"/>
+        <rect x="530" y="128" width="130" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="595" y="155" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">검증</text>
+        <line x1="662" y1="150" x2="696" y2="150" stroke="var(--brand-crimson)"
+              stroke-width="1.4" marker-end="url(#lp-ar)"/>
+        <rect x="700" y="128" width="130" height="44" rx="3" fill="#FAF8F5" stroke="var(--rule)"/>
+        <text x="765" y="155" font-size="14.5" text-anchor="middle" fill="var(--ink-2)">결과</text>
+
+        <path d="M 595 174 L 595 202 Q 595 210 585 210 L 250 210 Q 240 210 240 202 L 240 180"
+              fill="none" stroke="var(--brand-crimson)" stroke-width="1.4"
+              stroke-dasharray="5 3" marker-end="url(#lp-ar)"/>
+        <text x="417" y="230" font-size="12.5" text-anchor="middle"
+              fill="var(--brand-crimson)" font-weight="700">어긋나면 다시</text>
+      </svg>
+      <p class="emph" style="margin-top:6px">
+        차이는 <span class="hl">스스로 찾아 읽고, 한 일을 확인하고, 어긋나면 되돌아가는 것</span>이다</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. 에이전트 루프 ════════════════════════════════════ -->
   <section class="s-split">
     <h2>에이전트 루프</h2>
     <div class="body tight">
@@ -190,7 +262,7 @@
     </div>
   </section>
 
-  <!-- ══ 8. 권한 ═════════════════════════════════════════ -->
+  <!-- ══ 9. 권한 ═════════════════════════════════════════ -->
   <section>
     <h2>권한</h2>
     <div class="body tight">
@@ -213,19 +285,23 @@
     </div>
   </section>
 
-  <!-- ══ 9. 모드 ═════════════════════════════════════════ -->
+  <!-- ══ 10. 모드 ════════════════════════════════════════ -->
   <section>
     <h2>모드</h2>
     <div class="body tight">
       <table style="width:100%;table-layout:fixed;margin-top:6px">
-        <thead><tr><th style="width:24%">모드</th><th style="width:36%">어떻게 움직이나</th>
+        <thead><tr><th style="width:26%">모드</th><th style="width:38%">어떻게 움직이나</th>
           <th>언제 쓰나</th></tr></thead>
         <tbody>
-          <tr><td>기본 <span class="en">ask</span></td><td>쓰기 · 실행 때마다 승인을 물음</td>
-            <td class="hl">평소. 오늘 실습도 이것</td></tr>
-          <tr><td>자동 승인 <span class="en">auto-accept</span></td><td>묻지 않고 끝까지 진행</td>
+          <tr><td>자동 <span class="en">auto</span></td><td>묻지 않고 끝까지 함</td>
             <td>되돌릴 수 있는 폴더에서만</td></tr>
-          <tr><td>계획 <span class="en">plan</span></td><td>읽기만 하고 <span class="hl">할 일을 먼저 보여 줌</span></td>
+          <tr><td>수동 <span class="en">default</span></td><td>쓰기 · 실행 때마다 승인을 물음</td>
+            <td class="hl">평소. 오늘 실습도 이것</td></tr>
+          <tr><td>편집 자동 수락 <span class="en">acceptEdits</span></td>
+            <td>파일 편집은 자동, 그 밖의 명령은 물음</td>
+            <td>같은 손질을 여러 파일에 반복할 때</td></tr>
+          <tr><td>계획 <span class="en">plan</span></td>
+            <td>읽기만 하고 <span class="hl">할 일을 먼저 보여 줌</span></td>
             <td>여러 파일을 한꺼번에 고치기 전</td></tr>
         </tbody>
       </table>
@@ -239,7 +315,7 @@
     </div>
   </section>
 
-  <!-- ══ 10. 모델 ════════════════════════════════════════ -->
+  <!-- ══ 11. 모델 ════════════════════════════════════════ -->
   <section>
     <h2>모델</h2>
     <div class="body tight">
@@ -248,10 +324,12 @@
         <thead><tr><th style="width:20%">이름</th><th style="width:40%">성격</th>
           <th>이 수업에서</th></tr></thead>
         <tbody>
-          <tr><td><span class="code">sonnet</span></td><td>일상 작업. 빠르고 고름</td>
-            <td class="hl">기본값. 대부분 이것으로 충분</td></tr>
+          <tr><td><span class="code">fable</span></td><td>가장 센 것. 오래 걸리는 어려운 일</td>
+            <td>원인을 못 찾고 헤맬 때</td></tr>
           <tr><td><span class="code">opus</span></td><td>어려운 추론 · 긴 작업</td>
             <td>분석 설계가 막힐 때</td></tr>
+          <tr><td><span class="code">sonnet</span></td><td>일상 작업. 빠르고 고름</td>
+            <td class="hl">기본값. 대부분 이것으로 충분</td></tr>
           <tr><td><span class="code">haiku</span></td><td>짧고 단순한 일</td>
             <td>파일 정리처럼 가벼운 일</td></tr>
         </tbody>
@@ -263,12 +341,12 @@
       </ul>
       <p class="caption" style="margin-top:10px">
         Pro 구독의 기본값은 <span class="code">sonnet</span> 이다.
-        <span class="hl">상위 모델은 한도를 빨리 쓴다</span> — 한도가 차면 그 주 실습을 못 한다.
+        위로 갈수록 <span class="hl">한도를 빨리 쓴다</span> — 한도가 차면 그 주 실습을 못 한다.
         막히는 대목에서만 올려 쓰고 다시 내린다</p>
     </div>
   </section>
 
-  <!-- ══ 11. CLAUDE.md ═════════════════════════════════ -->
+  <!-- ══ 12. CLAUDE.md ═════════════════════════════════ -->
   <section class="s-split">
     <h2>CLAUDE.md</h2>
     <div class="body tight">
@@ -310,7 +388,7 @@
     </div>
   </section>
 
-  <!-- ══ 12. 컨텍스트 ══════════════════════════════════════ -->
+  <!-- ══ 13. 컨텍스트 ══════════════════════════════════════ -->
   <section>
     <h2>컨텍스트</h2>
     <div class="body tight">
@@ -334,7 +412,7 @@
     </div>
   </section>
 
-  <!-- ══ 13. 세션 ════════════════════════════════════════ -->
+  <!-- ══ 14. 세션 ════════════════════════════════════════ -->
   <section>
     <h2>세션</h2>
     <div class="body tight">
@@ -370,7 +448,7 @@
     </div>
   </section>
 
-  <!-- ══ 14. 지시 쓰는 법 ═══════════════════════════════════ -->
+  <!-- ══ 15. 지시 쓰는 법 ═══════════════════════════════════ -->
   <section>
     <h2>지시가 좁을수록 결과가 좁아진다</h2>
     <div class="body tight">
@@ -393,7 +471,7 @@
     </div>
   </section>
 
-  <!-- ══ 15. 되돌리기와 에러 ══════════════════════════════════ -->
+  <!-- ══ 16. 되돌리기와 에러 ══════════════════════════════════ -->
   <section class="s-split">
     <h2>잘못 고쳤을 때 · 에러가 났을 때</h2>
     <div class="body tight">
@@ -427,7 +505,7 @@
     </div>
   </section>
 
-  <!-- ══ 16. 하지 말 것 ════════════════════════════════════ -->
+  <!-- ══ 17. 하지 말 것 ════════════════════════════════════ -->
   <section>
     <h2>하지 말 것 셋</h2>
     <div class="body">
@@ -448,7 +526,7 @@
     </div>
   </section>
 
-  <!-- ══ 17. 명령 한 장 ════════════════════════════════════ -->
+  <!-- ══ 18. 명령 한 장 ════════════════════════════════════ -->
   <section class="s-split">
     <h2>오늘 쓸 명령은 이만큼이다</h2>
     <div class="body tight">
@@ -493,14 +571,26 @@
     </div>
   </section>
 
-  <!-- ══ 18. 2부 구분 ═════════════════════════════════════ -->
+  <!-- ══ 19. 2부 구분 ═════════════════════════════════════ -->
   <section class="s-section">
     <div class="section-rule"></div>
     <p class="section-label">지식 위키</p>
     <p class="section-sub">무엇을 왜 쌓는가</p>
   </section>
 
-  <!-- ══ 19. 왜 위키인가 ════════════════════════════════════ -->
+  <!-- ══ 20. 발문 ════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>지난 학기 강의노트, 지금 어디 있나?</h2>
+    <div class="body">
+      <ul>
+        <li>대여섯 과목의 노트가 다운로드 폴더에 흩어져 있다</li>
+        <li>시험 때 한 번 열고 다시 열지 않는다</li>
+        <li>과목끼리 어떻게 이어지는지는 <span class="mark">아무도 이어 주지 않는다</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 21. 왜 위키인가 ════════════════════════════════════ -->
   <section>
     <h2>매번 다시 읽는가, 쌓아 두는가</h2>
     <div class="body">
@@ -520,9 +610,9 @@
     </div>
   </section>
 
-  <!-- ══ 20. 구조 ════════════════════════════════════════ -->
+  <!-- ══ 22. 구조 ════════════════════════════════════════ -->
   <section>
-    <h2>위키의 구조</h2>
+    <h2>위키의 구조 (예시)</h2>
     <div class="body tight">
       <div class="doc">
         <div class="bar">my-wiki/</div>
@@ -544,7 +634,7 @@
     </div>
   </section>
 
-  <!-- ══ 21. 근거의 층위 ════════════════════════════════════ -->
+  <!-- ══ 23. 근거의 층위 ════════════════════════════════════ -->
   <section>
     <h2>폴더를 나누는 이유 — 근거의 층위</h2>
     <div class="body tight">
@@ -568,19 +658,25 @@
     </div>
   </section>
 
-  <!-- ══ 22. 페이지와 규칙 ═══════════════════════════════════ -->
+  <!-- ══ 24. 페이지와 규칙 ═══════════════════════════════════ -->
   <section class="s-split">
     <h2>페이지 두 종류, 규칙 셋</h2>
     <div class="body tight">
       <div class="col-l">
         <p class="sub">페이지</p>
         <ul>
-          <li><span class="code">topics/</span> 개념과 방법론 — 집적경제, 회귀분석</li>
-          <li><span class="code">sources/</span> 읽은 자료 한 건 — 강의 · 논문 · 발표 · 책</li>
+          <li><span class="code">sources/</span> <span class="hl">읽은 자료 한 건 = 한 장</span>
+            — 강의 · 논문 · 발표 · 책</li>
+          <li><span class="code">topics/</span> 그 자료들에서 끌어낸 개념과 방법론</li>
         </ul>
         <p class="caption" style="margin:6px 0 0">
-          개념과 방법론을 폴더로 가르지 않음 — 회귀분석이 어느 쪽인지 고민할 시간을 아낌.
-          구분은 <span class="code">type:</span> 한 줄</p>
+          들어온 것을 먼저 한 장씩 남기고, 거기서 개념을 끌어낸다. 순서가 반대면
+          <span class="hl">근거 없는 개념 페이지</span>가 먼저 생긴다</p>
+        <p class="caption" style="margin:6px 0 0">
+          <span class="hl"><span class="code">topics</span> 가 유일한 답은 아니다.</span>
+          <span class="code">entity</span>(사람 · 기관 · 장소) · <span class="code">themes</span> ·
+          <span class="code">overviews</span> 처럼 갈라도 된다 —
+          내 자료의 성격과 내 선택에 달렸다</p>
         <div class="doc" style="margin-top:10px">
           <div class="bar">frontmatter — 네 줄</div>
           <pre>type: concept
@@ -604,11 +700,11 @@ status: draft</pre>
     </div>
   </section>
 
-  <!-- ══ 23. 위키의 CLAUDE.md ═════════════════════════════ -->
+  <!-- ══ 25. 위키의 CLAUDE.md ═════════════════════════════ -->
   <section>
     <h2>위키의 CLAUDE.md 는 이렇게 생겼다</h2>
     <div class="body tight">
-      <p class="emph" style="margin-bottom:4px">11쪽에서 본 <span class="code">./CLAUDE.md</span> 자리다.
+      <p class="emph" style="margin-bottom:4px">12쪽에서 본 <span class="code">./CLAUDE.md</span> 자리다.
         <span class="hl">위키 규칙 다섯 줄</span>이 들어간다</p>
       <div class="doc" style="margin-top:8px">
         <div class="bar">CLAUDE.md</div>
@@ -620,13 +716,10 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
 새 페이지를 만들기 전에 wiki/index.md 를 먼저 읽는다.
 인제스트가 끝나면 index.md 와 log.md 를 갱신한다.</pre>
       </div>
-      <p class="emph" style="margin-top:12px">
-        오늘 실습 ③에서 <span class="hl">이 파일을 자기 손으로 고친다</span> —
-        마음에 안 드는 결과가 곧 규칙이 된다</p>
     </div>
   </section>
 
-  <!-- ══ 24. 확장 ════════════════════════════════════════ -->
+  <!-- ══ 26. 확장 ════════════════════════════════════════ -->
   <section>
     <h2>강의노트만이 아니다</h2>
     <div class="body">
@@ -646,14 +739,14 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 25. 실습 구분 ═════════════════════════════════════ -->
+  <!-- ══ 27. 실습 구분 ═════════════════════════════════════ -->
   <section class="s-section">
     <div class="section-rule"></div>
     <p class="section-label">실습</p>
     <p class="section-sub">내 지식 위키 만들기 — 약 1시간 20분</p>
   </section>
 
-  <!-- ══ 26. 실습 ① ══════════════════════════════════════ -->
+  <!-- ══ 28. 실습 ① ══════════════════════════════════════ -->
   <section>
     <h2>① 설치 확인 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:10</span></h2>
     <div class="body tight">
@@ -674,7 +767,7 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 27. 실습 ② 카파시를 읽는다 ═════════════════════════════ -->
+  <!-- ══ 29. 실습 ② 카파시를 읽는다 ═════════════════════════════ -->
   <section>
     <h2>② 카파시의 글을 읽는다 <span class="en" style="font-size:16px;color:var(--muted)">0:10–0:30</span></h2>
     <div class="body tight">
@@ -687,7 +780,6 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
         <li>주소를 클로드에게 주고 <span class="hl">한국어로 옮기게 한다</span></li>
         <li>번역에서 멈추지 않는다 —
           <span class="mark">특징 다섯 개</span>를 뽑고 <span class="hl">근거 문장</span>을 달게 한다</li>
-        <li>그 결과를 <span class="code">notes/카파시-위키-정리.md</span> 로 저장한다</li>
       </ol>
       <div class="prompt-box">
         <p class="who">프롬프트</p>
@@ -701,26 +793,29 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 28. 실습 ③ 내 위키를 만든다 ════════════════════════════ -->
+  <!-- ══ 30. 실습 ③ 내 위키를 만든다 ════════════════════════════ -->
   <section>
-    <h2>③ 내 위키를 만들게 한다 <span class="en" style="font-size:16px;color:var(--muted)">0:30–1:00</span></h2>
+    <h2>③ 내 위키를 만들게 한다 <span class="en" style="font-size:16px;color:var(--muted)">0:30–0:55</span></h2>
     <div class="body tight">
       <p class="emph" style="margin-bottom:6px">카파시는 폴더 이름도 페이지 형식도 정해 주지 않는다.
         <span class="hl">그 자리를 내가 정한다</span></p>
       <ol class="steps">
-        <li>앞에서 만든 <span class="code">notes/카파시-위키-정리.md</span> 를 준다</li>
-        <li>내가 넣을 자료가 무엇인지 말한다
-          <span class="t">강의노트 · 논문 · 세미나 발표자료 · 전공서적</span></li>
+        <li><span class="hl">앞서 읽은 카파시의 원문을 그대로 붙여 넣는다</span>
+          <span class="t">글 자체가 "자기 LLM 에이전트에 복사해 붙여 넣으라"고 적고 있다</span></li>
+        <li><span class="hl">이미 넣어 둔 자료를 보게 한다</span>
+          <span class="t">1주차에 my-wiki 에 강의노트를 두세 개 넣어 두었다</span></li>
         <li><span class="mark">안을 먼저 받고 고른다</span>
-          <span class="t">바로 만들게 하지 않는다 — 계획 모드를 써도 좋다</span></li>
+          <span class="t">바로 만들게 하지 않는다 — 계획 모드로 받는다 (Shift+Tab)</span></li>
         <li>고른 구조로 폴더와 <span class="code">CLAUDE.md</span> 를 만들게 한다</li>
         <li>자료 하나를 실제로 넣어 본다</li>
       </ol>
       <div class="prompt-box">
         <p class="who">프롬프트</p>
-        <p>"<span class="mark">@notes/카파시-위키-정리.md</span> 를 읽어 줘. 나는 강의노트 · 논문 ·
-          세미나 발표자료를 넣을 거야. 이 방식대로 폴더 구조와 CLAUDE.md 를 만들려고 해.
-          <span class="mark">먼저 안을 두세 개 제안해 줘. 내가 고른 다음에 만들자.</span>"</p>
+        <p><span class="mark">(카파시의 글 전문을 붙여 넣고)</span></p>
+        <p>"이 글의 방식으로 내 위키를 만들려고 해.
+          <span class="mark">이 폴더에 강의노트를 이미 몇 개 넣어 두었어. 그것부터 보고</span>
+          내 자료에 맞는 폴더 구조와 CLAUDE.md 안을 두세 개 제안해 줘.
+          내가 고른 다음에 만들자."</p>
       </div>
       <div class="ck">
         <b>되었는지 확인.</b> 원자료 자리와 클로드가 쓰는 자리가 <b>갈려 있고</b>,
@@ -729,9 +824,48 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 29. 실습 ④ 남의 위키를 본다 ════════════════════════════ -->
+  <!-- ══ 31. 실습 ④ 나온 것을 읽는다 ════════════════════════════ -->
+  <section class="s-split">
+    <h2>④ 나온 것을 읽어 본다 <span class="en" style="font-size:16px;color:var(--muted)">0:55–1:05</span></h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">한 장을 끝까지 읽는다</p>
+        <ol class="steps">
+          <li><span class="code">wiki/</span> 에서 페이지 하나를 연다</li>
+          <li><span class="mark">내가 준 자료에 없는 문장</span>이 있는지 본다</li>
+          <li>출처가 붙어 어디서 왔는지 알 수 있는지 본다</li>
+          <li><span class="code">index.md</span> 와 <span class="code">log.md</span> 가
+            갱신되었는지 본다</li>
+        </ol>
+        <div class="prompt-box">
+          <p class="who">프롬프트</p>
+          <p>"이 페이지에서 <span class="mark">내가 준 자료에 근거가 없는 문장</span>을 찾아
+            표시해 줘. 내가 판단할게."</p>
+        </div>
+      </div>
+      <div class="col-r">
+        <p class="sub">마음에 안 드는 것이 곧 다음 규칙이다</p>
+        <table style="width:100%;table-layout:fixed">
+          <thead><tr><th style="width:44%">마음에 안 드는 것</th>
+            <th>CLAUDE.md 에 적을 말</th></tr></thead>
+          <tbody>
+            <tr><td>출처가 없다</td><td class="hl">사실 문장 옆에 출처를 적는다</td></tr>
+            <tr><td>안 배운 말이 섞였다</td><td>자료에 없는 것은 절을 갈라 「확인 필요」를 단다</td></tr>
+            <tr><td>페이지가 잘게 쪼개졌다</td><td>이을 곳 없는 개념은 페이지로 만들지 않는다</td></tr>
+            <tr><td>영어 제목만 있다</td><td>제목은 국문(영문) 병기로 쓴다</td></tr>
+          </tbody>
+        </table>
+        <div class="ck">
+          <b>되었는지 확인.</b> 규칙을 적고 <b>같은 자료를 다시 넣었을 때</b>
+          결과가 달라진다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 32. 실습 ④ 남의 위키를 본다 ════════════════════════════ -->
   <section>
-    <h2>④ 남의 위키를 보고 내 것을 고친다 <span class="en" style="font-size:16px;color:var(--muted)">1:00–1:20</span></h2>
+    <h2>⑤ 남의 위키를 보고 내 것을 고친다 <span class="en" style="font-size:16px;color:var(--muted)">1:05–1:20</span></h2>
     <div class="body tight">
       <table style="width:100%;table-layout:fixed">
         <thead><tr><th style="width:34%">볼 것</th><th>어떻게 생겼나</th></tr></thead>
@@ -758,22 +892,18 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 30. 제출물 ═══════════════════════════════════════ -->
+  <!-- ══ 33. 제출물 ═══════════════════════════════════════ -->
   <section>
     <h2>제출물</h2>
     <div class="body tight">
       <ul>
-        <li><span class="code">notes/카파시-위키-정리.md</span>
-          — 특징 다섯과 <span class="hl">근거 문장</span></li>
-        <li><span class="hl">내가 정한 폴더 구조</span>
-          — 왜 그렇게 갈랐는지 두세 줄</li>
         <li><span class="code">CLAUDE.md</span> — <span class="hl">내 말로 쓴 규칙</span></li>
-        <li><span class="code">wiki/</span> 페이지 세 장 · <span class="code">index.md</span> ·
-          <span class="code">log.md</span></li>
-        <li>남의 위키에서 가져온 것 <span class="hl">두 개와 그 이유</span></li>
+        <li><span class="code">wiki/index.md</span> · <span class="code">wiki/log.md</span>
+          — 무엇을 언제 넣었나</li>
       </ul>
       <p class="emph" style="margin-top:16px">
-        페이지 수는 세지 않는다. <span class="hl">고른 근거를 말할 수 있는지</span>를 본다</p>
+        <span class="hl">이 둘만 낸다.</span> 페이지는 세지 않는다 —
+        규칙을 내 말로 썼는지, 넣은 것이 기록에 남았는지를 본다</p>
       <p class="caption" style="margin-top:8px">
         폴더를 통째로 압축해 제출한다. 구조가 서로 달라도 된다 —
         <span class="hl">같은 글에서 서로 다른 위키가 나오는 것이 정상이다.</span>
@@ -781,7 +911,7 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 31. 제출 주소 ═════════════════════════════════════ -->
+  <!-- ══ 34. 제출 주소 ═════════════════════════════════════ -->
   <section>
     <h2>제출은 이 주소로</h2>
     <div class="body tight">
@@ -807,7 +937,7 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 32. 다음 주부터 ════════════════════════════════════ -->
+  <!-- ══ 35. 다음 주부터 ════════════════════════════════════ -->
   <section>
     <h2>다음 주부터 — 매주 10분</h2>
     <div class="body">
@@ -824,7 +954,7 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 33. 출처 ════════════════════════════════════════ -->
+  <!-- ══ 36. 출처 ════════════════════════════════════════ -->
   <section>
     <h2>자료 출처</h2>
     <div class="body tight">
@@ -833,15 +963,15 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
           <span class="code">cc101.axwith.com/ko</span> (2026. 9. 9. 확인)</li>
         <li>같은 내용의 원 출처 — 클로드 코드 공식 문서
           <span class="code">code.claude.com/docs</span></li>
-        <li>6쪽의 실행 환경 비교 — 공식 문서 「Overview」와 「Desktop app」
+        <li>5쪽의 실행 환경 비교 — 공식 문서 「Overview」와 「Desktop app」
           (2026. 9. 14. 확인). <span class="hl">앱도 SSH·클라우드 세션으로 원격 실행을 한다</span> —
           갈리는 것은 사람 없이 돌리는 일이다 (<span class="code">--print</span> ·
           <span class="en">Agent SDK</span> 는 터미널만)</li>
-        <li>10쪽의 모델 — 공식 문서 「Model configuration」. <span class="hl">기본값은 구독 등급에
+        <li>11쪽의 모델 — 공식 문서 「Model configuration」. <span class="hl">기본값은 구독 등급에
           따라 다르다</span> (Pro 는 Sonnet, Max 는 Opus)</li>
         <li>스킬 · 플러그인 · MCP · 서브에이전트는 <span class="hl">3주차</span>,
           깃과 깃허브는 <span class="hl">5주차</span>에서 다룬다</li>
-        <li>8 · 14쪽의 터미널 화면과 프롬프트는 이 수업용으로 쓴 예시다.
+        <li>6 · 9 · 15쪽의 터미널 화면과 프롬프트는 이 수업용으로 쓴 예시다.
           공식 문서의 예제가 아니다</li>
         <li>실습 ②의 원문 — Andrej Karpathy, 「<span class="en">LLM Wiki</span>」
           <span class="code">gist.github.com/karpathy/442a6bf555914893e9891c11519de94f</span>
@@ -857,7 +987,7 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
     </div>
   </section>
 
-  <!-- ══ 34. 마무리 ═══════════════════════════════════════ -->
+  <!-- ══ 37. 마무리 ═══════════════════════════════════════ -->
   <section class="s-closing">
     <p class="qa">Q &amp; A</p>
     <div class="qa-rule"></div>
