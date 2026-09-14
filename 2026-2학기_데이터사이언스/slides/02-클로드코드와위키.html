@@ -131,9 +131,11 @@
             <td>명령 한 줄로 따로 설치</td></tr>
           <tr><td>고친 자리</td><td class="hl">나란히 놓고 눈으로 봄</td><td>글자로 읽음</td></tr>
           <tr><td>여러 일</td><td>세션을 한 화면에 나란히</td><td>터미널 창을 여러 개</td></tr>
+          <tr><td>남의 컴퓨터</td><td>SSH · 클라우드 세션을 화면에서 고름</td>
+            <td><span class="code">ssh</span> 로 붙어 거기서 실행</td></tr>
           <tr><td>좋은 점</td><td>터미널을 몰라도 됨 · 승인 화면이 읽기 쉬움</td>
-            <td class="hl">다른 명령과 이어 붙임 · SSH 원격 · 정기 실행</td></tr>
-          <tr><td>아쉬운 점</td><td class="mark">파이프 · CI · 원격 실행이 안 됨</td>
+            <td class="hl">다른 명령과 이어 붙임 · 예약·반복 실행</td></tr>
+          <tr><td>아쉬운 점</td><td class="mark">사람이 쳐야 함 — 다른 프로그램이 대신 못 부름</td>
             <td>검은 화면이 낯섦</td></tr>
         </tbody>
       </table>
@@ -142,8 +144,9 @@
         그 세션을 데스크탑 앱에서 이어 볼 수 있다.
       </div>
       <p class="caption" style="margin-top:8px">
-        「다른 명령과 이어 붙임」은 <span class="code">tail -200 app.log | claude -p "이상한 것 있으면 알려 줘"</span> 같은 것이다.
-        화면을 눌러 쓰는 앱에서는 붙일 자리가 없다</p>
+        <span class="hl">원격은 양쪽 다 된다</span> — 앱도 SSH·클라우드로 남의 컴퓨터에서 돌린다.
+        갈리는 것은 <span class="hl">「매일 아침 7시에 사람 없이 한 번 돌기」</span> 같은 일이다.
+        앱은 사람이 보고 누르는 창이라 그 자리가 없다</p>
     </div>
   </section>
 
@@ -830,9 +833,10 @@ raw/ 와 notes/ 는 읽기 전용이다. 고치지 않는다.
           <span class="code">cc101.axwith.com/ko</span> (2026. 9. 9. 확인)</li>
         <li>같은 내용의 원 출처 — 클로드 코드 공식 문서
           <span class="code">code.claude.com/docs</span></li>
-        <li>6쪽의 실행 환경 비교 — 공식 문서 「Overview」의
-          <span class="en">Terminal · Desktop app</span> 항목과 위 입문 가이드 「00 시작하기 전에」
-          (2026. 9. 13. 확인)</li>
+        <li>6쪽의 실행 환경 비교 — 공식 문서 「Overview」와 「Desktop app」
+          (2026. 9. 14. 확인). <span class="hl">앱도 SSH·클라우드 세션으로 원격 실행을 한다</span> —
+          갈리는 것은 사람 없이 돌리는 일이다 (<span class="code">--print</span> ·
+          <span class="en">Agent SDK</span> 는 터미널만)</li>
         <li>10쪽의 모델 — 공식 문서 「Model configuration」. <span class="hl">기본값은 구독 등급에
           따라 다르다</span> (Pro 는 Sonnet, Max 는 Opus)</li>
         <li>스킬 · 플러그인 · MCP · 서브에이전트는 <span class="hl">3주차</span>,
