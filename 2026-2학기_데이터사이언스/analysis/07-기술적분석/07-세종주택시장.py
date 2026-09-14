@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""7강(기술적 분석) 슬라이드에 쓰는 수치를 만드는 스크립트.
+"""6강(기술적 분석 1) 슬라이드에 쓰는 수치를 만드는 스크립트.
 
 입력: ~/data/compas/sejong-housing/3.세종시_아파트(매매)_실거래가.csv
       COMPAS 「주택 시장 특성분석」(세종, SBJ_2102_001) 공개 데이터
@@ -77,7 +77,22 @@ def main():
         print(f'  {d:<6} {st.median(v):>5.0f}만원  ({len(v):,}건)')
     print(f'  최고/최저 {st.median(ok[0][1]) / st.median(ok[-1][1]):.2f}배')
 
+    # 도수분포표 — 6강 「도수분포표와 히스토그램」 이 쓴다.
+    # 계급 폭은 1억(10,000만원). 최대 17억까지라 17계급이면 한 장에 들어간다.
+    BIN = 10_000
+    top = (max(amt) // BIN + 1) * BIN
+    freq = [0] * (top // BIN)
+    for v in amt:
+        freq[min(v // BIN, len(freq) - 1)] += 1
+    print(f'\n도수분포표 (계급 폭 {BIN:,}만원)')
+    for i, c in enumerate(freq):
+        if c:
+            print(f'  {i*BIN:>7,}~{(i+1)*BIN:>7,}  {c:>5,}건  {c/len(amt)*100:>5.1f}%')
+
     print('\n요약표 저장')
+    save('07-세종주택시장-도수분포.csv', ['계급하한(만원)', '계급상한(만원)', '빈도', '상대빈도(%)'],
+         [[i * BIN, (i + 1) * BIN, c, round(c / len(amt) * 100, 2)]
+          for i, c in enumerate(freq)])
     save('07-세종주택시장-기술통계.csv', ['지표', '값'], [
         ['거래건수', len(rows)],
         ['거래금액 평균(만원)', round(st.mean(amt))],
