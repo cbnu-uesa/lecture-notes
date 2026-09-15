@@ -1,0 +1,97 @@
+{
+  "id": "2026-2-urban-transport-stats",
+  "title": "도시교통통계학",
+  "titleEn": "Urban Transportation Statistics",
+  "term": "2026-2학기",
+  "termEn": "Fall 2026",
+  "instructor": "KWON",
+  "label": "2026-2학기 도시교통통계학",
+  "footer": "Urban Transportation Statistics / Fall 2026 / KWON",
+  "_note": "원본은 2025-2학기 개정 pptx (source/). 2022-2학기 판은 03. 교육활동/2022-2학기_도시교통통계학 에 그대로 있다 — 그쪽에만 있는 것이 둘 있다: 13강 전문가 특강(국토연구원 문정호, pdf 만 있고 외부 자료라 변환 대상이 아니다)과 \"y에 대한 x의 계수\" 보충 pptx. 참고서는 류근관 통계학(그 폴더의 chapter_*.pdf). 강 번호를 주차에 그대로 매핑했고 1강 = 2026. 9. 2. (수) 부터 매주 수요일이다. 원본에 7강이 없다 — 그 주가 중간고사였던 것으로 보인다. status: todo=미변환, done=HTML 완료",
+  "lectures": [
+    {
+      "no": 1,
+      "title": "도시교통통계학 강의 소개",
+      "file": "01-강의소개.html",
+      "date": "2026. 9. 2.",
+      "status": "done"
+    },
+    {
+      "no": 2,
+      "title": "통계학과 자료의 정리",
+      "file": "02-자료의정리.html",
+      "date": "2026. 9. 9.",
+      "status": "done"
+    },
+    {
+      "no": 3,
+      "title": "정규분포와 정규분포로의 근사",
+      "file": "03-정규분포.html",
+      "date": "2026. 9. 16.",
+      "status": "done"
+    },
+    {
+      "no": 4,
+      "title": "상관관계",
+      "file": "04-상관관계.html",
+      "date": "2026. 9. 23.",
+      "status": "done"
+    },
+    {
+      "no": 5,
+      "title": "회귀분석 (1)",
+      "file": "05-회귀분석1.html",
+      "date": "2026. 9. 30.",
+      "status": "done"
+    },
+    {
+      "no": 6,
+      "title": "회귀분석 (2)",
+      "file": "06-회귀분석2.html",
+      "date": "2026. 10. 7.",
+      "status": "done"
+    },
+    {
+      "no": 8,
+      "title": "확률이론 (1)",
+      "file": "08-확률이론1.html",
+      "date": "2026. 10. 21.",
+      "status": "done"
+    },
+    {
+      "no": 9,
+      "title": "확률이론 (2)",
+      "file": "09-확률이론2.html",
+      "date": "2026. 10. 28.",
+      "status": "done"
+    },
+    {
+      "no": 10,
+      "title": "대수의 법칙과 중심극한정리",
+      "file": "10-대수의법칙과중심극한정리.html",
+      "date": "2026. 11. 4.",
+      "status": "done"
+    },
+    {
+      "no": 11,
+      "title": "표본추출과 모수추정",
+      "file": "11-표본추출과모수추정.html",
+      "date": "2026. 11. 11.",
+      "status": "done"
+    },
+    {
+      "no": 12,
+      "title": "가설검정",
+      "file": "12-가설검정.html",
+      "date": "2026. 11. 18.",
+      "status": "done"
+    },
+    {
+      "no": 14,
+      "title": "도시교통통계학 요약",
+      "file": "14-요약강의.html",
+      "date": "2026. 12. 2.",
+      "status": "done"
+    }
+  ]
+}

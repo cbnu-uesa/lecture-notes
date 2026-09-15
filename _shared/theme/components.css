@@ -1,0 +1,618 @@
+/* 슬라이드 유형별 컴포넌트 — design.md §5 카탈로그
+   실물 예시는 _design/slides/t01-cover.html ~ t11-numbered.html */
+
+/* ─── 텍스트 역할 (design.md §3.2) ─── */
+
+.lead      { font-size: var(--fs-lead); font-weight: 700; line-height: 1.5; letter-spacing: -.015em; margin: 0 0 12px; }
+.sub       { font-size: var(--fs-sub);  font-weight: 700; margin: 0 0 8px; color: var(--brand-crimson); letter-spacing: -.01em; }
+.emph      { font-size: var(--fs-emph); font-weight: 400; margin: 0 0 10px; color: var(--ink-2); }
+.caption   { font-size: var(--fs-caption); font-weight: 400; color: var(--muted); }
+
+/* 캡션: 표·그림 위 파란 라벨 (2강 p.2 "아이스크림의 가격에 따른 소비량") */
+/* 캡션 안의 주소 — 출처 표기 (design.md §4.5) */
+.u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11px; }
+
+.caption-blue {
+  font-size: var(--fs-emph);
+  font-weight: 500;
+  color: var(--accent-blue);
+  margin: 0 0 8px;
+}
+
+/* 도출 결과: "→ 한계편익(marginal benefit)" */
+.derive {
+  font-size: var(--fs-emph);
+  font-weight: 500;
+  color: var(--brand-crimson);
+  margin: 6px 0;
+}
+
+/* ─── 넘칠 때 쓰는 손잡이 ───
+   내용이 푸터를 넘으면 <div class="body tight"> 또는 tighter 를 붙인다.
+   그래도 안 되면 그림·표 크기를 줄인다. 넘침은 check-figures.sh 가 잡아낸다.
+   표 규칙은 아래 .tbl-stagger 보다 뒤에 와야 한다 — 가중치가 같아 순서로 갈린다. */
+.body.tight   { --lh-body: 1.45; font-size: 14px; }
+.body.tight  p, .body.tight li { margin-bottom: 5px; }
+.body.tighter { --lh-body: 1.34; font-size: 13px; }
+.body.tighter p, .body.tighter li { margin-bottom: 3px; }
+
+/* ─── T2 발문 ─── */
+
+.s-question .body > ul { padding-left: 24px; }
+.s-question .body > ul > li {
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 46px;
+}
+.s-question .body > ul > li::before { left: -22px; color: var(--muted); }
+
+/* ─── T3 정의 ─── */
+
+.s-definition .define {
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  color: var(--define-crimson);
+  line-height: 1.45;
+  margin: 0 0 4px;
+}
+.s-definition .conclusion {
+  font-size: var(--fs-sub);
+  font-weight: 500;
+  margin-top: 18px;
+}
+
+/* ─── T4 2단: 좌 설명·표 / 우 그래프 ─── */
+
+/* 세로 가운데 정렬 — 콘텐츠가 위로 몰려 아래가 휑해지지 않게 한다 (design.md §4.3).
+   누적 공개 요소는 숨겨져도 자리를 차지하므로 단계가 바뀌어도 흔들리지 않는다. */
+.s-split .body { display: flex; gap: 24px; align-items: center; }
+.s-split .col-l { flex: 0 0 45%; }
+.s-split .col-r { flex: 1 1 auto; }
+.s-split.wide-fig .col-l { flex: 0 0 40%; }
+/* 왼쪽 표·설명이 넓어야 하는 경우 */
+.s-split.wide-left .col-l { flex: 0 0 56%; }
+
+/* 제목 아래 한 덩어리로 쌓이는 슬라이드(설명문 + 큰 그래프)를 세로 가운데로 */
+.body.stack {
+  display: flex; flex-direction: column; justify-content: center;
+}
+
+/* 정의문이 상단 전체 폭을 쓰고 그 아래에서 좌우로 나뉘는 배치.
+   긴 정의문을 좁은 칸에 넣으면 어색하게 끊긴다 — 원본도 이 배치를 쓴다. */
+.body > .cols { display: flex; gap: 24px; align-items: center; margin-top: 10px; }
+.body > .cols > .col-l { flex: 0 0 47%; }
+.body > .cols > .col-r { flex: 1 1 auto; }
+.body > .cols.fig-left > .col-l { flex: 0 0 52%; }
+
+/* ─── T6 3분할 ─── */
+
+.s-triptych .body { display: flex; gap: 16px; align-items: flex-start; }
+
+/* 세 칸 위에 설명문이 먼저 오는 변형. body 자체를 flex 로 만들면 그 설명문까지
+   flex 아이템이 되어 세로로 찌그러진다 — 3분할은 안쪽 컨테이너가 맡는다. */
+.triptych { display: flex; gap: 20px; align-items: flex-start; }
+.triptych > .cell { flex: 1 1 0; text-align: center; }
+
+.s-triptych .cell,
+.triptych .cell { flex: 1 1 0; text-align: center; }
+.s-triptych .cell > .cell-title,
+.triptych .cell > .cell-title {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--accent-red);
+  margin: 0 0 10px;
+}
+
+/* ─── T7 수식 ─── */
+
+.s-formula .formula { margin: 12px 0; }
+.reveal mjx-container[display='true'] { margin: 12px 0 !important; }
+
+/* 결론 수식 강조 — design.md §7
+   \color{} 는 쓰지 않는다 (MathJax가 별도 확장 파일을 찾다 실패한다).
+   SVG 출력이 currentColor를 따르므로 바깥에서 색을 주면 그대로 물든다. */
+.reveal .formula-key { color: var(--accent-red); }
+
+/* ─── T8 표 (design.md §5 T8) ─── */
+
+/* 기본 표. :where() 로 가중치를 요소 수준까지 낮춘다 —
+   그러지 않으면 .tbl-schedule 처럼 클래스 하나로 지정한 글자크기·줄간격을
+   이 규칙이 덮어버린다 (.reveal table 은 (0,1,1) 이라 클래스 하나보다 세다). */
+:where(.reveal) table {
+  border-collapse: collapse;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  margin: 0;
+}
+/* 정렬과 세로 괘선은 :where() 로 요소 수준까지 낮춰 둔다 (design.md §11).
+   .tbl-prod th 처럼 오른쪽 정렬하는 표, .tbl-payoff 처럼 흰 괘선을 두르는 표가
+   클래스 하나(0,1,1)로 이걸 뒤집을 수 있어야 한다. */
+:where(.reveal) table th { text-align: left; border: none; }
+:where(.reveal) table td { border: none; }
+
+/* 파란 헤더와 줄무늬를 버리고 가로 괘선만 남긴다. 여기에 .reveal 을 붙이는 이유는
+   .tbl-stagger th 같은 개별 표 규칙(0,1,1)을 이겨야 하기 때문이다 —
+   가중치를 낮추면 파란 헤더가 되살아난다. 강의 쪽 인라인 <style> 도 이 값(0,1,2)을
+   전제로 .reveal 을 붙여 두었다. 정렬·세로 괘선을 여기에 적으면 안 된다. */
+.reveal table th {
+  background: none;
+  color: var(--ink);
+  font-weight: 700;
+  padding: 5px 10px 7px;
+  border-bottom: 1.5px solid var(--ink);
+}
+.reveal table td {
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+/* 줄무늬 규칙은 :nth-child 라 가중치가 (0,2,4) — 같은 모양으로 맞춰 눌러 둔다 */
+.reveal table tbody tr:nth-child(n) td { background: none; }
+.reveal table tbody tr:last-child td   { border-bottom: none; }
+.reveal table tbody tr.hi td { background: var(--brand-crimson); color: #FFF; }
+
+/* ─── 그래프 (design.md §6.2) ─── */
+
+.reveal svg.fig { display: block; overflow: visible; }
+
+/* 그림은 본문 영역보다 커질 수 없다. viewBox 가 있으므로 비율을 지키며 줄어든다.
+   손으로 적은 width 가 여백에서 조금씩 넘치던 것을 여기서 한 번에 막는다. */
+.reveal .body svg.fig { max-width: 100%; max-height: 330px; }
+/* 위에 설명문이 한 줄이라도 있으면 그림이 쓸 수 있는 높이가 그만큼 줄어든다 */
+.reveal .body .cols svg.fig,
+.reveal .body .col-l svg.fig, .reveal .body .col-r svg.fig { max-height: 296px; }
+
+.reveal svg.fig .axis   { stroke: var(--ink); stroke-width: 1; fill: none; }
+
+/* 곡선. 기본 .curve 와 계열 .curve-* 은 가중치가 같아(0,3,0) 순서로 갈린다 —
+   .curve 를 반드시 먼저 두고, 계열마다 굵기까지 적어 준다. */
+.reveal svg.fig .curve  { stroke: var(--ink); stroke-width: 2.4; fill: none; stroke-linecap: round; }
+/* 수요·공급 도해의 색 약속 (design.md §6.2) — D 파랑 / S 크림슨 */
+.reveal svg.fig .curve-demand { stroke: var(--accent-blue);   stroke-width: 2.4; }
+.reveal svg.fig .curve-supply { stroke: var(--brand-crimson); stroke-width: 2.4; }
+/* 개별 주체 곡선 D1·D2·D3 / S1·S2·S3 — 시장 합계는 기본 잉크색 */
+.reveal svg.fig .curve-i1 { stroke: var(--accent-green); stroke-width: 2.2; }
+.reveal svg.fig .curve-i2 { stroke: var(--chart-orange); stroke-width: 2.2; }
+.reveal svg.fig .curve-i3 { stroke: var(--chart-blue);   stroke-width: 2.2; }
+.reveal svg.fig .curve-alt    { stroke: var(--chart-orange); stroke-width: 2.2; }
+.reveal svg.fig .curve-budget { stroke: var(--chart-blue);   stroke-width: 2.2; }
+/* 정부 규제 상한·하한 가격선 */
+.reveal svg.fig .curve-cap { stroke: var(--muted); stroke-width: 1.8; }
+
+/* 잉여 영역 채움 — 같은 크림슨을 농도로 나눈다 */
+.reveal svg.fig .area-surplus { fill: var(--brand-crimson); fill-opacity: 0.10; stroke: none; }
+.reveal svg.fig .area-loss    { fill: var(--brand-crimson); fill-opacity: 0.28; stroke: none; }
+/* 후생손실 삼각형 (4강 p.18) — 잉여 사각형과 구분되게 다른 색으로 채운다 */
+.reveal svg.fig .area-dwl     { fill: var(--chart-blue); fill-opacity: 0.30; stroke: none; }
+.reveal svg.fig .area-bar     { fill: var(--brand-crimson); fill-opacity: 0.18; stroke: #FFF; stroke-width: 1; }
+.reveal svg.fig .area-hatch   { fill: url(#hatch-blue); stroke: var(--chart-blue); stroke-width: 1; }
+.reveal svg.fig .guide  { stroke: var(--guide); stroke-width: 1.2; stroke-dasharray: 3 3; fill: none; }
+.reveal svg.fig .dot    { fill: var(--brand-crimson); }
+.reveal svg.fig .dot-open { fill: #FFF; stroke: var(--ink-2); stroke-width: 1.4; }
+/* 산점도의 점 (Fig.dots). 좌표점(.dot)이 "곡선 위의 한 점"이라 크림슨으로 도드라진다면
+   산점도의 점은 자료 뭉치라 작고 파랗게 깔린다. 크림슨은 이탈값처럼 뜻이 있을 때만. */
+.reveal svg.fig .pt     { fill: var(--accent-blue); }
+.reveal svg.fig .pt-red { fill: var(--brand-crimson); }
+/* 그래프 안의 글자는 흰 테두리를 두른다 (design.md §6.5).
+   곡선·보조선 위에 글자가 얹혀도 읽힌다. 겹침을 완전히 없애는 게 우선이지만,
+   개념도에서는 붙여 써야 뜻이 통하는 라벨이 있어 마지막 안전장치로 둔다. */
+.reveal svg.fig text {
+  paint-order: stroke fill;
+  stroke: #FFF;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+/* 크림슨·회색 면 위에 얹는 흰 글자는 흰 테두리를 끈다. 위 규칙은 곡선 위 글자를
+   읽히게 하려는 안전장치인데, 어두운 면 위 흰 글자에는 자간을 메워 역효과가 난다.
+   두 학기 8개 강의가 각자 이걸 껐다 — 그래서 이름을 하나 준다. */
+.reveal svg.fig text.on-dark { stroke: none; }
+.reveal svg.fig .axis-name { font-size: 11px; font-weight: 700; fill: var(--ink-2); }
+.reveal svg.fig .tick      { font-size: 11px; font-weight: 400; fill: var(--ink-2); }
+.reveal svg.fig .annot     { font-size: 12px; font-weight: 500; fill: var(--ink); }
+.reveal svg.fig .annot.red    { fill: var(--brand-crimson); }
+.reveal svg.fig .annot.blue   { fill: var(--chart-blue); }
+.reveal svg.fig .annot.orange { fill: var(--chart-orange); }
+.reveal svg.fig .annot.muted  { fill: var(--muted); }
+.reveal svg.fig .arrow { stroke: var(--ink-2); stroke-width: 1.5; fill: none; }
+.reveal svg.fig .arrow.red   { stroke: var(--brand-crimson); }
+.reveal svg.fig .arrow.blue  { stroke: var(--chart-blue); }
+.reveal svg.fig .arrow.green { stroke: var(--accent-green); stroke-width: 4; }
+
+/* ─── T12 섹션 구분 (3강의 "소비자 이론" / "생산자 이론") ───
+   본문 없이 큰 제목 하나만. 강의를 두 덩어리로 나눌 때 쓴다. */
+
+.s-section .section-label {
+  position: absolute; left: 54px; top: 228px;
+  margin: 0;
+  font-family: 'BookkMyungjo', serif;
+  font-size: 40px; font-weight: 700;
+  letter-spacing: -0.04em; color: var(--ink);
+}
+/* 짧은 크림슨 막대가 아니라 폭 전체를 가로지르는 헤어라인 한 줄이다 */
+.s-section .section-rule {
+  position: absolute; left: var(--gutter-l); right: var(--gutter-r); top: 200px;
+  width: auto; border-top: 1px solid var(--rule);
+}
+.s-section .section-sub {
+  position: absolute; left: var(--gutter-l); top: 296px;
+  margin: 0; font-size: 13px; font-weight: 400; color: var(--muted);
+}
+
+/* ─── 넓은 표 (열이 4개 이상인 수치표) ─── */
+
+.tbl-wide { font-size: 13px; }
+.tbl-wide th, .tbl-wide td { padding: 5px 10px; text-align: right; }
+.tbl-wide th:first-child, .tbl-wide td:first-child { text-align: left; }
+
+/* ─── 엇갈린 표 (3강 효용표·생산표)
+   한계값은 두 행 사이에 놓여야 "차분"이라는 뜻이 드러난다. 원본의 장치를 살린다. */
+
+/* 색면 대신 괘선으로 가른다. 행이 두 배로 늘어나는 표라 기본 행높이로는 푸터를 넘어,
+   .reveal 을 붙여 위의 .reveal table td(0,1,2)를 이기고 행을 눌러 둔다. */
+.tbl-stagger { border-collapse: collapse; font-size: var(--fs-body); font-weight: 500; }
+.tbl-stagger td { height: 17px; }
+.reveal .tbl-stagger th { padding: 4px 10px 6px; }
+.reveal .tbl-stagger td { padding: 1px 10px; line-height: 1.3; }
+.tbl-stagger tr.lv td { background: none; border-bottom: none; border-top: 1px solid var(--rule); }
+.tbl-stagger tr.mg td { background: none; border-bottom: none; }
+.tbl-stagger tr:first-child td { border-top: none; }
+.tbl-stagger .mgv { color: var(--brand-crimson); font-weight: 700; }
+
+/* 눌러 쓰는 본문 안에서는 표도 함께 눌린다. 바로 위 .reveal .tbl-stagger td 와
+   가중치가 같아(0,2,1) 순서로 갈리므로 반드시 뒤에 둔다. */
+.body.tight   table td { padding: 1px 8px; line-height: 1.25; }
+.body.tighter table td { padding: 0 8px; line-height: 1.2; }
+
+/* 생산·비용표는 13행 엇갈림 구조라 본문 행높이를 그대로 쓰면 슬라이드를 넘긴다.
+   line-height를 명시해 눌러야 한다 — padding만 줄이면 상속된 --lh-body가 그대로 남는다. */
+.tbl-prod { font-size: 12px; }
+.tbl-prod th, .tbl-prod td { padding: 1px 9px; line-height: 1.25; text-align: right; }
+.tbl-prod th:first-child, .tbl-prod td:first-child { text-align: left; }
+.tbl-prod td { height: auto; }
+
+/* 이윤표는 6열 — 원본 p.47 */
+.tbl-profit { font-size: 12px; }
+.tbl-profit th, .tbl-profit td { padding: 1px 7px; line-height: 1.3; text-align: right; }
+.tbl-profit th:first-child, .tbl-profit td:first-child { text-align: left; }
+.tbl-profit td { height: auto; }
+/* 이윤이 최대인 구간을 강조한다 (tr.hi). 색만으로 뜻을 전하지 않도록
+   본문의 "이윤 = 총수입 – 총비용"과 함께 읽히는 자리에만 쓴다 (design.md §10).
+   규칙 자체는 위 표 기본값의 .reveal table tbody tr.hi td 에 있다. */
+
+/* ─── 지난 강의 리뷰 (4강 p.1)
+   앞 강의의 그림들을 축소해 한 화면에 늘어놓고 흐름을 화살표로 잇는다.
+   x축 높이를 맞춰야 줄이 서 보이므로 아래 정렬한다. */
+
+.s-review .body { padding-top: 4px; }
+.rv-title { font-size: 13px; font-weight: 700; color: var(--accent-red); margin: 0 0 2px; }
+.rv-row   { display: flex; align-items: flex-end; gap: 8px; }
+.rv-row > #r-ic, .rv-row > #r-dem { width: 236px; }
+.rv-row > #r-iq, .rv-row > #r-tc, .rv-row > #r-mc { width: 236px; }
+.rv-row #r-eq { width: 250px; }
+.rv-ar { width: 34px; height: 34px; flex: 0 0 34px; margin-bottom: 60px; overflow: visible; }
+
+/* ─── 시장 비교표 (4강 p.3) — 5열 × 6행 ─── */
+
+.tbl-market { font-size: 13px; width: 100%; table-layout: fixed; }
+.tbl-market th, .tbl-market td { padding: 5px 8px; text-align: center; line-height: 1.35; }
+.tbl-market th:first-child, .tbl-market td:first-child { text-align: left; width: 20%; }
+.tbl-market .en { display: block; font-size: 10px; font-weight: 400; opacity: 0.85; }
+
+/* 제목·본문 안의 영문 병기는 한 급 작게 (design.md §3.2) */
+/* 제목은 명조인데 영문 병기는 산세리프로 되돌린다 — 명조 영문은 제목에서 튄다 */
+.reveal h2 .en {
+  font-family: Pretendard, sans-serif;
+  font-size: 0.58em; font-weight: 500; color: var(--ink-2); letter-spacing: -0.01em;
+}
+
+/* ─── 생산중단 판단 슬라이드 (4강 p.6~8) ─── */
+
+ol.tight { margin: 0 0 22px; padding-left: 22px; font-size: var(--fs-body); font-weight: 500; }
+ol.tight > li { margin-bottom: 4px; }
+.shutdown { font-size: var(--fs-body); font-weight: 500; line-height: 1.6; margin: 0; }
+
+/* ─── 2연 그림 (4강 p.10·11: 시장 / 개별기업)
+   두 그림을 나란히 놓고 가격선 높이를 맞춰 "시장이 정한 가격을 기업이 받는다"를 보인다. */
+
+.s-pair .body { display: flex; gap: 20px; align-items: flex-start; padding-top: 6px; }
+.s-pair .pair-cell { flex: 0 0 auto; }
+.s-pair .pair-title { font-size: var(--fs-emph); font-weight: 500; margin: 0 0 4px; }
+.s-pair #f-se-m, .s-pair #f-le-m { width: 330px; }
+.s-pair #f-se-f, .s-pair #f-le-f { width: 470px; }
+.s-pair #f-fe-p, .s-pair #f-fe2-p { width: 340px; }
+.s-pair #f-fe-l, .s-pair #f-fe2-l { width: 420px; }
+.s-pair #f-ks, .s-pair #f-rs { width: 420px; }
+
+/* ─── 독점 슬라이드 보조 (4강 p.16·20) ─── */
+
+.mono-note { position: absolute; left: var(--gutter-l); top: 214px;
+  margin: 0; font-size: var(--fs-body); font-weight: 500; line-height: 1.6; color: var(--muted); }
+/* 제목이 62px 로 내려와 있으므로 제목 옆·아래에 놓던 절대배치 보조문은 본문 첫 줄 자리로
+   내린다. 본문 상단과의 간격(-10px · +14px)은 두 줄짜리 발문도 들어가게 잡은 값이다. */
+.pd-lead { position: absolute; left: var(--gutter-l); top: calc(var(--content-top) - 10px); margin: 0; font-size: var(--fs-emph); }
+.pd-sub  { position: absolute; left: var(--gutter-l); top: calc(var(--content-top) + 14px); margin: 0; }
+.pd-note { font-size: var(--fs-caption); font-weight: 500; line-height: 1.5;
+  margin: 0 0 6px; text-align: center; }
+.s-pair #f-pdA, .s-pair #f-pdB { width: 420px; }
+
+/* ─── 보수행렬 (4강 p.27~30)
+   행·열 머리가 2단이라 일반 표 규칙(첫 행만 헤더)으로는 모양이 나오지 않는다.
+   열 폭은 <colgroup> 으로 못 박는다 — 내용 길이에 따라 칸이 출렁이면 세 장의 표가
+   서로 다른 모양이 된다. */
+
+.tbl-payoff { border-collapse: collapse; width: 100%;
+  font-size: var(--fs-body); font-weight: 500; margin: 0; }
+.tbl-payoff th, .tbl-payoff td {
+  border: 1px solid #FFF; padding: 9px 10px; text-align: center; white-space: nowrap;
+}
+.tbl-payoff th   { background: var(--chart-blue); color: #FFF; font-weight: 700; }
+.tbl-payoff td   { background: var(--table-row-a); color: var(--ink); }
+.tbl-payoff .corner { background: var(--chart-blue); color: #FFF; font-weight: 700;
+  text-align: left; vertical-align: top; }
+/* 강조 셀. nth-child 배경 규칙(0,3,2)을 넘어야 해서 .reveal 을 붙인다. */
+.tbl-payoff td.hi { background: var(--chart-orange); color: #FFF; font-weight: 700; }
+
+/* 표 위에 나란히 놓는 항목 줄 (4강 p.29) */
+.rule-row { display: flex; gap: 60px; margin: 0 0 26px; }
+.rule-row > .sub { margin: 0; }
+
+/* ─── 게임이론 슬라이드 (4강 p.25)
+   원본의 영화 포스터를 그대로 쓴다. 강의실 인용은 문제없지만 웹 배포는 별개 문제이므로
+   배포를 실제로 진행할 때 이 이미지의 처리를 따로 판단한다. */
+
+.gt-poster { display: block; margin: 0 auto; height: 290px; width: auto; }
+
+/* ─── 1강(강의소개) 전용 ──────────────────────────────────
+   1강은 구형 템플릿(웜그레이 배경 + 손글씨체)이었다. 손글씨로 적던 발문은
+   정본에서 같은 층위인 빨간 발문(.lead.t-define)과 도출문(.derive)으로 옮긴다. */
+
+/* 큰 제시문 (원본 28pt 항목) */
+.ask { font-size: 24px; font-weight: 500; line-height: 1.5; margin: 0 0 34px; }
+.body.stack > .ask:last-child { margin-bottom: 0; }
+
+/* 정의문 (원본 40pt 크림슨) */
+.define-big { font-size: 28px; font-weight: 700; line-height: 1.5;
+  color: var(--define-crimson); margin: 0; }
+
+/* 편익·비용 번호 목록 */
+ol.bc { margin: 30px 0 0; padding-left: 30px;
+  font-size: var(--fs-sub); font-weight: 500; line-height: 1.6; }
+ol.bc > li { margin-bottom: 30px; }
+ol.bc > li:last-child { margin-bottom: 0; }
+
+/* 목록 아래 들여쓴 도출문 */
+.note-in { margin: 10px 0 10px 120px; font-weight: 500; }
+
+/* 발문은 제목 밑에 붙이고 본문은 남은 공간 가운데에 둔다 */
+.body.lede { display: flex; flex-direction: column; }
+.body.lede > .lead { margin: 6px 0 0; }
+.lede-main { margin: auto 0; }
+
+/* 밑줄 없는 크림슨 강조. .mark 는 밑줄을 긋는데 원본의 붉은 강조에는 밑줄이 없는 경우가
+   많다. 표 안에서도 쓰이므로 .reveal 을 붙여 .reveal table td(0,1,2)를 이기게 한다 —
+   (0,1,0) 으로 두면 표 셀에서 색이 먹지 않는다. */
+.reveal .hl { color: var(--brand-crimson); font-weight: 700; }
+
+/* 크림슨 밑줄 강조 */
+.mark { color: var(--brand-crimson); font-weight: 700;
+  text-decoration: underline; text-decoration-color: var(--brand-crimson);
+  text-underline-offset: 4px; }
+
+/* 크림슨 라벨 박스 + 설명 (원본 p.11 · p.14 · p.15) */
+.def-row { display: flex; align-items: center; gap: 26px; }
+.def-row + .def-row { margin-top: 42px; }
+.def-tag { flex: 0 0 218px; padding: 14px 10px; text-align: center;
+  background: var(--brand-crimson); color: #FFF;
+  font-size: var(--fs-body); font-weight: 700; line-height: 1.45; }
+.def-tag .en { font-weight: 500; }
+.def-row > p, .def-row > div > p { margin: 0 0 4px; font-size: var(--fs-emph); }
+.def-row > div > p:last-child { margin-bottom: 0; }
+
+/* 표지 이미지 나열 */
+.covers { display: flex; gap: 30px; justify-content: center; align-items: flex-start; }
+.covers img { height: 380px; width: auto; }
+.covers.text-covers { justify-content: flex-start; gap: 46px; margin: 26px 0 0 40px; }
+.covers.text-covers img { height: 300px; }
+
+.photo { display: block; height: 300px; width: auto; margin: 14px 0 6px; }
+.source { font-size: var(--fs-caption); color: var(--accent-blue); margin: 0; }
+.link { font-size: var(--fs-body); color: var(--accent-blue); line-height: 1.5; margin: 0; }
+
+/* 열 개 원칙 목록 (원본 p.16) */
+ol.basics { margin: 8px 0 0; padding-left: 34px; font-size: 17px; font-weight: 500; }
+ol.basics > li { margin-bottom: 11px; }
+
+ol.books { margin: 0; padding-left: 26px; font-size: var(--fs-emph); font-weight: 500; }
+ol.books > li { margin-bottom: 10px; }
+
+/* 주별 강의 내용 (원본 p.19)
+   괘선도 줄무늬도 없는 두 칸짜리 목록이다. <table> 로 만들면 기본 표 규칙(줄무늬·여백)과
+   계속 싸우게 되므로 애초에 표로 만들지 않는다. */
+
+.schedule { margin: 4px 0 0 120px; font-size: 15px; font-weight: 500; }
+.schedule .row { display: flex; gap: 6px; line-height: 1.6; }
+.schedule .row > .d { flex: 0 0 92px; }
+.schedule .row.exam { color: var(--accent-blue); }
+.schedule .row.off  { color: var(--point-red); }
+
+/* 평가 방법 막대 (원본 p.21) — 칸 너비가 곧 배점이다 */
+.grade-bar { display: flex; width: 700px; margin: 0 auto; }
+.grade-bar .seg { padding: 16px 6px; text-align: center; color: #FFF;
+  font-size: var(--fs-body); font-weight: 700; line-height: 1.4; }
+.grade-bar .s1 { background: #B9AE9C; }
+.grade-bar .s2 { background: #6B6357; }
+.grade-bar .s3 { background: #9E9E9E; }
+.grade-bar .s4 { background: var(--brand-crimson); }
+
+/* ─── 5강 전용 ─────────────────────────────────────────── */
+
+.tbl-vmp { font-size: 13px; }
+.tbl-vmp th, .tbl-vmp td { padding: 4px 12px; text-align: center; }
+.tbl-vmp th:first-child, .tbl-vmp td:first-child { text-align: left; }
+.tbl-decile { font-size: 13px; }
+.tbl-decile th, .tbl-decile td { padding: 4px 14px; text-align: right; }
+.tbl-decile th:first-child, .tbl-decile td:first-child { text-align: left; }
+
+/* 경제적 지대 / 전용수입 (5강 p.13) — 한 사각형을 공급곡선이 위아래로 가른다 */
+.reveal svg.fig .area-erent    { fill: var(--accent-blue); fill-opacity: 0.22; stroke: none; }
+.reveal svg.fig .area-transfer { fill: var(--point-red);   fill-opacity: 0.14; stroke: none; }
+.reveal svg.fig .annot.green   { fill: var(--accent-green); }
+
+/* 조세부담의 전가 (6강 p.15) — 한 사각형을 균형가격선이 위아래로 가른다 */
+.reveal svg.fig .area-buyer  { fill: var(--chart-blue);   fill-opacity: 0.30; stroke: none; }
+.reveal svg.fig .area-seller { fill: var(--chart-orange); fill-opacity: 0.42; stroke: none; }
+
+/* ─── 7강 전용 ─────────────────────────────────────────── */
+
+/* 부가가치 사슬 (7강 p.10) */
+.chain { display: flex; align-items: flex-start; justify-content: center; gap: 0; margin-top: 40px; }
+.chain .node { position: relative; width: 118px; padding: 20px 6px; text-align: center;
+  background: var(--brand-crimson); color: #FFF; font-size: var(--fs-body); font-weight: 700;
+  line-height: 1.35; }
+.chain .node .va { position: absolute; left: 50%; transform: translateX(-50%); top: calc(100% + 8px);
+  white-space: nowrap; color: var(--ink); font-weight: 500; }
+.chain .link { flex: 0 0 92px; align-self: center; text-align: center;
+  font-size: var(--fs-body); font-weight: 500; position: relative; padding-bottom: 10px; }
+.chain .link::after { content: ''; position: absolute; left: 6px; right: 6px; bottom: 0;
+  border-top: 1.4px solid #7C7C7C; }
+.chain .link::before { content: ''; position: absolute; right: 4px; bottom: -4px;
+  border: 4px solid transparent; border-left-color: #7C7C7C; }
+
+/* 세 국민소득 (7강 p.13) */
+.triple { display: flex; gap: 22px; justify-content: center; }
+.triple .cell { flex: 1 1 0; text-align: center; }
+.triple .tag { background: var(--brand-crimson); color: #FFF; font-weight: 700;
+  font-size: var(--fs-emph); padding: 22px 8px; }
+.triple .cell > p { margin: 8px 0 0; font-size: var(--fs-body); line-height: 1.45; }
+
+/* 물가지수 바스켓 표 (7강 p.17) */
+.tbl-basket { font-size: 13px; width: 100%; }
+.tbl-basket th, .tbl-basket td { padding: 4px 12px; }
+
+/* 답이 뒤에 붙는 문답 (7강 p.19) */
+.qa-ans { font-size: var(--fs-caption); color: var(--muted); margin-left: 26px; }
+
+.s-pair #f-micro, .s-pair #f-macro, .s-pair #f-adup, .s-pair #f-asdn { width: 420px; }
+
+/* ─── 8강 전용 ─────────────────────────────────────────── */
+
+.tbl-eqcond { font-size: 13px; position: absolute; right: 0; top: 0; width: 560px; }
+.tbl-eqcond th, .tbl-eqcond td { padding: 4px 12px; }
+.eqcond-label { font-size: 22px; margin: 26px 0 0; }
+.tbl-multi { font-size: 14px; width: 620px; }
+.tbl-multi th, .tbl-multi td { padding: 3px 14px; text-align: center; }
+.tbl-multi th:first-child, .tbl-multi td:first-child { text-align: left; }
+
+/* 경제기반모형 계통도 (8강 p.15) */
+.base-tree .tag { background: var(--brand-crimson); color: #FFF; font-weight: 700;
+  text-align: center; padding: 8px 6px; font-size: var(--fs-body); line-height: 1.3; }
+.base-tree .tag.wide { width: 300px; margin: 0 auto; }
+.base-tree .tag.sm { width: 130px; padding: 6px; }
+.base-tree .row2 { display: flex; gap: 22px; justify-content: center; margin-top: 14px; }
+.base-tree .row2 > .tag { flex: 0 0 190px; }
+.base-tree .row2.small { justify-content: flex-start; margin-left: 10px; }
+.base-tree .row2.small .spacer { flex: 1 1 auto; }
+.base-tree .eq { margin: 12px 0; font-size: var(--fs-body); }
+
+/* 경기침체갭 / 인플레이션갭 정리 (8강 p.33) */
+.gap-table { display: flex; gap: 40px; }
+.gap-table .col { flex: 1 1 0; }
+.gap-table .tagline { background: var(--table-row-a); color: var(--define-crimson);
+  font-weight: 700; text-align: center; padding: 10px; margin: 0 0 10px; }
+
+.s-pair #f-adderive1, .s-pair #f-adderive2,
+.s-pair #f-adshift-ae, .s-pair #f-adshift-ad,
+.s-pair #f-gap1, .s-pair #f-gap2, .s-pair #f-self1, .s-pair #f-self2 { width: 420px; }
+
+/* ─── 9강 전용 ─────────────────────────────────────────── */
+
+.tbl-money { font-size: 12px; }
+.tbl-money th, .tbl-money td { padding: 4px 10px; }
+.tbl-money td:nth-child(3), .tbl-money td:nth-child(4),
+.tbl-money th:nth-child(3), .tbl-money th:nth-child(4) { text-align: right; width: 92px; }
+.tbl-compare { font-size: 12px; }
+.tbl-compare th, .tbl-compare td { padding: 6px 10px; vertical-align: top; }
+.tbl-compare td:first-child, .tbl-compare th:first-child { width: 130px; }
+.tbl-trade { font-size: 13px; }
+.tbl-trade th, .tbl-trade td { padding: 4px 14px; text-align: center; }
+.tbl-trade th:first-child, .tbl-trade td:first-child { text-align: left; }
+.tbl-trade2 { font-size: 12px; }
+.tbl-trade2 th, .tbl-trade2 td { padding: 4px 8px; text-align: center; }
+.tbl-trade2 th:first-child, .tbl-trade2 td:first-child { text-align: left; }
+.tbl-bop { font-size: 12px; }
+.tbl-bop th, .tbl-bop td { padding: 3px 10px; }
+.tbl-bop td:first-child { width: 96px; }
+.tbl-bop td:nth-child(2) { width: 150px; }
+.tbl-fxsys { font-size: 12px; }
+.tbl-fxsys th, .tbl-fxsys td { padding: 8px 10px; vertical-align: top; }
+.tbl-fxsys td:first-child, .tbl-fxsys th:first-child { width: 70px; }
+
+/* 테두리 상자 (9강 p.30 환율 예시) */
+.callout { border: 1.6px solid var(--brand-crimson); border-radius: 18px;
+  padding: 20px 26px; margin-top: 14px; font-size: var(--fs-emph); }
+
+/* 인구 구조 계통도 (9강 p.43) */
+.pop-tree .tag { background: var(--brand-crimson); color: #FFF; font-weight: 700;
+  text-align: center; padding: 10px 6px; font-size: var(--fs-body); line-height: 1.4; }
+.pop-tree .tag .num { font-weight: 500; font-size: var(--fs-caption); }
+.pop-tree .tag.wide { width: 320px; margin: 0 auto; }
+.pop-tree .row2 { display: flex; gap: 20px; justify-content: center; margin-top: 16px; }
+.pop-tree .row2 > .tag { flex: 0 0 190px; }
+
+ol.dense > li { margin-bottom: 18px; }
+
+.s-pair #f-md, .s-pair #f-md2, .s-pair #f-ms, .s-pair #f-ms2,
+.s-pair #f-ms-short, .s-pair #f-adas-short, .s-pair #f-ms-long, .s-pair #f-adas-long,
+.s-pair #f-ms-crowd, .s-pair #f-adas-crowd, .s-pair #f-ms-fl, .s-pair #f-adas-fl,
+.s-pair #f-fx-d, .s-pair #f-fx-s, .s-pair #f-inf1, .s-pair #f-inf2,
+.s-pair #f-sup1, .s-pair #f-sup2 { width: 420px; }
+
+/* ─── T10 마무리 (2강 p.26 "Q & A") ─── */
+
+.s-closing .qa {
+  position: absolute; left: var(--gutter-l); top: 250px;
+  margin: 0;
+  font-family: 'BookkMyungjo', serif;
+  font-size: 34px; font-weight: 400;
+  color: var(--brand-crimson);
+  letter-spacing: 0.02em;
+}
+.s-closing .qa-rule {
+  position: absolute; left: var(--gutter-l); top: 297px;
+  width: 380px; height: 0;
+  border-top: 1px solid; border-color: var(--rule);
+}
+.s-closing .contact {
+  position: absolute; left: var(--gutter-l); top: 322px;
+  margin: 0; font-size: 15px; font-weight: 700; line-height: 1.45;
+}
+.s-closing .contact .en { font-size: 13px; }
+
+/* ─── 번호 목록 (2강 p.10, p.16 결정요인) ─── */
+
+.s-numbered .body ol {
+  margin: 34px 0 0; padding: 0 0 0 42px;
+  font-size: var(--fs-sub); font-weight: 700; color: var(--accent-red);
+}
+.s-numbered .body ol > li { margin-bottom: 40px; padding-left: 10px; }
+
+/* ─── 우상단 보조 노트 (2강 p.8 "탄력성 > 1 → 탄력적") ─── */
+
+.corner-note {
+  position: absolute; right: var(--gutter-r); top: 24px;
+  margin: 0; text-align: left;
+  font-size: var(--fs-emph); font-weight: 500; line-height: 1.5;
+}
+
+/* ─── 누적 공개 (design.md §8) ─── */
+
+.reveal .fragment.fade-in:not(.visible) { opacity: 0; }
+
+/* ─── 색 유틸리티 ────────────────────────────────────────
+   파일 맨 끝에 둔다. 앞에 두면 .derive 처럼 색을 함께 지정하는 컴포넌트가
+   나중 선언으로 이겨서 t-red 를 붙여도 색이 바뀌지 않는다. */
+
+.t-red     { color: var(--accent-red); }      /* 소제목·핵심 라벨 */
+.t-define  { color: var(--define-crimson); }  /* 정의문·발문 */
+.t-blue    { color: var(--chart-blue); }      /* 캡션·도출 결과 */
