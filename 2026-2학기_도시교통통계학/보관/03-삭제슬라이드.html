@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>3강. 정규분포와 정규분포로의 근사</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols { align-items: flex-start; }
+
+  /* R 로 뽑은 히스토그램 3장 — 관측 횟수가 늘수록 종모양으로 수렴하는 과정 */
+  .hists { display: flex; gap: 16px; justify-content: center; margin: 4px 0 0; }
+  .hists figure { margin: 0; text-align: center; }
+  .hists img { display: block; height: 152px; width: auto; }
+  .hists figcaption { font-size: 13px; font-weight: 500; margin-top: 2px; }
+  /* 마지막 판에는 히스토그램에서 되찾은 N(170, 5²) 곡선을 겹쳐 얹는다.
+     이미지 픽셀 좌표계를 그대로 viewBox 로 쓰므로 눈금과 정확히 맞는다. */
+  .ov { position: relative; display: inline-block; }
+  .ov > svg.fig { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  #f-fit .curve { stroke-width: 11; }
+  .hist-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  .dens { font-size: 13px; line-height: 1.5; margin: 0; color: var(--ink-2); }
+  .dens.ind { padding-left: 92px; text-indent: -0.5px; }
+
+  /* 표준정규분포표 발췌 — 원본은 웹 화면 캡처였지만 인쇄된 숫자를 그대로 다시 짰다 */
+  .ztbl { font-size: 11px; width: 100%; table-layout: fixed; }
+  .reveal .ztbl th, .reveal .ztbl td { padding: 1px 8px; text-align: right; line-height: 1.3; height: auto; }
+  .reveal .ztbl th:first-child, .reveal .ztbl td:first-child { text-align: center; }
+  .ztbl .hl { color: var(--brand-crimson); font-weight: 700; }
+  .ztbl-tall { font-size: 10px; }
+  .reveal .ztbl-tall th, .reveal .ztbl-tall td { padding: 0 8px; line-height: 1.0; }
+
+  /* 상자그림 — 뼈대는 얇은 잉크선, 중앙값만 굵은 파랑 */
+  .bx     { fill: none; stroke: var(--ink); stroke-width: 1.6; }
+  .bx-med { stroke: var(--chart-blue); stroke-width: 3.6; fill: none; }
+
+  .ztables { display: flex; gap: 40px; justify-content: center; margin-top: 6px; }
+  .ztables figure { margin: 0; text-align: center; }
+  .ztables img { display: block; height: 306px; width: auto; }
+  .ztables figcaption { font-size: 11px; color: var(--accent-blue); margin-top: 4px; }
+  .scan { display: block; margin: 10px auto 0; height: 214px; width: auto; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <!-- ══ 표지 — 이 파일의 성격 ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>3강에서 뺀 슬라이드</h1>
+    <p class="cover-date">2026-09-15 보관</p>
+  </section>
+
+  <!-- ══ 무엇을 왜 뺐나 ═══════════════════════════════════════ -->
+  <section>
+    <h2>이 파일은 무엇인가</h2>
+    <div class="body stack">
+      <p class="lead t-define">3강 「정규분포와 정규분포로의 근사」에서 뺀 슬라이드를 버리지 않고 모아 둔 것</p>
+      <ul>
+        <li>정규분포로의 근사 — 면적을 구하는 두 가지 방법 (적분 · 표준화 후 표)
+          <br><span class="caption">앞뒤 슬라이드가 같은 h2 로 이어지는데 이 장만 두 방법을 미리 늘어놓아
+          흐름이 끊겼다. 표준화와 표준정규분포표를 배운 뒤 자연스럽게 나오는 내용이다.</span></li>
+      </ul>
+      <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+      <p class="caption" style="margin-top:14px">PDF 내려받기 단추는 이 파일에서 동작하지 않는다
+        (pdf/03-삭제슬라이드.pdf 를 만들지 않기 때문이다).</p>
+    </div>
+  </section>
+
+  <!-- ══ 원본 3강 13쪽 — 면적을 구하는 두 가지 방법 ═══════════════ -->
+  <section>
+    <h2>정규분포로의 근사 <span class="en">(normal approximation)</span></h2>
+    <div class="body tighter">
+      <p class="lead">만약 어떤 확률변수가 정규분포와 유사한 형태의 분포를 지니고 있다면
+        그 분포를 정규분포로 간주하고,<br>표준화를 통해 어떤 구간 내에 속한 숫자의 비율을 구할 수 있다.</p>
+      <p class="formula-key" style="margin:2px 0 0">$X \sim N(50,\ 5^{2})$ &nbsp;&nbsp;
+        $f(X)=\dfrac{1}{\sqrt{2\pi}*5}\,e^{-\frac{1}{2}\left(\frac{X-50}{5}\right)^{2}}$</p>
+      <svg class="fig" id="f-std" viewBox="0 0 820 178" style="width:820px" role="img">
+        <title>실제단위 히스토그램을 표준단위 표준정규분포로 옮기는 그림</title>
+      </svg>
+      <p class="sub" style="margin-top:6px">정규분포곡선 아래 구간의 면적(= 그 구간 내에 속한 자료의 비율
+        = 그 구간의 값이 나올 확률)을 구하는 법</p>
+      <ol class="dense">
+        <li>(표준)정규분포곡선을 구간에 대하여 적분</li>
+        <li>구간의 값을 표준화한 뒤 표준정규분포표를 통해 면적을 도출</li>
+      </ol>
+    </div>
+  </section>
+
+</div></div>
+
+<script>
+/* 표준단위 눈금이 붙은 종모양 한 판. 원본이 여러 슬라이드에서 같은 그림을 되풀이한다.
+ *   ticks: [[표준단위 값, 붙일 글자], …]   unit: 눈금 줄 위에 얹는 단위 이름 */
+function bell(sel, box, o) {
+  o = o || {};
+  const F = Fig.withBox(box);
+  const S = F.scale({ x: [-3.8, 3.8], y: [0, 0.42] });
+  const pts = S.curve(Fig.normal(0, 1, -3.8, 3.8, { through: (o.ticks || []).map((t) => t[0]) }));
+  const parts = [
+    F.raw(`<path class="axis" d="M${box.x0},${box.y0} L${box.x1},${box.y0}"/>`),
+  ];
+  (o.before || function () { return []; })(F, S).forEach((p) => parts.push(p));
+  parts.push(F.curve(pts, { variant: 'demand' }));
+  parts.push(F.raw(`<path class="axis" d="M${S.x(0)},${box.y0} L${S.x(0)},${S.y(0.3989)}"/>`));
+  if (o.unit) parts.push(F.annot(S.x(0), box.y1 - 26, o.unit, { anchor: 'middle', size: 11 }));
+  (o.ticks || []).forEach(([v, t]) =>
+    parts.push(F.annot(S.x(v), box.y1 - 8, t, { anchor: 'middle', size: 11 })));
+  (o.after || function () { return []; })(F, S).forEach((p) => parts.push(p));
+  if (sel) F.draw(sel, { parts: parts });
+  return { F: F, S: S, pts: pts, parts: parts };
+}
+
+/* N(50, 5²)을 계급 2.5로 자른 히스토그램. 막대 높이도 같은 밀도함수에서 뽑으므로
+   얹는 곡선과 어긋날 수 없다 (design.md §6.5). */
+function histN(F, S, lo, hi, w) {
+  let s = '';
+  for (let x = lo; x < hi - 1e-9; x += w) {
+    const c = x + w / 2;
+    const d = Math.exp(-0.5 * Math.pow((c - 50) / 5, 2)) / (5 * Math.sqrt(2 * Math.PI));
+    s += `<rect class="area-bar" x="${S.x(x)}" y="${S.y(d)}" ` +
+         `width="${S.x(x + w) - S.x(x)}" height="${F.BOX.y0 - S.y(d)}"/>`;
+  }
+  return F.raw(s);
+}
+
+/* 실제단위(평균 ± nSD) 눈금이 붙은 N(50, 5²) 한 판 */
+function realPanel(sel, box, o) {
+  o = o || {};
+  const F = Fig.withBox(box);
+  const S = F.scale({ x: [32.5, 67.5], y: [0, 0.09] });
+  const parts = [
+    histN(F, S, 35, 65, 2.5),
+    F.raw(`<path class="axis" d="M${box.x0},${box.y0} L${box.x1},${box.y0}"/>`),
+    F.curve(S.curve(Fig.normal(50, 5, 34, 66)), { variant: 'demand' }),
+  ];
+  parts.push(F.annot(S.x(50), box.y1 - 26, '실제단위', { anchor: 'middle', size: 11 }));
+  [[35, '−3SD'], [40, '−2SD'], [45, '−1SD'], [50, '평균'],
+   [55, '+1SD'], [60, '+2SD'], [65, '+3SD']].forEach(([v, t]) =>
+    parts.push(F.annot(S.x(v), box.y1 - 8, t, { anchor: 'middle', size: 11 })));
+  (o.after || function () { return []; })(F, S).forEach((p) => parts.push(p));
+  F.draw(sel, { parts: parts });
+}
+
+/* 원본 3강 13쪽의 그림 — 실제단위 판과 표준단위 판을 화살표로 잇는다 */
+(function () {
+  const ZT = [[-3, '\u22123.0'], [-2, '\u22122.0'], [-1, '\u22121.0'], [0, '0'],
+              [1, '+1.0'], [2, '+2.0'], [3, '+3.0']];
+  realPanel('#f-std', { x0: 30, y0: 166, x1: 350, y1: 64 });
+  const std = document.getElementById('f-std');
+  const right = bell(null, { x0: 500, y0: 166, x1: 800, y1: 64 }, { unit: '표준단위', ticks: ZT });
+  std.insertAdjacentHTML('beforeend',
+    Fig.arrow(384, 128, 466, 128) + right.parts.join('\n'));
+})();
+</script>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

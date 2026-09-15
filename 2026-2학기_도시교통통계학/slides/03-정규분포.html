@@ -57,7 +57,7 @@
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <h1>3강. 정규분포와<br>정규분포로의 근사</h1>
+    <h1>3강. 정규분포와 정규분포로의 근사</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
@@ -257,44 +257,8 @@
   </section>
 
   <!-- 원본 p.12 -->
-  <section>
-    <h2>정규분포로의 근사 <span class="en">(normal approximation)</span></h2>
-    <div class="body tight">
-      <p class="lead">만약 어떤 확률변수가 정규분포와 유사한 형태의 분포를 지니고 있다면
-        그 분포를 정규분포로 간주하고,<br>표준화를 통해 어떤 구간 내에 속한 숫자의 비율을 구할 수 있다.</p>
-      <div class="cols" style="align-items:center">
-        <div class="col-l">
-          <svg class="fig" id="f-q" viewBox="0 0 400 210" style="width:400px" role="img">
-            <title>평균 50, 표준편차 5인 분포에서 40과 60 사이 구간을 표시한 히스토그램</title>
-          </svg>
-        </div>
-        <div class="col-r">
-          <p class="lead">“평균 50, 표준편차 5”인 분포</p>
-          <p class="lead">→ 40~60 사이에 속한 자료는 대략 몇 %일까?</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- 원본 p.13 -->
-  <section>
-    <h2>정규분포로의 근사 <span class="en">(normal approximation)</span></h2>
-    <div class="body tighter">
-      <p class="lead">만약 어떤 확률변수가 정규분포와 유사한 형태의 분포를 지니고 있다면
-        그 분포를 정규분포로 간주하고,<br>표준화를 통해 어떤 구간 내에 속한 숫자의 비율을 구할 수 있다.</p>
-      <p class="formula-key" style="margin:2px 0 0">$X \sim N(50,\ 5^{2})$ &nbsp;&nbsp;
-        $f(X)=\dfrac{1}{\sqrt{2\pi}*5}\,e^{-\frac{1}{2}\left(\frac{X-50}{5}\right)^{2}}$</p>
-      <svg class="fig" id="f-std" viewBox="0 0 820 178" style="width:820px" role="img">
-        <title>실제단위 히스토그램을 표준단위 표준정규분포로 옮기는 그림</title>
-      </svg>
-      <p class="sub" style="margin-top:6px">정규분포곡선 아래 구간의 면적(= 그 구간 내에 속한 자료의 비율
-        = 그 구간의 값이 나올 확률)을 구하는 법</p>
-      <ol class="dense">
-        <li>(표준)정규분포곡선을 구간에 대하여 적분</li>
-        <li>구간의 값을 표준화한 뒤 표준정규분포표를 통해 면적을 도출</li>
-      </ol>
-    </div>
-  </section>
 
   <!-- 원본 p.14 -->
   <section>
@@ -382,7 +346,7 @@
   <section>
     <h2>정규분포로의 근사 <span class="en">(normal approximation)</span></h2>
     <div class="body tight">
-      <p class="lead">만약 어떤 확률변수가 정규분포와 유사한 형태의 분포를 지니고 있다면
+      <p class="lead">만약 어떤 자료의 분포가 정규분포와 유사한 형태의 분포를 지니고 있다면
         그 분포를 정규분포로 간주하고,<br>표준화를 통해 어떤 구간 내에 속한 숫자의 비율을 구할 수 있다.</p>
       <div class="cols" style="align-items:center">
         <div class="col-l">
@@ -417,12 +381,30 @@
       </ol>
     </div>
   </section>
+  <section>
+    <h2>정규분포로의 근사 <span class="en">(normal approximation)</span></h2>
+    <div class="body tight">
+      <p class="lead">만약 어떤 자료의 분포가 정규분포와 유사한 형태의 분포를 지니고 있다면
+        그 분포를 정규분포로 간주하고,<br>표준화를 통해 어떤 구간 내에 속한 숫자의 비율을 구할 수 있다.</p>
+      <div class="cols" style="align-items:center">
+        <div class="col-l">
+          <svg class="fig" id="f-q" viewBox="0 0 400 210" style="width:400px" role="img">
+            <title>평균 50, 표준편차 5인 분포에서 40과 60 사이 구간을 표시한 히스토그램</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <p class="lead">“평균 50, 표준편차 5”인 분포</p>
+          <p class="lead">→ 40~60 사이에 속한 자료는 대략 몇 %일까?</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- 원본 p.18 -->
   <section>
     <h2>정규분포로의 근사 <span class="en">(normal approximation)</span></h2>
     <div class="body tight">
-      <p class="lead">만약 어떤 확률변수가 정규분포와 유사한 형태의 분포를 지니고 있다면
+      <p class="lead">만약 어떤 자료의 분포가 정규분포와 유사한 형태의 분포를 지니고 있다면
         그 분포를 정규분포로 간주하고,<br>표준화를 통해 어떤 구간 내에 속한 숫자의 비율을 구할 수 있다.</p>
       <div class="cols" style="align-items:center">
         <div class="col-l">
@@ -463,7 +445,7 @@
         </div>
         <div class="col-r fragment" data-fragment-index="1">
           <table class="ztbl ztbl-tall">
-            <thead><tr><th>μ</th><th>+ 0.00</th><th>+ 0.01</th></tr></thead>
+            <thead><tr><th>z</th><th>+ 0.00</th><th>+ 0.01</th></tr></thead>
             <tbody>
               <tr><td>0.0</td><td>0.5000</td><td>0.5040</td></tr>
               <tr><td>0.1</td><td>0.5398</td><td>0.5438</td></tr>
@@ -587,8 +569,8 @@
         <li>특정 현상이 정규분포를 따른다면 그 현상의 평균과 표준편차만으로
           해당 현상의 발생빈도를 완벽하게 묘사할 수 있다.</li>
         <li>정규분포 중에서 평균이 0이고 표준편차가 1인 정규분포를 표준정규분포라 한다.</li>
-        <li>어떤 자료에서 평균을 빼고 이를 표준편차로 나눈 것을 자료의 표준화라고 하며,
-          특정 자료가 정규분포를 따를 경우 이를 표준화 한 값은 표준정규분포를 따른다.</li>
+        <li>어떤 자료에서 평균을 빼고 표준편차로 나눈 것을 자료의 표준화라고 하며,
+          정규분포를 따르는 자료를 표준화한 값은 표준정규분포를 따른다.</li>
       </ul>
     </div>
   </section>
@@ -598,8 +580,8 @@
     <h2>오늘 강의 요약</h2>
     <div class="body tight">
       <ul>
-        <li>특정 자료가 정규분포를 따를 때 해당 자료는 평균을 중심으로 ±1표준편차 이내에
-          전체 자료의 약 68%가, ±2표준편차 이내에 전체 자료의 약 95%가 포함된다.</li>
+        <li>정규분포를 따르는 자료는 평균을 중심으로 ±1표준편차 이내에 약 68%가,
+          ±2표준편차 이내에 약 95%가 포함된다.</li>
         <li>특정 자료가 정규분포와 유사한 분포를 따를 경우 이 분포를 정규분포로 간주하고,
           정규분포표를 사용하여 특정 구간 내에 속한 자료의 비중을 계산할 수 있으며
           이를 정규분포로의 근사라 한다.</li>
@@ -745,13 +727,6 @@ function realPanel(sel, box, o) {
 (function () {
   const ZT = [[-3, '−3.0'], [-2, '−2.0'], [-1, '−1.0'], [0, '0'],
               [1, '+1.0'], [2, '+2.0'], [3, '+3.0']];
-
-  realPanel('#f-std', { x0: 30, y0: 166, x1: 350, y1: 64 });
-  // 오른쪽 판과 화살표는 같은 캔버스에 이어 붙인다
-  const std = document.getElementById('f-std');
-  const right = bell(null, { x0: 500, y0: 166, x1: 800, y1: 64 }, { unit: '표준단위', ticks: ZT });
-  std.insertAdjacentHTML('beforeend',
-    Fig.arrow(384, 128, 466, 128) + right.parts.join('\n'));
 
   const F2 = Fig.withBox({ x0: 30, y0: 156, x1: 350, y1: 56 });
   bell('#f-z2', { x0: 30, y0: 156, x1: 350, y1: 56 }, {
