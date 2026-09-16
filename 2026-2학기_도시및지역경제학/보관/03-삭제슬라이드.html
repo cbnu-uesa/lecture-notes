@@ -182,9 +182,6 @@
           — 위 도해의 수식 정리 <span class="en">m = 1/2(n−1)</span></li>
         <li><strong>수치로 보면</strong> (원본 PDF 28쪽)
           — 균형·효율 군집규모를 30개 기업으로 계산한 표</li>
-        <li><strong>중위입지는 어디인가</strong> (2026-09-15 에 뺌)
-          — 다섯 도시의 공장 수 막대그림. A·B·M·C 20마일 간격, D 는 100마일.
-          <span class="caption">뒤따르는 「고객 간 거리는 입지선택에 무관하다」가 이 그림의 설정을 받는다</span></li>
         <li><strong>노동매칭 고전모형의 네 가정</strong> (2026-09-15 에 뺌)
           — 기술 주소 · 규모의 경제 · 기술요구 · 훈련비용</li>
       </ul>
@@ -284,50 +281,6 @@
     <p class="caption" style="margin-top:8px">150 = 5 × 30 &nbsp;·&nbsp; 360 = 12 × 15 + 12 × 15</p>
     <p class="derive t-red" style="margin-top:14px">→ 개별 기업이 외부효과를 간과하기 때문에
       <strong>집적지가 너무 커지고 총 이윤은 절반에도 못 미침</strong></p>
-  </div>
-</section>
-  <!-- ══ 중위입지는 어디인가 (2026-09-15) ═════════════════════ -->
-<section>
-  <h2>중위입지는 어디인가</h2>
-  <div class="body">
-    <svg class="fig" id="f-median" viewBox="0 0 700 260" style="width:620px;margin:2px 0 0 108px" role="img">
-      <title>다섯 도시의 공장 수 막대와 그 중위입지가 M에서 D로 옮겨 가는 그림</title></svg>
-    <script>
-      (function () {
-        const M = window.MEDIAN, F = Fig;
-        const X0 = 96, X1 = 620, Y = 200, HMAX = 150;
-        const maxN = Math.max(...M.cities.map((c) => c.grown || c.n));
-        const px = (x) => X0 + (x / M.cities[M.cities.length - 1].x) * (X1 - X0);
-        const parts = [
-          F.raw(`<path d="M${X0 - 26},${Y} L${X1 + 20},${Y}" stroke="var(--ink)" stroke-width="1" fill="none"/>`),
-          F.annot(X0 - 34, Y - 76, '공장의 수', { anchor: 'middle', size: 11 }),
-          F.annot((X0 + X1) / 2, Y + 36, '도시', { anchor: 'middle', size: 12 }),
-        ];
-        M.cities.forEach((c) => {
-          [[c.n, 0], [c.grown, 1]].forEach(([n, step]) => {
-            if (!n) return;
-            const h = (n / maxN) * HMAX, w = 26;
-            parts.push(F.raw(
-              `<rect x="${px(c.x) - w / 2}" y="${Y - h}" width="${w}" height="${h}" ` +
-              `fill="var(--brand-crimson)" fill-opacity="${n >= 8 ? 0.85 : 0.35}" ` +
-              `stroke="var(--brand-crimson)" stroke-width="1"/>`, { fragment: step }));
-            parts.push(F.annot(px(c.x), Y - h - 7, String(n),
-                               { anchor: 'middle', size: 12, fragment: step }));
-          });
-          parts.push(F.annot(px(c.x), Y + 17, c.name, { anchor: 'middle', size: 13 }));
-        });
-        parts.push(F.annot(px(40), Y + 54, '↑ 중위입지 M — 서쪽 10명, 동쪽 10명',
-                           { anchor: 'middle', size: 12, tone: 'red', fragment: 0 }));
-        parts.push(F.annot(px(160), Y + 54, '↑ 이제는 D',
-                           { anchor: 'middle', size: 12, tone: 'red', fragment: 1 }));
-        F.draw('#f-median', { parts });
-      })();
-    </script>
-    <p class="emph" style="margin-top:4px">A·B·M·C는 <strong>20마일 간격</strong>, D는 C로부터 <strong>100마일</strong></p>
-      <p class="emph" style="margin-top:4px">M에서 C로 20마일 이동하면 동쪽 통행거리는 200마일(10×20) 줄지만
-      서쪽은 220마일(11×20) 늘어 <strong>총 통행거리가 증가</strong>함</p>
-    <p class="derive t-red" style="margin-top:2px">→ D의 공장이 13개로 늘면 중위입지가 D로 옮겨 감</p>
-      <p class="derive t-red" style="margin-top:2px">→ <strong>대도시들에서 수요의 집중이 대도시들을 성장하게 함</strong></p>
   </div>
 </section>
   <!-- ══ 노동매칭 고전모형의 네 가정 (2026-09-15) ═══════════ -->
