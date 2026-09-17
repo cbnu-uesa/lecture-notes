@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6강. 정보경제이론과 시장실패, 정부실패</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 (p.1) ════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <!-- 46px 표지 제목은 한 줄에 14자 남짓이다. 자동 줄바꿈에 맡기면 "정/부실패"가 갈라진다. -->
+  <h1>6강. 정보경제이론과<br>시장실패, 정부실패</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 완전경쟁시장 (p.2) ════════════════════════════════
+     4강에서 다룬 조건을 다시 꺼내되, 이번 강의의 출발점인 4번을 붉게 남긴다. -->
+<section class="s-numbered">
+  <h2>완전경쟁시장 <span class="en">(perfect competition market)</span></h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:0">〈완전경쟁시장의 조건〉</p>
+    <ol>
+      <li>다수의 판매자와 구매자 (price-taker)</li>
+      <li>동질적 상품</li>
+      <li>진입장벽 X</li>
+      <li>완전한 정보공유</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 3. 정보의 비대칭성 (p.3) ═════════════════════════════ -->
+<section>
+  <h2>정보의 비대칭성</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:48px">경제주체 간 정보의 양과 질이 서로 다른 경우,<br>
+      즉 완전한 정보공유가 불가능한 상황</p>
+    <p class="sub t-red" style="margin-bottom:2px">감추어진 특성</p>
+    <p style="margin-bottom:36px">거래 한 당사자가 상대방의 유형 혹은 특성에 대한 정보가 부족한 경우 (예. 레몬마켓)</p>
+    <p class="sub t-red" style="margin-bottom:2px">감추어진 행동</p>
+    <p>거래 한 당사자가 상대방의 행동에 대한 정보가 부족한 경우 (예. 도덕적 해이)</p>
+  </div>
+</section>
+
+<!-- ══ 4. 탐색행위 (p.4) ════════════════════════════════════ -->
+<section>
+  <h2>정보 비대칭성에 따른 탐색행위</h2>
+  <div class="body">
+    <div class="cols" style="margin-top:24px">
+      <div class="col-l" style="flex:0 0 56%">
+        <svg class="fig" id="f-search" viewBox="0 0 480 300" style="width:480px" role="img">
+          <title>탐색시간이 늘수록 낮아지는 한계편익과 수평인 한계비용이 만나는 최적 탐색시간</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">탐색행위의 한계비용</p>
+        <p style="margin-bottom:34px">= 손실시간에 따른 기회비용<br>= 시간당 임금 등</p>
+        <p class="sub t-red" style="margin-bottom:2px">탐색행위의 한계편익</p>
+        <p class="caption" style="margin-top:14px">한계편익곡선의 우측이동</p>
+        <ol class="tight" style="margin-top:4px">
+          <li>상품가격이 과도하게 분산되어 있을 경우</li>
+          <li>상품 구입량이 클 경우</li>
+          <li>탐색된 정보의 유효시간이 클 경우</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 66, y0: 258, x1: 400, y1: 26 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      const MB = S.curve(Fig.hyper(14, 1.6, 9.6, { through: [3.5] }));
+      const mc = 4;
+      F.draw('#f-search', {
+        axes: { x: '탐색시간', y: '편익\n/비용' },
+        parts: [
+          F.curve(Fig.shift(MB, 62, 0), { variant: 'i3', 'stroke-opacity': '0.45' }),
+          F.curve(MB, { variant: 'i3' }),
+          F.line(F.BOX.x0, S.y(mc), S.x(9.8), S.y(mc), { variant: 'supply' }),
+          F.raw(`<path class="guide" d="M${S.x(3.5)},${S.y(mc)} L${S.x(3.5)},${F.BOX.y0}"/>`),
+          F.annot(S.x(3.5), F.BOX.y0 + 19, 'T*', { anchor: 'middle', size: 14 }),
+          F.arrow(S.x(1.4), S.y(7.4), S.x(2.6), S.y(7.4), { tone: 'blue' }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 5. 레몬마켓과 역선택 (p.5) ═══════════════════════════ -->
+<section>
+  <h2>레몬마켓과 역선택</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">레몬마켓(market for lemons)</p>
+    <p style="margin-bottom:26px">상품의 외양만 보고 품질을 정확하게 알 수 없는 상황에서 바람직하지 않은 상품만 남게 되는 시장</p>
+    <p class="sub t-red" style="margin-bottom:2px">역선택(adverse selection)</p>
+    <p>거래 상대방에 대한 정보가 부족한 상황에서 바람직하지 않은 상대방과 거래할 가능성이 높은 상황</p>
+    <img class="photo" src="../assets/lemon-market.png"
+         alt="같은 값에 팔리지만 실제 가치는 다른 두 중고차를 나타낸 그림"
+         style="height:222px;margin:14px auto 0">
+  </div>
+</section>
+
+<!-- ══ 6. 본인-대리인 관계와 도덕적 해이 (p.6) ══════════════ -->
+<section>
+  <h2>본인-대리인 관계와 도덕적 해이</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">본인-대리인 관계(principal-agent relationship)</p>
+    <p style="margin-bottom:24px">어떤 일을 본인이 직접하기에는 능력이 없거나 시간이 일처리를 맡기는 경우 발생하는 관계<br>
+      (예. 간접민주주의, 전문경영인제 등)</p>
+    <p class="sub t-red" style="margin-bottom:2px">도덕적 해이(moral hazard)</p>
+    <p style="margin-bottom:24px">본인이 대리인의 행동을 일이 감시하지 못하는 상황을 이용해 대리인이 자신의 이익을 좇아 행동하는 현상<br>
+      (예. 보험계약자가 사고방지노력을 하지 않는 경우, 전문경영인이 평판 혹은 이직을 위해 매출액만 신경 쓰는 경우)</p>
+    <p class="sub t-red" style="margin-bottom:6px">도덕적 해이(moral hazard) 관련 유인책</p>
+    <ul style="margin:0">
+      <li>실적에 따른 임금 지급</li>
+      <li>효율임금의 지급: 균형임금보다 더 높은 임금을 지급 (단점: 실업발생 가능성)</li>
+      <li>작업감독제도</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 7. 근본 방향 (p.7) ═══════════════════════════════════ -->
+<section>
+  <h2>정보 비대칭성 문제의 근본 방향</h2>
+  <div class="body stack" style="text-align:center">
+    <p class="define-big">계약 등의 강제적 규제(regulation)</p>
+    <p class="define-big" style="margin:22px 0">+</p>
+    <p class="define-big">인센티브(incentive)</p>
+  </div>
+</section>
+
+<!-- ══ 8. 시장과 효율성 (p.8) ═══════════════════════════════ -->
+<section>
+  <h2>시장과 효율성</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">파레토 효율성(pareto efficiency)</p>
+    <p style="margin-bottom:2px">특정한 자원배분 상태에서 누구에게도 손해가 가지 않으면서<br>
+      추가적인 이득이 가능한 새로운 배분상태로 이동하는 것이 불가능한 상태</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 47%">
+        <svg class="fig" id="f-pareto" viewBox="0 0 470 280" style="width:470px" role="img">
+          <title>후생경계와 그 안쪽 A에서 파레토 개선이 가능한 영역</title></svg>
+        <p class="caption" style="margin-left:40px">출처: 김동건, 2012, 비용−편익분석, 박영사.</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:6px">파레토효율성의 조건</p>
+        <ol class="tight">
+          <li>주어진 자원을 최대한 사용해서 생산효율성을 달성해야 함</li>
+          <li>교환을 통해 생산물을 배분할 수 있어야 함</li>
+        </ol>
+        <p class="derive t-red">→ 완전경쟁시장의 경우 가격을 통해 파레토 효율성 달성 가능</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 70, y0: 236, x1: 400, y1: 24 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      // 후생경계: 원점에 대해 오목한 곡선 (한쪽이 좋아지면 다른 쪽이 나빠진다)
+      const FR = S.curve([[0.6, 9.0], [2.4, 8.4], [3.6, 7.4], [4.6, 5.8], [5.4, 3.8],
+                          [6.6, 1.8], [8.6, 0.6]]);
+      const A = S.p([2.6, 3.4]);
+      const Bp = Fig.at(FR, { x: S.x(2.6) });
+      const Cp = Fig.at(FR, { y: S.y(3.4) });
+      F.draw('#f-pareto', {
+        axes: { x: 'A의 후생수준', y: 'B의 후생수준' },
+        parts: [
+          F.raw('<defs><pattern id="h-par" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+                '<line x1="0" y1="0" x2="0" y2="7" stroke="var(--chart-blue)" stroke-width="1"/></pattern></defs>'),
+          F.raw(`<polygon fill="url(#h-par)" stroke="var(--chart-blue)" stroke-width="0.8" points="${
+            [A, Bp, ...FR.filter((p) => p[0] > Bp[0] && p[0] < Cp[0]), Cp].map((p) => p.join(',')).join(' ')}"/>`),
+          F.curve(FR),
+          F.dot(...S.p([0.6, 9.0]), { open: true, label: 'Z_B', lx: -30, ly: 4 }),
+          F.dot(...S.p([8.6, 0.6]), { open: true, label: 'Z_A', lx: -6, ly: -12 }),
+          F.dot(...Bp, { open: true, label: 'B', lx: -4, ly: -12 }),
+          F.dot(...Cp, { open: true, label: 'C', lx: 8, ly: 6 }),
+          F.dot(...A, { label: 'A', lx: -18, ly: 5, free: true }),
+          F.dot(...S.p([6.4, 8.2]), { open: true, label: 'K', lx: -4, ly: -13, free: true }),
+          F.annot(S.x(6.7), S.y(7.4), '도달 불가능한 영역', { size: 11 }),
+          F.arrow(A[0], A[1], Bp[0] + 22, Bp[1] + 34, { tone: 'red' }),
+          F.annot(S.x(4.2), S.y(3.9), '파레토 개선(pareto improvement)', { size: 11 }),
+          F.annot(S.x(6.9), S.y(2.6), '후생경계(효용가능경계)\n→ 파레토 최적 (pareto optimality)', { size: 11, lh: 13 }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 9. 시장실패 (p.9) ════════════════════════════════════ -->
+<section>
+  <h2>시장실패<span class="en">(market failure)</span></h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:14px">시장이 효율적인 자원배분을 가져다 주지 못하는 상태</p>
+    <p class="sub t-red" style="margin-bottom:8px">시장실패의 원인</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:14px">불완전 경쟁: 독점 및 과점시장의 사례</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">공공재(public goods): 여러 사람의 공동소비를 위해 생산된 재화 및 서비스 중 비경합성과 배제불가능성을 가진 것</p>
+    <ul style="margin-bottom:4px">
+      <li>비경합성(non-rivalry): 한 사람이 소비하면 다른 사람의 소비 기회가 줄어들지 않는 경우</li>
+      <li>배제불가능성(non-excludability): 대가를 치르지 않는 사람을 소비하지 못하게 할 수 없는 경우</li>
+    </ul>
+    <p class="derive t-red" style="margin-bottom:16px">→ 가격기제가 작동하지 못함</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">외부성(externality): 어떤 사람의 행동이 대가없이 제3자에게 의도하지 않은 혜택이나 손해를 가져다 주는 경우</p>
+    <p>(예. 손해: 배기가스 배출, 혜택: 기초학문 발전에 따른 효과)</p>
+  </div>
+</section>
+
+<!-- ══ 10. 정부의 개입 (p.10) ═══════════════════════════════ -->
+<section class="s-numbered">
+  <h2>시장실패에 대한 정부의 개입</h2>
+  <div class="body">
+    <ol>
+      <li>직접적 행동: 공공재의 직접적인 공급</li>
+      <li>유인의 제공: 시장기구를 활용하되 정책적 유인만 제공<br>
+        <span style="font-weight:500;color:var(--ink)">(예. 세제혜택, 정책금융, 소비세부과 등)</span></li>
+      <li>민간부문의 행동을 규제</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 11. 정부실패 (p.11) ══════════════════════════════════ -->
+<section class="s-numbered">
+  <h2>정부실패<span class="en">(government failure)</span></h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:0">정부의 개입 자체가 비효율성을 가져오는 경우</p>
+    <p class="sub t-red" style="margin:14px 0 0">정부실패의 원인</p>
+    <ol style="margin-top:14px">
+      <li>제한된 정보와 지식: 정부정책의 효과에 대한 불확실성</li>
+      <li>민간부문 반응의 통제 불가능성 (예. 부동산시장)</li>
+      <li>정치적 과정에서의 제약: 정치적 타협에 따른 결과</li>
+      <li>관료조직의 도덕적 해이</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 12. 정부실패의 해결책 (p.12) ═════════════════════════ -->
+<section class="s-numbered">
+  <h2>정부실패에 대한 해결책</h2>
+  <div class="body">
+    <ol>
+      <li>제도개혁: 관료조직 비대화, 불명확성 등 방지</li>
+      <li>유인의 제공: 관료의 평가 및 보상제공</li>
+      <li>경쟁도입: 민간과의 경쟁체제</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 13. 공공재의 문제 (p.13) ═════════════════════════════ -->
+<section>
+  <h2>공공재의 문제</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">공공재(public goods)</p>
+    <p style="margin-bottom:30px">여러 사람의 공동소비를 위해 생산된 재화 및 서비스 중 비경합성과 배제불가능성을 가진 것</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:10px">
+      비경합성(non-rivalry): 한 사람이 소비하면 다른 사람의 소비 기회가 줄어들지 않는 경우 (한계비용 = 0)</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:26px">
+      배제불가능성(non-excludability): 대가를 치르지 않는 사람을 소비하지 못하게 할 수 없는 경우</p>
+    <p class="derive t-red" style="margin-bottom:2px">→ 무임승차자 문제(free-rider problem) 발생</p>
+    <p style="margin-bottom:26px">공공재 생산비용을 부담하지 않으면서 소비에는 참여하고자 하는 경향</p>
+    <p class="derive t-red">→ 적정한 수준의 부담 유도(강제적 납부) + 공공재 생산량을 위한 선호 파악 필요</p>
+  </div>
+</section>
+
+<!-- ══ 14. 환경오염과 코우즈 정리 (p.14) ════════════════════ -->
+<section>
+  <h2>환경오염과 코우즈 정리</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">환경오염의 외부성</p>
+    <p style="margin-bottom:32px">환경오염 발생자가 비용을 지불하지 않고 다른 3자에게 피해를 입히는 상황<br>
+      (현실에서는 환경관련 조세를 통해서 비용지불 및 피해자에 대한 재분배)</p>
+    <p class="sub t-red" style="margin-bottom:8px">코우즈 정리(Coase Theorem)</p>
+    <p class="lead t-define" style="font-size:var(--fs-emph);margin-bottom:14px">
+      외부성 문제가 존재할 경우 이해 당사자들 간의 자발적 협상을 통한 거래를 통해 파레토효율성을 달성할 수 있음</p>
+    <p style="margin-bottom:6px">→ 환경세 부과와 같은 정부의 과도한 개입이 오히려 비효율적일 수 있음</p>
+    <p style="margin-bottom:20px">→ 협상(bargaining)을 위한 거래비용(transaction cost) 수준이 중요.
+      실제 현실에서 거래비용은 0이 아님 (예. 이해당사자 식별 어려움 등)</p>
+    <p class="derive t-red">→ 핵심은 어떤 경제제도가 거래비용을 더 낮출 수 있는지 주목하자는 것</p>
+  </div>
+</section>
+
+<!-- ══ 15. 조세부담의 전가 (p.15) ═══════════════════════════ -->
+<section>
+  <h2>조세부담의 전가</h2>
+  <div class="body">
+    <p class="lead t-define">어떤 경제주체에게 부과된 조세의 부담이 다른 경제주체로 옮겨가는 것</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 62%">
+        <svg class="fig" id="f-tax" viewBox="0 0 560 300" style="width:560px" role="img">
+          <title>공해세로 공급곡선이 위로 이동해 가격이 오르고 세부담이 소비자와 생산자로 나뉘는 그림</title></svg>
+      </div>
+      <div class="col-r">
+        <p>수요의 가격탄력성이 낮을수록,<br>공급의 가격탄력성이 클수록<br>소비자 전가가 더 커짐</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // 왼쪽에 '소비자에게 전가되는 조세의 크기' 가 붙으므로 플롯을 오른쪽으로 민다
+      const F = Fig.withBox({ x0: 176, y0: 262, x1: 500, y1: 24 });
+      const S = F.scale({ x: [0, 10], y: [380, 700] });
+      const D = S.curve([[1.0, 640], [9.0, 420]]);
+      const S0 = S.curve([[1.2, 430], [8.8, 610]]);        // 과세 전 공급
+      const S1b = S.curve([[1.2, 530], [8.0, 690]]);        // 과세 후: 100 만큼 위로
+      const E = Fig.cross(D, S0);                           // 과세 전 균형 (500)
+      const E2 = Fig.cross(D, S1b);                         // 과세 후 균형 (560)
+      F.draw('#f-tax', {
+        axes: { x: 'Q', y: 'P' },
+        parts: [
+          F.raw(`<polygon class="area-buyer" points="${F.BOX.x0},${S.y(560)} ${E2[0]},${S.y(560)} ${E2[0]},${S.y(500)} ${F.BOX.x0},${S.y(500)}"/>`),
+          F.raw(`<polygon class="area-seller" points="${F.BOX.x0},${S.y(500)} ${E2[0]},${S.y(500)} ${E2[0]},${S.y(460)} ${F.BOX.x0},${S.y(460)}"/>`),
+          F.curve(S0, { variant: 'supply', dash: '9 7' }),
+          F.curve(S1b, { variant: 'supply' }),
+          F.curve(D, { variant: 'demand' }),
+          F.raw(`<path class="guide" d="M${E2[0]},${S.y(560)} L${E2[0]},${F.BOX.y0}"/>`),
+          F.raw(`<path class="guide" d="M${E[0]},${E[1]} L${E[0]},${F.BOX.y0}"/>`),
+          F.dot(...E2), F.dot(...E, { label: 'E', lx: 7, ly: -6 }),
+          F.annot(F.BOX.x0 - 8, S.y(560) + 4, '560', { anchor: 'end', size: 12 }),
+          F.annot(F.BOX.x0 - 8, S.y(500) + 4, '500', { anchor: 'end', size: 12 }),
+          F.annot(F.BOX.x0 - 8, S.y(460) + 4, '460', { anchor: 'end', size: 12 }),
+          F.annot(F.BOX.x0 - 42, S.y(536), '소비자에게\n전가되는 조세의 크기', { anchor: 'end', size: 10, lh: 12 }),
+          F.annot(E2[0], F.BOX.y0 + 19, 'Q’', { anchor: 'middle', size: 13, tone: 'red' }),
+          F.annot(E[0], F.BOX.y0 + 19, 'Q', { anchor: 'middle', size: 13, tone: 'red' }),
+          F.labelIn([[F.BOX.x0, S.y(560)], [E2[0], S.y(560)], [E2[0], S.y(500)], [F.BOX.x0, S.y(500)]], '소비자부담', { size: 12 }),
+          F.labelIn([[F.BOX.x0, S.y(500)], [E2[0], S.y(500)], [E2[0], S.y(460)], [F.BOX.x0, S.y(460)]], '생산자부담', { size: 12 }),
+          F.arrow(S.x(7.6), S.y(560), S.x(7.6), S.y(614), { tone: 'blue' }),
+          F.annot(S.x(7.9), S.y(596), '100', { size: 12 }),
+          F.annot(S.x(8.2), S.y(690), 'S’', { size: 13 }),
+          F.annot(S.x(9.2), S.y(596), 'S', { size: 13 }),
+          F.annot(S.x(9.3), S.y(416), 'D', { size: 13 }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 16. Q & A (p.16) ═════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
