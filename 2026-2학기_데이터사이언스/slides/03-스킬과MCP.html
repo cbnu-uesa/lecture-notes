@@ -661,7 +661,7 @@ claude mcp add &lt;이름&gt; -- &lt;실행 명령&gt;
     </div>
   </section>
 
-  <!-- ══ 21. 실습 ② MCP 둘 붙이기 ════════════════════════ -->
+  <!-- ══ 21. 실습 ② 붙이기 — 시켜서 ═══════════════════ -->
   <section class="s-split">
     <h2>② MCP 둘을 붙인다 <span class="en" style="font-size:16px;color:var(--muted)">0:15–0:45</span></h2>
     <div class="body tight">
@@ -671,40 +671,83 @@ claude mcp add &lt;이름&gt; -- &lt;실행 명령&gt;
           <div class="bar">0단계 · 인증키 발급 (무료)</div>
           <pre><span class="h">open.law.go.kr</span> 회원가입 → [Open API 사용 신청]</pre>
         </div>
-        <div class="doc" style="margin-top:8px">
-          <div class="bar">1단계 · 클로드 코드 안 — 두 줄이다</div>
-          <pre>/plugin marketplace add chrisryugj/korean-law-mcp
-/plugin install korean-law@korean-law-marketplace</pre>
+        <div class="prompt-box">
+          <p class="who">1단계 · 그대로 쓴다</p>
+          <p>"<b>https://github.com/chrisryugj/korean-law-mcp</b> —
+            이 MCP 를 붙여 줘.</p>
+          <p>README 의 설치 방법을 그대로 따라 줘.
+            <b>인증키는 설치기가 물어볼 때 내가 직접 넣을게</b> —
+            너는 어느 파일에도 적지 마. 다 되면 <b>/mcp 로 확인</b>해 줘."</p>
         </div>
         <p class="caption" style="margin-top:7px">
-          설치 중에 <span class="hl">인증키를 물어본다.</span> 거기 넣는다 —
-          <span class="mark">어느 파일에도 적지 않는다</span></p>
-        <div class="stuck"><b>Permission denied (publickey) 가 뜨면</b> —
-          설치기가 깃허브에 SSH 로 붙으려다 막힌 것이다. 한 줄 넣고 다시 설치한다.
-          <div class="doc" style="margin-top:7px">
-            <pre>git config --global url."https://github.com/" \
-  .insteadOf "git@github.com:"</pre>
-          </div>
-        </div>
+          클로드가 README 를 읽고 맞는 명령을 골라 실행한다.
+          <span class="hl">명령을 외울 필요가 없다</span></p>
       </div>
       <div class="col-r">
         <p class="sub">KOSIS — 국가통계포털</p>
-        <div class="doc">
-          <div class="bar">터미널 — 한 줄이고 인증키가 없다</div>
-          <pre>claude mcp add --transport http kosis \
-  https://kosismcp2026.vercel.app/api/mcp</pre>
+        <div class="prompt-box" style="margin-top:6px">
+          <p class="who">그대로 쓴다</p>
+          <p>"<b>https://kosismcp2026.vercel.app/api/mcp</b> —
+            이 원격 MCP 도 붙여 줘. <b>인증키는 없어.</b></p>
+          <p>붙인 뒤에 <b>"청주시 총인구를 2020년부터 연도별로"</b> 를 물어서
+            실제로 숫자가 오는지 확인해 줘."</p>
         </div>
-        <p class="caption" style="margin-top:7px">
-          시범 운영이라 키를 받지 않는다. <span class="hl">붙이면 바로 쓴다</span></p>
         <div class="ck"><b>✓ 확인 지점</b> — <span class="code">/mcp</span> 에
           <span class="code">korean-law</span> 와 <span class="code">kosis</span> 가
           <b>둘 다 ✔ Connected</b> 로 뜬다.</div>
-        <p class="caption" style="margin-top:11px">
-          웹·앱 클로드는 [설정] → [커넥터] → [커스텀 커넥터 추가] 에 주소를 넣는다.
-          korean-law 는 <span class="code">mcp.gomdori.app/law?oc=내인증키</span> 다.
-          추가한 뒤 <span class="hl">[구성] 에서 도구를 「항상 사용」으로</span> 바꿔야 매번 승인하지 않는다.</p>
-        <p class="caption">출처: <span class="u">github.com/chrisryugj/korean-law-mcp</span> README
-          (2026. 9. 20. 확인)</p>
+        <div class="stuck"><b>Permission denied (publickey) 가 뜨면</b> —
+          설치기가 깃허브에 SSH 로 붙으려다 막힌 것이다.
+          <span class="mark">그 오류 메시지를 그대로 클로드에게 준다</span> —
+          우회하는 한 줄을 넣고 다시 한다. <b>그래도 안 되면 다음 장으로 간다.</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 22. 실습 ②-2 원격 · 인증키 ══════════════════════ -->
+  <section class="s-split">
+    <h2>②-2 원격으로 붙일 때 인증키를 어디에 넣나</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>플러그인 설치가 막히면 <span class="hl">원격 서버로 바로 붙는 길</span>이 있다.
+          내 컴퓨터에 아무것도 깔지 않는다.</p>
+        <div class="prompt-box">
+          <p class="who">그대로 쓴다</p>
+          <p>"korean-law 를 <b>원격으로</b> 붙여 줘.
+            주소는 <b>https://mcp.gomdori.app/law</b> 이고
+            내 인증키는 <b>헤더로</b> 넘기고 싶어.</p>
+          <p><b>인증키를 파일에 적지 말고</b>, 범위는 이 프로젝트 안에서만
+            쓰이게 해 줘."</p>
+        </div>
+        <div class="doc" style="margin-top:9px">
+          <div class="bar">클로드가 실행하는 명령</div>
+          <pre>claude mcp add --transport http korean-law \
+  https://mcp.gomdori.app/law \
+  --header "apikey: 내인증키"</pre>
+        </div>
+      </div>
+      <div class="col-r">
+        <p class="sub">키를 넣는 자리 셋</p>
+        <table style="width:100%;table-layout:fixed;margin-top:4px">
+          <thead><tr><th style="width:34%">어디에</th><th>언제 쓰나</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">--header</span><br>
+                <span class="caption">apikey: 내키</span></td>
+                <td class="hl">원격으로 붙일 때. 주소와 키가 분리돼 화면·기록에 덜 남는다</td></tr>
+            <tr><td>주소 끝에<br><span class="code">?oc=내키</span></td>
+                <td>웹·앱 클로드의 커넥터. <span class="hl">키가 주소에 붙어 있어 그대로 복사된다</span></td></tr>
+            <tr><td><span class="code">LAW_OC</span><br>
+                <span class="caption">환경변수</span></td>
+                <td>내 컴퓨터에 직접 깔아 쓸 때</td></tr>
+          </tbody>
+        </table>
+        <div class="ck"><b>범위를 먼저 본다.</b>
+          <span class="code">--scope project</span> 로 붙이면 설정이
+          <span class="code">.mcp.json</span> 에 적혀 <b>저장소에 함께 올라간다.</b>
+          <span class="hl">키가 든 설정은 기본값인 <span class="code">local</span> 로 둔다</span> —
+          내 컴퓨터에만 남는다.</div>
+        <p class="caption" style="margin-top:8px">출처:
+          <span class="u">github.com/chrisryugj/korean-law-mcp</span> README ·
+          클로드 코드 <span class="code">mcp add</span> 도움말 (2026. 9. 21. 확인)</p>
       </div>
     </div>
   </section>
