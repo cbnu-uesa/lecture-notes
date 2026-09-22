@@ -28,6 +28,8 @@
   ul.slim > li { margin-bottom: 3px; }
   ol.dense { margin: 0 0 0 2px; padding-left: 20px; }
   ol.dense > li { margin-bottom: 4px; }
+  /* 상관계수의 부호 슬라이드 — 점이 음/양 위치 사이를 부드럽게 이동한다 */
+  #f-corrsign circle.pt { transition: cx .9s ease, cy .9s ease; }
 </style>
 </head>
 <body>
@@ -50,9 +52,9 @@
         <li>정규분포는 평균과 표준편차에 따라 그 모양과 크기가 달라진다.</li>
         <li>특정 현상이 정규분포를 따른다면 그 현상의 평균과 표준편차만으로 해당 현상의
           발생빈도를 완벽하게 묘사할 수 있다.</li>
-        <li>정규분포 중에서 평균이 0이고 표준편차가 1인 정규분포를 표준정규분포라고 한다.</li>
-        <li>어떤 자료에서 평균을 빼고 이를 표준편차로 나눈 것을 자료의 표준화라고 하며,
-          특정 자료가 정규분포를 따를 경우 이를 표준화 한 값은 표준정규분포를 따른다.</li>
+        <li>정규분포 중에서 평균이 0이고 표준편차가 1인 정규분포를 표준정규분포라 한다.</li>
+        <li>어떤 자료에서 평균을 빼고 표준편차로 나눈 것을 자료의 표준화라고 하며,
+          정규분포를 따르는 자료를 표준화한 값은 표준정규분포를 따른다.</li>
       </ul>
     </div>
   </section>
@@ -62,8 +64,8 @@
     <h2>지난 강의 요약</h2>
     <div class="body tight">
       <ul>
-        <li>특정 자료가 정규분포를 따를 때 해당 자료는 평균을 중심으로 ±1표준편차 이내에
-          전체 자료의 약 68%가, ±2표준편차 이내에 전체 자료의 약 95%가 포함된다.</li>
+        <li>정규분포를 따르는 자료는 평균을 중심으로 ±1표준편차 이내에 약 68%가,
+          ±2표준편차 이내에 약 95%가 포함된다.</li>
         <li>특정 자료가 정규분포와 유사한 분포를 따를 경우 이 분포를 정규분포로 간주하고,
           정규분포표를 사용하여 특정 구간 내에 속한 자료의 비중을 계산할 수 있으며
           이를 정규분포로의 근사라 한다.</li>
@@ -255,7 +257,8 @@
               <p class="sub" style="margin:2px 0 0 10px">→ 모든 점들이 하나의 선 위에 위치</p></li>
             <li style="margin-top:12px">상관계수의 의미
               <p class="sub" style="margin:4px 0 0 10px">두 변수의 결합분포가 하나의 선 주위로 밀집된 정도</p>
-              <p class="sub" style="margin:2px 0 0 10px">= x의 1표준편차 변화에 따른 y의 표준편차 단위 변화량</p></li>
+              <p class="sub" style="margin:2px 0 0 10px">= x의 1표준편차 변화에 대해 평균적으로 나타나는
+                y의 표준편차 단위 변화량</p></li>
           </ul>
         </div>
         <div class="col-r">
@@ -291,6 +294,88 @@
           return Fig.raw(s);
         });
         Fig.draw('#f-rgrid', { parts });
+      })();
+    </script>
+  </section>
+
+  <!-- 신규: 상관계수의 부호(양/음)를 동적 산포도로 보여준다. 원본 PPT에는 없던 장이다. -->
+  <section>
+    <h2>상관계수의 부호</h2>
+    <div class="body tight">
+      <div class="cols top">
+        <div class="col-l">
+          <ul>
+            <li>정(+)의 상관관계: x가 커질 때 y도 함께 커지는 경향
+              <p class="sub" style="margin:4px 0 0 10px">→ 산포도가 오른쪽 위로 향한다</p></li>
+            <li style="margin-top:16px">음(−)의 상관관계: x가 커질 때 y는 작아지는 경향
+              <p class="sub" style="margin:4px 0 0 10px">→ 산포도가 오른쪽 아래로 향한다</p></li>
+          </ul>
+          <p class="sub" style="margin-top:20px">→ 다음으로 넘기면 아래 산포도의 점들이
+            같은 자리에서 부호만 바뀐 위치로 이동한다</p>
+        </div>
+        <div class="col-r">
+          <svg class="fig" id="f-corrsign" viewBox="0 0 310 265" style="width:300px" role="img">
+            <title>50개의 점이 음의 상관관계 위치에서 양의 상관관계 위치로 이동하는 산포도</title>
+          </svg>
+          <p class="caption" id="f-corrsign-cap" style="margin-top:4px">r = −0.75 (음의 상관관계)</p>
+        </div>
+      </div>
+      <span class="fragment" id="corr-sign-trigger"
+            style="position:absolute;width:0;height:0;overflow:hidden"></span>
+    </div>
+    <script>
+      (function () {
+        /* 같은 seed로 두 상관계수의 표본을 뽑으면 z1·z2(자료의 "위치" 성분)는 r과 무관하게
+           똑같이 나온다 — Fig.scatter() 정의 참고(charts.js). 그래서 인덱스가 같은 점은
+           "같은 자료점이 부호만 바뀌어 이동한 것"이 되고, 두 좌표 사이를 CSS transition으로
+           보간해도 자료의 의미가 어긋나지 않는다. 평균 3·표준편차 1·50개는 슬라이드 8의
+           그리드와 같은 규약이다. */
+        const NEG = -0.75, POS = 0.75;
+        const x0 = 34, TOP = 18, PW = 250, PH = 210;
+        const F = Fig.withBox({ x0, y0: TOP + PH, x1: x0 + PW, y1: TOP });
+        const S = F.scale({ x: [0, 6], y: [0, 6] });
+        const negPts = S.curve(Fig.scatter({ n: 50, mx: 3, my: 3, sx: 1, sy: 1, r: NEG, seed: 11 }));
+        const posPts = S.curve(Fig.scatter({ n: 50, mx: 3, my: 3, sx: 1, sy: 1, r: POS, seed: 11 }));
+
+        let axes = `<path class="axis" d="M${x0},${TOP} L${x0},${TOP + PH} L${x0 + PW},${TOP + PH}"/>`;
+        for (let v = 0; v <= 6; v++) {
+          axes += `<text class="tick" x="${S.x(v)}" y="${TOP + PH + 16}" text-anchor="middle">${v}</text>`;
+          if (v > 0) axes += `<text class="tick" x="${x0 - 8}" y="${S.y(v) + 4}" text-anchor="end">${v}</text>`;
+        }
+        const dots = negPts.map(([x, y], i) =>
+          `<circle class="pt" cx="${x}" cy="${y}"
+             data-nx="${x}" data-ny="${y}" data-px="${posPts[i][0]}" data-py="${posPts[i][1]}" r="3"/>`
+        ).join('');
+
+        Fig.draw('#f-corrsign', { parts: [Fig.raw(axes), Fig.raw(dots)] });
+
+        /* 부호 전환 — 강의 중 다음으로 넘기면(스페이스·화살표·클릭 모두 reveal의 표준
+           fragment 진행) 이 fragment가 뜨고, 점의 cx/cy를 데이터 속성값으로 바꾼다.
+           실제 이동 애니메이션은 <style>의 CSS transition이 맡는다. */
+        const svg = document.getElementById('f-corrsign');
+        const cap = document.getElementById('f-corrsign-cap');
+        function setSign(positive) {
+          svg.querySelectorAll('circle.pt').forEach((c) => {
+            c.setAttribute('cx', positive ? c.dataset.px : c.dataset.nx);
+            c.setAttribute('cy', positive ? c.dataset.py : c.dataset.ny);
+          });
+          // toFixed()는 자판 하이픈(-)을 쓴다. 이 덱은 음수 표기에 늘 − (U+2212)를 쓰므로
+          // 직접 붙인다 (예: 슬라이드 8 "−1 ≤ r ≤ +1").
+          cap.textContent = positive
+            ? `r = +${POS.toFixed(2)} (양의 상관관계)`
+            : `r = −${Math.abs(NEG).toFixed(2)} (음의 상관관계)`;
+        }
+        const trigger = document.getElementById('corr-sign-trigger');
+        // Reveal 라이브러리는 이 <script>보다 뒤(</body> 근처)에서 불러오므로
+        // 지금 시점엔 window.Reveal이 아직 없다. 생길 때까지 짧게 기다렸다 건다.
+        (function bindWhenReady() {
+          if (window.Reveal && Reveal.on) {
+            Reveal.on('fragmentshown', (e) => { if (e.fragment === trigger) setSign(true); });
+            Reveal.on('fragmenthidden', (e) => { if (e.fragment === trigger) setSign(false); });
+          } else {
+            setTimeout(bindWhenReady, 30);
+          }
+        })();
       })();
     </script>
   </section>
@@ -530,14 +615,14 @@
     <div class="body tight">
       <ul>
         <li>하나의 변수에 대한 분포가 아니라 두 변수 사이의 상호관계를 고려한 분포를
-          결합분포라고 하며, 두 변수의 결합분포를 나타내기 위해 한 변수를 x축에,
-          다른 변수를 y축에 표시하여 점으로 나타낸 것을 산포도(scatter plot)이라고 한다.</li>
+          <span class="hl">결합분포</span>라고 하며, 두 변수의 결합분포를 나타내기 위해 한 변수를 x축에,
+          다른 변수를 y축에 표시하여 점으로 나타낸 것을 <span class="hl">산포도(scatter plot)</span>이라고 한다.</li>
         <li>평균과 분산이 동일한 두 변수가 존재하더라도 두 변수 간의 관계는 서로 다를 수 있다.</li>
         <li>두 변수 간의 관계를 요약한 대표적인 수치는 두 변수 간 선형관계를 나타내는
-          공분산(covariance)이다.</li>
+          <span class="hl">공분산(covariance)</span>이다.</li>
         <li>공분산은 자료의 단위에 의존하기 때문에, 서로 다른 선형관계 간의 비교가 어렵다.</li>
         <li>공분산의 단위를 제거하기 위해 두 변수 간 공분산을 각 변수의 표준편차로 나누어
-          −1~1사이의 값을 갖도록 조정한 통계량을 상관계수라 한다.</li>
+          −1~1사이의 값을 갖도록 조정한 통계량을 <span class="hl">상관계수</span>라 한다.</li>
       </ul>
     </div>
   </section>
@@ -550,13 +635,13 @@
         <li>두 변수 간 관계가 음(−)의 상관관계를 가질 경우 −1에 가까운 값을,
           정(+)의 상관관계를 가질 경우 +1에 가까운 값이 나타나며, 두 변수 간 선형관계가
           존재하지 않을 경우 0에 가까운 값이 나타난다.</li>
-        <li>상관계수는 두 변수 간 선형관계만을 수치화하기 때문에 선형관계가 아닌 비선형 관계는
-          나타낼 수 없다.</li>
-        <li>상관계수는 이상치에 민감하다.</li>
+        <li>상관계수는 두 변수 간 선형관계만을 수치화하기 때문에
+          <span class="hl">비선형 관계는 나타낼 수 없다</span>.</li>
+        <li>상관계수는 <span class="hl">이상치에 민감하다</span>.</li>
         <li>평균이나 비율로 계산한 상관계수는 이미 변수의 편차가 소거된 상태이기 때문에,
           실제 두 변수 간의 선형관계를 왜곡할 여지가 있다.</li>
         <li>상관관계는 두 변수 간의 선형의 연관성(association)만 나타낼 뿐이며,
-          인과관계(causality)는 아니다.</li>
+          <span class="hl">인과관계(causality)는 아니다</span>.</li>
       </ul>
     </div>
   </section>
