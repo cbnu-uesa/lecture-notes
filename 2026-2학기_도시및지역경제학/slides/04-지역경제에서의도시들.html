@@ -106,10 +106,12 @@
     city: [
       // 세 곡선의 색은 서로 분명히 갈려야 한다 (design.md §3.3).
       // i3 는 demand 와 같은 #1F5C8B 라 쓸 수 없다 — i1(초록)으로 간다.
-      // u0: x0 에서의 시작 높이. 원본 그림처럼 파란 < 초록 < 검정 순으로 벌어진다.
-      { tag: 's', name: '작은 도시',   M: 2.5, P: 3.5, X: 4,  variant: 'demand', u0: 0.4 },
-      { tag: 'm', name: '중간 도시',   M: 4,   P: 3.9, X: 6,  variant: 'i1',     u0: 0.6 },
-      { tag: 'b', name: '큰 도시',     M: 8,   P: 4.6, X: 12, variant: null,     u0: 1.0 },
+      // u0: x0 에서의 시작 높이. 파란 < 초록 < 검정 순으로 벌어진다.
+      // M·P 는 세 곡선이 서로 만나지 않도록 잡았다 — 어느 노동력에서나
+      // 검정 > 초록 > 파랑 이고 가장 좁은 자리에서도 0.27 만큼 떨어져 있다.
+      { tag: 's', name: '작은 도시',   M: 2.8, P: 3.2, X: 4,  variant: 'demand', u0: 0.4 },
+      { tag: 'm', name: '중간 도시',   M: 3.8, P: 4.2, X: 6,  variant: 'i1',     u0: 0.8 },
+      { tag: 'b', name: '큰 도시',     M: 6.0, P: 5.5, X: 12, variant: null,     u0: 1.6 },
     ],
     // 정점 오른쪽은 u* 를 지나는 기울기, 왼쪽은 x0 에서 u0 를 지나는 기울기 — 비대칭 포물선.
     gRight(c) { return (c.P - this.uStar) / (c.X - c.M) ** 2; },
@@ -121,14 +123,19 @@
   };
 
   // ── 혁신과 지역 전체 효용 [p.143] ──────────────────────────
-  // 초기 곡선 u0 와 혁신 후 곡선 u1 = u0 + Δ.
-  // Δ 는 "새 균형에서 두 도시의 효용이 같다"는 조건에서 유도한다: u0(5) = u0(7) + Δ.
+  // 초기 곡선 u0 와 혁신 후 곡선 u1. 원본 그림 7-6 처럼 혁신은 곡선을 위로,
+  // 그리고 오른쪽으로(sx) 민다 — 두 곡선은 왼쪽 끝에서 거의 붙었다가
+  // 오른쪽으로 갈수록 벌어진다.
+  // 위로 미는 폭 sy 는 "새 균형에서 두 도시의 효용이 같다"는 조건
+  // u1(7) = u0(5) 에서 유도한다.
   window.INNOV = {
-    M: 4, P: 3.6, g: 0.05,
+    M: 4, P: 3.6, g: 0.05, sx: 0.5,
     N0: 6, Nshrink: 5, Ngrow: 7,
     u0(N) { return this.P - this.g * (N - this.M) ** 2; },
-    get delta() { return this.u0(this.Nshrink) - this.u0(this.Ngrow); },
-    u1(N) { return this.u0(N) + this.delta; },
+    get sy() {
+      return this.g * ((this.Ngrow - this.M - this.sx) ** 2 - (this.Nshrink - this.M) ** 2);
+    },
+    u1(N) { return this.P + this.sy - this.g * (N - this.M - this.sx) ** 2; },
   };
 </script>
 
@@ -636,28 +643,72 @@
 </section>
 <section class="s-split">
   <h2>중심지이론: 면적 공간</h2>
-  <div class="body">
+  <div class="body tight">
     <div class="col-l">
       <p><strong>최소요구치</strong> <span class="en">(threshold)</span> — 기업이 살아남는 데 필요한
         최소시장규모</p>
       <p style="margin-top:10px"><strong>재화의 도달범위</strong> <span class="en">(range)</span> —
         중심지에서 멀어질수록 판매량이 줄어들다 <strong>0이 되는 지점까지의 거리</strong></p>
-      <svg class="fig" id="f-range" viewBox="0 0 400 260" role="img">
-        <title>중심지를 중심으로 최소요구치 반경의 안쪽 원과 재화의 도달범위까지의 바깥쪽 원을 그린 그림</title></svg>
+      <p class="derive t-red" style="margin-top:10px">→ 재화의 도달범위가 최소요구치보다 넓어야
+        중심지가 성립함</p>
+      <svg class="fig" id="f-range" viewBox="0 0 420 292" style="width:380px" role="img">
+        <title>위쪽은 거리에 따른 총수익과 투자비용이 A와 B에서 만나는 그래프, 아래쪽은 그 A와 B를
+          반지름으로 삼아 중심지를 둘러싼 최소요구치 구역과 재화의 도달범위를 그린 그림</title></svg>
       <script>
         (function () {
-          const F = Fig, cx = 200, cy = 130, rT = 46, rR = 100;
+          const F = Fig;
+          const OX = 58, OY = 124;          // 원점 — 중심지이자 가격 0
+          const UX = 31, UY = 11.0;         // 거리 1단위 · 가격 1단위의 픽셀 길이
+          const A = 4.0, B = 7.2;           // 최소요구치 · 재화의 도달범위 (거리)
+          const KY = 0.62;                  // 아래 지도의 세로 압축비 (원본 도식과 같다)
+          const X = (d) => OX + d * UX;
+          const Y = (p) => OY - p * UY;
+          // 총수익은 S자로 늘다 멈추고, 투자비용은 완만하다 급히 솟는다.
+          // 계수는 두 곡선이 A 와 B 에서 정확히 만나도록 그 두 조건에서 유도했다.
+          const rev  = (d) => 9.2 / (1 + Math.exp(-1.15 * (d - 4.3)));
+          const cost = (d) => 2.6 + 0.1846 * d + 0.001842 * d ** 4;
+          const samp = (f, a, b, n) => {
+            const o = [];
+            for (let i = 0; i <= n; i++) { const d = a + ((b - a) * i) / n; o.push([X(d), Y(f(d))]); }
+            return o;
+          };
+          const rxA = A * UX, ryA = rxA * KY, rxB = B * UX, ryB = rxB * KY;
+          const disc = (rx, ry, op) =>
+            `<path d="M${OX},${OY} L${OX + rx},${OY} A${rx},${ry} 0 0 1 ${OX},${OY + ry} Z" ` +
+            `fill="var(--brand-crimson)" fill-opacity="${op}" stroke="none"/>`;
+          const arc = (rx, ry, color, dash) =>
+            `<path d="M${OX + rx},${OY} A${rx},${ry} 0 0 1 ${OX},${OY + ry}" fill="none" ` +
+            `stroke="${color}" stroke-width="1.4" stroke-dasharray="${dash}"/>`;
           F.draw('#f-range', {
             parts: [
-              F.raw(`<circle cx="${cx}" cy="${cy}" r="${rR}" class="curve-supply" fill="var(--brand-crimson)" fill-opacity="0.08"/>`),
-              F.raw(`<circle cx="${cx}" cy="${cy}" r="${rT}" class="curve-demand" fill="var(--brand-crimson)" fill-opacity="0.28"/>`),
-              F.raw(`<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - rT}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3"/>`),
-              F.raw(`<line x1="${cx}" y1="${cy}" x2="${cx + rR * 0.707}" y2="${cy - rR * 0.707}" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3"/>`),
-              F.raw(`<circle cx="${cx}" cy="${cy}" r="3.2" fill="var(--ink)"/>`),
-              F.annot(cx, cy + 4, '중심지', { anchor: 'middle', size: 11 }),
-              F.annot(cx, cy - rT - 8, '최소요구치', { anchor: 'middle', size: 11, tone: 'red' }),
-              F.annot(cx + rR * 0.707 + 10, cy - rR * 0.707 - 6, '재화의', { size: 11, tone: 'red' }),
-              F.annot(cx + rR * 0.707 + 10, cy - rR * 0.707 + 8, '도달범위', { size: 11, tone: 'red' }),
+              // ── 아래 — 중심지를 둘러싼 시장구역 ──
+              F.raw(disc(rxB, ryB, 0.08)),
+              F.raw(disc(rxA, ryA, 0.22)),
+              F.raw(arc(rxB, ryB, 'var(--brand-crimson)', '6 4')),
+              F.raw(arc(rxA, ryA, 'var(--ink)', '4 3')),
+              // ── 축 ──
+              F.raw(`<path d="M${OX},${OY + ryB + 10} L${OX},18" stroke="var(--ink)" stroke-width="1.2" fill="none"/>`),
+              F.raw(`<path d="M${OX},${OY} L396,${OY}" stroke="var(--ink)" stroke-width="1.2" fill="none"/>`),
+              F.raw(`<path d="M58,14 L54.5,22 L61.5,22 Z" fill="var(--ink)"/>`),
+              F.raw(`<path d="M400,${OY} L392,${OY - 3.5} L392,${OY + 3.5} Z" fill="var(--ink)"/>`),
+              // ── 위 — 총수익과 투자비용 ──
+              F.curve(samp(cost, 0, 7.50, 60), { variant: 'supply' }),
+              F.curve(samp(rev, 0.1, 10.8, 70), { variant: 'demand' }),
+              F.raw(`<path class="guide" d="M${X(A)},${Y(rev(A))} L${X(A)},${OY + 8}"/>`),
+              F.raw(`<path class="guide" d="M${X(B)},${Y(rev(B))} L${X(B)},${OY + 8}"/>`),
+              F.annot(X(3.6), 50, '총수익', { size: 11, tone: 'blue' }),
+              F.annot(X(5.6), 96, '투자비용', { size: 11, tone: 'red' }),
+              F.annot(OX - 6, 26, '가격(원)', { anchor: 'end', size: 11 }),
+              F.annot(OX + 6, OY - 6, '0', { size: 11 }),
+              F.annot(392, OY + 22, '거리(km)', { anchor: 'end', size: 11 }),
+              F.annot(X(A), OY + 22, 'A', { anchor: 'middle', size: 12 }),
+              F.annot(X(B), OY + 22, 'B', { anchor: 'middle', size: 12 }),
+              // ── 아래 지도의 반지름 표시 ──
+              F.annot(OX - 6, OY - 4, '중심지', { anchor: 'end', size: 11 }),
+              F.raw(`<path d="M${OX - 6},${OY + ryA} L${OX + 6},${OY + ryA}" stroke="var(--ink)" stroke-width="1"/>`),
+              F.raw(`<path d="M${OX - 6},${OY + ryB} L${OX + 6},${OY + ryB}" stroke="var(--brand-crimson)" stroke-width="1"/>`),
+              F.annot(OX + 8, OY + ryA + 14, '최소요구치', { size: 11 }),
+              F.annot(OX + 8, OY + ryB + 14, '재화의 도달범위', { size: 11, tone: 'red' }),
             ],
           });
         })();
@@ -1031,7 +1082,7 @@
         (function () {
           const Z = window.SIZE;
           const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
-          const S = F.scale({ x: [0, 15], y: [0.2, 5.0] });
+          const S = F.scale({ x: [0, 15], y: [0.2, 5.8] });
           const parts = [
             F.line(F.BOX.x0, S.y(Z.uStar), S.x(14.4), S.y(Z.uStar), { variant: 'cap' }),
             F.annot(F.BOX.x0 - 8, S.y(Z.uStar) + 4, 'u*', { anchor: 'end', size: 12 }),
