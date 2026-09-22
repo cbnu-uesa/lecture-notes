@@ -112,6 +112,34 @@
   <p class="cover-date" data-course-date>&nbsp;</p>
 </section>
 
+<!-- ══ 2·3강 요약 (2026-09-22 추가) ═══════════════════════ -->
+<section>
+  <h2>지난 시간 — 도시는 왜, 어떻게 생기고 커지는가</h2>
+  <div class="body tight">
+    <div class="cols" style="align-items:flex-start">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">2강 — 도시의 생성</p>
+        <p>가내생산모형의 세 가정을 하나씩 완화하면 도시가 생김</p>
+        <p><strong>비교우위 + 교환의 규모의 경제</strong> → 교역도시</p>
+        <p style="margin-bottom:8px"><strong>생산의 규모의 경제</strong> → 공장도시</p>
+        <p class="caption">두 경우 모두 통근·통행을 아끼려 가까이 살고,
+          토지 경쟁이 가격을 올려 인구밀도가 높아짐</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">3강 — 도시는 왜 커지고, 어떤 재화를 갖는가</p>
+        <p><strong>집적의 경제</strong>(중간재 공유·노동풀링·숙련매칭·지식파급)가
+          <strong>집적의 불경제</strong>(통근비용·오염 등)와 겨뤄 균형 군집규모를 정함</p>
+        <p style="margin-bottom:8px">기업의 입지선택(운송비용)에 이어, <strong>독점적 경쟁</strong>과
+          <strong>중심지이론</strong>은 소비자 관점에서 도시의 규모와 재화 다양성이
+          어떻게 갈리는지 설명함</p>
+        <p class="caption">큰 도시일수록 1인당 수요가 낮은 재화까지 지탱해 더 다양한 재화를 가짐</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:20px">→ 오늘은 이 도시들이 <strong>노동시장</strong>으로 연결된
+      하나의 지역경제에서 규모가 어떻게 정해지는지 봄</p>
+  </div>
+</section>
+
 <!-- ══ CHAPTER 06 — 3강에서 옮겨 옴 (2026-09-15) ══════════ -->
 <section class="s-section">
   <div class="section-rule"></div>
@@ -154,9 +182,55 @@
           중심에 위치한 식당은 변두리 식당보다 접근성이 나음</p>
       </div>
     </div>
-    <p class="derive t-red" style="margin-top:20px">→ 개별 기업은 좁게 차별화된 제품에 대해 <strong>지역 독점</strong>을 가짐</p>
-      <p class="derive t-red" style="margin-top:20px">→ 인근에서 유일한 이탈리안 식당일 수 있음</p>
+    <p class="derive t-red" style="margin-top:20px">→ 개별 기업은 좁게 차별화된 제품에 대해 <strong>지역 독점</strong>을 가짐
+      (인근에서 유일한 이탈리안 식당일 수 있음)</p>
       <p class="derive t-red" style="margin-top:20px">→ 그러나 입지나 제품에서 차별화된 다른 식당들과 <strong>경쟁</strong>함</p>
+  </div>
+</section>
+<section class="s-split">
+  <h2>단기이윤에서 장기균형까지</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">진입 전에는 <strong>독점시장과 같은 조건</strong>(MR = MC)으로 단기이윤을 얻음</p>
+      <p class="emph" style="margin-bottom:16px">이윤을 보고 기업들이 진입하면 개별 기업의 수요곡선이
+        <strong>왼쪽으로 밀려</strong> 장기평균비용곡선에 <strong>접하는 점 F</strong>에서 멈춤</p>
+      <p class="derive t-red">→ F 에서는 가격 = 평균비용이라 <strong>경제적 이윤이 영(0)</strong></p>
+      <p class="derive t-red">→ 다음 쪽부터 이 과정을 기업 수를 하나씩 늘려가며 따라감</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-mc-overview" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>단기 수요곡선이 왼쪽으로 이동해 평균비용곡선에 접하는 점 F에서 장기균형에 이르는 그림</title></svg>
+      <script>
+        (function () {
+          const M = window.MC, S0 = M.stage[0], S2 = M.stage[2];
+          const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 16] });
+          const samp = (f, a, b, n) => {
+            const o = [];
+            for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const q2 = M.qStar(S2.A), p2 = M.demand(S2.A, q2);
+          F.draw('#f-mc-overview', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              F.curve(samp((x) => M.ac(x), 1.1, 15.5, 70)),
+              F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
+              F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
+              F.annot(S.x(1.6), S.y(M.c) - 8, '한계비용', { size: 11 }),
+              F.line(...S.p([0, S0.A]), ...S.p([15.5, M.demand(S0.A, 15.5)]), { variant: 'demand', dash: '5 4' }),
+              F.annot(S.x(1.5), S.y(M.demand(S0.A, 1.5)) - 8, '단기: 진입 전',
+                      { size: 11, tone: 'blue' }),
+              F.line(...S.p([0, S2.A]), ...S.p([S2.A / M.B, 0]), { variant: 'demand' }),
+              F.annot(S.x(1.5), S.y(M.demand(S2.A, 1.5)) - 8, '장기: 진입 후',
+                      { size: 11, tone: 'blue' }),
+              F.guide(...S.p([q2, p2]), { xtick: 'Q*', ytick: 'P*' }),
+              F.dot(...S.p([q2, p2]), { label: 'F', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
   </div>
 </section>
 <section class="s-split">
@@ -170,7 +244,7 @@
       <p style="margin-bottom:18px">장기평균비용곡선은 음(−)의 기울기를 가지며 수평의 한계비용곡선에
         <strong>점근적</strong></p>
       <p class="emph" id="k-mono" style="margin-bottom:16px"></p>
-      <p class="derive t-red">→ 진입에 장벽이 없다면 이것은 <strong>장기균형이 아님</strong></p>
+      <p class="derive t-red">→ 진입 장벽이 낮으므로 이것은 <strong>장기균형이 아님</strong></p>
       <p class="derive t-red">→ 양(+)의 경제적 이윤을 보고 다른 기업들이 들어옴</p>
     </div>
     <div class="col-r">
@@ -198,9 +272,9 @@
               F.line(...S.p([0, S0.A]), ...S.p([9.4, M.mr(S0.A, 9.4)]), { variant: 'supply' }),
               F.curve(AC),
               F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
-              F.annot(S.x(14), S.y(M.demand(S0.A, 14)) + 15, S0.sub + ': ' + S0.name,
-                      { size: 11, tone: 'blue', anchor: 'end' }),
-              F.annot(S.x(8.4), S.y(M.mr(S0.A, 8.4)) - 8, '한계수입', { size: 11, tone: 'red' }),
+              F.annot(S.x(1.5), S.y(M.demand(S0.A, 1.5)) - 8, S0.sub + ': ' + S0.name,
+                      { size: 11, tone: 'blue' }),
+              F.annot(S.x(5), S.y(M.mr(S0.A, 5)) - 8, '한계수입', { size: 11, tone: 'red' }),
               F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
               F.annot(S.x(3), S.y(M.c) - 8, '한계비용', { size: 11 }),
               F.guide(...S.p([q, p]), { xtick: "q′", ytick: "p′" }),
@@ -226,23 +300,20 @@
   </script>
 </section>
 <section class="s-split">
-  <h2>진입과 독점적 경쟁</h2>
+  <h2>복점 <span class="en">(duopolist)</span></h2>
   <div class="body">
     <div class="col-l">
-      <p class="sub t-red" style="margin-bottom:2px">복점 — 잔여수요곡선이 왼쪽으로</p>
+      <p class="sub t-red" style="margin-bottom:2px">두 번째 기업의 진입 — 잔여수요곡선이 왼쪽으로</p>
       <p>두 번째 기업의 진입이 <strong>잔여수요곡선</strong>을 왼쪽으로 밀어냄</p>
       <p style="margin-bottom:20px">진입은 위(낮은 가격) · 오른쪽(기업당 작은 수량) · 아래(높은 평균비용)로부터 이윤을 줄임</p>
-      <p class="sub t-red fragment fade-in" data-fragment-index="0" style="margin-bottom:2px">장기균형 — 경제적 이윤이 영(0)</p>
-      <p class="fragment fade-in" data-fragment-index="0" style="margin-bottom:20px">진입은 경제적 이윤이 영이 될 때까지 계속됨. 여기서는 네 기업의 <strong>사중복점</strong>. 개별 기업에 대해 <strong>MR = MC</strong>(이윤극대화)이고
-        <strong>가격 = 평균비용</strong>(영의 이윤)</p>
-      <p class="derive t-red fragment fade-in" data-fragment-index="0">→ 퇴출할 유인도, 진입할 유인도 없음. <strong>내쉬균형</strong>. 균형 기업의 수는 n* = Q*/q*</p>
+      <p class="derive t-red">→ 독점기업의 수요곡선 d₁이 <strong>복점기업의 수요곡선 d₂</strong>로 왼쪽 이동함</p>
     </div>
     <div class="col-r">
       <svg class="fig" id="f-duo" viewBox="0 0 470 300" style="width:430px" role="img">
-        <title>진입으로 잔여수요곡선이 왼쪽으로 밀려 결국 평균비용곡선에 접하는 장기균형에 이르는 그림</title></svg>
+        <title>진입으로 독점기업의 수요곡선이 왼쪽으로 밀려 복점기업의 수요곡선이 되는 그림</title></svg>
       <script>
         (function () {
-          const M = window.MC;
+          const M = window.MC, S0 = M.stage[0], S1 = M.stage[1];
           const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
           const S = F.scale({ x: [0, 16], y: [0, 16] });
           const samp = (f, a, b, n) => {
@@ -250,33 +321,76 @@
             for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
             return S.curve(o);
           };
-          const parts = [
-            F.curve(samp((x) => M.ac(x), 1.1, 15.5, 70)),
-            F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
-            F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
-            F.annot(S.x(3), S.y(M.c) - 8, '한계비용', { size: 11 }),
-          ];
-          [1, 2].forEach((i, step) => {
-            const st = M.stage[i];
-            const q = M.qStar(st.A), p = M.demand(st.A, q), ac = M.ac(q);
-            const xEnd = st.A / M.B;
-            parts.push(F.line(...S.p([0, st.A]), ...S.p([Math.min(xEnd, 15.5), M.demand(st.A, Math.min(xEnd, 15.5))]),
-                              { variant: 'demand', fragment: step }));
-            parts.push(F.line(...S.p([0, st.A]), ...S.p([st.A / (2 * M.B), 0]),
-                              { variant: 'supply', fragment: step }));
-            parts.push(F.annot(S.x(Math.min(xEnd, 14.6)), S.y(M.demand(st.A, Math.min(xEnd, 14.6))) + 14,
-                               st.sub + ': ' + st.name,
-                               { size: 11, tone: 'blue', anchor: 'end', fragment: step }));
-            parts.push(F.guide(...S.p([q, p]), { xtick: st.pts[0] === 'f' ? 'q″' : 'q*',
-                                                 ytick: st.pts[0] === 'f' ? 'p″' : 'p*', fragment: step }));
-            parts.push(F.dot(...S.p([q, p]),   { label: st.pts[0], lx: 8, ly: -8, fragment: step }));
-            if (st.pts[1]) {
-              parts.push(F.guide(...S.p([q, ac]), { ytick: 'ac″', only: 'y', fragment: step }));
-              parts.push(F.dot(...S.p([q, ac]), { label: st.pts[1], lx: 8, ly: -8, fragment: step }));
-            }
-            parts.push(F.dot(...S.p([q, M.c]), { label: st.pts[2], lx: 8, ly: -8, fragment: step }));
+          const q1 = M.qStar(S1.A), p1 = M.demand(S1.A, q1), ac1 = M.ac(q1);
+          F.draw('#f-duo', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              F.curve(samp((x) => M.ac(x), 1.1, 15.5, 70)),
+              F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
+              F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
+              F.annot(S.x(3), S.y(M.c) - 8, '한계비용', { size: 11 }),
+              F.line(...S.p([0, S0.A]), ...S.p([15.5, M.demand(S0.A, 15.5)]), { variant: 'demand', dash: '5 4' }),
+              F.annot(S.x(1.5), S.y(M.demand(S0.A, 1.5)) - 8, S0.sub + ': ' + S0.name,
+                      { size: 11, tone: 'blue' }),
+              F.line(...S.p([0, S1.A]), ...S.p([S1.A / M.B, 0]), { variant: 'demand' }),
+              F.line(...S.p([0, S1.A]), ...S.p([S1.A / (2 * M.B), 0]), { variant: 'supply' }),
+              F.annot(S.x(10.2), S.y(M.demand(S1.A, 10.2)) + 14, S1.sub + ': ' + S1.name,
+                      { size: 11, tone: 'blue', anchor: 'end' }),
+              F.annot(S.x(1.8), S.y(M.mr(S1.A, 1.8)) - 8, '한계수입', { size: 11, tone: 'red' }),
+              F.guide(...S.p([q1, p1]), { xtick: 'q″', ytick: 'p″' }),
+              F.guide(...S.p([q1, ac1]), { ytick: 'ac″', only: 'y' }),
+              F.dot(...S.p([q1, p1]),  { label: 'f', lx: 8, ly: -8 }),
+              F.dot(...S.p([q1, ac1]), { label: 'e', lx: 8, ly: -8 }),
+              F.dot(...S.p([q1, M.c]), { label: 'd', lx: 8, ly: -8 }),
+            ],
           });
-          F.draw('#f-duo', { axes: { x: '수량', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+<section class="s-split">
+  <h2>장기균형 — 사중복점</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">경제적 이윤이 영(0)이 될 때까지 진입</p>
+      <p>진입은 경제적 이윤이 영이 될 때까지 계속됨</p>
+      <p style="margin-bottom:20px">여기서는 네 기업의 <strong>사중복점</strong>. 개별 기업에 대해 <strong>MR = MC</strong>(이윤극대화)이고
+        <strong>가격 = 평균비용</strong>(영의 이윤)</p>
+      <p class="derive t-red">→ 퇴출할 유인도, 진입할 유인도 없음. <strong>내쉬균형</strong></p>
+      <p class="derive t-red">→ 균형 기업의 수는 n* = Q*/q*</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-quad" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>사중복점기업의 수요곡선이 평균비용곡선에 접하는 장기균형 그림</title></svg>
+      <script>
+        (function () {
+          const M = window.MC, S2 = M.stage[2];
+          const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 16] });
+          const samp = (f, a, b, n) => {
+            const o = [];
+            for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const q2 = M.qStar(S2.A), p2 = M.demand(S2.A, q2);
+          F.draw('#f-quad', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              F.curve(samp((x) => M.ac(x), 1.1, 15.5, 70)),
+              F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
+              F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
+              F.annot(S.x(11), S.y(M.c) - 8, '한계비용', { size: 11 }),
+              F.line(...S.p([0, S2.A]), ...S.p([S2.A / M.B, 0]), { variant: 'demand' }),
+              F.line(...S.p([0, S2.A]), ...S.p([S2.A / (2 * M.B), 0]), { variant: 'supply' }),
+              F.annot(S.x(6), S.y(M.demand(S2.A, 6)) - 8, S2.sub + ': ' + S2.name,
+                      { size: 11, tone: 'blue' }),
+              F.annot(S.x(1), S.y(M.mr(S2.A, 1)) - 8, '한계수입', { size: 11, tone: 'red' }),
+              F.guide(...S.p([q2, p2]), { xtick: 'q*', ytick: 'p*' }),
+              F.dot(...S.p([q2, p2]), { label: 'h', lx: 8, ly: -8 }),
+              F.dot(...S.p([q2, M.c]), { label: 'g', lx: 8, ly: -8 }),
+            ],
+          });
         })();
       </script>
     </div>
@@ -304,6 +418,8 @@
       <p class="caption">개별 식당은 영업을 이어갈 만큼 벌지만 다른 기업의 진입을 부를 만큼 벌지는 못함</p>
       </div>
     </div>
+    <p class="derive t-red" style="margin-top:14px">→ 개별 기업은 자신의 영업권에서 독점이지만
+      새로운 기업이 진입하면서 수요가 감소하여 균형에서 0의 경제적 이윤을 얻음</p>
   </div>
 </section>
 <section class="s-section">
@@ -798,7 +914,7 @@
           const pts = [];
           for (let i = 0; i <= 70; i++) { const N = 0.55 + (7.1 * i) / 70; pts.push([N, U.u(N)]); }
           const mk = (N, lb, tick, lx, ly) => [
-            F.guide(...S.p([N, U.u(N)]), { xtick: String(N), ytick: tick }),
+            F.guide(...S.p([N, U.u(N)]), { xtick: String(N), ...(tick != null ? { ytick: tick } : {}) }),
             F.dot(...S.p([N, U.u(N)]), { label: lb, lx, ly }),
           ];
           F.draw('#f-u3', {
