@@ -305,9 +305,9 @@
       <div class="cols top">
         <div class="col-l">
           <ul>
-            <li>정(+)의 상관관계: x가 커질 때 y도 함께 커지는 경향
+            <li>양의 상관관계: x가 커질 때 y도 함께 커지는 경향
               <p class="sub" style="margin:4px 0 0 10px">→ 산포도가 오른쪽 위로 향한다</p></li>
-            <li style="margin-top:16px">음(−)의 상관관계: x가 커질 때 y는 작아지는 경향
+            <li style="margin-top:16px">음의 상관관계: x가 커질 때 y는 작아지는 경향
               <p class="sub" style="margin:4px 0 0 10px">→ 산포도가 오른쪽 아래로 향한다</p></li>
           </ul>
           <p class="sub" style="margin-top:20px">→ 다음으로 넘기면 아래 산포도의 점들이
@@ -315,9 +315,9 @@
         </div>
         <div class="col-r">
           <svg class="fig" id="f-corrsign" viewBox="0 0 310 265" style="width:300px" role="img">
-            <title>50개의 점이 음의 상관관계 위치에서 양의 상관관계 위치로 이동하는 산포도</title>
+            <title>50개의 점이 양의 상관관계 위치에서 음의 상관관계 위치로 이동하는 산포도</title>
           </svg>
-          <p class="caption" id="f-corrsign-cap" style="margin-top:4px">r = −0.75 (음의 상관관계)</p>
+          <p class="caption" id="f-corrsign-cap" style="margin-top:4px">r = +0.75 (양의 상관관계)</p>
         </div>
       </div>
       <span class="fragment" id="corr-sign-trigger"
@@ -342,9 +342,11 @@
           axes += `<text class="tick" x="${S.x(v)}" y="${TOP + PH + 16}" text-anchor="middle">${v}</text>`;
           if (v > 0) axes += `<text class="tick" x="${x0 - 8}" y="${S.y(v) + 4}" text-anchor="end">${v}</text>`;
         }
-        const dots = negPts.map(([x, y], i) =>
+        // 양이 먼저 보이는 상태다 — data-nx/ny(기본, 화면에 그려지는 값)가 양수 위치,
+        // data-tx/ty(다음으로 넘기면 옮겨갈 자리)가 음수 위치다.
+        const dots = posPts.map(([x, y], i) =>
           `<circle class="pt" cx="${x}" cy="${y}"
-             data-nx="${x}" data-ny="${y}" data-px="${posPts[i][0]}" data-py="${posPts[i][1]}" r="3"/>`
+             data-nx="${x}" data-ny="${y}" data-tx="${negPts[i][0]}" data-ty="${negPts[i][1]}" r="3"/>`
         ).join('');
 
         Fig.draw('#f-corrsign', { parts: [Fig.raw(axes), Fig.raw(dots)] });
@@ -354,16 +356,16 @@
            실제 이동 애니메이션은 <style>의 CSS transition이 맡는다. */
         const svg = document.getElementById('f-corrsign');
         const cap = document.getElementById('f-corrsign-cap');
-        function setSign(positive) {
+        function setSign(negative) {
           svg.querySelectorAll('circle.pt').forEach((c) => {
-            c.setAttribute('cx', positive ? c.dataset.px : c.dataset.nx);
-            c.setAttribute('cy', positive ? c.dataset.py : c.dataset.ny);
+            c.setAttribute('cx', negative ? c.dataset.tx : c.dataset.nx);
+            c.setAttribute('cy', negative ? c.dataset.ty : c.dataset.ny);
           });
           // toFixed()는 자판 하이픈(-)을 쓴다. 이 덱은 음수 표기에 늘 − (U+2212)를 쓰므로
           // 직접 붙인다 (예: 슬라이드 8 "−1 ≤ r ≤ +1").
-          cap.textContent = positive
-            ? `r = +${POS.toFixed(2)} (양의 상관관계)`
-            : `r = −${Math.abs(NEG).toFixed(2)} (음의 상관관계)`;
+          cap.textContent = negative
+            ? `r = −${Math.abs(NEG).toFixed(2)} (음의 상관관계)`
+            : `r = +${POS.toFixed(2)} (양의 상관관계)`;
         }
         const trigger = document.getElementById('corr-sign-trigger');
         // Reveal 라이브러리는 이 <script>보다 뒤(</body> 근처)에서 불러오므로
