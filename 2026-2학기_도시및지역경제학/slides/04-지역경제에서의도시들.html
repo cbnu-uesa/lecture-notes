@@ -102,15 +102,22 @@
   //   u_k(N) = P_k − g_k(N − M_k)²,  g_k 는 u_k(X_k) = u* 에서 유도한다.
   window.SIZE = {
     uStar: 3,
+    x0: 0.3,   // 세 곡선이 공유하는 왼쪽 시작점 (원본 그림 7-5, 세 곡선이 세로축 부근에서 모임)
     city: [
       // 세 곡선의 색은 서로 분명히 갈려야 한다 (design.md §3.3).
       // i3 는 demand 와 같은 #1F5C8B 라 쓸 수 없다 — i1(초록)으로 간다.
-      { tag: 's', name: '작은 도시',   M: 2.5, P: 3.5, X: 4,  variant: 'demand' },
-      { tag: 'm', name: '중간 도시',   M: 4,   P: 3.9, X: 6,  variant: 'i1' },
-      { tag: 'b', name: '큰 도시',     M: 8,   P: 4.6, X: 12, variant: null },
+      // u0: x0 에서의 시작 높이. 원본 그림처럼 파란 < 초록 < 검정 순으로 벌어진다.
+      { tag: 's', name: '작은 도시',   M: 2.5, P: 3.5, X: 4,  variant: 'demand', u0: 0.4 },
+      { tag: 'm', name: '중간 도시',   M: 4,   P: 3.9, X: 6,  variant: 'i1',     u0: 0.6 },
+      { tag: 'b', name: '큰 도시',     M: 8,   P: 4.6, X: 12, variant: null,     u0: 1.0 },
     ],
-    g(c) { return (c.P - this.uStar) / (c.X - c.M) ** 2; },
-    u(c, N) { return c.P - this.g(c) * (N - c.M) ** 2; },
+    // 정점 오른쪽은 u* 를 지나는 기울기, 왼쪽은 x0 에서 u0 를 지나는 기울기 — 비대칭 포물선.
+    gRight(c) { return (c.P - this.uStar) / (c.X - c.M) ** 2; },
+    gLeft(c)  { return (c.P - c.u0) / (c.M - this.x0) ** 2; },
+    u(c, N) {
+      const g = N <= c.M ? this.gLeft(c) : this.gRight(c);
+      return c.P - g * (N - c.M) ** 2;
+    },
   };
 
   // ── 혁신과 지역 전체 효용 [p.143] ──────────────────────────
@@ -833,7 +840,7 @@
 
 <!-- ══ 7. 그림 7-2 자기-강화적 이주 (p.135) ═════════════════ -->
 <section class="s-split">
-  <h2>도시들은 지나치게 작지 않다</h2>
+  <h2>도시들은 지나치게 작지 않다: 여섯 도시 구성</h2>
   <div class="body">
     <div class="col-l">
       <p class="emph" style="margin-bottom:16px">일부 노동자가 도시 D에서 도시 A로 이동한다고 하자</p>
@@ -882,7 +889,7 @@
 
 <!-- ══ 8. 그림 7-3 자기-교정적 (p.136~137) ══════════════════ -->
 <section class="s-split">
-  <h2>도시들은 지나치게 클 수 있다</h2>
+  <h2>도시들은 지나치게 클 수 있다: 두 도시 구성</h2>
   <div class="body">
     <div class="col-l">
       <p class="emph" style="margin-bottom:16px">두−도시 구성(점 j)에서 일부 노동자가 B에서 A로 이동한다면</p>
@@ -940,14 +947,14 @@
       <div class="col-l">
         <p class="sub t-red" style="margin-bottom:2px">1. 안정성</p>
         <p>효용곡선이 정점의 <strong>오른쪽으로 더 가파르다면</strong> 안정적</p>
-      <p>안으로−이주로 인한 효용 감소가 밖으로−이주로 인한 감소보다 커서,
+      <p>이주로 인한 효용 감소가 이주로 인한 감소보다 커서,
           성장하는 도시의 효용이 축소하는 도시보다 <strong>작음</strong></p>
       <p>이주자들은 되돌아와 원래의 노동력을 회복시킴</p>
       </div>
       <div class="col-r">
         <p class="sub t-red" style="margin-bottom:2px">2. 불안정성</p>
         <p>효용곡선이 정점의 <strong>오른쪽으로 더 평평하다면</strong> 불안정적</p>
-      <p>밖으로−이주가 더 큰 감소를 낳아 성장하는 도시의 효용이 <strong>더 높음</strong></p>
+      <p>이주가 더 큰 감소를 낳아 성장하는 도시의 효용이 <strong>더 높음</strong></p>
       <p>이주가 자기−강화적이라 성장 도시는 성장을, 축소 도시는 축소를 지속함</p>
       </div>
     </div>
@@ -1001,8 +1008,7 @@
         F.draw('#f-rank', { parts });
       })();
     </script>
-    <p class="caption" style="margin-top:2px;margin-left:112px">상위 50개 대도시지역 ·
-      <span class="en">그림 7−4</span>. 교재에 막대별 수치가 인쇄돼 있지 않아 윤곽을 옮긴 근사값</p>
+    <p class="caption" style="margin-top:2px;margin-left:112px">상위 50개 대도시지역</p>
   </div>
 </section>
 
@@ -1014,7 +1020,6 @@
       <p class="emph" style="margin-bottom:14px">집적의 경제가 <strong>얼마나 큰가</strong>에 따라
         효용곡선의 정점이 놓이는 위치가 달라짐</p>
       <p><strong>점 s의 도시</strong> — 집적의 경제가 작아 불경제가 빠르게 압도함</p>
-      <p style="margin-bottom:6px">정점이 작은 노동력에서 발생함</p>
       <p style="margin-bottom:6px"><strong>점 m의 도시</strong> — 집적의 경제가 중간 정도, 정점도 중간 규모</p>
       <p style="margin-bottom:16px"><strong>점 b의 도시</strong> — 집적의 경제가 커서 정점이 큰 노동력에서 발생함</p>
       <p class="derive t-red">→ 세 도시가 <strong>같은 효용 u*</strong>를 서로 다른 규모에서 달성함</p>
@@ -1026,18 +1031,16 @@
         (function () {
           const Z = window.SIZE;
           const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
-          const S = F.scale({ x: [0, 15], y: [1.6, 5.0] });
+          const S = F.scale({ x: [0, 15], y: [0.2, 5.0] });
           const parts = [
             F.line(F.BOX.x0, S.y(Z.uStar), S.x(14.4), S.y(Z.uStar), { variant: 'cap' }),
             F.annot(F.BOX.x0 - 8, S.y(Z.uStar) + 4, 'u*', { anchor: 'end', size: 12 }),
           ];
           for (const c of Z.city) {
             const pts = [];
-            const lo = Math.max(0.4, c.M - (c.X - c.M) * 1.5);
             for (let i = 0; i <= 60; i++) {
-              const N = lo + ((c.X * 1.12 - lo) * i) / 60;
-              const u = Z.u(c, N);
-              if (u > 1.7) pts.push([N, u]);
+              const N = Z.x0 + ((c.X * 1.12 - Z.x0) * i) / 60;
+              pts.push([N, Z.u(c, N)]);
             }
             parts.push(F.curve(S.curve(pts), c.variant ? { variant: c.variant } : {}));
             parts.push(F.guide(...S.p([c.X, Z.uStar]), { xtick: String(c.X), only: 'x' }));
@@ -1055,7 +1058,7 @@
   <h2>입지적 균형의 두 조건</h2>
   <div class="body stack">
     <div class="def-row">
-      <div class="def-tag">1. 내쉬균형<br><span class="en">동일한 효용</span></div>
+      <div class="def-tag">1. 내쉬균형</div>
       <div>
         <p>세 도시의 노동자가 <strong>동일한 효용수준</strong>을 달성해
           일방적으로 이탈할 유인이 없음</p>
@@ -1079,12 +1082,15 @@
   <div class="body">
     <div class="col-l">
       <p class="lead t-define" style="margin-bottom:14px"><span class="mark">순위 곱하기 인구는 도시들 간 일정함</span></p>
-      <p class="formula-key" style="margin-bottom:10px">R = c / N<sup>b</sup></p>
-      <p>c는 상수, N은 인구, 멱지수 b는 자료로부터 추정함</p>
-      <p style="margin-bottom:14px"><strong>b = 1.0이면 순위−규모 준칙이 성립</strong>함</p>
-      <p class="sub t-red" style="margin-bottom:2px">니체(Nitsche, 2005)의 29개 연구 요약</p>
-      <p>b 추정치의 2/3가 <strong>0.80 ~ 1.20</strong> 사이, 중위 추정치는 <strong>1.09</strong>.
-        도시 인구는 준칙이 예측하는 것보다 <strong>고르게</strong> 분포함</p>
+      <p class="formula-key" style="margin-bottom:10px">$R = \dfrac{c}{N_R^{\,b}}$</p>
+      <p>c는 상수(1순위 도시인구), N<sub>R</sub>은 R번째 도시인구,
+        b는 매개변수로서 자료에서 추정함</p>
+      <p class="caption" style="margin-bottom:14px">예. R번째 도시인구 = 1순위 도시인구 / R<sup>b</sup>, 즉 $N_R = \dfrac{N_1}{R^{\,b}}$</p>
+      <ol class="dense" style="margin:0;padding:0;list-style-position:inside">
+        <li><strong>b = 1</strong> — 순위−규모분포: 도시 간 인구규모가 순위에 정확히 반비례</li>
+        <li><strong>b &gt; 1</strong> — 과두분포·종주분포: 상위 도시에 인구가 집중된 구조</li>
+        <li><strong>b &lt; 1</strong> — 중간규모분포: 중간규모·하위 도시의 인구가 상대적으로 많은 구조</li>
+      </ol>
     </div>
     <div class="col-r">
       <p class="caption-blue">c = 12백만, b = 1 인 경우</p>
@@ -1115,10 +1121,10 @@
   <h2>경제성장의 네 원천</h2>
   <div class="body">
     <p class="emph" style="margin-bottom:6px">도시경제의 맥락에서 경제적 성장은
-      <strong>전형적인 거주자의 효용수준의 증가</strong>로 정의된다 —
+      <strong>전형적인 거주자의 효용수준의 증가</strong>로 정의된다 —<br>
       시장 소득(임금) 외에 재화의 다양성 같은 편익과 주거·통근·오염 비용을 함께 고려함</p>
     <ol class="dense" style="margin:0;padding:0;list-style-position:inside">
-      <li><strong>자본의 심화</strong> <span class="en">capital deepening</span> —
+      <li><strong>자본의 심화</strong> —
         노동자 1인당 자본량의 증가. 개별 노동자가 보다 많은 자본을 가지고 일하게 해 생산성과 소득을 올림</li>
       <li><strong>인적자본의 증가</strong> — 교육과 경험을 통해 습득되는 지식과 기술의 증가</li>
       <li><strong>기술진보</strong> — 생산을 어떻게 보다 잘 조직할 것인가에 대한 노동자의 상식적 아이디어부터
@@ -1174,6 +1180,8 @@
               F.dot(...S.p([I.N0, uStar]),       { label: 'a', lx: 8, ly: 15 }),
               F.dot(...S.p([I.Nshrink, uNew]),   { label: 'c', lx: -6, ly: -12 }),
               F.dot(...S.p([I.Ngrow, I.u1(I.Ngrow)]), { label: 'd', lx: 8, ly: -8 }),
+              F.arrow(...S.p([5.9, I.u0(5.9)]), ...S.p([5.08, I.u0(5.08)]), { tone: 'blue' }),
+              F.arrow(...S.p([6.1, I.u1(6.1)]), ...S.p([6.92, I.u1(6.92)]), { tone: 'red' }),
             ],
           });
         })();
@@ -1182,31 +1190,13 @@
   </div>
 </section>
 
-<!-- ══ 18. 혁신 편익의 분산 (p.144) ═════════════════════════ -->
-<section>
-  <h2>혁신의 편익은 지역 전체로 퍼진다</h2>
-  <div class="body stack">
-    <p class="emph">축소하는 도시의 노동자들도 편익을 얻음</p>
-      <p class="emph" style="margin-bottom:24px">인구 감소가 그 도시를 <strong>음(−)의 기울기 부분을 따라 점 a에서 점 c로 상향 이동</strong>시키기 때문</p>
-    <p class="lead t-define" style="margin-bottom:24px">두−도시 지역에서 개별 도시의 노동자들은
-      <span class="mark">초기 격차의 대략 절반</span>과 동일한 효용 증가를 경험한다 —
-      (u** − u*)는 (u″ − u*)의 대략 절반</p>
-    <p class="emph">지역이 <strong>10개 도시</strong>라면 편익을 공유하는 노동자가 다섯 배가 되어
-      효용 증가는 초기 격차의 약 <strong>1/10</strong>이 됨</p>
-      <p class="emph" style="margin-bottom:20px"><strong>50개 도시</strong>라면 약 <strong>1/50</strong></p>
-    <p class="derive t-red">→ 혁신의 편익을 공유하는 노동자의 수가 클수록 <strong>노동자 1인당 편익은 작음</strong></p>
-      <p class="derive t-red">→ 다만 두 도시가 <strong>동시에</strong> 같은 진보를 경험하면 효용 격차가 없어
-      두 도시 모두 점 b로 이동하고 노동력은 그대로 유지됨</p>
-  </div>
-</section>
-
 <!-- ══ 19. 인적자본과 경제성장 (p.144~145) ══════════════════ -->
 <section>
   <h2>인적자본과 경제성장</h2>
   <div class="body">
-    <p class="emph" style="margin-bottom:8px">특정 노동자의 교육 혹은 직업 숙련의 증가는 세 가지 효과를 지닌다 —
-      <strong>① 보다 높은 임금</strong>(생산성 증가에 고용주 간 경쟁이 임금을 맞춘다)
-      <strong>② 파급 편익</strong>(공식·비공식으로 지식을 공유해 다른 노동자가 배운다)
+    <p class="emph" style="margin-bottom:8px">특정 노동자의 교육 혹은 직업 숙련의 증가는 세 가지 효과를 지닌다 —<br>
+      <strong>① 보다 높은 임금</strong>(생산성 증가에 고용주 간 경쟁이 임금을 올린다)<br>
+      <strong>② 파급 편익</strong>(공식·비공식으로 지식을 공유해 다른 노동자가 배운다)<br>
       <strong>③ 기술적인 진보</strong>(혁신의 비율을 높인다)</p>
     <div class="cols">
       <div class="col-l">
