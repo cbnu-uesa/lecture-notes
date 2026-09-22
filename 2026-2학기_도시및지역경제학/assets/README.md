@@ -43,6 +43,24 @@
 세 파일 모두 강의 목적의 인용이며, 슬라이드마다 출처를 그림 아래에 적어 두었다
 (design.md §4.5).
 
+### tb-christaller-portrait.jpg
+- Walter Christaller (1893–1969) 인물 사진
+- 출처: https://link.springer.com/chapter/10.1007/978-3-031-90625-1_2 (교수 제공, 2026-09-22)
+- 쓰는 곳: **4강** 「중심지 이론」 소개 슬라이드
+- 크기: 370×540
+- 사진 저작권자를 확인하지 못했다 — Christaller 본인 저작권과는 별개로 촬영자 저작권이
+  있을 수 있다. **대외 배포 전 저작권 판단 대상**
+
+### tb-christaller-market-principle.png
+- 중심지이론 시장원리(market principle) 육각형 시장구역 다이어그램
+- 출처: Rodrigue, J-P., *The Geography of Transport Systems*, transportgeography.org
+  (`central_places_theory2.png`)
+- 쓰는 곳: **4강** 「중심지이론: 면적 공간」 슬라이드
+- 크기: 900×504
+- 이 사이트는 "교실 수업 목적"의 사용만 명시적으로 허용하고 그 밖의 재배포는 금지한다
+  (사이트 소개 페이지 참조). **대외 배포(공개 웹사이트) 전 저작권 판단 대상** —
+  강의실 안에서 보여주는 용도로만 쓴다
+
 ## 다른 과목에서 가져온 그림
 
 - **파레토 효율성 도식** (`f-pareto`) — 2주차 29쪽. 1학기 도시경제학입문

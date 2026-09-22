@@ -18,6 +18,22 @@
 
 <script src="../../_shared/js/charts.js"></script>
 
+<script>
+  // ── 독점 → 복점 → 장기균형 [본편에서 옮겨 옴] ────────────────
+  window.MC = {
+    k: 12, c: 2, B: 0.75,
+    ac(q) { return this.k / q + this.c; },
+    stage: [
+      { A: 14, name: '독점기업',   sub: 'd₁', pts: ['b', 'c', 'a'] },
+      { A: 11, name: '복점기업',   sub: 'd₂', pts: ['f', 'e', 'd'] },
+      { A: 8,  name: '사중복점기업', sub: 'd₄', pts: ['h', null, 'g'] },
+    ],
+    demand(A, q) { return A - this.B * q; },
+    mr(A, q)     { return A - 2 * this.B * q; },
+    qStar(A)     { return (A - this.c) / (2 * this.B); },
+  };
+</script>
+
 <style>
   .body > .cols { align-items: flex-start; }
 </style>
@@ -41,6 +57,8 @@
     <ul>
       <li><strong>이발사와 뇌외과 의사</strong> — "도시 규모와 제품의 다양성" 슬라이드와 내용이 겹쳐
         2026-09-22 에 뺌. 뇌외과 의사 사례는 그 슬라이드로 옮겨 갔다</li>
+      <li><strong>단기이윤에서 장기균형까지</strong> — 슬라이드 8~10(독점의 결과·복점·장기균형)이
+        같은 내용을 이미 자세히 다뤄 2026-09-22 에 뺌</li>
     </ul>
     <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
     <p class="caption" style="margin-top:14px">PDF 내려받기 단추는 이 파일에서 동작하지 않는다
@@ -69,6 +87,54 @@
       <p>시설과 장비는 비싸 <strong>규모의 경제가 큼</strong></p>
         <p class="caption">→ <strong>수백만의 잠재적 고객</strong>을 갖는 도시들에 입지함</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 2026-09-22 뺌 — 슬라이드 8~10과 중복 ══════════════════ -->
+<section class="s-split">
+  <h2>단기이윤에서 장기균형까지</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">진입 전에는 <strong>독점시장과 같은 조건</strong>(MR = MC)으로 단기이윤을 얻음</p>
+      <p class="emph" style="margin-bottom:16px">이윤을 보고 기업들이 진입하면 개별 기업의 수요곡선이
+        <strong>왼쪽으로 밀려</strong> 장기평균비용곡선에 <strong>접하는 점 F</strong>에서 멈춤</p>
+      <p class="derive t-red">→ F 에서는 가격 = 평균비용이라 <strong>경제적 이윤이 영(0)</strong></p>
+      <p class="derive t-red">→ 다음 쪽부터 이 과정을 기업 수를 하나씩 늘려가며 따라감</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-mc-overview" viewBox="0 0 470 300" style="width:430px" role="img">
+        <title>단기 수요곡선이 왼쪽으로 이동해 평균비용곡선에 접하는 점 F에서 장기균형에 이르는 그림</title></svg>
+      <script>
+        (function () {
+          const M = window.MC, S0 = M.stage[0], S2 = M.stage[2];
+          const F = Fig.withBox({ x0: 62, y0: 250, x1: 404, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 16] });
+          const samp = (f, a, b, n) => {
+            const o = [];
+            for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const q2 = M.qStar(S2.A), p2 = M.demand(S2.A, q2);
+          F.draw('#f-mc-overview', {
+            axes: { x: '수량', y: '$' },
+            parts: [
+              F.curve(samp((x) => M.ac(x), 1.1, 15.5, 70)),
+              F.line(...S.p([0, M.c]), ...S.p([15.5, M.c]), { variant: 'cap' }),
+              F.annot(S.x(13), S.y(M.ac(13)) + 16, '평균비용', { size: 11 }),
+              F.annot(S.x(1.6), S.y(M.c) - 8, '한계비용', { size: 11 }),
+              F.line(...S.p([0, S0.A]), ...S.p([15.5, M.demand(S0.A, 15.5)]), { variant: 'demand', dash: '5 4' }),
+              F.annot(S.x(1.5), S.y(M.demand(S0.A, 1.5)) - 8, '단기: 진입 전',
+                      { size: 11, tone: 'blue' }),
+              F.line(...S.p([0, S2.A]), ...S.p([S2.A / M.B, 0]), { variant: 'demand' }),
+              F.annot(S.x(1.5), S.y(M.demand(S2.A, 1.5)) - 8, '장기: 진입 후',
+                      { size: 11, tone: 'blue' }),
+              F.guide(...S.p([q2, p2]), { xtick: 'Q*', ytick: 'P*' }),
+              F.dot(...S.p([q2, p2]), { label: 'F', lx: 8, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
     </div>
   </div>
 </section>
