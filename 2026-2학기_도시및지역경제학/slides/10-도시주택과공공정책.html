@@ -192,15 +192,17 @@
       <script>
         (function () {
           const F = Fig.withBox({ x0: 68, y0: 206, x1: 392, y1: 34 });
-          const S = F.scale({ x: [0, 65], y: [0, 340] });
-          // 교재가 인쇄한 세 점 (20,115)·(40,200)·(50,250)을 지나는 곡선을 맞춘다
-          const mc = (q) => 115 + 4.25 * (q - 20) + 0.075 * (q - 20) * (q - 20);
+          const S = F.scale({ x: [0, 65], y: [0, 300] });
+          // 교재가 인쇄한 세 점 (20,115)·(40,200)·(50,250)을 지나는 2차 곡선을 푼 것이다.
+          //   115 + 20a + 400b = 200 · 115 + 30a + 900b = 250 → a = 3.75 · b = 0.025
+          // 그래야 편익 수평선(200)이 점 b(q=40)를 정확히 지나 균형이 교차점이 된다
+          const mc = (q) => 115 + 3.75 * (q - 20) + 0.025 * (q - 20) * (q - 20);
           const pts = []; for (let i = 0; i <= 40; i++) { const q = 4 + (48 * i) / 40; pts.push([q, mc(q)]); }
           const parts = [
             F.curve(S.curve(pts)),
             F.annot(S.x(50), S.y(mc(50)) - 10, '한계 유지관리비용', { anchor: 'end', size: 10 }),
             F.line(S.x(0), S.y(200), S.x(62), S.y(200), { variant: 'demand' }),
-            F.annot(S.x(6), S.y(200) - 9, '편익 = p_h − p_l', { size: 10, tone: 'blue' }),
+            F.annot(S.x(6), S.y(200) - 9, '편익 = pₕ − pₗ', { size: 10, tone: 'blue' }),
           ];
           [[20, 'a'], [40, 'b'], [50, 'c']].forEach(([q, nm]) => {
             parts.push(F.guide(...S.p([q, mc(q)]), { xtick: String(q), ytick: String(Math.round(mc(q))) }));
@@ -248,6 +250,8 @@
           parts.push(F.line(S.x(qk), S.y(20), S.x(q3 * 1.2), S.y(py + (py - 20) * 0.2), { variant: 'supply' }));
           parts.push(F.annot(S.x(q3 * 1.2) + 4, S.y(py + (py - 20) * 0.2), plabel[2], { size: 9, tone: 'red' }));
           parts.push(F.dot(S.x(qk), S.y(20), { label: plabel[3], lx: -14, ly: -6 }));
+          parts.push(F.raw(`<path class="guide" d="M${P.BOX.x0},${S.y(20)} L${S.x(qk)},${S.y(20)}"/>`));
+          parts.push(F.annot(P.BOX.x0 - 8, S.y(20) + 4, plabel[8], { anchor: 'end', size: 10 }));
           parts.push(F.raw(`<path class="guide" d="M${P.BOX.x0},${S.y(py)} L${S.x(q3)},${S.y(py)}"/>`));
           parts.push(F.annot(P.BOX.x0 - 8, S.y(py) + 4, plabel[4], { anchor: 'end', size: 11 }));
           [[q1, plabel[5]], [q2, plabel[6]], [q3, plabel[7]]].forEach(([q, nm]) => {
@@ -258,9 +262,9 @@
           parts.push(F.annot(S.x(32), P.BOX.y0 + 33, note, { anchor: 'middle', size: 11 }));
         };
         panel({ x0: 62, y0: 166, x1: 312, y1: 32 }, [15, 40, 55], '수량: 높은-품질 주택',
-              ['공급: 신규', '공급: 남아 있는', '공급: 시장', 'k', 'p′', 'a', 'b', 'c']);
+              ['공급: 신규', '공급: 남아 있는', '공급: 시장', 'k', 'p′', 'a', 'b', 'c', 'p₀']);
         panel({ x0: 432, y0: 166, x1: 656, y1: 32 }, [10, 26, 36], '수량: 낮은-품질 주택',
-              ['공급: 하향 여과', '공급: 남아 있는', '공급: 시장', 's', 'p″', 'f', 'g', 'h']);
+              ['공급: 하향 여과', '공급: 남아 있는', '공급: 시장', 's', 'p″', 'f', 'g', 'h', 'p₀']);
         F.draw('#f-supply', { parts, check: false });
       })();
     </script>
@@ -283,7 +287,7 @@
         const parts = [];
         // 왼쪽 — 높은-품질 하부시장
         const A = Fig.withBox({ x0: 62, y0: 168, x1: 312, y1: 32 });
-        const SA = A.scale({ x: [0, 68], y: [0, 100] });
+        const SA = A.scale({ x: [0, 68], y: [40, 110] });
         const rem = (q) => 8 + 1.4 * q;                 // 남아 있는 공급 (40 에서 64)
         const dem = (q) => 130 - 1.2 * q;               // 55 에서 64
         parts.push(F.raw(`<path class="axis" d="M${A.BOX.x0},${A.BOX.y1 - 7} L${A.BOX.x0},${A.BOX.y0} L${A.BOX.x1 + 8},${A.BOX.y0}"/>`));
@@ -293,7 +297,7 @@
         // 시장공급 — 굴절 뒤 완만 (신규가 더해진다)
         const mkt = (q) => (q <= 20 ? rem(q) : rem(20) + 0.72 * (q - 20));
         parts.push(F.line(SA.x(20), SA.y(mkt(20)), SA.x(66), SA.y(mkt(66)), { variant: 'supply' }));
-        parts.push(F.annot(SA.x(64), SA.y(mkt(64)) + 14, '공급: 시장', { anchor: 'end', size: 9, tone: 'red' }));
+        parts.push(F.annot(SA.x(40), SA.y(mkt(40)) + 15, '공급: 시장', { size: 9, tone: 'red' }));
         parts.push(F.line(SA.x(10), SA.y(dem(10)), SA.x(66), SA.y(dem(66)), {}));
         parts.push(F.annot(SA.x(64), SA.y(dem(64)) - 8, '수요', { anchor: 'end', size: 9 }));
         [[55, dem(55), 'c', 'p*'], [48, rem(48), 'e', 'p**']].forEach(([q, v, nm, tick]) => {
@@ -305,30 +309,32 @@
         parts.push(F.annot(SA.x(34), A.BOX.y0 + 33, '수량: 높은-품질 주택', { anchor: 'middle', size: 11 }));
         // 오른쪽 — 낮은-품질 하부시장
         const B = Fig.withBox({ x0: 432, y0: 168, x1: 656, y1: 32 });
-        const SB = B.scale({ x: [0, 64], y: [0, 100] });
-        const s0 = (q) => 14 + 1.1 * q, s1 = (q) => 14 + 1.1 * (q + 8);
-        const d0 = (q) => 104 - 1.0 * q, d1 = (q) => 104 - 1.0 * (q - 9);
+        const SB = B.scale({ x: [0, 56], y: [40, 100] });
+        // 교재 17-5 는 l** < l* 다. 수요 이동이 공급 이동보다 작아야 수량이 줄어든다.
+        // 공급은 왼쪽으로 10, 수요는 오른쪽으로 6 만 옮긴다 → l* 35.6 → l** 32.1
+        const s0 = (q) => 14 + 1.6 * q, s1 = (q) => s0(q + 10);
+        const d0 = (q) => 110 - 1.1 * q, d1 = (q) => d0(q - 6);
         parts.push(F.raw(`<path class="axis" d="M${B.BOX.x0},${B.BOX.y1 - 7} L${B.BOX.x0},${B.BOX.y0} L${B.BOX.x1 + 8},${B.BOX.y0}"/>`));
         parts.push(F.annot(B.BOX.x0, B.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
-        parts.push(F.line(SB.x(4), SB.y(s0(4)), SB.x(56), SB.y(s0(56)), { variant: 'cap' }));
-        parts.push(F.annot(SB.x(54), SB.y(s0(54)) + 13, '초기 공급', { anchor: 'end', size: 9 }));
-        parts.push(F.line(SB.x(0), SB.y(s1(0)), SB.x(50), SB.y(s1(50)), {}));
-        parts.push(F.annot(SB.x(24), SB.y(s1(24)) - 9, '공급: 보다 적은 여과', { anchor: 'end', size: 9 }));
-        parts.push(F.line(SB.x(4), SB.y(d0(4)), SB.x(56), SB.y(d0(56)), { variant: 'cap' }));
-        parts.push(F.annot(SB.x(54), SB.y(d0(54)) - 8, '초기 수요', { anchor: 'end', size: 9 }));
-        parts.push(F.line(SB.x(12), SB.y(d1(12)), SB.x(60), SB.y(d1(60)), { variant: 'demand' }));
-        parts.push(F.annot(SB.x(58), SB.y(d1(58)) - 8, '새로운 수요', { anchor: 'end', size: 9, tone: 'blue' }));
-        const pa = Fig.cross(SB.curve([[4, s0(4)], [56, s0(56)]]), SB.curve([[4, d0(4)], [56, d0(56)]]));
-        const pb = Fig.cross(SB.curve([[0, s1(0)], [50, s1(50)]]), SB.curve([[4, d0(4)], [56, d0(56)]]));
-        const pc = Fig.cross(SB.curve([[0, s1(0)], [50, s1(50)]]), SB.curve([[12, d1(12)], [60, d1(60)]]));
-        [[pa, 'a', 'p*', 8, 14], [pb, 'b', 'p′', -14, -8], [pc, 'c', 'p**', 8, -8]]
+        const S0 = SB.curve([[16, s0(16)], [48, s0(48)]]), S1 = SB.curve([[12, s1(12)], [42, s1(42)]]);
+        const D0 = SB.curve([[16, d0(16)], [48, d0(48)]]), D1 = SB.curve([[20, d1(20)], [52, d1(52)]]);
+        parts.push(F.line(...S0[0], ...S0[1], { variant: 'cap' }));
+        parts.push(F.annot(SB.x(47), SB.y(s0(47)) + 14, '초기 공급', { anchor: 'end', size: 9 }));
+        parts.push(F.line(...S1[0], ...S1[1], {}));
+        parts.push(F.annot(SB.x(22), SB.y(s1(22)) - 9, '공급: 보다 적은 여과', { size: 9 }));
+        parts.push(F.line(...D0[0], ...D0[1], { variant: 'cap' }));
+        parts.push(F.annot(SB.x(47), SB.y(d0(47)) - 9, '초기 수요', { anchor: 'end', size: 9 }));
+        parts.push(F.line(...D1[0], ...D1[1], { variant: 'demand' }));
+        parts.push(F.annot(SB.x(51), SB.y(d1(51)) + 14, '새로운 수요', { anchor: 'end', size: 9, tone: 'blue' }));
+        const pa = Fig.cross(S0, D0), pb = Fig.cross(S1, D0), pc = Fig.cross(S1, D1);
+        [[pa, 'a', 'p*', 9, 15], [pb, 'b', 'p′', -15, 14], [pc, 'c', 'p**', 9, -8]]
           .forEach(([P, nm, tick, lx, ly]) => {
             parts.push(F.raw(`<path class="guide" d="M${B.BOX.x0},${P[1]} L${P[0]},${P[1]}"/>`));
             parts.push(F.annot(B.BOX.x0 - 8, P[1] + 4, tick, { anchor: 'end', size: 10 }));
             parts.push(F.dot(P[0], P[1], { label: nm, lx, ly }));
           });
-        parts.push(F.annot(SB.x(32), B.BOX.y0 + 33, '낮은-품질 주택', { anchor: 'middle', size: 11 }));
-        F.draw('#f-ban', { parts, check: false });
+        parts.push(F.annot(SB.x(28), B.BOX.y0 + 33, '낮은-품질 주택', { anchor: 'middle', size: 11 }));
+        F.draw('#f-ban', { parts });
       })();
     </script>
     <p class="derive t-red" style="margin-top:4px">→ 높은-품질 가격이 p* → p** 로 오르고 수량은 55 → 48채.
@@ -372,12 +378,12 @@
       <script>
         (function () {
           const H = window.HOUSE17, F = Fig.withBox({ x0: 70, y0: 222, x1: 392, y1: 34 });
-          const S = F.scale({ x: [240, 780], y: [540, 1060] });
+          const S = F.scale({ x: [240, 780], y: [540, 1290] });
           const I0 = H.income, I1 = I0 + H.voucher;
           const A = H.tangent(I0), C = H.tangent(I1), B = [H.pub.h, H.pub.g];
           const U0 = H.U(...A), U1 = H.U(...C);
           const parts = [
-            F.line(S.x(260), S.y(I0 - 260), S.x(460), S.y(I0 - 460), { variant: 'cap' }),
+            F.line(S.x(248), S.y(I0 - 248), S.x(460), S.y(I0 - 460), { variant: 'i1' }),
             F.annot(S.x(452), S.y(I0 - 452) - 8, '예산', { anchor: 'end', size: 10 }),
             F.line(S.x(300), S.y(I1 - 300), S.x(700), S.y(I1 - 700), { variant: 'demand' }),
             F.annot(S.x(690), S.y(I1 - 690) - 8, '예산 + 240달러', { anchor: 'end', size: 10, tone: 'blue' }),
@@ -390,7 +396,9 @@
             F.dot(...S.p(B), { label: 'b', lx: 9, ly: -8 }),
             F.dot(...S.p(A), { label: 'a', lx: -14, ly: -8 }),
             F.annot(F.BOX.x0 - 8, S.y(1000) + 4, '1,000', { anchor: 'end', size: 10 }),
-            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(1000)} L${S.x(300)},${S.y(1000)}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(1000)} L${S.x(248)},${S.y(1000)}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(1240) + 4, '1,240', { anchor: 'end', size: 10 }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(1240)} L${S.x(300)},${S.y(1240)}"/>`),
           ];
           F.draw('#f-public', { axes: { x: '주택', y: '모든 다른 재화($)' }, parts });
         })();
@@ -421,24 +429,27 @@
       <script>
         (function () {
           const F = Fig.withBox({ x0: 70, y0: 214, x1: 392, y1: 34 });
-          const S = F.scale({ x: [0, 200], y: [0, 100] });
-          const s0 = (q) => 20 + 0.6 * q, s1 = (q) => 20 + 0.6 * (q - 90);
-          const d = (q) => 106 - 0.32 * q;
+          const S = F.scale({ x: [0, 200], y: [0, 70] });
+          // 교재 17-8 은 세 점을 인쇄한다 — a(70, p*) · b(160, p*) · c(100, p**).
+          // 지원 공급은 초기 공급을 오른쪽으로 90채 옮긴 것이므로 b 는 a 와 같은 높이여야 한다.
+          // 그 세 조건을 풀면 수요의 기울기가 공급의 두 배여야 한다.
+          const s0 = (q) => 20 + 0.2 * q, s1 = (q) => s0(q - 90);
+          const d = (q) => 62 - 0.4 * q;
           const c0 = S.curve([[0, s0(0)], [190, s0(190)]]);
           const c1 = S.curve([[90, s1(90)], [190, s1(190)]]);
-          const cd = S.curve([[10, d(10)], [190, d(190)]]);
+          const cd = S.curve([[10, d(10)], [150, d(150)]]);
           const a = Fig.cross(c0, cd), c = Fig.cross(c1, cd);
           const parts = [
             F.line(...c0[0], ...c0[c0.length - 1], { variant: 'demand' }),
-            F.annot(S.x(112), S.y(s0(112)) - 9, '초기 공급', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.annot(S.x(96), S.y(s0(96)) - 10, '초기 공급', { anchor: 'end', size: 10, tone: 'blue' }),
             F.line(...c1[0], ...c1[c1.length - 1], {}),
-            F.annot(S.x(188), S.y(s1(188)) - 9, '공급: 지원', { anchor: 'end', size: 10 }),
+            F.annot(S.x(190), S.y(s1(190)) - 10, '공급: 지원', { anchor: 'end', size: 10 }),
             F.line(...cd[0], ...cd[cd.length - 1], { variant: 'cap' }),
-            F.annot(S.x(186), S.y(d(186)) - 9, '수요', { anchor: 'end', size: 10 }),
+            F.annot(S.x(146), S.y(d(146)) - 9, '수요', { anchor: 'end', size: 10 }),
             F.guide(a[0], a[1], { xtick: '70', ytick: 'p*' }),
             F.dot(a[0], a[1], { label: 'a', lx: -14, ly: -8 }),
             F.guide(c[0], c[1], { xtick: '100', ytick: 'p**' }),
-            F.dot(c[0], c[1], { label: 'c', lx: 9, ly: -8 }),
+            F.dot(c[0], c[1], { label: 'c', lx: 9, ly: 15 }),
             F.guide(...S.p([160, s1(160)]), { xtick: '160', only: 'x' }),
             F.dot(...S.p([160, s1(160)]), { label: 'b', lx: 9, ly: -8 }),
           ];

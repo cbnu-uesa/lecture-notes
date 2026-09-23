@@ -91,10 +91,14 @@
   // ── 성장경계의 도시 간 효과 [p.354~355, 그림 16-9] ──────────
   // 두 도시 각 5백만명에서 출발한다. 컨트롤시티가 4백만으로 줄면
   // 다른 도시가 6백만이 되고, 지역 전체 효용이 점 c(u**)에 고정된다.
+  // 정점을 4백만명에 두어 언덕 모양이 화면 안에 들어오게 한다. 정점이 화면 밖이면
+  // 「효용-극대화 규모」를 그림에서 읽을 수 없고 곡선이 가로축을 뚫고 내려간다.
+  //   u′ = u0(4) = 100 · u* = u0(5) = 96 · u** = u0(6) = 84
+  // 컨트롤시티 곡선은 u1(4) = u** 가 되도록 내린다 → 점 d 가 점 c 와 같은 높이가 된다
   window.UTIL16 = {
-    P: 100, g: 2, M: 2,
+    P: 100, g: 4, M: 4,
     u0(N) { return this.P - this.g * (N - this.M) ** 2; },
-    get drop() { return this.u0(4) - this.u0(6); },     // 컨트롤시티 곡선의 하향 이동폭
+    get drop() { return this.u0(4) - this.u0(6); },     // = 16
     u1(N) { return this.u0(N) - this.drop; },
   };
 </script>
@@ -321,8 +325,9 @@
           x += 28; x0 = x;
           Z.split.forEach((s) => draw(s.rate, s.v));
           parts.push(F.annot((x0 + x - 8) / 2, Y0 + 32, '동질적인 자치시들', { anchor: 'middle', size: 11 }));
+          // 파선을 첫 막대 앞까지만 긋는다. 막대 안까지 그으면 세액 숫자를 가로지른다
           [3, 2, 1.5].forEach((r) => {
-            parts.push(F.raw(`<path class="guide" d="M66,${Y0 - r * YU} L${x - 16},${Y0 - r * YU}"/>`));
+            parts.push(F.raw(`<path class="guide" d="M66,${Y0 - r * YU} L82,${Y0 - r * YU}"/>`));
             parts.push(F.annot(62, Y0 - r * YU + 4, r + '%', { anchor: 'end', size: 11 }));
           });
           parts.push(F.raw(`<path class="axis" d="M66,${Y0 - 136} L66,${Y0} L${x - 8},${Y0}"/>`));
@@ -384,28 +389,32 @@
       (function () {
         const F = Fig;
         const parts = [];
-        const panel = (box, xs, marks, note) => {
+        const RSTAR = 60;
+        const panel = (box, h0, slope, marks, note) => {
           const P = Fig.withBox(box);
           const S = P.scale({ x: [0, 70], y: [0, 100] });
-          const dem = (h) => 110 - 1.2 * h;                  // 40 에서 62 · 30 에서 74
+          // 두 시장의 수요는 서로 다르지만 초기 할당량에서 값이 r* 로 같다.
+          // 「초기에는 두 시장의 가격이 같다」가 이 그림의 요점이다
+          const dem = (h) => RSTAR + slope * (h0 - h);
           parts.push(F.raw(`<path class="axis" d="M${P.BOX.x0},${P.BOX.y1 - 7} L${P.BOX.x0},${P.BOX.y0} L${P.BOX.x1 + 8},${P.BOX.y0}"/>`));
           parts.push(F.annot(P.BOX.x0, P.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
           parts.push(F.line(S.x(6), S.y(dem(6)), S.x(66), S.y(dem(66)), { variant: 'demand' }));
-          parts.push(F.annot(S.x(62), S.y(dem(62)) - 9, '수요', { anchor: 'end', size: 10, tone: 'blue' }));
+          parts.push(F.annot(S.x(16), S.y(dem(16)) - 9, '수요', { size: 10, tone: 'blue' }));
           marks.forEach(([h, nm, tick, lx, ly]) => {
             const y = S.y(dem(h));
             parts.push(F.raw(`<path class="guide" d="M${P.BOX.x0},${y} L${S.x(h)},${y} L${S.x(h)},${P.BOX.y0}"/>`));
             parts.push(F.annot(P.BOX.x0 - 8, y + 4, tick, { anchor: 'end', size: 11 }));
+            if (tick === 'r*') parts.push(F.raw(`<path class="guide" d="M${S.x(h)},${y} L${P.BOX.x1 + 8},${y}"/>`));
             parts.push(F.annot(S.x(h), P.BOX.y0 + 15, String(h), { anchor: 'middle', size: 11 }));
             parts.push(F.dot(S.x(h), y, { label: nm, lx, ly }));
           });
           parts.push(F.annot(S.x(36), P.BOX.y0 + 34, note, { anchor: 'middle', size: 11 }));
           parts.push(F.annot(S.x(36), P.BOX.y0 + 50, '헥타르', { anchor: 'middle', size: 10 }));
         };
-        panel({ x0: 72, y0: 162, x1: 314, y1: 32 },
-              null, [[40, 'a', 'r*', 9, -8], [50, 'b', 'r′', 9, 14]], '단독주택을 위한 토지');
-        panel({ x0: 430, y0: 162, x1: 668, y1: 32 },
-              null, [[20, 'd', 'r″', 9, -8], [30, 'c', 'r*', 9, 14]], '아파트를 위한 토지');
+        panel({ x0: 72, y0: 162, x1: 314, y1: 32 }, 40, 1.2,
+              [[40, 'a', 'r*', 9, -8], [50, 'b', 'r′', 9, 14]], '단독주택을 위한 토지');
+        panel({ x0: 430, y0: 162, x1: 668, y1: 32 }, 30, 1.5,
+              [[20, 'd', 'r″', -14, -8], [30, 'c', 'r*', 9, 14]], '아파트를 위한 토지');
         F.draw('#f-lowdens', { parts });
       })();
     </script>
@@ -449,7 +458,8 @@
           const S = F.scale({ x: [0, 210], y: [80, 300] });
           const parts = [
             F.line(S.x(0), S.y(P.s(0)), S.x(200), S.y(P.s(200)), {}),
-            F.annot(S.x(178), S.y(P.s(178)) + 16, '공급과 한계비용', { anchor: 'end', size: 10 }),
+            F.guide(S.x(0), S.y(P.s(0)), { ytick: '120', only: 'y' }),
+            F.annot(S.x(198), S.y(P.s(198)) - 10, '공급과 한계비용', { anchor: 'end', size: 10 }),
             F.line(S.x(40), S.y(P.d(40)), S.x(200), S.y(P.d(200)), { variant: 'demand' }),
             F.annot(S.x(196), S.y(P.d(196)) - 9, '수요', { anchor: 'end', size: 10, tone: 'blue' }),
             F.line(S.x(P.cap), S.y(P.s(P.cap)), S.x(P.cap), S.y(292), { variant: 'supply' }),
@@ -496,7 +506,7 @@
           const h2 = D.hNew();
           const parts = [
             F.line(S.x(22), S.y(D.sup(22)), S.x(54), S.y(D.sup(54)), {}),
-            F.annot(S.x(50), S.y(D.sup(50)) + 16, '공급과 한계비용', { anchor: 'end', size: 10 }),
+            F.annot(S.x(28), S.y(D.sup(28)) + 16, '공급과 한계비용', { size: 10 }),
             F.line(S.x(22), S.y(D.sup(22, D.tax)), S.x(54), S.y(D.sup(54, D.tax)), { variant: 'supply' }),
             F.annot(S.x(42), S.y(D.sup(42, D.tax)) - 9, '공급: 20,000달러 세금',
                     { anchor: 'end', size: 10, tone: 'red' }),
@@ -549,9 +559,9 @@
           const mk = (k, x1) => { const o = []; for (let i = 0; i <= 36; i++) { const x = (x1 * i) / 36; o.push([x, B.bid(x, k)]); } return S.curve(o); };
           const parts = [
             F.curve(S.curve([[0, B.agri], [16, B.agri]]), { variant: 'cap' }),
-            F.annot(S.x(14.4), S.y(B.agri) - 9, '농업 입찰-임대료', { anchor: 'end', size: 10 }),
+            F.annot(S.x(15.6), S.y(B.agri) + 16, '농업 입찰-임대료', { anchor: 'end', size: 10 }),
             F.curve(mk(B.k0, B.edge)),
-            F.annot(S.x(6.6), S.y(B.bid(6.6, B.k0)) + 16, '도시 입찰-임대료', { size: 10 }),
+            F.annot(S.x(4.6), S.y(B.bid(4.6, B.k0)) - 10, '도시 입찰-임대료', { size: 10 }),
             F.curve(mk(B.k1, B.bound), { variant: 'demand' }),
             F.annot(S.x(1.2), S.y(B.bid(1.2, B.k1)) - 10, '경계하에서의 도시 입찰-임대료',
                     { size: 10, tone: 'blue' }),
@@ -671,6 +681,9 @@
             F.annot(S.x(9.6), S.y(G.r1(9.6)) + 15, '주거용 입찰지대곡선', { anchor: 'end', size: 10, tone: 'blue' }),
             F.raw(`<path class="guide" d="M${S.x(G.bound)},${F.BOX.y0} L${S.x(G.bound)},${S.y(60)}"/>`),
             F.annot(S.x(G.bound), S.y(64), '경계', { anchor: 'middle', size: 11, tone: 'red' }),
+            // 이동 방향 — 상업용은 아래로, 주거용은 위로
+            F.arrow(S.x(2.0), S.y(G.c0(2.0)), S.x(2.0), S.y(G.c1(2.0))),
+            F.arrow(S.x(6.6), S.y(G.r0(6.6)), S.x(6.6), S.y(G.r1(6.6)), { tone: 'blue' }),
           ];
           [[c, 'c', 'x₄', -15, -8], [a, 'a', 'x₁', 9, -8]].forEach(([P, nm, tick, lx, ly]) => {
             parts.push(F.raw(`<path class="guide" d="M${P[0]},${P[1]} L${P[0]},${F.BOX.y0}"/>`));
@@ -715,13 +728,13 @@
       <script>
         (function () {
           const U = window.UTIL16, F = Fig.withBox({ x0: 68, y0: 208, x1: 392, y1: 34 });
-          const S = F.scale({ x: [2.6, 7.2], y: [40, 104] });
-          const mk = (f) => { const o = []; for (let i = 0; i <= 36; i++) { const x = 2.8 + (4.2 * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
+          const S = F.scale({ x: [2.6, 7.4], y: [38, 106] });
+          const mk = (f) => { const o = []; for (let i = 0; i <= 36; i++) { const x = 2.8 + (4.4 * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
           const parts = [
             F.curve(mk((N) => U.u0(N)), { variant: 'demand' }),
-            F.annot(S.x(3.1), S.y(U.u0(3.1)) - 10, '초기 효용', { size: 10, tone: 'blue' }),
+            F.annot(S.x(7.3), S.y(U.u0(7.3)) - 10, '초기 효용', { anchor: 'end', size: 10, tone: 'blue' }),
             F.curve(mk((N) => U.u1(N))),
-            F.annot(S.x(3.1), S.y(U.u1(3.1)) - 10, '컨트롤시티', { size: 10 }),
+            F.annot(S.x(7.3), S.y(U.u1(7.3)) - 10, '컨트롤시티', { anchor: 'end', size: 10 }),
           ];
           [[4, U.u0(4), 'b', 'u′', 9, -8], [5, U.u0(5), 'a', 'u*', 9, -8],
            [6, U.u0(6), 'c', 'u**', 9, -8], [4, U.u1(4), 'd', null, -15, -8]]
