@@ -52,6 +52,7 @@
   --chart-blue:     #1F5C8B;   /* 예산선·3계열    7.1:1 */
   --accent-green:   #2E7D4F;   /* 평균비용·SAC   5.1:1 */
   --chart-orange:   #B07A1E;   /* 대비 곡선      3.7:1 */
+  --chart-sky:      #7FB3D5;   /* 막대의 둘째 계열 (면 채움 전용, 글자에 쓰지 않는다) */
 
   /* 표에는 줄무늬를 쓰지 않는다 (design.md §11). 색면 대신 괘선으로 가른다. */
   --table-row-a:    transparent;

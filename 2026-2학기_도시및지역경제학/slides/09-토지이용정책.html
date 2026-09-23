@@ -1,0 +1,754 @@
+<!doctype html>
+<!--
+  9주차. 토지이용정책
+  교재: 오설리반의 도시경제학 제9판 — 16장 (p.335~356). PART 03 도시토지이용과 주택.
+  8주차는 중간고사라 강 번호를 건너뛴다.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9주차. 토지이용정책</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 재정적 용도지역제 [p.341~342, 그림 16-1] ────────────────
+  // 직사각형의 넓이(세율 × 주택가치)가 곧 세액이다. 교재의 네 값이 전부 여기서 나온다.
+  //   혼합 자치시 2% → L 2,000 · H 4,000 (평균 3,000)
+  //   갈라서면 L 3% → 3,000 · H 1.5% → 3,000
+  window.ZONE = {
+    cost: 3000,
+    mixed: { rate: 0.02, v: [100, 200] },
+    split: [{ rate: 0.03, v: 100 }, { rate: 0.015, v: 200 }],
+    tax(rate, vThousand) { return rate * vThousand * 1000; },
+  };
+
+  // ── 건축허가제한 [p.346~347, 그림 16-3] ─────────────────────
+  // 교재가 인쇄한 네 값(260·200·170·120)과 두 수량(100·160)에서 두 직선을 역산했다.
+  //   공급 s(h) = 120 + 0.5h  (160 에서 200 · 100 에서 170)
+  //   수요 d(h) = 360 − h     (160 에서 200 · 100 에서 260)
+  window.PERMIT = {
+    cap: 100, hStar: 160,
+    s(h) { return 120 + 0.5 * h; },
+    d(h) { return 360 - h; },
+  };
+
+  // ── 개발세 [p.347~348, 그림 16-4] ───────────────────────────
+  // 교재는 20,000달러 세금이 소비자에게 3/5(12), 지주에게 2/5(8) 전가된다고 적는다.
+  // 선형 곡선에서 소비자 몫은 d/(s+d) 이므로 d = 1.5s 여야 한다. s=1, d=1.5 로 잡았다.
+  //   가격 200 → 212 · 한계비용 200 → 192
+  window.DEVTAX = {
+    tax: 20, s: 1, d: 1.5, hStar: 40, pStar: 200,
+    get a() { return this.pStar - this.s * this.hStar; },
+    get b() { return this.pStar + this.d * this.hStar; },
+    sup(h, t = 0) { return this.a + t + this.s * h; },
+    dem(h)        { return this.b - this.d * h; },
+    hNew()        { return (this.b - this.a - this.tax) / (this.s + this.d); },
+  };
+
+  // ── 성장경계와 토지시장 [p.349~350, 그림 16-6] ──────────────
+  // 초기 도시 입찰지대는 12마일에서 농업용과 만난다. 경계는 8마일이다.
+  window.BID16 = {
+    agri: 10, edge: 12, bound: 8,
+    bid(x, k) { return this.agri + k * Math.pow(Math.max(0, this.edge - x), 1.8); },
+    k0: 0.35, k1: 0.55,
+  };
+
+  // ── 규제 할증금 [p.351~352, 표 16-2 · 그림 16-7] ────────────
+  window.REG = {
+    muni: [
+      { k: '시애틀', idx: 2.39, p: 305939 },
+      { k: '샌프란시스코', idx: 1.96, p: 250896 },
+      { k: '애틀란타', idx: 0.70, p: 89606 },
+      { k: '댈러스', idx: -0.14, p: -17921 },
+      { k: '시카고', idx: -1.15, p: -147209 },
+    ],
+    metro: [
+      { k: '애틀란타', v: 5120 }, { k: '보스턴', v: 197132 }, { k: '시카고', v: 7680 },
+      { k: '댈러스', v: -44803 }, { k: '샌프란시스코', v: 115207 }, { k: '시애틀', v: 129288 },
+    ],
+  };
+
+  // ── 성장경계의 일반균형 [p.352~353, 그림 16-8] ──────────────
+  // 경계(x₃=9)가 주거영토를 줄여 임금이 오르고, 잉여의 원칙으로
+  // 상업용 곡선은 내려가고 주거용 곡선은 올라간다.
+  window.GE16 = {
+    agri: 10, bound: 9,
+    c0(x) { return 100 - 20 * x; },
+    r0(x) { return 64 - 4.5 * x; },      // 12 에서 농업용과 만난다 (x₂)
+    c1(x) { return this.c0(x) - 14; },
+    r1(x) { return this.r0(x) + 6; },
+  };
+
+  // ── 성장경계의 도시 간 효과 [p.354~355, 그림 16-9] ──────────
+  // 두 도시 각 5백만명에서 출발한다. 컨트롤시티가 4백만으로 줄면
+  // 다른 도시가 6백만이 되고, 지역 전체 효용이 점 c(u**)에 고정된다.
+  window.UTIL16 = {
+    P: 100, g: 2, M: 2,
+    u0(N) { return this.P - this.g * (N - this.M) ** 2; },
+    get drop() { return this.u0(4) - this.u0(6); },     // 컨트롤시티 곡선의 하향 이동폭
+    u1(N) { return this.u0(N) - this.drop; },
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+  .tbl-zone { width: 100%; table-layout: fixed; }
+  .tbl-zone th, .tbl-zone td { text-align: right; }
+  .tbl-zone th:first-child, .tbl-zone td:first-child { text-align: left; }
+  .quote-law { border-left: 3px solid var(--rule); padding-left: 14px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 표지 ══════════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>9주차. 토지이용정책</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 지난 시간 — 7주차 요약 ════════════════════════════════ -->
+<section>
+  <h2>지난 시간 — 고용과 주거의 공간적 분포</h2>
+  <div class="body tight">
+    <div class="cols" style="align-items:flex-start">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">13장 — 분포를 재다</p>
+        <p>중심 도시 안 통근은 0.45 → 0.15 로 줄고 교외 안 통근은 0.34 → 0.62 로 늘었음</p>
+        <p style="margin-bottom:8px">어느 규모에서든 <strong>중위 근무지 &lt; 중위 거주지</strong>.
+          확산은 소득·통행비용과 <strong>네 가지 정부 정책</strong>이 함께 만든 것</p>
+        <p class="sub t-red" style="margin-bottom:2px">14장 — 모형을 만들다</p>
+        <p>가장 가파른 지불용의곡선이 가운데를 가져감. 전차 하나가
+          <strong>토지시장과 노동시장을 차례로</strong> 움직여 두 구역을 다 키웠음</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">15장 — 이웃 안을 보다</p>
+        <p>비유사성 지수로 잰 갈라짐. 지방공공재 수요의 차이와 과세물품의 차이가
+          가구를 <strong>소득에 따라 패지어 살게</strong> 함</p>
+        <p style="margin-bottom:8px">선호되는 이웃을 두고 입찰하면 완전한 통합은 <strong>불안정</strong>함.
+          다만 <strong>부지규모</strong>가 커지면 통합이 살아남</p>
+        <p class="sub t-red" style="margin-bottom:2px">거기서 나온 물음</p>
+        <p>최소부지규모 용도지역제가 시장의 결과였던 통합을 <strong>차별로 뒤집었음</strong>.
+          그 정책들을 정면으로 다루는 것이 오늘임</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:18px">→ 이제까지 토지이용은 <strong>가장 높은 값을 부른 쪽이 가져간다</strong>는
+      경쟁적 입찰로 설명됐음. 오늘은 그 입찰에 <strong>정부가 개입할 때</strong> 무슨 일이 생기는지 봄 —
+      <strong>용도지역제</strong>와 <strong>개발제한</strong></p>
+  </div>
+</section>
+
+<!-- ══ 발문 (p.335) ══════════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:30px">
+      “좋은 법률, 아름다운 건축, 그리고 청결한 거리를 갖춘 조용한 도시는 복종하는 멍청이들 교실과 같은 반면에
+      무정부 도시는 약속의 도시이다.”
+      <span class="who">— 마크 헬프린</span></p>
+    <p class="lead t-define">이제까지는 토지가 <span class="mark">가장 높은 가격입찰자</span>에게 할당되는
+      경쟁적 입찰에 초점을 맞췄음</p>
+      <p class="lead t-define" style="margin-bottom:16px">이 장에서는 <span class="mark">두 유형의 토지이용정책</span>의 효과를 봄</p>
+    <p class="emph"><strong>용도지역제</strong> — 산업·상업·주거가 도시 안 어디에 놓일지를 정함</p>
+      <p class="emph" style="margin-bottom:14px"><strong>개발제한</strong> — 건축허가의 수를 제한하거나,
+      새 주택에 세금을 매기거나, 개발을 특정 지역에 한정함</p>
+    <p class="derive t-red">→ 두 정책 모두 <strong>환경적 관심과 재정적 관심</strong>에서 나왔고,
+      <strong>토지와 주택의 가격</strong>에 큰 효과를 냄</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 01 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 용도지역제: 역사와 법적 기초</p>
+  <p class="section-sub">어디서 온 권한이고 무엇이 그것을 떠받치는가 · 교재 p.335~339</p>
+</section>
+
+<!-- ══ 권한의 부여 · 표 16-1 (p.336) ═════════════════════════ -->
+<section>
+  <h2>권한은 주에서 온다</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:4px">대부분의 주에서 토지-이용 정책의 근거법은
+      1926년 미국 상무성의 <strong>표준주용도지역제허용법</strong>을 본떴음</p>
+    <p class="quote-law" style="margin-bottom:10px">지역공동체의 보건, 안전, 공공도덕, 혹은 일반 후생을 촉진할 목적으로,
+      도시나 법인화된 마을들의 입법부는 빌딩이나 다른 건축물들의 높이, 층수, 그리고 크기, 점유되는 부지의 비율,
+      뜰, 정원, 그리고 기타 공터의 크기, 인구밀도, 그리고 상업, 공업, 거주, 혹은 다른 목적으로 사용되는
+      건물, 건축물, 그리고 토지의 위치나 이용을 규제하고 제한할 수 있는 권한이 이로써 부여된다.</p>
+    <table class="tbl-zone">
+      <thead><tr><th>주거용: 단독주택<br>최소부지규모(평방피트)</th><th>주거용: 다세대<br>에이커당 최대 주거지 수</th>
+        <th>상업용 기능</th><th>고용과 산업용 기능</th></tr></thead>
+      <tbody>
+        <tr><td>20,000</td><td>15</td><td>인근 소매와 서비스</td><td>일반 고용</td></tr>
+        <tr><td>10,000</td><td>43</td><td>지역 소매와 서비스: 보행자</td><td>중심 산업과 서비스</td></tr>
+        <tr><td>7,000</td><td>65</td><td>지역 소매와 서비스: 자동차</td><td>일반 산업</td></tr>
+        <tr><td>5,000</td><td>85+</td><td>시내 · 사무 군집 · 상업과 주거의 혼합</td><td>중공업</td></tr>
+      </tbody>
+    </table>
+    <p class="caption" style="margin-top:4px">포틀랜드, 오레곤의 용도지역제 분류 (교재 표 16−1, p.336).
+      주거용 하위등급은 <strong>부지규모와 밀도</strong>, 상업용은 <strong>기능</strong>,
+      산업용은 <strong>입지와 소음·공해·교통량</strong>에 따라 나뉜다</p>
+  </div>
+</section>
+
+<!-- ══ 초기 역사 (p.337~338) ═════════════════════════════════ -->
+<section>
+  <h2>왜 용도지역제는 더 일찍 생기지 않았는가</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:8px">뉴욕시가 <strong>1916년</strong>에 처음으로 종합적인 용도지역제를 도입했고
+      같은 해 여덟 도시가 뒤따랐음. 1936년까지 <strong>1,300개 도시</strong>로 퍼졌음</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">그 전에는 필요가 없었다</p>
+        <p><strong>14장에서 본 대로</strong> 마차가 느리고 비싸 제조회사는 중심 기점에 묶여 있었음</p>
+        <p style="margin-bottom:8px">저소득 가구는 시내전차 선로를 따라 살았고,
+          주택소유자들은 <strong>방사상 선로 사이</strong>에서 산업·상업·아파트와 격리돼 있었음</p>
+        <p class="caption">주택소유자들은 조용하고 낮은 밀도의 환경에 높은 가치를 뒀고,
+          선로 확장을 막으려 조직돼 있었다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">기술이 바뀌자 필요해졌다</p>
+        <p><strong>트럭</strong>(1910년 무렵)이 기업을 중심에서 풀어 주자 도시들은
+          주택에서 산업을 떼어 내는 용도지역제를 실행했음</p>
+        <p style="margin-bottom:8px"><strong>승객용 버스</strong>(1920)가 저소득 노동자를 선로 사이로 들여보내자
+          도시들은 아파트를 격리하는 주거 용도지역제를 만들었음</p>
+        <p class="caption">1916년 뉴욕타임즈 표제 — “용도지역제 조례는 사업침입의 공포를 제거한다”</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:12px">→ 용도지역제는 <strong>운송기술이 바뀐 뒤에</strong> 생겼음.
+      기업과 노동자의 입지선택 범위가 넓어지자 비로소 격리할 이유가 생긴 것임</p>
+  </div>
+</section>
+
+<!-- ══ 법적 근거 (p.338~339) ═════════════════════════════════ -->
+<section>
+  <h2>용도지역제를 떠받치는 세 기준</h2>
+  <div class="body tight">
+    <p class="sub t-red" style="margin-bottom:2px">1. 실체적 적정과정 <span class="en">substantive due process</span></p>
+    <p>합법적인 공공의 목적을 위해 합리적인 방법으로 실행되어야 함.
+      <strong>유클리드 대 앰블러(1924)</strong>에서 대법원은 조례가 보건·안전·도덕·복지와
+      “어느 정도 합리적인 관계”만 있으면 된다고 봄</p>
+    <p class="caption" style="margin-bottom:10px">편익이 비용을 넘어야 한다고는 하지 않았다.
+      피쉘(1985)은 이것을 편익−비용분석이 아니라 <strong>편익분석</strong>이라 부른다</p>
+    <p class="sub t-red" style="margin-bottom:2px">2. 동일한 보호 <span class="en">equal protection</span></p>
+    <p style="margin-bottom:4px">연방법원은 배타적 용도지역제를 대체로 지지했음</p>
+    <p class="caption" style="margin-bottom:10px">자치시 밖 사람에 대한 효과는 중요하지 않고(Euclid v. Ambler, 1924) ·
+      특정한 개인적 피해가 없었으며(Warth v. Selden, 1975) ·
+      공무원의 차별적 의도에 기인하지 않았고(Village of Arlington Heights v. Metropolitan Housing, 1977) ·
+      <strong>인종에 기초한 차별은 위헌이나 소득에 기초한 차별은 합법</strong>(Ybarra v. Town of Los Altos Hills).
+      일부 주 법원은 반대로 저소득 주민의 “공정한 몫”을 명령했다</p>
+    <p class="sub t-red" style="margin-bottom:2px">3. 적절한 보상 <span class="en">just compensation</span></p>
+    <p>제5차 헌법개정의 <strong>취득조항</strong>. 대부분의 조례는 토지를 공적 사용으로 바꾸지 않고
+      사적 사용을 제한해 시장가치만 떨어뜨림</p>
+    <p class="derive t-red" style="margin-top:6px">→ <strong>피해−예방 규칙</strong> — 조례가 토지의 유해한 이용을 막는 것이라면
+      취득이 아니므로 보상이 필요 없음</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 02 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 용도지역제의 역할</p>
+  <p class="section-sub">환경 · 재정 · 밀도 — 세 가지 쓰임 · 교재 p.339~345</p>
+</section>
+
+<!-- ══ 환경적 외부효과 (p.340) ═══════════════════════════════ -->
+<section>
+  <h2>환경정책으로서의 용도지역제</h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:16px">용도지역제가 환경정책으로 매력적인 이유는 <strong>간단하기 때문</strong>임.
+      오염 노출을 줄이는 가장 손쉬운 방법은 오염자와 피해자 사이에 <strong>완충물</strong>을 놓는 것</p>
+    <p class="lead t-define" style="margin-bottom:16px">문제는 이것이 오염을 사회적으로 효율적인 수준까지 줄이지 않고
+      <span class="mark">단순히 다른 곳으로 보낸다</span>는 것임</p>
+    <p class="emph" style="margin-bottom:6px">오염에 대한 경제적 접근은 <strong>한계 외적 비용과 같은 세금</strong>을 매기는 것임.
+      세금을 내는 기업은 원재료·자본·노동을 아끼듯 오염도 아끼게 됨</p>
+    <p class="derive t-red" style="margin-bottom:16px">→ 둘을 결합하는 것이 답임. 오염발생자를 산업지역에 두고 세금을 매기면
+      <strong>노출은 통제되고 오염량은 효율적 수준으로</strong> 줄어듦.
+      노출을 줄이는 용도지역제는 한계 외적 비용을 낮춰 <strong>세율 자체도 낮춤</strong></p>
+    <p class="emph">소매상은 통행량을 통해 혼잡·오염·소음·주차혼잡을 일으킴.
+      전통적 용도지역제는 이들을 특정 지역에 가둠</p>
+    <p class="derive t-red">→ <strong>이행 용도지역제</strong>는 입지선택을 넓게 주는 대신
+      주차·교통·소음에 <strong>이행표준</strong>을 강제함</p>
+  </div>
+</section>
+
+<!-- ══ 그림 16-1 재정적자 (p.341~342) ════════════════════════ -->
+<section class="s-split">
+  <h2>재정적자를 막기 위한 용도지역제</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">지방정부 조세수입의 <strong>약 3/4</strong>이 재산세임.
+        세액은 주택가치가, 서비스 사용량은 <strong>가구원 수</strong>가 정함</p>
+      <p style="margin-bottom:8px">공공서비스 비용은 가구당 연 <strong>3,000달러</strong>.
+        절반은 10만달러 주택(L), 절반은 20만달러 주택(H)을 가짐</p>
+      <p style="margin-bottom:10px">혼합 자치시에서 <strong>2%</strong> 세율이면 L은 2,000달러, H는 4,000달러를 내
+        평균이 3,000달러가 됨. L은 1,000달러 <strong>적자</strong>, H는 1,000달러 <strong>흑자</strong>임</p>
+      <p class="derive t-red">→ H가 20만달러 최소가치의 배타적 자치시를 세우면 세율이
+        <strong>1.5%</strong>로 내려감. 남은 L은 <strong>3%</strong>로 올려야 함</p>
+      <p class="derive t-red">→ 주택가치의 차이가 비싼 쪽에게 <strong>값싼 쪽을 배제할 유인</strong>을 줌</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-fiscal" viewBox="0 0 430 244" style="width:392px" role="img">
+        <title>직사각형의 넓이가 세액이 되어 혼합 자치시에서는 2,000달러와 4,000달러이지만 갈라서면 둘 다 3,000달러가 되는 그림</title></svg>
+      <script>
+        (function () {
+          const Z = window.ZONE, F = Fig;
+          const Y0 = 170, XU = 0.34, YU = 40;     // 1천달러 = 0.34px, 세율 1%p = 40px
+          const parts = [];
+          let x = 86;
+          const draw = (rate, v, label) => {
+            const w = v * XU, h = rate * 100 * YU;
+            parts.push(F.raw(`<rect x="${x}" y="${Y0 - h}" width="${w}" height="${h}" ` +
+                             `fill="var(--accent-blue)" opacity="0.2" stroke="var(--ink)" stroke-width="0.8"/>`));
+            parts.push(F.annot(x + w / 2, Y0 - h / 2 + 4,
+                               '$' + Z.tax(rate, v).toLocaleString(), { anchor: 'middle', size: 10 }));
+            parts.push(F.annot(x + w / 2, Y0 + 15, String(v), { anchor: 'middle', size: 10 }));
+            x += w + 8;
+          };
+          let x0 = x;
+          Z.mixed.v.forEach((v) => draw(Z.mixed.rate, v));
+          parts.push(F.annot((x0 + x - 8) / 2, Y0 + 32, '혼합된 자치시', { anchor: 'middle', size: 11 }));
+          x += 28; x0 = x;
+          Z.split.forEach((s) => draw(s.rate, s.v));
+          parts.push(F.annot((x0 + x - 8) / 2, Y0 + 32, '동질적인 자치시들', { anchor: 'middle', size: 11 }));
+          [3, 2, 1.5].forEach((r) => {
+            parts.push(F.raw(`<path class="guide" d="M66,${Y0 - r * YU} L${x - 16},${Y0 - r * YU}"/>`));
+            parts.push(F.annot(62, Y0 - r * YU + 4, r + '%', { anchor: 'end', size: 11 }));
+          });
+          parts.push(F.raw(`<path class="axis" d="M66,${Y0 - 136} L66,${Y0} L${x - 8},${Y0}"/>`));
+          parts.push(F.annot(66, Y0 - 144, '세율', { size: 11 }));
+          parts.push(F.annot((66 + x) / 2, Y0 + 50, '주택가치(천달러)', { anchor: 'middle', size: 11 }));
+          F.draw('#f-fiscal', { parts, check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:2px;text-align:center">최소부지면적 = ⅕ · V′/R.
+        V′ = 20만달러, R = 에이커당 24만달러면 목표는 <strong>1/6 에이커</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 밀도외부효과와 무임승차 (p.343~344) ═══════════════════ -->
+<section>
+  <h2>밀도외부효과 — 용도지역제가 효율을 높일 때와 낮출 때</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:6px">낮은-밀도 이웃의 공터 하나. 아파트단지는 <strong>30만달러</strong>,
+      단독주택은 <strong>10만달러</strong>를 낼 용의가 있음. 시장결과는 아파트임</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">이웃 1인당 2,000달러일 때</p>
+        <p style="margin-bottom:4px">기존 주민 101명 × 2,000 = <strong>202,000달러</strong></p>
+        <p style="margin-bottom:4px">단독주택 쪽 합계 = 100,000 + 202,000 = <strong>302,000달러</strong></p>
+        <p style="margin-bottom:8px">아파트 300,000달러보다 크므로
+          <strong>효율적인 결과는 단독주택</strong>임. 시장결과가 비효율적임</p>
+        <p class="derive t-red">→ 이웃연합은 이길 수 없음. 과세권이 없어 기여가 자발적이라
+          <strong>무임승차</strong>가 생김</p>
+        <p class="derive t-red">→ 이때 중간 밀도를 위한 용도지역제는
+          토지를 <strong>가장 높고 가장 좋은 이용</strong>에 할당함</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">이웃 1인당 500달러라면</p>
+        <p style="margin-bottom:4px">101명 × 500 = <strong>50,500달러</strong></p>
+        <p style="margin-bottom:4px">단독주택 쪽 합계 = 100,000 + 50,500 = <strong>150,500달러</strong></p>
+        <p style="margin-bottom:8px">아파트 300,000달러가 더 크므로
+          <strong>시장균형인 아파트가 효율적</strong>임</p>
+        <p class="derive t-red">→ 그런데도 개별 이웃은 아파트를 금지하자고
+          <strong>목소리를 낼 유인</strong>을 가짐</p>
+        <p class="derive t-red">→ 목소리가 충분히 크면 도시는 효율적인 아파트단지를
+          금지하는 <strong>비효율적 선택</strong>을 함</p>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:8px">용도지역제는 밀도외부효과와 무임승차의 결합을 다루는
+      <strong>무딘 정책도구</strong>다. 어느 쪽으로도 틀릴 수 있다</p>
+  </div>
+</section>
+
+<!-- ══ 그림 16-2 낮은-밀도 용도지역제 (p.344~345) ════════════ -->
+<section>
+  <h2>낮은-밀도 용도지역제의 시장효과</h2>
+  <div class="body tight">
+    <p class="emph">시장균형(점 a·c)에서는 두 시장의 가격이 <strong>같음</strong> (r*).
+      단독주택에 40헥타르, 아파트에 30헥타르가 할당됨</p>
+    <svg class="fig" id="f-lowdens" viewBox="0 0 700 258" style="width:600px;margin:4px 0 0 122px" role="img">
+      <title>단독주택용 토지를 40에서 50헥타르로 늘리고 아파트용을 30에서 20헥타르로 줄이면 두 시장의 가격이 갈라지는 그림</title></svg>
+    <script>
+      (function () {
+        const F = Fig;
+        const parts = [];
+        const panel = (box, xs, marks, note) => {
+          const P = Fig.withBox(box);
+          const S = P.scale({ x: [0, 70], y: [0, 100] });
+          const dem = (h) => 110 - 1.2 * h;                  // 40 에서 62 · 30 에서 74
+          parts.push(F.raw(`<path class="axis" d="M${P.BOX.x0},${P.BOX.y1 - 7} L${P.BOX.x0},${P.BOX.y0} L${P.BOX.x1 + 8},${P.BOX.y0}"/>`));
+          parts.push(F.annot(P.BOX.x0, P.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
+          parts.push(F.line(S.x(6), S.y(dem(6)), S.x(66), S.y(dem(66)), { variant: 'demand' }));
+          parts.push(F.annot(S.x(62), S.y(dem(62)) - 9, '수요', { anchor: 'end', size: 10, tone: 'blue' }));
+          marks.forEach(([h, nm, tick, lx, ly]) => {
+            const y = S.y(dem(h));
+            parts.push(F.raw(`<path class="guide" d="M${P.BOX.x0},${y} L${S.x(h)},${y} L${S.x(h)},${P.BOX.y0}"/>`));
+            parts.push(F.annot(P.BOX.x0 - 8, y + 4, tick, { anchor: 'end', size: 11 }));
+            parts.push(F.annot(S.x(h), P.BOX.y0 + 15, String(h), { anchor: 'middle', size: 11 }));
+            parts.push(F.dot(S.x(h), y, { label: nm, lx, ly }));
+          });
+          parts.push(F.annot(S.x(36), P.BOX.y0 + 34, note, { anchor: 'middle', size: 11 }));
+          parts.push(F.annot(S.x(36), P.BOX.y0 + 50, '헥타르', { anchor: 'middle', size: 10 }));
+        };
+        panel({ x0: 72, y0: 162, x1: 314, y1: 32 },
+              null, [[40, 'a', 'r*', 9, -8], [50, 'b', 'r′', 9, 14]], '단독주택을 위한 토지');
+        panel({ x0: 430, y0: 162, x1: 668, y1: 32 },
+              null, [[20, 'd', 'r″', 9, -8], [30, 'c', 'r*', 9, 14]], '아파트를 위한 토지');
+        F.draw('#f-lowdens', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:4px">→ 단독주택용을 <strong>50헥타르</strong>로 늘리면 가격이 r* → r′ 로 내리고,
+      아파트용이 <strong>20헥타르</strong>로 줄면 r* → r″ 로 오름</p>
+      <p class="derive t-red" style="margin-top:2px">→ 그러면 <strong>r″ &gt; r′</strong> — 아파트건설회사가 공터에 더 낼 용의가 있음.
+      이웃들이 집단적으로 <strong>(r″ − r′) 이상</strong>을 낼 용의가 있으면 이 결과는 효율적이고, 아니면 비효율적임</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 03 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 주택 개발에 대한 제한</p>
+  <p class="section-sub">허가 · 세금 · 경계 — 세 가지 방법과 그 값 · 교재 p.345~352</p>
+</section>
+
+<!-- ══ 그림 16-3 건축허가제한 (p.346~347) ════════════════════ -->
+<section class="s-split">
+  <h2>건축허가제한</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">초기 균형은 점 a — 가격 <strong>200,000달러</strong>,
+        수량 <strong>160채</strong></p>
+      <p style="margin-bottom:8px">도시가 연간 <strong>100개</strong>로 허가를 제한하면 공급곡선이 굴절해
+        100에서 수직이 됨. 새 균형은 점 b, 가격 <strong>260,000달러</strong></p>
+      <p style="margin-bottom:10px">공급곡선은 곧 <strong>한계비용곡선</strong>임. 수량이 줄면 토지수요가 줄어
+        한계비용이 점 c의 <strong>170,000달러</strong>로 내려감 — 부지 가격이 30,000달러 떨어진 것</p>
+      <p class="derive t-red">→ 소비자가 60,000달러를, 토지소유주가 30,000달러를 부담함</p>
+      <p class="derive t-red">→ 허가 하나의 값은 <strong>90,000달러</strong>(260 − 170). 100개를 경매하면
+        도시는 연간 <strong>9백만달러</strong>를 벌 수 있음</p>
+      <p class="derive t-red">→ 제안을 심사해 나눠 주면 <strong>지대추구</strong>가 생김.
+        발표에 쓰인 자원은 다른 데 쓰일 수 있었으므로 낭비임</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-permit" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>건축허가를 100개로 제한하면 공급곡선이 수직이 되어 가격이 200에서 260으로 오르고 한계비용은 170으로 내려가는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PERMIT, F = Fig.withBox({ x0: 68, y0: 216, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 210], y: [80, 300] });
+          const parts = [
+            F.line(S.x(0), S.y(P.s(0)), S.x(200), S.y(P.s(200)), {}),
+            F.annot(S.x(178), S.y(P.s(178)) + 16, '공급과 한계비용', { anchor: 'end', size: 10 }),
+            F.line(S.x(40), S.y(P.d(40)), S.x(200), S.y(P.d(200)), { variant: 'demand' }),
+            F.annot(S.x(196), S.y(P.d(196)) - 9, '수요', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.line(S.x(P.cap), S.y(P.s(P.cap)), S.x(P.cap), S.y(292), { variant: 'supply' }),
+            F.annot(S.x(P.cap) + 6, S.y(288), '공급: 100개의 건축허가', { size: 10, tone: 'red' }),
+          ];
+          [[P.hStar, P.s(P.hStar), 'a', 9, -8], [P.cap, P.d(P.cap), 'b', -15, -8],
+           [P.cap, P.s(P.cap), 'c', 9, 15]].forEach(([h, v, nm, lx, ly]) => {
+            parts.push(F.guide(...S.p([h, v]), { xtick: String(h), ytick: String(v) }));
+            parts.push(F.dot(...S.p([h, v]), { label: nm, lx, ly }));
+          });
+          parts.push(F.arrow(S.x(P.cap) - 30, S.y(170), S.x(P.cap) - 30, S.y(260)));
+          parts.push(F.arrow(S.x(P.cap) - 30, S.y(260), S.x(P.cap) - 30, S.y(170)));
+          parts.push(F.annot(S.x(P.cap) - 34, (S.y(170) + S.y(260)) / 2 + 4, '건축허가에\n대한 지불용의',
+                             { anchor: 'end', size: 10, lh: 13 }));
+          F.draw('#f-permit', { axes: { x: '연간 신규 주택수', y: '$1,000' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 16-4 개발세 (p.347~348) ══════════════════════════ -->
+<section class="s-split">
+  <h2>개발세</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">주택이 지어질 때 부과되고 <strong>법적으로는 건축회사</strong>가 냄.
+        공급곡선이 세금 <strong>20,000달러</strong>만큼 위로 이동함</p>
+      <p style="margin-bottom:8px">균형가격은 점 b의 200,000달러에서 점 d의 <strong>212,000달러</strong>로 오름 —
+        세금의 <strong>3/5</strong>가 소비자에게 전가됨</p>
+      <p style="margin-bottom:10px">수량이 줄어 토지수요가 줄고 한계비용이 점 c의 <strong>192,000달러</strong>로 내림 —
+        나머지 <strong>2/5</strong>가 토지소유주에게 전가됨</p>
+      <p class="derive t-red">→ 법적으로 누가 내든 <strong>실제 부담은 셋이 나눠</strong> 짐</p>
+      <p class="derive t-red">→ 신규 구역의 기반시설(도로·하수관·학교·공원) 비용을 대려는 것이면
+        <strong>개발효과요금</strong>·<strong>시스템개발 부과금</strong>이라 부름</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-devtax" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>개발세가 공급곡선을 위로 이동시켜 가격이 200에서 212로 오르고 한계비용은 192로 내려가는 그림</title></svg>
+      <script>
+        (function () {
+          const D = window.DEVTAX, F = Fig.withBox({ x0: 68, y0: 216, x1: 392, y1: 34 });
+          const S = F.scale({ x: [20, 56], y: [180, 224] });
+          const h2 = D.hNew();
+          const parts = [
+            F.line(S.x(22), S.y(D.sup(22)), S.x(54), S.y(D.sup(54)), {}),
+            F.annot(S.x(50), S.y(D.sup(50)) + 16, '공급과 한계비용', { anchor: 'end', size: 10 }),
+            F.line(S.x(22), S.y(D.sup(22, D.tax)), S.x(54), S.y(D.sup(54, D.tax)), { variant: 'supply' }),
+            F.annot(S.x(42), S.y(D.sup(42, D.tax)) - 9, '공급: 20,000달러 세금',
+                    { anchor: 'end', size: 10, tone: 'red' }),
+            F.line(S.x(22), S.y(D.dem(22)), S.x(54), S.y(D.dem(54)), { variant: 'demand' }),
+            F.annot(S.x(52), S.y(D.dem(52)) - 9, '수요', { anchor: 'end', size: 10, tone: 'blue' }),
+          ];
+          [[h2, D.sup(h2, D.tax), 'd', 'h**', 212, -15, -8],
+           [D.hStar, D.pStar, 'b', 'h*', 200, 9, -8],
+           [h2, D.sup(h2), 'c', null, 192, 9, 15]].forEach(([h, v, nm, xt, yt, lx, ly]) => {
+            parts.push(F.guide(...S.p([h, v]), xt ? { xtick: xt, ytick: String(yt) } : { ytick: String(yt), only: 'y' }));
+            parts.push(F.dot(...S.p([h, v]), { label: nm, lx, ly }));
+          });
+          const xa = S.x(28);
+          parts.push(F.arrow(xa, S.y(D.sup(28)), xa, S.y(D.sup(28, D.tax))));
+          parts.push(F.arrow(xa, S.y(D.sup(28, D.tax)), xa, S.y(D.sup(28))));
+          parts.push(F.annot(xa - 5, (S.y(D.sup(28)) + S.y(D.sup(28, D.tax))) / 2 + 4, '$20',
+                             { anchor: 'end', size: 10 }));
+          F.draw('#f-devtax', { axes: { x: '연간 신규 주택수', y: '천달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 16-6 성장경계 (p.348~350) ════════════════════════ -->
+<section class="s-split">
+  <h2>성장경계 — 토지소유주 사이에 승자와 패자가 생긴다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">개발을 특정 지리적 구역 안으로 한정함.
+        명시적 금지일 수도, <strong>필수 공공재의 공급을 끊는 것</strong>일 수도 있음</p>
+      <p style="margin-bottom:8px"><strong>주택시장에서</strong> — 공급곡선이 h′ 에서 굴절해 가격이 p* → p**,
+        수량이 h* → h** 가 됨</p>
+      <p style="margin-bottom:10px">발표 시점에 주택을 가진 사람은 <strong>(p** − p*)의 자본이득</strong>을 얻고,
+        새로 진입하는 사람은 더 비싸게 삼</p>
+      <p class="derive t-red">→ <strong>토지시장에서</strong> 8~12마일 구간의 땅값은
+        <strong>농업용 입찰지대로 떨어짐</strong> (점 a ~ 점 b)</p>
+      <p class="derive t-red">→ 쫓겨난 가구들이 경계 안의 땅값을 올림 — 곡선이 <strong>위로</strong> 이동함</p>
+      <p class="derive t-red">→ 세 정책 모두 주택가격을 올리고 수량을 줄임.
+        <strong>차이는 토지시장</strong>임 — 허가와 개발세는 땅값을 낮추지만
+        성장경계는 <strong>경계 안 지주가 경계 밖 지주의 희생으로</strong> 이득을 봄</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-boundary" viewBox="0 0 430 268" style="width:392px" role="img">
+        <title>성장경계 안의 도시 입찰지대곡선이 위로 이동하고 경계 밖 8~12마일 구간은 농업용 지대로 떨어지는 그림</title></svg>
+      <script>
+        (function () {
+          const B = window.BID16, F = Fig.withBox({ x0: 66, y0: 198, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 16], y: [0, 50] });
+          const mk = (k, x1) => { const o = []; for (let i = 0; i <= 36; i++) { const x = (x1 * i) / 36; o.push([x, B.bid(x, k)]); } return S.curve(o); };
+          const parts = [
+            F.curve(S.curve([[0, B.agri], [16, B.agri]]), { variant: 'cap' }),
+            F.annot(S.x(14.4), S.y(B.agri) - 9, '농업 입찰-임대료', { anchor: 'end', size: 10 }),
+            F.curve(mk(B.k0, B.edge)),
+            F.annot(S.x(6.6), S.y(B.bid(6.6, B.k0)) + 16, '도시 입찰-임대료', { size: 10 }),
+            F.curve(mk(B.k1, B.bound), { variant: 'demand' }),
+            F.annot(S.x(1.2), S.y(B.bid(1.2, B.k1)) - 10, '경계하에서의 도시 입찰-임대료',
+                    { size: 10, tone: 'blue' }),
+            F.raw(`<path class="guide" d="M${S.x(B.bound)},${F.BOX.y0} L${S.x(B.bound)},${S.y(46)}"/>`),
+            F.annot(S.x(B.bound), S.y(48), '경계', { anchor: 'middle', size: 11, tone: 'red' }),
+            F.dot(...S.p([B.bound, B.bid(B.bound, B.k1)]), { label: 'c', lx: 9, ly: -8 }),
+            F.dot(...S.p([B.bound, B.agri]), { label: 'b', lx: -6, ly: 16 }),
+            F.dot(...S.p([B.edge, B.agri]), { label: 'a', lx: 8, ly: 16 }),
+          ];
+          [[B.bound, '8'], [B.edge, '12']].forEach(([x, t]) =>
+            parts.push(F.annot(S.x(x), F.BOX.y0 + 16, t, { anchor: 'middle', size: 11 })));
+          F.draw('#f-boundary', { axes: { x: '중심지로부터의 거리(마일)', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 표 16-2 · 그림 16-7 규제 할증금 (p.351~352) ═══════════ -->
+<section>
+  <h2>규제는 주택가격에 얼마를 얹는가</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:4px"><strong>와튼규제지수</strong>는 토지-이용 규제의 가혹성을 잼.
+      평균 도시가 0, 가혹하면 양수임. 검토절차가 길수록·개발세·공터 의무·큰 최소부지규모일수록 값이 큼</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">자치시 수준 (표 16−2)</p>
+        <table class="tbl-zone">
+          <thead><tr><th>자치시</th><th>규제지수</th><th>가격할증금</th></tr></thead>
+          <tbody>
+            <tr><td>시애틀</td><td>2.39</td><td>305,939</td></tr>
+            <tr><td>샌프란시스코</td><td>1.96</td><td>250,896</td></tr>
+            <tr><td>애틀란타</td><td>0.70</td><td>89,606</td></tr>
+            <tr><td>댈러스</td><td>−0.14</td><td>−17,921</td></tr>
+            <tr><td>시카고</td><td>−1.15</td><td>−147,209</td></tr>
+          </tbody>
+        </table>
+        <p class="derive t-red" style="margin-top:6px">→ 시카고의 주택에서 시애틀의 같은 주택으로 옮기는 가구는
+          <strong>453,148달러</strong>를 더 냄</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">대도시 수준 (그림 16−7)</p>
+        <svg class="fig" id="f-reg" viewBox="0 0 430 236" style="width:376px" role="img">
+          <title>대도시별 규제 가격할증금 막대그래프. 댈러스만 0선 아래로 내려간다</title></svg>
+        <script>
+          (function () {
+            const R = window.REG, F = Fig;
+            const X0 = 40, X1 = 420, Y0 = 142, SC = 100 / 200000;
+            const parts = [];
+            const gw = (X1 - X0) / R.metro.length, bw = 30;
+            R.metro.forEach((g, i) => {
+              const cx = X0 + gw * (i + 0.5), h = Math.abs(g.v) * SC;
+              const y = g.v >= 0 ? Y0 - h : Y0;
+              parts.push(F.raw(`<rect x="${cx - bw / 2}" y="${y}" width="${bw}" height="${h}" ` +
+                               `fill="var(--accent-blue)" opacity="${g.v < 0 ? 0.5 : 0.28}"/>`));
+              // 양수는 값이 막대 위·이름이 축 아래, 음수는 값이 막대 아래·이름이 축 위다
+              parts.push(F.annot(cx, g.v >= 0 ? y - 5 : Y0 + h + 13, g.v.toLocaleString(),
+                                 { anchor: 'middle', size: 9 }));
+              parts.push(F.annot(cx, g.v >= 0 ? Y0 + 14 : Y0 - 6, g.k,
+                                 { anchor: 'middle', size: 9 }));
+            });
+            parts.push(F.raw(`<path class="axis" d="M${X0 - 8},${Y0} L${X1 + 4},${Y0}"/>`));
+            F.draw('#f-reg', { parts, check: false });
+          })();
+        </script>
+        <p class="caption" style="margin-top:2px">대도시 할증금은 그 안 자치시들의 <strong>가중 평균</strong>이라
+          자치시 값과 다르다 (애틀란타 89,606 대 5,120). 댈러스만 음수다</p>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:4px">출처: Gyourko, Saiz, and Summers, <em>Urban Studies</em> 45, 2008 ·
+      Gyourko, “Housing: Urban Housing Markets,” in <em>Making Cities Work</em>, 2009</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 04 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">04 성장규제와 노동시장</p>
+  <p class="section-sub">정책의 효과는 그것이 겨냥한 지리를 넘어간다 · 교재 p.352~356</p>
+</section>
+
+<!-- ══ 그림 16-8 일반균형효과 (p.352~354) ════════════════════ -->
+<section class="s-split">
+  <h2>성장경계의 일반균형효과</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px"><strong>7주차 14장에서 만든 모형</strong>을 그대로 씀 —
+        토지시장과 노동시장이 맞물린 단일도심도시</p>
+      <p style="margin-bottom:8px">초기 균형은 점 a(x₁)와 점 b(x₂). 중심상업지구 폭이 x₁,
+        주거지역 폭이 x₂ − x₁ 임</p>
+      <p style="margin-bottom:10px">경계 x₃ 가 주거영토를 줄여 <strong>노동공급이 감소</strong>함.
+        초과수요가 <strong>임금을 올림</strong></p>
+      <p class="derive t-red">→ 임금이 오르면 생산비용이 올라 상업용 곡선이 <strong>아래로</strong>,
+        주택가격이 올라 주거용 곡선이 <strong>위로</strong> 이동함</p>
+      <p class="derive t-red">→ 새 균형은 점 c(x₄)와 점 d(x₃). 주거구역을 겨냥한 정책이
+        <strong>상업구역까지 줄였음</strong></p>
+      <p class="derive t-red">→ 건축허가제한과 개발세도 <strong>똑같은 경로</strong>를 지남 —
+        거주민이 줄고, 임금이 오르고, 상업용 입찰지대가 내려감</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-ge16" viewBox="0 0 430 276" style="width:392px" role="img">
+        <title>성장경계가 주거용 곡선을 위로 상업용 곡선을 아래로 이동시켜 두 구역이 모두 줄어드는 그림</title></svg>
+      <script>
+        (function () {
+          const G = window.GE16, F = Fig.withBox({ x0: 66, y0: 202, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 14], y: [0, 105] });
+          const mk = (f, x1) => { const o = []; for (let i = 0; i <= 36; i++) { const x = (x1 * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
+          const agr = S.curve([[0, G.agri], [14, G.agri]]);
+          const c0 = mk((x) => G.c0(x), 4.4), r0 = mk((x) => G.r0(x), 12.4);
+          const c1 = mk((x) => G.c1(x), 3.6), r1 = mk((x) => G.r1(x), 13.2);
+          const a = Fig.cross(c0, r0), b = Fig.cross(r0, agr), c = Fig.cross(c1, r1);
+          const parts = [
+            F.curve(agr, { variant: 'cap' }),
+            F.curve(c0, { variant: 'cap' }), F.curve(r0, { variant: 'cap' }),
+            F.curve(c1), F.annot(S.x(0.4), S.y(78), '상업용 입찰지대곡선', { size: 10 }),
+            F.curve(r1, { variant: 'demand' }),
+            F.annot(S.x(9.6), S.y(G.r1(9.6)) + 15, '주거용 입찰지대곡선', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.raw(`<path class="guide" d="M${S.x(G.bound)},${F.BOX.y0} L${S.x(G.bound)},${S.y(60)}"/>`),
+            F.annot(S.x(G.bound), S.y(64), '경계', { anchor: 'middle', size: 11, tone: 'red' }),
+          ];
+          [[c, 'c', 'x₄', -15, -8], [a, 'a', 'x₁', 9, -8]].forEach(([P, nm, tick, lx, ly]) => {
+            parts.push(F.raw(`<path class="guide" d="M${P[0]},${P[1]} L${P[0]},${F.BOX.y0}"/>`));
+            parts.push(F.annot(P[0], F.BOX.y0 + 16, tick, { anchor: 'middle', size: 11 }));
+            parts.push(F.dot(P[0], P[1], { label: nm, lx, ly }));
+          });
+          const d = S.p([G.bound, G.r1(G.bound)]);
+          parts.push(F.dot(...d, { label: 'd', lx: 9, ly: -8 }));
+          parts.push(F.annot(S.x(G.bound), F.BOX.y0 + 16, 'x₃', { anchor: 'middle', size: 11 }));
+          parts.push(F.raw(`<path class="guide" d="M${b[0]},${b[1]} L${b[0]},${F.BOX.y0}"/>`));
+          parts.push(F.dot(b[0], b[1], { label: 'b', lx: 8, ly: 15 }));
+          parts.push(F.annot(b[0], F.BOX.y0 + 16, 'x₂', { anchor: 'middle', size: 11 }));
+          F.draw('#f-ge16', { axes: { x: '중심지로부터의 거리(킬로미터)', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 16-9 도시 간 효과 (p.354~356) ════════════════════ -->
+<section class="s-split">
+  <h2>한 도시의 경계가 지역 전체를 낮춘다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px"><strong>4주차 7장의 두-도시 모형</strong>을 다시 씀.
+        지역의 총노동력은 고정이고 노동자는 도시 간 자유롭게 이동함</p>
+      <p style="margin-bottom:8px">초기 균형은 점 a — 두 도시 각 <strong>5백만명</strong>, 공통 효용 u*</p>
+      <p style="margin-bottom:10px">컨트롤시티가 노동력을 <strong>4백만</strong>으로 묶으면
+        1백만이 옮겨가 다른 도시는 <strong>6백만</strong>이 됨.
+        즉각적으로 컨트롤시티는 u′(점 b), 다른 도시는 u**(점 c)가 됨</p>
+      <p class="derive t-red">→ 이 격차는 남지 않음. 지역 전체가 컨트롤시티의 고정된 부지를 두고 경쟁해
+        <strong>토지임대료가 오르고</strong> 효용곡선이 내려감 (점 d)</p>
+      <p class="derive t-red">→ 지역 전체 효용은 <strong>점 c에 고정</strong>됨.
+        작은 도시에 사는 편익이 <strong>높은 임대료로 완전히 상쇄</strong>됨</p>
+      <p class="derive t-red">→ 두 도시가 모두 이미 지나치게 컸는데 규제 없는 도시는
+        효용-극대화 규모에서 <strong>더 멀어짐</strong>. 이득을 보는 것은
+        <strong>컨트롤시티의 토지소유주</strong>임</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-interurban" viewBox="0 0 430 280" style="width:392px" role="img">
+        <title>컨트롤시티의 효용곡선이 아래로 이동해 지역 전체 효용이 점 c의 수준으로 고정되는 그림</title></svg>
+      <script>
+        (function () {
+          const U = window.UTIL16, F = Fig.withBox({ x0: 68, y0: 208, x1: 392, y1: 34 });
+          const S = F.scale({ x: [2.6, 7.2], y: [40, 104] });
+          const mk = (f) => { const o = []; for (let i = 0; i <= 36; i++) { const x = 2.8 + (4.2 * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
+          const parts = [
+            F.curve(mk((N) => U.u0(N)), { variant: 'demand' }),
+            F.annot(S.x(3.1), S.y(U.u0(3.1)) - 10, '초기 효용', { size: 10, tone: 'blue' }),
+            F.curve(mk((N) => U.u1(N))),
+            F.annot(S.x(3.1), S.y(U.u1(3.1)) - 10, '컨트롤시티', { size: 10 }),
+          ];
+          [[4, U.u0(4), 'b', 'u′', 9, -8], [5, U.u0(5), 'a', 'u*', 9, -8],
+           [6, U.u0(6), 'c', 'u**', 9, -8], [4, U.u1(4), 'd', null, -15, -8]]
+            .forEach(([N, v, nm, tick, lx, ly]) => {
+              parts.push(F.guide(...S.p([N, v]), tick ? { xtick: String(N), ytick: tick } : { only: 'y' }));
+              parts.push(F.dot(...S.p([N, v]), { label: nm, lx, ly }));
+            });
+          F.draw('#f-interurban', { axes: { x: '노동자수(백만명)', y: '효용' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ Q & A ════════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

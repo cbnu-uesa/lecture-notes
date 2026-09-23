@@ -1,0 +1,632 @@
+<!doctype html>
+<!--
+  10주차. 도시주택과 공공정책
+  교재: 오설리반의 도시경제학 제9판 — 17장 (p.362~383). PART 03 도시토지이용과 주택.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10주차. 도시주택과 공공정책</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 여과 점화식 [p.363, 수치 예] ────────────────────────────
+  window.FILTER = {
+    H0: 100, L0: 200, neu: 18, f: 0.10, r: 0.06,
+    Ht() { return this.H0 * (1 - this.f) + this.neu; },          // 108
+    Lt() { return this.L0 * (1 - this.r) + this.f * this.H0; },  // 198
+  };
+
+  // ── 소비자선택 [p.370~377, 그림 17-6·17-7·17-9] ─────────────
+  // CES, ρ = −2 (대체탄력성 1/3). 접점에서 h/g 는 언제나 0.55 다.
+  // α 는 두 조건이 동시에 성립하도록 푼 값이다.
+  //   ① 점 c(440, 800)가 예산 1,240 의 접점이다
+  //   ② 점 c 와 공공주택 묶음 점 b(660, 700)가 같은 무차별곡선 위에 있다
+  // 교재의 핵심 주장 — 바우처 240달러와 공공주택 1,020달러가 같은 후생을 준다 —
+  // 이 그림에서 그대로 성립한다. U(440,800) = U(660,700) = 694.
+  window.HOUSE17 = {
+    rho: -2, ratio: 0.55, income: 1000, voucher: 240,
+    pub: { h: 660, g: 700 }, pubCost: 1020,
+    get al() { return 0.166375 / 1.166375; },
+    U(h, g) {
+      return Math.pow(this.al * Math.pow(h, this.rho)
+                    + (1 - this.al) * Math.pow(g, this.rho), 1 / this.rho);
+    },
+    tangent(I) { const h = (I * this.ratio) / (1 + this.ratio); return [h, I - h]; },
+    // 무차별곡선 — (1−α)g^ρ = U^ρ − α h^ρ 를 g 에 대해 푼다
+    ic(U0, x0, x1, n = 44) {
+      const o = [];
+      for (let i = 0; i <= n; i++) {
+        const h = x0 + ((x1 - x0) * i) / n;
+        const t = (Math.pow(U0, this.rho) - this.al * Math.pow(h, this.rho)) / (1 - this.al);
+        if (t > 0) o.push([h, Math.pow(t, 1 / this.rho)]);
+      }
+      return o;
+    },
+  };
+
+  // ── 주택담보대출 지원 [p.380~381, 그림 17-12·17-13] ─────────
+  window.MORT = {
+    rate: 0.28,                       // 한계세율
+    get mpc() { return 1 - this.rate; },   // 0.72
+    msc: 1,
+    benefit: [
+      ['10,000 이하', 0], ['10,000~20,000', 0.1], ['20,000~30,000', 0.2],
+      ['30,000~40,000', 0.6], ['40,000~50,000', 1.2], ['50,000~75,000', 5.9],
+      ['75,000~100,000', 7.6], ['100,000~200,000', 29], ['200,000 초과', 23.6],
+    ],
+  };
+
+  // ── 노숙인구 [p.382, 그림 17-14] ────────────────────────────
+  window.HOMELESS = [
+    ['혼자 사는 개인들', 76], ['혼자 사는 남성', 51], ['흑인', 42],
+    ['18세 미만 아이들', 39], ['백인', 38], ['중독질환자', 30],
+    ['혼자 사는 여성', 25], ['자녀가 있는 가족', 23], ['정신질환자', 23],
+    ['히스패닉', 20], ['5세 미만 아이들', 16], ['퇴역군인', 13], ['직장이 있는 사람', 13],
+  ];
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 표지 ══════════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>10주차. 도시주택과<br>공공정책</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 지난 시간 — 9주차 요약 ════════════════════════════════ -->
+<section>
+  <h2>지난 시간 — 토지이용정책</h2>
+  <div class="body tight">
+    <div class="cols" style="align-items:flex-start">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">용도지역제</p>
+        <p>권한은 주에서 오고, 세 기준(실체적 적정과정·동일한 보호·적절한 보상)이 떠받침</p>
+        <p style="margin-bottom:8px">환경정책으로 쓰면 오염을 줄이는 게 아니라 <strong>옮길</strong> 뿐.
+          재정적 용도지역제는 값싼 주택을 <strong>배제</strong>하는 유인에서 나옴</p>
+        <p class="sub t-red" style="margin-bottom:2px">개발제한 셋</p>
+        <p>건축허가제한 · 개발세 · 성장경계. <strong>셋 다 주택가격을 올리고 수량을 줄임</strong>.
+          차이는 토지시장에 나타남</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">효과는 겨냥한 지리를 넘는다</p>
+        <p>주거용 개발을 제한하면 노동공급이 줄고 임금이 올라
+          <strong>상업구역까지 줄어듦</strong></p>
+        <p style="margin-bottom:8px">한 도시의 성장경계는 다른 도시를 더 키워
+          <strong>지역 전체의 효용을 낮춤</strong>. 이득은 경계 안 토지소유주가 봄</p>
+        <p class="sub t-red" style="margin-bottom:2px">거기서 나온 물음</p>
+        <p>정책이 주택가격을 올린다는 것은 봤음. 그러면 <strong>주택을 살 수 없는 가구</strong>는
+          어떻게 되는가</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:18px">→ 오늘은 주택시장 자체의 구조를 봄.
+      주택은 <strong>내구적</strong>이라 시간이 지나며 품질이 내려가고, 그래서 시장이
+      <strong>여러 하부시장으로 이어져</strong> 있음. 그 구조 위에서 네 가지 주택정책을 평가함</p>
+  </div>
+</section>
+
+<!-- ══ 발문 (p.362) ══════════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:30px">
+      “유능한 사람은 누구나 그의 집을 지키기 위해 싸울 것이나, 그 누구도 자신의 하숙집을 위해
+      전쟁에 나서는 사람에 대해 들어보지 못하였다.”
+      <span class="who">— 마크 트와인</span></p>
+    <p class="lead t-define" style="margin-bottom:16px">주택은 세 가지 점에서
+      <span class="mark">다른 제품과 다름</span></p>
+    <p class="emph"><strong>내구적</strong> — 주의 깊게 관리하면 수십 년간 주택서비스를 제공함</p>
+      <p class="emph"><strong>이질적</strong> — 크기·나이·배치·디자인·위치가 다 다름.
+      그래서 도시주택시장은 <strong>상호의존적인 하부시장들의 집합</strong>임</p>
+      <p class="emph" style="margin-bottom:16px"><strong>재산축적의 주된 수단</strong> —
+      주택가격의 변화가 가구재산에 큰 효과를 냄</p>
+    <p class="derive t-red">→ 이 세 성질 때문에 <strong>한 하부시장의 정책이 다른 하부시장으로 번짐</strong></p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 01 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 여과: 내구성과 하부시장들</p>
+  <p class="section-sub">주택은 품질사다리를 타고 내려간다 · 교재 p.362~369</p>
+</section>
+
+<!-- ══ 여과 점화식 (p.363) ═══════════════════════════════════ -->
+<section>
+  <h2>여과 <span class="en">(filtering)</span></h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:6px">주택소유주는 해마다 주택을 품질사다리의 어디에 둘지 결정함.
+      아무것도 하지 않으면 <strong>내려가고</strong>, 중간 정도로 쓰면 <strong>제자리</strong>,
+      올리려면 <strong>상당한 돈</strong>이 듦</p>
+    <p class="caption" style="margin-bottom:14px">단순화 — 신규 주택은 모두 높은-품질이고,
+      낮은 품질에서 높은 품질로 올리는 것은 엄두도 못 낼 만큼 비싸다고 둔다</p>
+    <p class="formula-key" style="margin-bottom:4px">
+      $H_t = H_{t-1}(1-f) + \text{new}$</p>
+    <p class="caption" style="margin-bottom:12px">f 는 낮은-품질로 하향 여과한 높은-품질 주택의 비중.
+      new = 18, $H_{t-1}$ = 100, f = 0.10 이면 $H_t$ = 100 × 0.9 + 18 = <strong>108</strong></p>
+    <p class="formula-key" style="margin-bottom:4px">
+      $L_t = L_{t-1}(1-r) + f \cdot H_{t-1}$</p>
+    <p class="caption" style="margin-bottom:14px">r 은 시장에서 퇴출된 낮은-품질 주택의 비중.
+      $L_{t-1}$ = 200, r = 0.06 이면 $L_t$ = 188 + 10 = <strong>198</strong></p>
+    <p class="derive t-red">→ 높은-품질 시장은 신규 18채와 남은 90채로 108채가 됨</p>
+      <p class="derive t-red">→ 낮은-품질 시장은 남은 188채에 <strong>내려온 10채</strong>가 더해짐.
+      두 시장은 이렇게 <strong>한 줄로 이어져</strong> 있음</p>
+  </div>
+</section>
+
+<!-- ══ 그림 17-1 여과과정 (p.364~365) ════════════════════════ -->
+<section class="s-split">
+  <h2>얼마나 내려보낼지는 가격 차이가 정한다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">높은-품질 주택 <strong>65채</strong>로 시작함.
+        오른쪽으로 갈수록 높은-품질이 늘고 낮은-품질이 줄어듦</p>
+      <p style="margin-bottom:8px">우상향 곡선은 주택을 높은-품질에 <strong>유지하는 한계비용</strong>임.
+        20번째 주택은 115달러(점 a), 40번째는 200달러(점 b), 50번째는 250달러(점 c)</p>
+      <p style="margin-bottom:10px">유지하는 <strong>편익</strong>은 두 시장의 가격 차이
+        $p_h - p_l$ 임. 수평선이 그것임</p>
+      <p class="derive t-red">→ 균형은 점 b. 처음 40채는 편익이 비용을 넘으므로 남고,
+        <strong>25채가 내려감</strong></p>
+      <p class="derive t-red">→ 가격 차이가 200 → 250달러로 벌어지면 남는 주택이 40 → 50채로 늘고
+        내려가는 주택은 25 → <strong>15채</strong>로 줄어듦</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-filter" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>한계 유지관리비용 곡선과 가격 차이 수평선이 점 b에서 만나 40채가 높은-품질에 남는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 68, y0: 206, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 65], y: [0, 340] });
+          // 교재가 인쇄한 세 점 (20,115)·(40,200)·(50,250)을 지나는 곡선을 맞춘다
+          const mc = (q) => 115 + 4.25 * (q - 20) + 0.075 * (q - 20) * (q - 20);
+          const pts = []; for (let i = 0; i <= 40; i++) { const q = 4 + (48 * i) / 40; pts.push([q, mc(q)]); }
+          const parts = [
+            F.curve(S.curve(pts)),
+            F.annot(S.x(50), S.y(mc(50)) - 10, '한계 유지관리비용', { anchor: 'end', size: 10 }),
+            F.line(S.x(0), S.y(200), S.x(62), S.y(200), { variant: 'demand' }),
+            F.annot(S.x(6), S.y(200) - 9, '편익 = p_h − p_l', { size: 10, tone: 'blue' }),
+          ];
+          [[20, 'a'], [40, 'b'], [50, 'c']].forEach(([q, nm]) => {
+            parts.push(F.guide(...S.p([q, mc(q)]), { xtick: String(q), ytick: String(Math.round(mc(q))) }));
+            parts.push(F.dot(...S.p([q, mc(q)]), { label: nm, lx: 9, ly: -8 }));
+          });
+          [[20, '45'], [40, '25'], [50, '15']].forEach(([q, t]) =>
+            parts.push(F.annot(S.x(q), F.BOX.y0 + 31, t, { anchor: 'middle', size: 10 })));
+          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 16, '높은-품질', { anchor: 'end', size: 10 }));
+          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 31, '낮은-품질', { anchor: 'end', size: 10 }));
+          F.draw('#f-filter', { axes: { y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 17-2 · 17-3 공급의 수평합 (p.365~366) ════════════ -->
+<section>
+  <h2>두 하부시장의 공급은 수평으로 더한 것이다</h2>
+  <div class="body tight">
+    <p class="emph">시장공급 = <strong>새로 들어오는 것</strong> + <strong>남아 있는 것</strong>.
+      굴절점 아래에서는 새로 들어오는 것이 없어 시장공급이 「남아 있는」 공급과 같음</p>
+    <svg class="fig" id="f-supply" viewBox="0 0 700 250" style="width:604px;margin:4px 0 0 118px" role="img">
+      <title>높은-품질 주택은 신규 15채와 남은 40채를 더해 55채, 낮은-품질 주택은 여과된 10채와 남은 26채를 더해 36채가 되는 그림</title></svg>
+    <script>
+      (function () {
+        const F = Fig;
+        const parts = [];
+        const panel = (box, marks, note, plabel) => {
+          const P = Fig.withBox(box);
+          const S = P.scale({ x: [0, 64], y: [0, 100] });
+          const [q1, q2, q3] = marks;
+          const py = 64;                                  // p′ 또는 p″ 의 높이
+          const A = (q) => 20 + (py - 20) * (q / q1);     // 신규·여과 공급 (가파름)
+          const B = (q) => 8 + (py - 8) * (q / q2);       // 남아 있는 공급
+          parts.push(F.raw(`<path class="axis" d="M${P.BOX.x0},${P.BOX.y1 - 7} L${P.BOX.x0},${P.BOX.y0} L${P.BOX.x1 + 8},${P.BOX.y0}"/>`));
+          parts.push(F.annot(P.BOX.x0, P.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
+          parts.push(F.line(S.x(0), S.y(20), S.x(q1 * 1.35), S.y(A(q1 * 1.35)), {}));
+          parts.push(F.annot(S.x(q1 * 1.35) + 4, S.y(A(q1 * 1.35)), plabel[0], { size: 9 }));
+          parts.push(F.line(S.x(0), S.y(8), S.x(q2 * 1.3), S.y(B(q2 * 1.3)), { variant: 'demand' }));
+          parts.push(F.annot(S.x(q2 * 1.3) + 4, S.y(B(q2 * 1.3)), plabel[1], { size: 9, tone: 'blue' }));
+          // 시장공급 — 굴절점(신규가 시작되는 가격 20)에서 꺾인다
+          const qk = q2 * (20 - 8) / (py - 8);
+          parts.push(F.line(S.x(0), S.y(8), S.x(qk), S.y(20), { variant: 'supply' }));
+          parts.push(F.line(S.x(qk), S.y(20), S.x(q3 * 1.2), S.y(py + (py - 20) * 0.2), { variant: 'supply' }));
+          parts.push(F.annot(S.x(q3 * 1.2) + 4, S.y(py + (py - 20) * 0.2), plabel[2], { size: 9, tone: 'red' }));
+          parts.push(F.dot(S.x(qk), S.y(20), { label: plabel[3], lx: -14, ly: -6 }));
+          parts.push(F.raw(`<path class="guide" d="M${P.BOX.x0},${S.y(py)} L${S.x(q3)},${S.y(py)}"/>`));
+          parts.push(F.annot(P.BOX.x0 - 8, S.y(py) + 4, plabel[4], { anchor: 'end', size: 11 }));
+          [[q1, plabel[5]], [q2, plabel[6]], [q3, plabel[7]]].forEach(([q, nm]) => {
+            parts.push(F.raw(`<path class="guide" d="M${S.x(q)},${S.y(py)} L${S.x(q)},${P.BOX.y0}"/>`));
+            parts.push(F.annot(S.x(q), P.BOX.y0 + 15, String(q), { anchor: 'middle', size: 10 }));
+            parts.push(F.dot(S.x(q), S.y(py), { label: nm, lx: 7, ly: -7 }));
+          });
+          parts.push(F.annot(S.x(32), P.BOX.y0 + 33, note, { anchor: 'middle', size: 11 }));
+        };
+        panel({ x0: 62, y0: 166, x1: 312, y1: 32 }, [15, 40, 55], '수량: 높은-품질 주택',
+              ['공급: 신규', '공급: 남아 있는', '공급: 시장', 'k', 'p′', 'a', 'b', 'c']);
+        panel({ x0: 432, y0: 166, x1: 656, y1: 32 }, [10, 26, 36], '수량: 낮은-품질 주택',
+              ['공급: 하향 여과', '공급: 남아 있는', '공급: 시장', 's', 'p″', 'f', 'g', 'h']);
+        F.draw('#f-supply', { parts, check: false });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:4px">→ p′ 에서 높은-품질 시장공급은 신규 15채 + 남은 40채 = <strong>55채</strong></p>
+      <p class="derive t-red" style="margin-top:2px">→ p″ 에서 낮은-품질 시장공급은 여과된 10채 + 남은 26채 = <strong>36채</strong></p>
+  </div>
+</section>
+
+<!-- ══ 그림 17-4 · 17-5 건축금지 (p.367~369) ═════════════════ -->
+<section>
+  <h2>신규 주택을 금지하면 두 시장이 다 오른다</h2>
+  <div class="body tight">
+    <p class="emph">초기 균형은 점 c — 가격 p*, 수량 55채 (신규 15 + 중고 40).
+      신규 주택을 금지하면 시장공급곡선이 「남아 있는」 공급곡선과 같아짐</p>
+    <svg class="fig" id="f-ban" viewBox="0 0 700 252" style="width:604px;margin:4px 0 0 118px" role="img">
+      <title>신규 주택 금지가 높은-품질 가격을 올리고, 여과가 줄어 낮은-품질 시장의 공급을 줄이고 수요를 늘려 가격을 두 번 올리는 그림</title></svg>
+    <script>
+      (function () {
+        const F = Fig;
+        const parts = [];
+        // 왼쪽 — 높은-품질 하부시장
+        const A = Fig.withBox({ x0: 62, y0: 168, x1: 312, y1: 32 });
+        const SA = A.scale({ x: [0, 68], y: [0, 100] });
+        const rem = (q) => 8 + 1.4 * q;                 // 남아 있는 공급 (40 에서 64)
+        const dem = (q) => 130 - 1.2 * q;               // 55 에서 64
+        parts.push(F.raw(`<path class="axis" d="M${A.BOX.x0},${A.BOX.y1 - 7} L${A.BOX.x0},${A.BOX.y0} L${A.BOX.x1 + 8},${A.BOX.y0}"/>`));
+        parts.push(F.annot(A.BOX.x0, A.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
+        parts.push(F.line(SA.x(0), SA.y(rem(0)), SA.x(62), SA.y(rem(62)), { variant: 'demand' }));
+        parts.push(F.annot(SA.x(58), SA.y(rem(58)) - 8, '공급: 남아 있는', { anchor: 'end', size: 9, tone: 'blue' }));
+        // 시장공급 — 굴절 뒤 완만 (신규가 더해진다)
+        const mkt = (q) => (q <= 20 ? rem(q) : rem(20) + 0.72 * (q - 20));
+        parts.push(F.line(SA.x(20), SA.y(mkt(20)), SA.x(66), SA.y(mkt(66)), { variant: 'supply' }));
+        parts.push(F.annot(SA.x(64), SA.y(mkt(64)) + 14, '공급: 시장', { anchor: 'end', size: 9, tone: 'red' }));
+        parts.push(F.line(SA.x(10), SA.y(dem(10)), SA.x(66), SA.y(dem(66)), {}));
+        parts.push(F.annot(SA.x(64), SA.y(dem(64)) - 8, '수요', { anchor: 'end', size: 9 }));
+        [[55, dem(55), 'c', 'p*'], [48, rem(48), 'e', 'p**']].forEach(([q, v, nm, tick]) => {
+          parts.push(F.raw(`<path class="guide" d="M${A.BOX.x0},${SA.y(v)} L${SA.x(q)},${SA.y(v)} L${SA.x(q)},${A.BOX.y0}"/>`));
+          parts.push(F.annot(A.BOX.x0 - 8, SA.y(v) + 4, tick, { anchor: 'end', size: 10 }));
+          parts.push(F.annot(SA.x(q), A.BOX.y0 + 15, String(q), { anchor: 'middle', size: 10 }));
+          parts.push(F.dot(SA.x(q), SA.y(v), { label: nm, lx: 8, ly: -8 }));
+        });
+        parts.push(F.annot(SA.x(34), A.BOX.y0 + 33, '수량: 높은-품질 주택', { anchor: 'middle', size: 11 }));
+        // 오른쪽 — 낮은-품질 하부시장
+        const B = Fig.withBox({ x0: 432, y0: 168, x1: 656, y1: 32 });
+        const SB = B.scale({ x: [0, 64], y: [0, 100] });
+        const s0 = (q) => 14 + 1.1 * q, s1 = (q) => 14 + 1.1 * (q + 8);
+        const d0 = (q) => 104 - 1.0 * q, d1 = (q) => 104 - 1.0 * (q - 9);
+        parts.push(F.raw(`<path class="axis" d="M${B.BOX.x0},${B.BOX.y1 - 7} L${B.BOX.x0},${B.BOX.y0} L${B.BOX.x1 + 8},${B.BOX.y0}"/>`));
+        parts.push(F.annot(B.BOX.x0, B.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
+        parts.push(F.line(SB.x(4), SB.y(s0(4)), SB.x(56), SB.y(s0(56)), { variant: 'cap' }));
+        parts.push(F.annot(SB.x(54), SB.y(s0(54)) + 13, '초기 공급', { anchor: 'end', size: 9 }));
+        parts.push(F.line(SB.x(0), SB.y(s1(0)), SB.x(50), SB.y(s1(50)), {}));
+        parts.push(F.annot(SB.x(24), SB.y(s1(24)) - 9, '공급: 보다 적은 여과', { anchor: 'end', size: 9 }));
+        parts.push(F.line(SB.x(4), SB.y(d0(4)), SB.x(56), SB.y(d0(56)), { variant: 'cap' }));
+        parts.push(F.annot(SB.x(54), SB.y(d0(54)) - 8, '초기 수요', { anchor: 'end', size: 9 }));
+        parts.push(F.line(SB.x(12), SB.y(d1(12)), SB.x(60), SB.y(d1(60)), { variant: 'demand' }));
+        parts.push(F.annot(SB.x(58), SB.y(d1(58)) - 8, '새로운 수요', { anchor: 'end', size: 9, tone: 'blue' }));
+        const pa = Fig.cross(SB.curve([[4, s0(4)], [56, s0(56)]]), SB.curve([[4, d0(4)], [56, d0(56)]]));
+        const pb = Fig.cross(SB.curve([[0, s1(0)], [50, s1(50)]]), SB.curve([[4, d0(4)], [56, d0(56)]]));
+        const pc = Fig.cross(SB.curve([[0, s1(0)], [50, s1(50)]]), SB.curve([[12, d1(12)], [60, d1(60)]]));
+        [[pa, 'a', 'p*', 8, 14], [pb, 'b', 'p′', -14, -8], [pc, 'c', 'p**', 8, -8]]
+          .forEach(([P, nm, tick, lx, ly]) => {
+            parts.push(F.raw(`<path class="guide" d="M${B.BOX.x0},${P[1]} L${P[0]},${P[1]}"/>`));
+            parts.push(F.annot(B.BOX.x0 - 8, P[1] + 4, tick, { anchor: 'end', size: 10 }));
+            parts.push(F.dot(P[0], P[1], { label: nm, lx, ly }));
+          });
+        parts.push(F.annot(SB.x(32), B.BOX.y0 + 33, '낮은-품질 주택', { anchor: 'middle', size: 11 }));
+        F.draw('#f-ban', { parts, check: false });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:4px">→ 높은-품질 가격이 p* → p** 로 오르고 수량은 55 → 48채.
+      가격이 오르자 하향 여과가 줄어 남는 주택이 40 → 48채가 되므로
+      <strong>15채가 아니라 7채만</strong> 줄어듦</p>
+      <p class="derive t-red" style="margin-top:2px">→ 낮은-품질 시장은 <strong>두 번</strong> 오름 —
+      여과가 줄어 <strong>공급이 왼쪽으로</strong>(a → b), 높은-품질에서 갈아탄 소비자 때문에
+      <strong>수요가 오른쪽으로</strong>(b → c)</p>
+      <p class="derive t-red" style="margin-top:2px">→ <strong>젠트리피케이션</strong>도 같은 논리임 —
+      고소득 가구의 유입이 높은-품질 가격을 올리면 여과가 줄고 품질개선이 늘어 낮은-품질 가격까지 오름</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 02 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 공급-측면 공공정책</p>
+  <p class="section-sub">공공주택에 쓴 1달러가 수혜자에게 얼마가 되는가 · 교재 p.370~374</p>
+</section>
+
+<!-- ══ 그림 17-6 · 17-7 공공주택 (p.370~372) ═════════════════ -->
+<section class="s-split">
+  <h2>공공주택은 고를 수 없는 묶음이다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">2012년에 약 <strong>1.1백만 가구</strong>가
+        연방예산 <strong>64억달러</strong>로 공공주택에 살았음. 임차료는 소득의 30%를 넘을 수 없고
+        나머지를 연방정부가 냄</p>
+      <p style="margin-bottom:8px">월 소득 1,000달러인 가구. 스스로 고르면 예산선 위의
+        <strong>점 a</strong>를 고름</p>
+      <p style="margin-bottom:10px">공공주택은 <strong>점 b(주택 660 · 다른 재화 700)</strong>라는 묶음을
+        통째로 줌. 예산선 바깥이라 자기 돈으로는 못 사는 묶음임</p>
+      <p class="derive t-red">→ 점 b 의 후생은 예산을 <strong>240달러</strong> 늘려 주고
+        스스로 고르게 했을 때의 점 c 와 <strong>정확히 같음</strong></p>
+      <p class="derive t-red">→ 그런데 공공주택의 예산비용은 수혜자 1인당 <strong>1,020달러</strong>임.
+        1달러를 써서 <strong>0.24달러</strong>의 편익을 주는 셈</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-public" viewBox="0 0 430 292" style="width:390px" role="img">
+        <title>예산을 240달러 늘렸을 때의 선택점 c와 공공주택 묶음 점 b가 같은 무차별곡선 위에 있는 그림</title></svg>
+      <script>
+        (function () {
+          const H = window.HOUSE17, F = Fig.withBox({ x0: 70, y0: 222, x1: 392, y1: 34 });
+          const S = F.scale({ x: [240, 780], y: [540, 1060] });
+          const I0 = H.income, I1 = I0 + H.voucher;
+          const A = H.tangent(I0), C = H.tangent(I1), B = [H.pub.h, H.pub.g];
+          const U0 = H.U(...A), U1 = H.U(...C);
+          const parts = [
+            F.line(S.x(260), S.y(I0 - 260), S.x(460), S.y(I0 - 460), { variant: 'cap' }),
+            F.annot(S.x(452), S.y(I0 - 452) - 8, '예산', { anchor: 'end', size: 10 }),
+            F.line(S.x(300), S.y(I1 - 300), S.x(700), S.y(I1 - 700), { variant: 'demand' }),
+            F.annot(S.x(690), S.y(I1 - 690) - 8, '예산 + 240달러', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.curve(S.curve(H.ic(U0, 280, 620)), { variant: 'cap' }),
+            F.curve(S.curve(H.ic(U1, 330, 760))),
+            F.annot(S.x(756), S.y(H.ic(U1, 756, 756)[0][1]) - 9, 'u′', { anchor: 'end', size: 11 }),
+            F.guide(...S.p(C), { xtick: '440', ytick: '800' }),
+            F.dot(...S.p(C), { label: 'c', lx: -15, ly: -8 }),
+            F.guide(...S.p(B), { xtick: '660', ytick: '700' }),
+            F.dot(...S.p(B), { label: 'b', lx: 9, ly: -8 }),
+            F.dot(...S.p(A), { label: 'a', lx: -14, ly: -8 }),
+            F.annot(F.BOX.x0 - 8, S.y(1000) + 4, '1,000', { anchor: 'end', size: 10 }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(1000)} L${S.x(300)},${S.y(1000)}"/>`),
+          ];
+          F.draw('#f-public', { axes: { x: '주택', y: '모든 다른 재화($)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 17-8 공급측면 정책의 시장효과 (p.373) ════════════ -->
+<section class="s-split">
+  <h2>지어 준 만큼 늘어나지 않는다 — 밀어내기</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">공급측면 정책은 지원받는 주택을 시장에 더함.
+        공급곡선이 <strong>오른쪽으로</strong> 평행이동함</p>
+      <p style="margin-bottom:8px">초기 균형은 점 a — 가격 p*, 수량 <strong>70채</strong>.
+        지원으로 같은 가격에서 <strong>160채</strong>(점 b)가 공급됨</p>
+      <p style="margin-bottom:10px">그런데 새 균형은 점 c — 가격이 p** 로 <strong>내려가고</strong>
+        수량은 <strong>100채</strong>에 그침</p>
+      <p class="derive t-red">→ 90채를 더했는데 30채만 늘었음. 가격이 내려가
+        <strong>민간이 60채를 줄였기</strong> 때문임 — 이것이 <strong>밀어내기</strong>임</p>
+      <p class="derive t-red">→ 연구들은 밀어내기가 <strong>1/2에서 2/3</strong>에 이른다고 봄.
+        퀴글리는 공공주택의 생산효율성을 <strong>0.62</strong>로 추정함</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-crowd" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>지원 공급곡선이 오른쪽으로 이동해 가격이 내려가고 수량은 70에서 100으로만 느는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 70, y0: 214, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 200], y: [0, 100] });
+          const s0 = (q) => 20 + 0.6 * q, s1 = (q) => 20 + 0.6 * (q - 90);
+          const d = (q) => 106 - 0.32 * q;
+          const c0 = S.curve([[0, s0(0)], [190, s0(190)]]);
+          const c1 = S.curve([[90, s1(90)], [190, s1(190)]]);
+          const cd = S.curve([[10, d(10)], [190, d(190)]]);
+          const a = Fig.cross(c0, cd), c = Fig.cross(c1, cd);
+          const parts = [
+            F.line(...c0[0], ...c0[c0.length - 1], { variant: 'demand' }),
+            F.annot(S.x(112), S.y(s0(112)) - 9, '초기 공급', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.line(...c1[0], ...c1[c1.length - 1], {}),
+            F.annot(S.x(188), S.y(s1(188)) - 9, '공급: 지원', { anchor: 'end', size: 10 }),
+            F.line(...cd[0], ...cd[cd.length - 1], { variant: 'cap' }),
+            F.annot(S.x(186), S.y(d(186)) - 9, '수요', { anchor: 'end', size: 10 }),
+            F.guide(a[0], a[1], { xtick: '70', ytick: 'p*' }),
+            F.dot(a[0], a[1], { label: 'a', lx: -14, ly: -8 }),
+            F.guide(c[0], c[1], { xtick: '100', ytick: 'p**' }),
+            F.dot(c[0], c[1], { label: 'c', lx: 9, ly: -8 }),
+            F.guide(...S.p([160, s1(160)]), { xtick: '160', only: 'x' }),
+            F.dot(...S.p([160, s1(160)]), { label: 'b', lx: 9, ly: -8 }),
+          ];
+          F.draw('#f-crowd', { axes: { x: '주택', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 03 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 수요-측면 공공정책</p>
+  <p class="section-sub">돈을 주고 고르게 하면 어떻게 다른가 · 교재 p.375~381</p>
+</section>
+
+<!-- ══ 그림 17-9 바우처 (p.375~377) ══════════════════════════ -->
+<section>
+  <h2>같은 후생을 1/4 비용으로</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:6px">바우처는 낮은-소득 가구에 쿠폰을 주어
+      <strong>민간 주택시장에서 스스로 고르게</strong> 함</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">앞 그림과 같은 자리</p>
+        <p>바우처 240달러를 받으면 예산선이 위로 올라가고 가구는 <strong>점 c(440, 800)</strong>를 고름</p>
+        <p style="margin-bottom:10px">공공주택의 점 b(660, 700)와 <strong>같은 무차별곡선</strong> 위임 —
+          두 프로그램의 후생이 같음</p>
+        <p class="sub t-red" style="margin-bottom:2px">비용은 다르다</p>
+        <p>바우처 <strong>240달러</strong> 대 공공주택 <strong>1,020달러</strong></p>
+        <p class="derive t-red" style="margin-top:8px">→ 공공주택에서 바우처로 옮기면
+          예산비용을 <strong>약 1/4</strong>로 줄이거나 지원 가구를 <strong>약 4배</strong>로 늘릴 수 있음</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">그런데 시장가격이 오른다</p>
+        <p><strong>낮은-품질</strong> — 수요가 오른쪽으로 이동해 가격이 p* → p**,
+          수량이 L* → L** 로 늘어남</p>
+        <p style="margin-bottom:8px"><strong>중간-품질</strong> — 하향 여과가 빨라져 공급이 왼쪽으로 이동.
+          가격은 오르고 수량은 줄어듦. 낮은-소득 가구를 위한 프로그램이
+          <strong>중간-소득 가구의 주택가격을 올림</strong></p>
+        <p>수신(Susin, 2002)은 90개 대도시지역에서 바우처가 낮은-소득 주택가격을
+          <strong>약 16%</strong> 올렸다고 추정함. 공급탄력성이 <strong>0.38</strong>로 비탄력적이라는 뜻임</p>
+        <p class="caption">중간-소득 주택은 약 3% 올랐고, 높은-소득 주택에서는 측정 가능한 효과가 없었다</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:10px">→ 가격효과가 <strong>세 번째 하부시장까지</strong> 번짐 —
+      중간-품질 가격이 오르면 높은-품질에서 중간-품질로의 여과율이 올라 높은-품질 가격도 오름</p>
+  </div>
+</section>
+
+<!-- ══ 그림 17-12 · 17-13 주택담보대출 지원 (p.379~381) ══════ -->
+<section>
+  <h2>주택담보대출 지원은 누구에게 가는가</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:2px">이제까지는 낮은-소득 가구를 겨냥한 정책이었음.
+      연방정부는 <strong>중간·높은 소득 가구</strong>에 유익한 정책도 가지고 있음</p>
+    <div class="cols">
+      <div class="col-l">
+        <svg class="fig" id="f-mortgage" viewBox="0 0 430 268" style="width:396px" role="img">
+          <title>주택담보대출 조세편익이 소득이 높을수록 급격히 커져 10만~20만달러 구간에서 290억달러에 이르는 막대그래프</title></svg>
+        <script>
+          (function () {
+            const M = window.MORT, F = Fig;
+            const X0 = 128, X1 = 404, Y0 = 26, GAP = 22, BH = 15;
+            const sx = (v) => X0 + (v / 30) * (X1 - X0);
+            const parts = [];
+            M.benefit.forEach(([k, v], i) => {
+              const y = Y0 + i * GAP;
+              parts.push(F.raw(`<rect x="${X0}" y="${y}" width="${Math.max(1, sx(v) - X0)}" height="${BH}" ` +
+                               `fill="var(--accent-blue)" opacity="0.5"/>`));
+              parts.push(F.annot(sx(v) + 5, y + 12, String(v), { size: 9 }));
+              parts.push(F.annot(X0 - 6, y + 12, k, { anchor: 'end', size: 9 }));
+            });
+            const yAx = Y0 + M.benefit.length * GAP;
+            parts.push(F.raw(`<path class="axis" d="M${X0},${Y0 - 6} L${X0},${yAx} L${X1 + 6},${yAx}"/>`));
+            [0, 7.5, 15, 22.5, 30].forEach((v) =>
+              parts.push(F.annot(sx(v), yAx + 14, String(v), { anchor: 'middle', size: 9 })));
+            parts.push(F.annot((X0 + X1) / 2, yAx + 30, '조세편익(십억달러) · 세로는 가구소득',
+                               { anchor: 'middle', size: 10 }));
+            F.draw('#f-mortgage', { parts, check: false });
+          })();
+        </script>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-deadweight" viewBox="0 0 430 226" style="width:396px" role="img">
+          <title>한계사적비용이 0.72로 한계사회비용 1.00보다 낮아 주택자본이 효율적 수준을 넘고 삼각형만큼 후생손실이 생기는 그림</title></svg>
+        <script>
+          (function () {
+            const M = window.MORT, F = Fig.withBox({ x0: 64, y0: 168, x1: 400, y1: 30 });
+            const S = F.scale({ x: [0, 100], y: [0.4, 1.35] });
+            const d = (h) => 1.6 - 0.011 * h;                 // 1.00 에서 54.5 · 0.72 에서 80
+            const hE = (1.6 - M.msc) / 0.011, hS = (1.6 - M.mpc) / 0.011;
+            const tri = [S.p([hE, M.msc]), S.p([hS, M.mpc]), S.p([hS, M.msc])];
+            const parts = [
+              F.raw(`<path class="area-surplus" d="M${tri[0][0]},${tri[0][1]} L${tri[1][0]},${tri[1][1]} L${tri[2][0]},${tri[2][1]} Z"/>`),
+              F.line(S.x(26), S.y(d(26)), S.x(94), S.y(d(94)), { variant: 'demand' }),
+              F.annot(S.x(30), S.y(d(30)) - 9, '수요와 한계사회편익', { size: 10, tone: 'blue' }),
+              F.line(S.x(0), S.y(M.msc), S.x(96), S.y(M.msc), {}),
+              F.annot(S.x(94), S.y(M.msc) - 9, '한계사회비용', { anchor: 'end', size: 10 }),
+              F.line(S.x(0), S.y(M.mpc), S.x(96), S.y(M.mpc), { variant: 'cap' }),
+              F.annot(S.x(28), S.y(M.mpc) + 15, '한계사적비용', { size: 10 }),
+              F.guide(...S.p([hE, M.msc]), { xtick: 'h^E', ytick: '1.00' }),
+              F.dot(...S.p([hE, M.msc]), { label: 'a', lx: -14, ly: -8 }),
+              F.guide(...S.p([hS, M.mpc]), { xtick: 'h*', ytick: '0.72' }),
+              F.dot(...S.p([hS, M.mpc]), { label: 'b', lx: 9, ly: 14 }),
+            ];
+            F.draw('#f-deadweight', { axes: { x: '주택자본', y: '달러' }, parts });
+          })();
+        </script>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:4px">→ 편익의 대부분이 <strong>소득 10만달러 초과 구간</strong>에 감
+      (29 + 23.6 = 526억달러). 5만달러 이하 구간을 다 합쳐도 <strong>21억달러</strong>임</p>
+      <p class="derive t-red" style="margin-top:2px">→ 한계세율 28%면 주택자본의 사적비용이 <strong>0.72달러</strong>가 되어
+      사회비용 1달러보다 낮음. 주택소비가 효율적 수준을 넘어 <strong>h* &gt; h^E</strong>.
+      삼각형이 후생손실임 — 그 자원은 공장·도로·학교에서 더 생산적이었을 것임</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 04 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">04 노숙자와 공공정책</p>
+  <p class="section-sub">주택시장의 맨 아래 · 교재 p.381~383</p>
+</section>
+
+<!-- ══ 그림 17-14 노숙인구 (p.381~383) ═══════════════════════ -->
+<section class="s-split">
+  <h2>노숙인구의 구성</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">주택도시개발부는 2009년 1월의 하룻밤에
+        전국에 <strong>640,000명 이상</strong>의 노숙자가 있었다고 보고함</p>
+      <p style="margin-bottom:8px">노숙자의 <strong>3/4 이상</strong>이 혼자 살고 절반 이상이 혼자 사는 남성임.
+        18세 미만 아이들이 거의 <strong>2/5</strong>를 차지함</p>
+      <p style="margin-bottom:10px">퇴역군인 비중(13%)은 국민 전체(11%)와 비슷하지만,
+        정신질환을 앓는 비중은 국민 전체(6%)의 <strong>다섯 배</strong>임</p>
+      <p class="sub t-red" style="margin-bottom:2px">노숙비율이 높은 지역의 세 특성</p>
+      <p>낮은-품질 주택의 <strong>높은 가격</strong> — 호닉과 파일러는 탄력성을 <strong>1.25</strong>로 추정함.
+        임차료가 10% 오르면 노숙비율이 12.5% 오름</p>
+      <p>약한 노동시장 (낮은 고용성장) · 정신질환자에 대한 <strong>낮은 기관수용률</strong></p>
+      <p class="caption" style="margin-top:6px">본문은 정신질환 30%·중독 약 1/3 로 적지만 그림의 막대는
+        정신질환자 23 · 중독질환자 30 이다. 교재의 두 숫자가 어긋나 있어 인쇄된 그대로 옮겼다</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-homeless" viewBox="0 0 430 322" style="width:372px" role="img">
+        <title>노숙인구의 구성을 항목별 가로 막대로 보이는 그림. 혼자 사는 개인들이 76으로 가장 높다</title></svg>
+      <script>
+        (function () {
+          const H = window.HOMELESS, F = Fig;
+          const X0 = 146, X1 = 400, Y0 = 20, GAP = 20, BH = 13;
+          const sx = (v) => X0 + (v / 80) * (X1 - X0);
+          const parts = [];
+          H.forEach(([k, v], i) => {
+            const y = Y0 + i * GAP;
+            parts.push(F.raw(`<rect x="${X0}" y="${y}" width="${sx(v) - X0}" height="${BH}" ` +
+                             `fill="var(--accent-blue)" opacity="0.5"/>`));
+            parts.push(F.annot(sx(v) + 5, y + 11, String(v), { size: 9 }));
+            parts.push(F.annot(X0 - 6, y + 11, k, { anchor: 'end', size: 9 }));
+          });
+          const yAx = Y0 + H.length * GAP;
+          parts.push(F.raw(`<path class="axis" d="M${X0},${Y0 - 6} L${X0},${yAx} L${X1 + 6},${yAx}"/>`));
+          [0, 20, 40, 60, 80].forEach((v) =>
+            parts.push(F.annot(sx(v), yAx + 14, String(v), { anchor: 'middle', size: 9 })));
+          parts.push(F.annot((X0 + X1) / 2, yAx + 29, '노숙인구 중 비중(%)', { anchor: 'middle', size: 10 }));
+          F.draw('#f-homeless', { parts, check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:2px;text-align:center">출처: National Coalition for the Homeless,
+        “Who Is Homeless?” 2009 (교재 그림 17−14, p.382)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ Q & A ════════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
