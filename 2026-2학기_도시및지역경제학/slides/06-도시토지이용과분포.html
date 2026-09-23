@@ -1,7 +1,8 @@
 <!doctype html>
 <!--
   6주차. 도시토지이용과 분포
-  교재: 오설리반의 도시경제학 제9판 — 10장 (p.195~207). PART 03 의 시작.
+  교재: 오설리반의 도시경제학 제9판 — 10장 (p.195~207) · 11장 (p.214~234) · 12장 (p.242~265).
+  PART 03 도시토지이용과 주택.
 -->
 <html lang="ko">
 <head>
@@ -54,6 +55,140 @@
     bid(C, x)       { return (this.revenue - this.total(C, x)) / this.T; },
     slope(C)        { return (-C.f + this.c) / this.T; },
   };
+
+  // ── 사무 정보교환 통행거리 [11장 p.215, 그림 11-1] ─────────
+  // 직선상 1블록 간격의 다섯 기업. 기업 i 의 총 통행거리는 나머지까지의 거리합이다.
+  //   A(0)=10 · B(1)=7 · C(2)=6 · D(3)=7 · E(4)=10  ← 교재가 인쇄한 값과 일치한다
+  window.OFFICE = {
+    names: ['A', 'B', 'C', 'D', 'E'],
+    travel(i) { let s = 0; for (let j = 0; j < 5; j++) s += Math.abs(i - j); return s; },
+    // 그림 11-2 — 총비용은 증가하는 비율로 오르고, 지불용의는 총수입에서 그것을 뺀 것
+    TR: 100, TC0: 20, k: 2.2,
+    tc(x)  { return this.TC0 + this.k * x * x; },
+    wtp(x) { return this.TR - this.tc(x); },
+  };
+
+  // ── 건물높이 [11장 p.222~230, 그림 11-5·11-6·11-7·11-10] ───
+  // 교재가 인쇄한 네 값에서 이윤함수를 역산했다 (design.md §6.5).
+  //   h*=50 에서 mb=mc · 이윤 90백만 · 80층에서 70백만 · 0층에서 0
+  //   → mb(h) − mc(h) = 4.030556 − 0.106444h + 0.00051667h²
+  // 이 차이를 지키는 한 갈라내는 방법은 여럿이다. 한계비용은 증가하는 비율로
+  // 오르게(p.223), 한계편익은 얕은 U 자가 되게(p.222 승강기) 갈랐다.
+  window.TOWER = {
+    hStar: 50, hTall: 80, prize: 20,
+    d0: 4.030556, d1: -0.106444, d2: 0.00051667,   // mb − mc
+    mc(h) { return 0.6 + 0.02 * h + 0.00055 * h * h; },
+    mb(h) { return this.mc(h) + this.gap(h); },
+    gap(h) { return this.d0 + this.d1 * h + this.d2 * h * h; },
+    // 0 층부터 h 층까지 쌓은 경제적 이윤 = 두 곡선 사이의 면적
+    profit(h) { return this.d0 * h + (this.d1 * h * h) / 2 + (this.d2 * h * h * h) / 3; },
+    // 한계편익이 dp 만큼 올라갔을 때의 새 균형높이 (그림 11-7)
+    hUp(dp) {
+      const a = this.d2, b = this.d1, c = this.d0 + dp;
+      return (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+    },
+  };
+
+  // ── 등량곡선과 생산요소 대체 [11장 p.226~228, 그림 11-8·11-9] ─
+  // 등량곡선 k·L = 1200. 접선의 기울기는 −k/L 이므로 R/p_k 가 그대로 나온다.
+  //   s(60, 20) · m(30, 40) · t(20, 60) — k‴ 는 k′ 의 3배 (교재 p.227)
+  window.ISOQ = {
+    K: 1200,
+    pt: [
+      { tag: 's', L: 60, k: 20, note: '먼 입지',     tone: null },
+      { tag: 'm', L: 30, k: 40, note: '중간',         tone: null },
+      { tag: 't', L: 20, k: 60, note: '접근성이 큰 입지', tone: 'blue' },
+    ],
+    cap(L) { return this.K / L; },
+    slope(P) { return P.k / P.L; },       // = R / p_k
+  };
+
+  // ── 소비자선택 [12장 p.243~257, 그림 12-1·12-2·12-3·12-9·12-10·12-11] ─
+  // CES, 대체탄력성 3.  U = (α h^⅔ + (1−α) g^⅔)^{3/2},  A = (1−α)/α = ∛9 / 6
+  //   g = I / (1 + 24/p²),   h = g · 24/p³
+  // 교재가 인쇄한 값이 모두 재현된다.
+  //   x=10 → I = w − t·x = 1500,  p*=6 → h*=100 · g*=900        (그림 12-1)
+  //   x=6  → I = 1700,  p′=8 예산선이 점 a(100,900)를 정확히 지남 (그림 12-2)
+  //   내쉬균형 p** = 9.0 → h**=43 · g**=1311                      (그림 12-3)
+  // p**=9 는 교재가 그림 12-4 에서 든 값(6 → 8 → 9)과 정확히 같다.
+  // 탄력성을 1(콥−더글러스)로 두면 g 가 가격과 무관해져 점 b 와 c 가 겹치고,
+  // 2 로 두면 갈라지긴 하나 8px 밖에 떨어지지 않아 이동이 보이지 않았다.
+  window.CHOICE = {
+    A: Math.cbrt(9) / 6, w: 2000, t: 50,
+    get al() { return 1 / (1 + this.A); },
+    I(x)     { return this.w - this.t * x; },
+    g(I, p)  { return I / (1 + 24 / (p * p)); },
+    h(I, p)  { return (this.g(I, p) * 24) / (p * p * p); },
+    U(h, g)  {
+      const v = this.al * Math.pow(h, 2 / 3) + (1 - this.al) * Math.pow(g, 2 / 3);
+      return Math.pow(v, 1.5);
+    },
+    // 무차별곡선 — U^{2/3} = α h^{2/3} + (1−α) g^{2/3} 를 g 에 대해 푼다
+    ic(U0, x0, x1, n = 48) {
+      const r = Math.pow(U0, 2 / 3), o = [];
+      for (let i = 0; i <= n; i++) {
+        const h = x0 + ((x1 - x0) * i) / n;
+        const t = (r - this.al * Math.pow(h, 2 / 3)) / (1 - this.al);
+        if (t > 0) o.push([h, Math.pow(t, 1.5)]);
+      }
+      return o;
+    },
+    // 소득이 I 로 바뀌었을 때 효용 U0 를 되돌리는 가격 (내쉬균형). 이분법.
+    pBack(U0, I) {
+      let lo = 0.5, hi = 80;
+      for (let i = 0; i < 70; i++) {
+        const m = (lo + hi) / 2;
+        if (this.U(this.h(I, m), this.g(I, m)) > U0) lo = m; else hi = m;
+      }
+      return (lo + hi) / 2;
+    },
+  };
+
+  // ── 범죄·대기의 질 [12장 p.254~257, 그림 12-9·12-10·12-11] ─
+  // 같은 효용함수를 쓰되 축에 숫자를 인쇄하지 않는다 (교재도 인쇄하지 않는다).
+  // 교재가 인쇄한 것은 기대비용 r·L = 0.005 × 8,000달러 = 40달러 하나뿐이다.
+  // 40달러가 눈에 보이도록 소득의 눈금을 잡았다 — 교재 그림도 과장되어 있다.
+  window.RISK = {
+    r: 0.005, L: 8000, w: 340,
+    cost()   { return this.r * this.L; },          // = 40
+    net()    { return this.w - this.cost(); },     // = 300
+    p0: 6,
+  };
+
+  // ── 주택-가격곡선 [12장 p.247~248, 그림 12-4·12-5] ──────────
+  // 교재가 인쇄한 세 점 (6,9)·(10,6)·(14,5)를 정확히 지나는 볼록 곡선을 풀었다.
+  //   p(x) = 4.5 + 23.3823·e^(−0.274653x)
+  // 직선은 통근비용 변화만 반영한 것 — 점 a 를 지나고 1km 당 0.5달러 기울기다.
+  //   x=6 → 8달러(점 c) · x=14 → 4달러(점 e). 곡선과의 차이가 소비자 대체다.
+  window.HOUSE = {
+    a: 4.5, b: 23.3823, c: 0.274653,
+    x0: 6, xa: 10, x1: 14,
+    p(x)    { return this.a + this.b * Math.exp(-this.c * x); },
+    line(x) { return 6 - 0.5 * (x - this.xa); },
+  };
+
+  // ── 주택생산 [12장 p.259~262, 그림 12-12 ~ 12-15] ───────────
+  // 고정된 토지 위의 주택생산은 체감하는 보수 아래 있다 → 한계비용이 우상향한다.
+  // 한계편익은 그 부지의 주택가격이라 수평이다.
+  window.HPROD = {
+    c0: 1, c1: 0.008, c2: 0.00004,
+    price: [
+      { tag: "p(x′)", p: 5, dot: 'a' },
+      { tag: 'p(x″)', p: 7, dot: 'b' },
+    ],
+    mc(H)    { return this.c0 + this.c1 * H + this.c2 * H * H; },
+    // mc(H) = p 를 H 에 대해 푼다 → p=7 에서 H = 300
+    Hstar(p) {
+      return (-this.c1 + Math.sqrt(this.c1 * this.c1 - 4 * this.c2 * (this.c0 - p)))
+             / (2 * this.c2);
+    },
+  };
+
+  // ── 세계 도시들의 건설밀도 [12장 p.265, 그림 12-17] ─────────
+  window.BUILT = [
+    ['베를린', 36], ['뉴욕', 40], ['자카르타', 51], ['런던', 62],
+    ['파리', 85], ['바르셀로나', 160], ['모스크바', 169], ['상하이', 303],
+  ];
 </script>
 
 <style>
@@ -62,6 +197,12 @@
   .tbl-farm th:first-child, .tbl-farm td:first-child { width: 40%; }
   .tbl-farm th:not(:first-child), .tbl-farm td:not(:first-child) { text-align: right; }
   .epigraph .who { display: block; margin-top: 4px; color: var(--muted); font-size: var(--fs-caption); }
+  .tbl-office { width: 100%; table-layout: fixed; }
+  .tbl-office th:first-child, .tbl-office td:first-child { width: 28%; }
+  .tbl-office th:not(:first-child), .tbl-office td:not(:first-child) { text-align: right; }
+  .tbl-dens { width: 100%; table-layout: fixed; }
+  .tbl-dens th, .tbl-dens td { text-align: right; }
+  .tbl-dens th:first-child, .tbl-dens td:first-child { text-align: left; }
 </style>
 </head>
 <body>
@@ -73,6 +214,36 @@
   <p class="cover-label" data-course-label>&nbsp;</p>
   <h1>6주차. 도시토지이용과 분포</h1>
   <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 1-2. 지난 시간 — 5강 요약 (design.md §5) ═════════════ -->
+<section>
+  <h2>지난 시간 — 도시노동시장</h2>
+  <div class="body tight">
+    <div class="cols" style="align-items:flex-start">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">노동시장의 두 곡선</p>
+        <p>도시노동<strong>공급</strong>곡선은 우상향함 — 임금이 오르면 다른 도시에서 노동자가 들어옴</p>
+        <p style="margin-bottom:8px">도시노동<strong>수요</strong>곡선은 우하향함 — 수출기업의 고용이 임금에 반응함</p>
+        <p class="sub t-red" style="margin-bottom:2px">고용승수</p>
+        <p>수출부문 일자리 하나가 지역서비스 일자리를 더 불러 총 고용이 처음보다 크게 늘어남</p>
+        <p class="caption">승수는 큰 도시에서 더 큼</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">비교정학</p>
+        <p>노동<strong>수요</strong>가 늘면 임금과 고용이 함께 오르지만,
+          새 일자리의 상당 부분은 <strong>이주해 온 사람</strong>에게 감</p>
+        <p style="margin-bottom:8px">노동<strong>공급</strong>이 늘면 고용은 늘고 임금은 내림</p>
+        <p class="sub t-red" style="margin-bottom:2px">공공정책</p>
+        <p>세금 유인책·스포츠 경기장·초대형 이벤트의 고용효과는
+          <strong>대체로 기대보다 작음</strong></p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:18px">→ 지난 시간까지는 노동자와 기업이 <strong>얼마나</strong> 모이는지를 봤음.
+      오늘은 그들이 <strong>어디에</strong> 자리 잡는지, 즉 토지시장으로 옮겨 감<br>
+      <strong>10장</strong> 농업·제조업 토지 · <strong>11장</strong> 사무공간과 건물높이 ·
+      <strong>12장</strong> 주택과 주거용 토지</p>
+  </div>
 </section>
 
 <!-- ══ 2. 발문 (p.195) ══════════════════════════════════════ -->
@@ -496,7 +667,1398 @@
   </div>
 </section>
 
-<!-- ══ 17. Q & A ════════════════════════════════════════════ -->
+
+<!-- ══ 18. 섹션 — CHAPTER 11 ════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 11 사무공간과 높은 건물</p>
+  <p class="section-sub">10장이 제조업이 낸 지대였다면 이 장은 사무기업이 낸 값이다 · 교재 p.214~234</p>
+</section>
+
+<!-- ══ 19. 발문 (p.214) ═════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="lead t-define">이제까지는 <span class="mark">농업과 제조업</span>이 토지에 얼마를 내는지를 봤음</p>
+      <p class="lead t-define" style="margin-bottom:16px">이 장에서는
+        <span class="mark">사무공간의 가격 · 건물의 높이 · 토지의 가격</span> 사이의 연계를 봄</p>
+    <p class="emph">사무공간의 가격은 <strong>다른 사무기업에 가까운 곳</strong>에서 높음</p>
+      <p class="emph">건물의 높이는 <strong>공간의 가격이 높은 곳</strong>에서 높음</p>
+      <p class="emph" style="margin-bottom:16px">상업용 토지의 가격은 <strong>그 둘이 모두 높은 곳</strong>에서 높음</p>
+    <p class="derive t-red">→ 사무공간의 가격은 <strong>위도·경도·고도</strong> 세 차원에서 각기 다름</p>
+  </div>
+</section>
+
+<!-- ══ 20. 섹션 — 01 사무공간의 가격 ════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 사무공간의 가격</p>
+  <p class="section-sub">사무기업은 왜 서로 가까이 있으려 하는가 · 교재 p.214~220</p>
+</section>
+
+<!-- ══ 21. 그림 11-1 정보교환 통행거리 (p.215~216) ══════════ -->
+<section class="s-split">
+  <h2>정보교환 통행거리</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">사무기업은 <strong>암묵적 정보</strong>를 다룸 — 서류나 웹페이지로 옮길 수 없어
+        <strong>대면접촉</strong>이 필요함</p>
+      <p class="emph" style="margin-bottom:12px">직선상 1블록 간격의 다섯 기업이 서로에게 통행함</p>
+      <p><strong>중위 기업 C</strong> — B·D 에 1블록, A·E 에 2블록, 합 <strong>6블록</strong></p>
+      <p><strong>중간 기업 B·D</strong> — 합 <strong>7블록</strong></p>
+      <p style="margin-bottom:12px"><strong>끝점 기업 A·E</strong> — 합 <strong>10블록</strong></p>
+      <p class="derive t-red">→ 총 통행거리는 <strong>중위입지</strong>에서 최소가 됨
+        (3강에서 본 중위입지의 원리)</p>
+      <p class="derive t-red">→ 중위입지에서 멀어지면 통행거리는
+        <strong>증가하는 비율로</strong> 증가함 (6 → 7 → 10)</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-info" viewBox="0 0 430 300" style="width:400px" role="img">
+        <title>다섯 기업의 정보교환 통행거리가 중위입지에서 6블록으로 최소가 되고 양끝에서 10블록으로 커지는 U자 그림</title></svg>
+      <script>
+        (function () {
+          const O = window.OFFICE, F = Fig.withBox({ x0: 62, y0: 214, x1: 386, y1: 34 });
+          const S = F.scale({ x: [-2.6, 2.6], y: [0, 12] });
+          const data = O.names.map((_, i) => [i - 2, O.travel(i)]);
+          const pts = S.curve(data);
+          const parts = [F.curve(pts)];
+          // 파선으로 그은 높이 — 교재가 인쇄한 10 · 7 · 6
+          [10, 7, 6].forEach((v) =>
+            parts.push(F.raw(`<path class="guide" d="M${F.BOX.x0 - 5},${S.y(v)} L${S.x(2.35)},${S.y(v)}"/>`),
+                       F.annot(F.BOX.x0 - 9, S.y(v) + 4, String(v), { anchor: 'end', size: 11 })));
+          // 점 — 골짜기(중위 기업)에는 교재에도 이름이 없다
+          [['a', -2], ['b', -1], [null, 0], ['d', 1], ['e', 2]].forEach(([nm, x]) => {
+            const P = S.p([x, O.travel(x + 2)]);
+            parts.push(F.dot(...P, nm ? { label: nm, lx: x < 0 ? -14 : 8, ly: -8 } : {}));
+            parts.push(F.raw(`<path class="guide" d="M${P[0]},${P[1]} L${P[0]},${F.BOX.y0}"/>`));
+          });
+          parts.push(F.annot(S.x(1.35), S.y(8.4), '통행거리', { size: 11 }));
+          [-2, -1, 0, 1, 2].forEach((x) =>
+            parts.push(F.annot(S.x(x), F.BOX.y0 + 16, String(Math.abs(x)), { anchor: 'middle', size: 11 })));
+          parts.push(F.annot(S.x(0), F.BOX.y0 + 32, '입지: 중심부로부터 블록수',
+                             { anchor: 'middle', size: 11 }));
+          // 아래 다섯 칸 띠 — A|B|C|D|E
+          const bt = F.BOX.y0 + 42, bh = 26, w = S.x(1) - S.x(0);
+          O.names.forEach((nm, i) => {
+            const x = S.x(i - 2) - w / 2;
+            parts.push(F.raw(`<rect x="${x}" y="${bt}" width="${w}" height="${bh}" ` +
+                             `fill="none" stroke="var(--rule)" stroke-width="1"/>`));
+            parts.push(F.annot(x + w / 2, bt + 18, nm, { anchor: 'middle', size: 12 }));
+          });
+          F.draw('#f-info', { axes: { y: '블록' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 22. 그림 11-2 지불용의 (p.216~218) ═══════════════════ -->
+<section>
+  <h2>사무공간에 대한 지불용의 = 총 수입 − 총 비용</h2>
+  <div class="body tight">
+    <p class="emph">총 수입은 입지에 따라 변하지 않는 반면 <strong>정보교환 통행비용</strong>은
+      중심부에서 멀수록 <strong>증가하는 비율로</strong> 늘어남</p>
+    <svg class="fig" id="f-wtp" viewBox="0 0 700 292" style="width:620px;margin:2px 0 0 112px" role="img">
+      <title>위 칸에서 총수입과 볼록한 총비용의 격차가, 아래 칸에서 오목하게 떨어지는 지불용의 곡선으로 옮겨지는 그림</title></svg>
+    <script>
+      (function () {
+        const O = window.OFFICE, F = Fig;
+        const parts = [];
+        const samp = (f, S, a, b, n = 40) => {
+          const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+          return S.curve(o);
+        };
+        // 위 칸 — 총 수입과 총 비용
+        const A = Fig.withBox({ x0: 60, y0: 132, x1: 330, y1: 32 });
+        const SA = A.scale({ x: [0, 7], y: [0, 120] });
+        parts.push(F.raw(`<path class="axis" d="M${A.BOX.x0},${A.BOX.y1 - 6} L${A.BOX.x0},${A.BOX.y0} L${A.BOX.x1 + 10},${A.BOX.y0}"/>`));
+        parts.push(F.annot(A.BOX.x0, A.BOX.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+        parts.push(F.line(SA.x(0), SA.y(O.TR), SA.x(6.6), SA.y(O.TR), { variant: 'demand' }));
+        parts.push(F.annot(SA.x(1.2), SA.y(O.TR) - 8, '총 수입', { size: 11, tone: 'blue' }));
+        parts.push(F.curve(samp((x) => O.tc(x), SA, 0, 6.6)));
+        parts.push(F.annot(SA.x(4.6), SA.y(O.tc(4.6)) + 15, '총 비용', { size: 11 }));
+        // 총수입과 총비용의 격차가 곧 지불용의다 — 교재처럼 양쪽화살표로 보인다
+        [1, 2, 4, 5, 6].forEach((x) => {
+          const yT = SA.y(O.TR), yC = SA.y(O.tc(x));
+          // 6블록에서는 총비용이 총수입에 거의 닿아 화살표가 검은 덩어리로 뭉친다.
+          // 격차가 보일 만한 곳에만 그린다.
+          if (O.TR - O.tc(x) > 20) {
+            parts.push(F.arrow(SA.x(x), yC, SA.x(x), yT + 7));
+            parts.push(F.arrow(SA.x(x), yT, SA.x(x), yC - 7));
+          }
+          parts.push(F.annot(SA.x(x), A.BOX.y0 + 15, String(x), { anchor: 'middle', size: 11 }));
+        });
+        // 교재는 이 이름표를 세로쓰기로 두지만, 회전한 글자는 검사기가 변환 전 좌표로
+        // 상자를 재어 캔버스를 벗어난 것으로 잡는다. 가로로 두고 화살표 옆에 붙인다.
+        parts.push(F.annot(SA.x(2.5), (SA.y(O.TR) + SA.y(O.tc(2.5))) / 2, '지불용의',
+                           { size: 10 }));
+        parts.push(F.annot(SA.x(3.4), A.BOX.y0 + 31, '입지: 중심부로부터 블록수',
+                           { anchor: 'middle', size: 11 }));
+        // 아래 칸 — 지불용의
+        const B = Fig.withBox({ x0: 420, y0: 132, x1: 660, y1: 32 });
+        const SB = B.scale({ x: [0, 7], y: [0, 90] });
+        parts.push(F.raw(`<path class="axis" d="M${B.BOX.x0},${B.BOX.y1 - 6} L${B.BOX.x0},${B.BOX.y0} L${B.BOX.x1 + 10},${B.BOX.y0}"/>`));
+        parts.push(F.annot(B.BOX.x0, B.BOX.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+        const wtp = samp((x) => O.wtp(x), SB, 0, 6.03);
+        parts.push(F.curve(wtp, { variant: 'supply' }));
+        parts.push(F.annot(SB.x(2.6), SB.y(O.wtp(2.6)) - 10, '공간에 대한 지불용의',
+                           { size: 11, tone: 'red' }));
+        // p(1) 과 p(2) 는 값이 가까워 눈금끼리 붙는다. 위아래로 조금씩 떼어 놓는다
+        [['a', 1, -5], ['b', 2, 5], ['c', 4, 0], ['d', 5, 0]].forEach(([nm, x, dy]) => {
+          const P = SB.p([x, O.wtp(x)]);
+          parts.push(F.raw(`<path class="guide" d="M${B.BOX.x0},${P[1]} L${P[0]},${P[1]} L${P[0]},${B.BOX.y0}"/>`));
+          parts.push(F.dot(...P, { label: nm, lx: 7, ly: -7 }));
+          parts.push(F.annot(B.BOX.x0 - 8, P[1] + 4 + dy, `p(${x})`, { anchor: 'end', size: 11 }));
+          parts.push(F.annot(P[0], B.BOX.y0 + 15, String(x), { anchor: 'middle', size: 11 }));
+        });
+        parts.push(F.annot(SB.x(6), B.BOX.y0 + 15, '6', { anchor: 'middle', size: 11 }));
+        parts.push(F.annot(SB.x(3.4), B.BOX.y0 + 31, '입지: 중심부로부터 블록수',
+                           { anchor: 'middle', size: 11 }));
+        F.draw('#f-wtp', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 지불용의 곡선은 <strong>음(−)의 기울기</strong>를 가지며
+      <strong>오목함</strong> — 멀어질수록 더 큰 폭으로 떨어짐</p>
+      <p class="derive t-red" style="margin-top:2px">→ 1블록에서 2블록으로 갈 때는 p(1)−p(2)만큼,
+      4블록에서 5블록으로 갈 때는 그보다 <strong>큰</strong> p(4)−p(5)만큼 줄어듦</p>
+  </div>
+</section>
+
+<!-- ══ 23. 그림 11-3 통근수단과 지불용의 (p.218~220) ════════ -->
+<section class="s-split">
+  <h2>노동접근성이 기울기를 바꾼다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">임금은 통근비용을 보상함 — 통근비용이 낮은 입지는
+        <strong>임금도 낮고</strong>, 따라서 공간에 더 낼 수 있음</p>
+      <p class="sub t-red" style="margin-bottom:2px">대중교통 통근자</p>
+      <p style="margin-bottom:10px">중심부로 갈수록 통행비용도 임금도 <strong>함께 내려감</strong> —
+        두 이유가 같은 방향이라 지불용의가 <strong>크게</strong> 오름</p>
+      <p class="sub t-red" style="margin-bottom:2px">자가용 통근자</p>
+      <p style="margin-bottom:12px">교외에 사는 노동자를 쓰므로 중심부로 갈수록 통행비용은 내려가나
+        <strong>임금은 올라감</strong> — 상반된 효과라 조금만 오름</p>
+      <p class="derive t-red">→ 중심부 대중교통에 대한 접근성은 지불용의 곡선을
+        <strong>가파르게</strong> 만듦</p>
+      <p class="derive t-red">→ 교외 노동력의 고용은 곡선을 <strong>완만하게</strong> 만듦</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-mode" viewBox="0 0 430 290" style="width:396px" role="img">
+        <title>대중교통 통근자의 가파른 지불용의 곡선과 자가용 통근자의 완만한 곡선이 점 a에서 교차하는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 64, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 10], y: [0, 100] });
+          // 두 곡선은 x′=5 에서 p′=55 로 만난다. 기울기만 다르게 준다.
+          const xa = 5, pa = 55;
+          const transit = (x) => pa + 9.5 * (xa - x) + 0.55 * (xa - x) * Math.abs(xa - x);
+          const car     = (x) => pa + 3.6 * (xa - x);
+          const samp = (f, a, b, n = 40) => {
+            const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const tp = samp(transit, 1.6, 8.6), cp = samp(car, 1.6, 8.6);
+          const parts = [
+            F.curve(tp), F.curve(cp, { variant: 'demand' }),
+            F.annot(S.x(2.0), S.y(transit(2.0)) - 10, '지불용의: 대중교통 통근자', { size: 11 }),
+            F.annot(S.x(6.0), S.y(car(6.0)) - 10, '지불용의: 자가용 통근자', { size: 11, tone: 'blue' }),
+            F.guide(...S.p([xa, pa]), { xtick: 'x′', ytick: 'p′' }),
+            F.dot(...S.p([xa, pa]), { label: 'a', lx: 9, ly: -8 }),
+          ];
+          // x″(중심 쪽) 과 x‴(바깥쪽)
+          [[2.6, 'x″'], [7.6, 'x‴']].forEach(([x, tick]) => {
+            parts.push(F.guide(S.x(x), S.y(transit(x)), { xtick: tick, only: 'x' }));
+          });
+          parts.push(F.dot(...S.p([2.6, transit(2.6)]), { label: 'd', lx: 8, ly: -8 }));
+          parts.push(F.dot(...S.p([2.6, car(2.6)]), { label: 'b', lx: 8, ly: 16 }));
+          parts.push(F.dot(...S.p([7.6, car(7.6)]), { label: 'f', lx: 8, ly: -8 }));
+          parts.push(F.dot(...S.p([7.6, transit(7.6)])));
+          F.draw('#f-mode', { axes: { x: '중심부로부터 블록수', y: '$' }, parts });
+        })();
+      </script>
+      <p class="caption" style="margin-top:2px;text-align:center">교재 그림 11−3. 오른쪽 아래 점은
+        원본에 점 d 와 같은 이름이 인쇄돼 있어 이름을 비워 두었다</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 24. 사무 부도심들 (p.220) ════════════════════════════ -->
+<section>
+  <h2>사무 부도심들 <span class="en">(suburban subcenters)</span></h2>
+  <div class="body stack">
+    <p class="emph">근대 도시에서 사무기업 고용은 <strong>도시 중심부 · 교외 부도심 · 그 밖의 작은 군집지</strong>로 나뉨</p>
+      <p class="emph" style="margin-bottom:24px">군집지마다 지불용의는 <strong>그 군집지의 중심에서 정점</strong>에 도달함</p>
+    <p class="lead t-define" style="margin-bottom:24px">부도심의 기업들도 도시 중심부의 기업들과 정보를 교환한다면,
+      지불용의는 <span class="mark">도시 중심부까지의 거리가 멀어질수록 함께 감소</span>함</p>
+    <p class="derive t-red">→ 경쟁적인 환경에서 <strong>사무공간의 가격은 기업들의 지불용의와 일치</strong>함</p>
+  </div>
+</section>
+
+<!-- ══ 25. 섹션 — 02 건물높이와 토지 가격들 ═════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 건물높이와 토지 가격들</p>
+  <p class="section-sub">이슈를 수직성으로 옮긴다 · 교재 p.220~228</p>
+</section>
+
+<!-- ══ 26. 그림 11-4 층과 가격 (p.221~222) ══════════════════ -->
+<section class="s-split">
+  <h2>층이 올라가면 값이 오르는가</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px">같은 부지에서도 층마다 가격이 다름. 맞서는 두 힘이 있음</p>
+      <p class="sub t-red" style="margin-bottom:2px">건물 내 통행비용</p>
+      <p style="margin-bottom:10px">층이 올라갈수록 다른 기업을 만나러 가는 시간이 늘어
+        지불용의를 <strong>끌어내림</strong></p>
+      <p class="sub t-red" style="margin-bottom:2px">고도에 따른 근무환경</p>
+      <p style="margin-bottom:12px">조망과 위상이 나아져 <strong>임금이 낮아지고</strong>
+        생산비용이 줄어 지불용의를 <strong>밀어올림</strong></p>
+      <p class="derive t-red">→ <strong>계단</strong> 건물은 통행비용이 빠르게 늘어
+        근무환경 효과가 이를 이기지 못함 — 곡선이 계속 내려감</p>
+      <p class="derive t-red">→ <strong>승강기</strong> 건물은 처음 서너 층을 넘으면 통행비용이 천천히 늘어
+        h′ 층 위부터는 곡선이 올라감</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-floor" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>승강기 건물의 사무공간 가격은 h′층에서 최저를 지나 다시 오르고 계단 건물은 계속 떨어지는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 64, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 30], y: [0, 100] });
+          // 두 곡선은 1층에서 같은 값으로 출발한다 (교재 p.222).
+          // 두 곡선은 1층에서 같은 값으로 출발하되 곧바로 갈라진다.
+          // 계단 곡선이 h′ 부근에서 승강기 곡선에 붙으면 h′ 가 "교차점"으로 읽힌다.
+          const p0 = 84;
+          const lift  = (h) => p0 - 3.6 * h + 0.13 * h * h;      // 최저 h′ = 13.85
+          const stair = (h) => p0 - 44 * (1 - Math.exp(-h / 6));
+          const samp = (f, a, b, n = 40) => {
+            const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const hp = 3.6 / (2 * 0.13);
+          F.draw('#f-floor', {
+            axes: { x: '건물높이', y: '$' },
+            parts: [
+              F.curve(samp(lift, 0, 28)),
+              F.annot(S.x(26.5), S.y(lift(26.5)) - 10, '사무공간의 가격: 승강기', { anchor: 'end', size: 11 }),
+              F.curve(samp(stair, 0, 28), { variant: 'demand' }),
+              F.annot(S.x(9.5), S.y(stair(9.5)) - 10, '사무공간의 가격: 계단', { size: 11, tone: 'blue' }),
+              F.guide(...S.p([hp, lift(hp)]), { xtick: 'h′', only: 'x' }),
+              F.dot(...S.p([hp, lift(hp)])),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 27. 그림 11-5 이윤-극대화 건물높이 (p.222~223) ═══════ -->
+<section class="s-split">
+  <h2>이윤-극대화 건물높이</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">건설기업은 구조물을 짓고 공간을 사무기업들에게 <strong>임대</strong>함.
+        핵심 결정은 <strong>몇 층으로 지을 것인가</strong></p>
+      <p style="margin-bottom:10px"><strong>한계편익</strong> — 한 층을 더 지어 거둘 수 있는 추가 수입.
+        곧 그 층 사무공간의 가격</p>
+      <p style="margin-bottom:12px"><strong>한계비용</strong> — 한 층을 더 짓는 추가 건축비.
+        높을수록 하중을 받치는 보강이 더 필요해 <strong>증가하는 비율로</strong> 늘어남</p>
+      <p class="derive t-red">→ 한계편익 = 한계비용인 <strong>h*</strong> 층에서 이윤이 극대화됨</p>
+      <p class="derive t-red">→ h* 보다 낮으면 한 층 더 짓는 것이 이득이고,
+        h* 보다 높으면 한 층 덜 짓는 것이 이득임</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-height" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>한계비용곡선과 한계편익곡선이 점 a에서 만나 이윤극대화 건물높이 h*를 정하는 그림</title></svg>
+      <script>
+        (function () {
+          const T = window.TOWER, F = Fig.withBox({ x0: 64, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 90], y: [0, 7] });
+          const samp = (f, a, b, n = 40) => {
+            const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          F.draw('#f-height', {
+            axes: { x: '건물높이(층)', y: '$' },
+            parts: [
+              F.curve(samp((h) => T.mc(h), 0, 86)),
+              F.annot(S.x(70), S.y(T.mc(70)) - 10, '한계비용', { size: 11 }),
+              F.curve(samp((h) => T.mb(h), 0, 86), { variant: 'demand' }),
+              F.annot(S.x(72), S.y(T.mb(72)) + 17, '한계편익', { size: 11, tone: 'blue' }),
+              F.guide(...S.p([T.hStar, T.mc(T.hStar)]), { xtick: 'h*', only: 'x' }),
+              F.dot(...S.p([T.hStar, T.mc(T.hStar)]), { label: 'a', lx: 9, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 28. 그림 11-6 토지에 대한 지불용의 (p.224~225) ═══════ -->
+<section class="s-split">
+  <h2>토지에 대한 지불용의</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">건설기업이 토지에 낼 수 있는 최대는
+        그 토지에서 얻는 <strong>경제적 이윤</strong>과 같음</p>
+      <p>h′ 층 하나가 낳는 이윤은 <strong>mb′ − mc′</strong> — 한계편익(점 b)과 한계비용(점 c)의 격차</p>
+      <p style="margin-bottom:12px">h* 층까지 층마다의 격차를 모두 더하면 두 곡선 사이의 <strong>음영 면적</strong>이 됨</p>
+      <p class="derive t-red">→ 건설기업들 간 경쟁이 토지의 가격을 이 면적까지 밀어올림</p>
+      <p class="derive t-red">→ <strong>10장에서 본 잉여의 원칙</strong>이 사무기업용 토지에서도 그대로 성립함 —
+        경제적 이윤은 지주에게 감</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-landbid" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>한계편익곡선과 한계비용곡선 사이 h*까지의 음영 면적이 토지에 대한 지불용의가 되는 그림</title></svg>
+      <script>
+        (function () {
+          const T = window.TOWER, F = Fig.withBox({ x0: 64, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 90], y: [0, 7] });
+          const samp = (f, a, b, n = 40) => {
+            const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const hp = 26;
+          // 음영 — 위(한계편익)에서 아래(한계비용)로 닫는다
+          const up = samp((h) => T.mb(h), 0, T.hStar), dn = samp((h) => T.mc(h), 0, T.hStar);
+          const poly = up.concat(dn.slice().reverse());
+          F.draw('#f-landbid', {
+            axes: { x: '건물높이(층)', y: '$' },
+            parts: [
+              F.raw(`<path class="area-surplus" d="${Fig.path(poly)} Z"/>`),
+              F.curve(samp((h) => T.mc(h), 0, 86)),
+              F.annot(S.x(70), S.y(T.mc(70)) - 10, '한계비용', { size: 11 }),
+              F.curve(samp((h) => T.mb(h), 0, 86), { variant: 'demand' }),
+              F.annot(S.x(72), S.y(T.mb(72)) + 17, '한계편익', { size: 11, tone: 'blue' }),
+              F.guide(S.x(hp), S.y(T.mb(hp)), { ytick: 'mb′', only: 'y' }),
+              F.guide(S.x(hp), S.y(T.mc(hp)), { ytick: 'mc′', only: 'y' }),
+              F.guide(S.x(hp), S.y(T.mc(hp)), { xtick: 'h′', only: 'x' }),
+              F.dot(...S.p([hp, T.mb(hp)]), { label: 'b', lx: 8, ly: -8 }),
+              F.dot(...S.p([hp, T.mc(hp)]), { label: 'c', lx: 8, ly: 16 }),
+              F.guide(...S.p([T.hStar, T.mc(T.hStar)]), { xtick: 'h*', only: 'x' }),
+              F.dot(...S.p([T.hStar, T.mc(T.hStar)]), { label: 'a', lx: 9, ly: -8 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 29. 그림 11-7 접근성과 건물높이 (p.225) ══════════════ -->
+<section class="s-split">
+  <h2>접근성이 좋아지면 건물이 높아지고 땅값이 오른다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px">사무공간의 <strong>기준 가격</strong>(1층 공간의 가격)은
+        그 입지의 접근성을 반영함</p>
+      <p>중심부로 가까이 가면 기준 가격이 높아지고, 그만큼 <strong>한계편익곡선이 위로</strong> 올라감</p>
+      <p style="margin-bottom:12px">한계의 원리는 더 높은 곳에서 충족됨: <strong>h** &gt; h*</strong></p>
+      <p class="derive t-red">→ 두 곡선 사이의 음영이 넓어짐 —
+        접근성이 좋은 부지의 <strong>경제적 이윤이 더 큼</strong></p>
+      <p class="derive t-red">→ <strong>높은 건물과 높은 토지가격은 함께 감</strong></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-access" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>한계편익곡선이 위로 이동해 균형 건물높이가 h*에서 h**로 올라가고 음영 면적이 넓어지는 그림</title></svg>
+      <script>
+        (function () {
+          const T = window.TOWER, F = Fig.withBox({ x0: 64, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 90], y: [0, 7] });
+          const dp = 0.5, h2 = T.hUp(dp);
+          const samp = (f, a, b, n = 40) => {
+            const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          const up = samp((h) => T.mb(h) + dp, 0, h2), dn = samp((h) => T.mc(h), 0, h2);
+          F.draw('#f-access', {
+            axes: { x: '건물높이(층)', y: '$' },
+            parts: [
+              F.raw(`<path class="area-surplus" d="${Fig.path(up.concat(dn.slice().reverse()))} Z"/>`),
+              F.curve(samp((h) => T.mc(h), 0, 86)),
+              F.annot(S.x(80), S.y(T.mc(80)) - 11, '한계비용', { anchor: 'end', size: 11 }),
+              F.curve(samp((h) => T.mb(h) + dp, 0, 86), { variant: 'demand' }),
+              F.annot(S.x(9), S.y(T.mb(9) + dp) - 11, '한계편익: 보다 높은 공간 가격',
+                      { size: 11, tone: 'blue' }),
+              F.guide(S.x(T.hStar), F.BOX.y0, { xtick: 'h*', only: 'x' }),
+              F.guide(...S.p([h2, T.mc(h2)]), { xtick: 'h**' }),
+              F.dot(...S.p([h2, T.mc(h2)]), { label: 'b', lx: -18, ly: -9 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 30. 그림 11-8 등량곡선 (p.226~227) ═══════════════════ -->
+<section class="s-split">
+  <h2>생산요소 대체 — 같은 공간을 짓는 두 방법</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">고정된 양의 사무공간을 짓는 <strong>토지와 자본의 조합</strong>은 여럿임</p>
+      <p><strong>점 s</strong> — 큰 토지(L′) 위의 낮은 건물(k′)</p>
+      <p><strong>점 m</strong> — 중간 높이 건물</p>
+      <p style="margin-bottom:10px"><strong>점 t</strong> — 작은 토지 위의 높은 건물.
+        자본이 점 s 의 <strong>대략 3배</strong> 필요함 (k‴ ≈ 3k′)</p>
+      <p class="sub t-red" style="margin-bottom:2px">왜 자본이 더 드는가</p>
+      <p><strong>아코디언 문제</strong> — 위층이 아래층을 찌그러뜨림. 보강이 필요함</p>
+      <p><strong>현수 하강 문제</strong> — 층 사이를 오갈 수 없음. 승강기와 계단이 필요함</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-isoq" viewBox="0 0 430 292" style="width:390px" role="img">
+        <title>같은 양의 사무공간을 생산하는 토지와 자본의 조합을 보여주는 등량곡선 위의 점 t·m·s</title></svg>
+      <script>
+        (function () {
+          const Z = window.ISOQ, F = Fig.withBox({ x0: 68, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 80], y: [0, 80] });
+          const iso = S.curve(Fig.hyper(Z.K, 16, 78, { through: Z.pt.map((P) => P.L) }));
+          const parts = [F.curve(iso),
+                         F.annot(S.x(38), S.y(Z.cap(38)) - 11, '등량곡선', { anchor: 'middle', size: 11 })];
+          Z.pt.forEach((P) => {
+            parts.push(F.guide(...S.p([P.L, P.k]), { xtick: '', ytick: '' }));
+            parts.push(F.dot(...S.p([P.L, P.k]), { label: P.tag, lx: 9, ly: -8 }));
+          });
+          [['k‴', 60], ['k″', 40], ['k′', 20]].forEach(([t, v]) =>
+            parts.push(F.annot(F.BOX.x0 - 9, S.y(v) + 4, t, { anchor: 'end', size: 11 })));
+          [['L‴', 20], ['L″', 30], ['L′', 60]].forEach(([t, v]) =>
+            parts.push(F.annot(S.x(v), F.BOX.y0 + 17, t, { anchor: 'middle', size: 11 })));
+          F.draw('#f-isoq', { axes: { x: '부지규모', y: '자본' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 31. 그림 11-9 생산요소 대체 (p.227~228) ══════════════ -->
+<section class="s-split">
+  <h2>토지가 비싸면 위로 짓는다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">비용-최소화 생산요소 묶음에서는
+        <strong>한계기술대체율 = 생산요소 가격비율</strong>이 성립함</p>
+      <p class="formula-key" style="margin-bottom:12px">$MRTS = R / p_k$</p>
+      <p class="caption" style="margin-bottom:12px">R 은 토지의 가격, $p_k$ 는 자본의 가격.
+        등량곡선의 기울기가 등비용선의 기울기와 같아지는 자리다</p>
+      <p><strong>점 s</strong> — 먼 입지. 등비용선이 평평해 낮은 자본/토지 비율에서 접함</p>
+      <p><strong>점 t</strong> — 접근성이 큰 입지. 등비용선이 가팔라 높은 자본/토지 비율에서 접함</p>
+      <p class="derive t-red" style="margin-top:10px">→ 토지가격이 높을수록
+        <strong>수직 건축의 편익이 비용을 넘어섬</strong></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-subst" viewBox="0 0 430 292" style="width:390px" role="img">
+        <title>기울기가 다른 등비용선 세 개가 하나의 등량곡선에 각각 점 t·m·s에서 접하는 그림</title></svg>
+      <p class="caption" style="margin-top:2px;text-align:center">등비용선 셋은 각각 s·m·t 에서 등량곡선에 접한다 —
+        토지가 비쌀수록 등비용선이 가파르다</p>
+      <script>
+        (function () {
+          const Z = window.ISOQ, F = Fig.withBox({ x0: 68, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 80], y: [0, 80] });
+          const iso = S.curve(Fig.hyper(Z.K, 16, 78, { through: Z.pt.map((P) => P.L) }));
+          const parts = [F.curve(iso),
+                         F.annot(S.x(41), S.y(Z.cap(41)) - 11, '등량곡선', { anchor: 'middle', size: 11 })];
+          // 등비용선 — 접점에서의 기울기 −k/L 로 그린다 (교재 p.227)
+          const tone = ['cap', 'i1', 'demand'];
+          Z.pt.forEach((P, i) => {
+            const m = Z.slope(P);            // = R / p_k
+            // 도면 안에 머물도록 자른다. 자르지 않으면 접선이 위로 빠져나가
+            // 접점에서 접한다는 사실이 그림에서 확인되지 않는다.
+            const xl = Math.max(2, P.L - (74 - P.k) / m);
+            const xr = Math.min(78, P.L + P.k / m);
+            const y = (x) => P.k - m * (x - P.L);
+            parts.push(F.line(S.x(xl), S.y(y(xl)), S.x(xr), S.y(y(xr)), { variant: tone[i] }));
+            parts.push(F.guide(...S.p([P.L, P.k]), { xtick: '', ytick: '' }));
+            parts.push(F.dot(...S.p([P.L, P.k]), { label: P.tag, lx: 9, ly: -9 }));
+          });
+          [['k‴', 60], ['k″', 40], ['k′', 20]].forEach(([t, v]) =>
+            parts.push(F.annot(F.BOX.x0 - 9, S.y(v) + 4, t, { anchor: 'end', size: 11 })));
+          [['L‴', 20], ['L″', 30], ['L′', 60]].forEach(([t, v]) =>
+            parts.push(F.annot(S.x(v), F.BOX.y0 + 17, t, { anchor: 'middle', size: 11 })));
+          F.draw('#f-subst', { axes: { x: '부지규모', y: '자본' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 32. 섹션 — 03 고층 건물 게임 ═════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 고층 건물 게임</p>
+  <p class="section-sub">토지의 높은 가격이 고층 건물을 다 설명하는가 · 교재 p.228~232</p>
+</section>
+
+<!-- ══ 33. 그림 11-10 가장 높은 건물이 되기 위한 경쟁 (p.229) ═ -->
+<section>
+  <h2>가장 높은 건물이 되기 위한 경쟁</h2>
+  <div class="body tight">
+    <p class="emph">개별 기업은 가장 높은 건물을 갖는 데 <strong>V = 20백만달러</strong>의 가치를 둠 —
+      무료 기업홍보, 혹은 투자자에게 보내는 신호</p>
+      <p class="emph" style="margin-bottom:2px">단 하나의 기업만 가질 수 있으므로 기업들은
+      <strong>20백만달러의 상금을 건 비협조적 게임</strong>에 참여하고 있음</p>
+    <svg class="fig" id="f-game" viewBox="0 0 700 300" style="width:600px;margin:2px 0 0 118px" role="img">
+      <title>위 칸의 한계편익·한계비용 교차점에서 50층과 이윤 90백만달러가, 아래 칸의 이윤곡선에서 80층의 70백만달러와 상금 20백만달러가 나오는 그림</title></svg>
+    <script>
+      (function () {
+        const T = window.TOWER, F = Fig;
+        const parts = [];
+        const samp = (f, S, a, b, n = 48) => {
+          const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+          return S.curve(o);
+        };
+        // 위 칸 — 한계편익 · 한계비용
+        const A = Fig.withBox({ x0: 60, y0: 136, x1: 320, y1: 34 });
+        const SA = A.scale({ x: [0, 95], y: [0, 7] });
+        parts.push(F.raw(`<path class="axis" d="M${A.BOX.x0},${A.BOX.y1 - 6} L${A.BOX.x0},${A.BOX.y0} L${A.BOX.x1 + 10},${A.BOX.y0}"/>`));
+        parts.push(F.annot(A.BOX.x0, A.BOX.y1 - 11, '백만달러', { anchor: 'middle', size: 11 }));
+        const up = samp((h) => T.mb(h), SA, 0, T.hStar), dn = samp((h) => T.mc(h), SA, 0, T.hStar);
+        parts.push(F.raw(`<path class="area-surplus" d="${F.path(up.concat(dn.slice().reverse()))} Z"/>`));
+        parts.push(F.labelIn(up.concat(dn.slice().reverse()), '90', { size: 12 }));
+        parts.push(F.curve(samp((h) => T.mc(h), SA, 0, 92)));
+        parts.push(F.annot(SA.x(74), SA.y(T.mc(74)) - 9, '한계비용', { size: 11 }));
+        parts.push(F.curve(samp((h) => T.mb(h), SA, 0, 92), { variant: 'demand' }));
+        parts.push(F.annot(SA.x(76), SA.y(T.mb(76)) + 16, '한계편익', { size: 11, tone: 'blue' }));
+        [T.hStar, T.hTall].forEach((h) =>
+          parts.push(F.raw(`<path class="guide" d="M${SA.x(h)},${SA.y(T.mc(h))} L${SA.x(h)},${A.BOX.y0}"/>`),
+                     F.annot(SA.x(h), A.BOX.y0 + 15, String(h), { anchor: 'middle', size: 11 })));
+        parts.push(F.dot(...SA.p([T.hStar, T.mc(T.hStar)]), { label: 'a', lx: 8, ly: -8 }));
+        parts.push(F.annot(SA.x(47), A.BOX.y0 + 31, '층', { anchor: 'middle', size: 11 }));
+        // 아래 칸 — 이윤곡선
+        const B = Fig.withBox({ x0: 420, y0: 136, x1: 660, y1: 34 });
+        const SB = B.scale({ x: [0, 95], y: [0, 105] });
+        parts.push(F.raw(`<path class="axis" d="M${B.BOX.x0},${B.BOX.y1 - 6} L${B.BOX.x0},${B.BOX.y0} L${B.BOX.x1 + 10},${B.BOX.y0}"/>`));
+        parts.push(F.annot(B.BOX.x0, B.BOX.y1 - 11, '백만달러', { anchor: 'middle', size: 11 }));
+        parts.push(F.curve(samp((h) => T.profit(h), SB, 0, 92), { variant: 'supply' }));
+        parts.push(F.annot(SB.x(62), SB.y(T.profit(62)) - 11, '이윤', { size: 11, tone: 'red' }));
+        [[T.hStar, 'b'], [T.hTall, 'c']].forEach(([h, nm]) => {
+          const v = Math.round(T.profit(h));
+          parts.push(F.raw(`<path class="guide" d="M${B.BOX.x0},${SB.y(v)} L${SB.x(h)},${SB.y(v)} L${SB.x(h)},${B.BOX.y0}"/>`));
+          parts.push(F.annot(B.BOX.x0 - 8, SB.y(v) + 4, String(v), { anchor: 'end', size: 11 }));
+          parts.push(F.annot(SB.x(h), B.BOX.y0 + 15, String(h), { anchor: 'middle', size: 11 }));
+          parts.push(F.dot(...SB.p([h, v]), { label: nm, lx: 8, ly: -8 }));
+        });
+        // 상금 = 90 − 70
+        const xArrow = B.BOX.x0 - 30;
+        parts.push(F.arrow(xArrow, SB.y(70), xArrow, SB.y(90)));
+        parts.push(F.arrow(xArrow, SB.y(90), xArrow, SB.y(70)));
+        parts.push(F.annot(xArrow - 6, (SB.y(70) + SB.y(90)) / 2 + 4, '상금 = $20',
+                           { anchor: 'end', size: 11 }));
+        parts.push(F.annot(SB.x(47), B.BOX.y0 + 31, '층', { anchor: 'middle', size: 11 }));
+        F.draw('#f-game', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 상금이 없다면 h* = 50층에서 이윤 90백만달러로 끝남.
+      80층으로 지으면 이윤은 70백만달러로 떨어짐</p>
+  </div>
+</section>
+
+<!-- ══ 34. 연속게임의 결과 (p.229~231) ══════════════════════ -->
+<section>
+  <h2>기업 1 이 먼저 짓고 기업 2 가 보고 짓는다</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">기업 1 은 자기 높이에 대한 기업 2 의 반응을 미리 따져 봐야 함</p>
+    <table class="tbl-office">
+      <thead><tr><th>기업 1 의 선택</th><th>기업 2 의 반응</th><th>왜 그런가</th></tr></thead>
+      <tbody>
+        <tr><td>h₁ = h* = 50</td><td>h₂ = 51 — 상금을 탐</td>
+          <td>51층에서 겪는 손실이 20백만달러 상금보다 작음</td></tr>
+        <tr><td>h₁ = 51</td><td>h₂ = 52 — 상금을 탐</td>
+          <td>상금이 51·52층에서 겪는 손실을 능가함</td></tr>
+        <tr><td>h₁ = 80</td><td>h₂ = 50 — <strong>승복함</strong></td>
+          <td>81층의 이윤은 70백만달러 바로 밑. 20백만달러를 타려고
+            20백만달러가 조금 넘는 금액을 희생하는 것은 비합리적임</td></tr>
+      </tbody>
+    </table>
+    <p class="derive t-red" style="margin-top:14px">→ 내쉬균형은 <strong>(h₁, h₂) = (80, 50)</strong>.
+      기업 1 은 건물이윤 70 + 상금 20 = <strong>90백만달러</strong>,
+      기업 2 도 건물이윤 <strong>90백만달러</strong></p>
+      <p class="derive t-red" style="margin-top:2px">→ 상금이 클수록 지나치게 높게 짓는 양이 커져
+      <strong>가장 높은 건물과 두 번째 건물의 격차가 벌어짐</strong>.
+      미국 20대 도시에서 그 격차는 평균 <strong>약 27%</strong>임</p>
+  </div>
+</section>
+
+<!-- ══ 35. 내쉬균형 대 파레토 효율성 (p.231~232) ════════════ -->
+<section>
+  <h2>내쉬균형은 파레토 비효율적이다</h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:6px">내쉬균형 (80, 50)에서 두 기업은 각각 90백만달러를 범</p>
+    <p class="lead t-define" style="margin-bottom:20px">기업 1 이 80층에서 <span class="mark">51층으로 낮추면</span>
+      건물이윤이 90백만달러 바로 아래가 되어 상금과 합해 <span class="mark">109백만달러</span>가 됨.
+      기업 2 는 그대로 90백만달러임</p>
+    <p class="emph" style="margin-bottom:20px">아무도 나빠지지 않고 기업 1 만 19백만달러 나아지므로
+      이것은 <strong>파레토 개선</strong>임</p>
+    <p class="derive t-red">→ 가장 높은 건물이 되기 위한 경쟁은 균형 높이를
+      <strong>효율적인 높이 이상으로</strong> 끌어올림</p>
+      <p class="derive t-red">→ 효율적인 결과는 50층 두 채에 건물이윤 180백만달러.
+      내쉬균형에서 시장의 총 가치도 180백만달러(90 + 70 + 20)로,
+      <strong>상금만큼 잉여가 줄어듦</strong></p>
+  </div>
+</section>
+
+<!-- ══ 36. 섹션 — 04 사무업의 공간적 분포 ═══════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">04 사무업의 공간적 분포</p>
+  <p class="section-sub">모형이 예측한 것이 실제로 보이는가 · 교재 p.232~234</p>
+</section>
+
+<!-- ══ 37. 그림 11-11 보스턴 금융·보험 고용밀도 (p.233) ═════ -->
+<section class="s-split">
+  <h2>금융과 보험업 고용의 밀도, 보스턴, 2014</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px">인구조사표준지역을 <strong>고용밀도만큼 밀어 올린</strong> 지도.
+        밀도는 1헥타르당 금융·보험 노동자수임</p>
+      <p class="derive t-red">→ 밀도는 <strong>중심상업지역에서 가장 높음</strong></p>
+      <p class="derive t-red">→ 중심지로부터 멀어질수록 <strong>빠르게 감소함</strong></p>
+      <p class="caption" style="margin-top:14px">앞에서 본 지불용의 곡선이 중심부에서 정점을 갖는다는
+        모형의 예측과 맞는다</p>
+    </div>
+    <div class="col-r">
+      <img src="../assets/tb-boston-finance-density.jpg"
+           alt="보스턴 대도시지역의 인구조사표준지역을 퍼즐조각으로 놓고 금융·보험업 고용밀도만큼 기둥을 세운 3차원 지도. 중심부에 가장 높은 기둥이 솟아 있다"
+           style="display:block;height:236px;width:auto;margin:0 auto">
+      <p class="caption" style="margin-top:4px;text-align:center">오설리반, 『오설리반의 도시경제학』 제9판,
+        박영사, 2022, 그림 11−11 (p.233)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 38. 표 11-1 사무공간의 분포 (p.233~234) ══════════════ -->
+<section>
+  <h2>사무공간은 시내에만 있지 않다</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:6px">13개 대도시지역의 사무공간을 밀도로 세 유형으로 나눈 것</p>
+    <table class="tbl-office">
+      <thead><tr><th>대도시지역</th><th>높은 밀도(시내)</th><th>중간 밀도(부중심)</th><th>낮은 밀도(산재)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>13개 평균</strong></td><td><strong>0.33</strong></td><td><strong>0.28</strong></td><td><strong>0.40</strong></td></tr>
+        <tr><td>뉴욕</td><td>0.55</td><td>0.13</td><td>0.32</td></tr>
+        <tr><td>시카고</td><td>0.49</td><td>0.11</td><td>0.39</td></tr>
+        <tr><td>보스턴</td><td>0.39</td><td>0.11</td><td>0.50</td></tr>
+        <tr><td>워싱턴, DC</td><td>0.23</td><td>0.53</td><td>0.24</td></tr>
+        <tr><td>애틀란타</td><td>0.07</td><td>0.55</td><td>0.38</td></tr>
+        <tr><td>마이애미</td><td>0.09</td><td>0.19</td><td>0.72</td></tr>
+      </tbody>
+    </table>
+    <p class="caption" style="margin-top:4px">높은 밀도 = 평방마일당 7.5백만 평방피트 이상 ·
+      중간 밀도 = 2백만~3.5백만 · 낮은 밀도 = 2백만 미만.
+      출처: Lang, Robert E., “Office Sprawl,” The Brookings Institution, 2000 (교재 표 11−1, p.233)</p>
+    <p class="derive t-red" style="margin-top:8px">→ 대도시지역 전체로 <strong>약 1/3</strong>만 높은-밀도 시내에 있고
+      <strong>2/5</strong>는 낮은-밀도 지역에 있음</p>
+      <p class="derive t-red" style="margin-top:2px">→ 시내 비중이 큰 곳은 뉴욕·시카고·보스턴,
+      작은 곳은 애틀란타·마이애미·로스앤젤레스임</p>
+  </div>
+</section>
+
+<!-- ══ 39. 섹션 — CHAPTER 12 ════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 12 주택가격과 주거용 토지 이용</p>
+  <p class="section-sub">11장까지는 기업이 공간에 내는 값이었다. 이제 가구가 내는 값이다 · 교재 p.242~265</p>
+</section>
+
+<!-- ══ 40. 발문 · 헤도닉 등식 (p.242) ═══════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="epigraph emph" style="margin-bottom:34px">
+      “냉소가(cynic)가 무엇인가? 모든 것의 가격을 알면서도 그 어느 것의 가치를 모르는 사람”
+      <span class="who">— 오스카 월드</span></p>
+    <p class="lead t-define" style="margin-bottom:14px">헤도닉접근법에서 주택은
+      <span class="mark">특성들의 묶음</span>이고, 시장가치는 그 특성들의 가치의 합임</p>
+    <p class="formula-key" style="margin-bottom:14px">
+      $V = p_B B + p_J J + p_S S + p_A A + p_C C$</p>
+    <p class="caption">B 침실의 수 · J 일자리 군집지까지의 거리 · S 지역 학교의 평균 시험성적 ·
+      A 공기의 질 · C 인근의 범죄율. $p_i$ 는 특성 i 의 암묵적 가격</p>
+    <p class="derive t-red" style="margin-top:14px">→ 가격은 바람직한 특성(침실·시험성적·공기의 질)에 대해
+      <strong>양수</strong>, 바람직하지 않은 특성(일자리까지의 거리·범죄율)에 대해 <strong>음수</strong>임</p>
+  </div>
+</section>
+
+<!-- ══ 41. 섹션 — 01 일자리 접근성 ══════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 일자리 접근성</p>
+  <p class="section-sub">일자리까지의 거리에 따라 주택의 가격은 어떻게 변하는가 · 교재 p.242~253</p>
+</section>
+
+<!-- ══ 42. 그림 12-1 통근비용과 효용극대화 (p.243~244) ══════ -->
+<section class="s-split">
+  <h2>통근비용과 효용을 극대화하는 주택소비</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">모든 고용이 중심상업지구에 있는 단순한 도시.
+        가구는 고정된 소득 <strong>w</strong> 를 주택·통근·여타 재화에 씀</p>
+      <p class="formula-key" style="margin-bottom:10px">$\text{수직축 절편} = w - t\,x$</p>
+      <p style="margin-bottom:12px">w = 2,000달러, t = 킬로미터당 50달러, x = 10킬로미터라면
+        절편은 <strong>1,500달러</strong>임</p>
+      <p class="derive t-red">→ 효용은 <strong>한계대체율 = 가격비율</strong>인 점 a 에서 극대화됨</p>
+      <p class="derive t-red">→ 점 z 도 예산선 위에 있어 살 수는 있으나 낮은 무차별곡선 위에 있음
+        (u* &gt; u′)</p>
+      <p class="derive t-red">→ 점 z 에서는 한계대체율이 가격비율보다 작아
+        <strong>주택을 줄이고 여타 재화를 늘리는 것</strong>이 합리적임</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-util" viewBox="0 0 430 292" style="width:392px" role="img">
+        <title>예산선이 무차별곡선 u*와 점 a에서 접하고, 예산선 위의 점 z는 더 낮은 무차별곡선 u′ 위에 있는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CHOICE, F = Fig.withBox({ x0: 100, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 280], y: [0, 2150] });
+          const I = C.I(10), p = 6;
+          const hS = C.h(I, p), gS = C.g(I, p), U = C.U(hS, gS);
+          // z 를 접점 가까이 두면 예산선·u*·u′ 가 한자리에 몰려 z 가 어느 곡선 위인지 보이지 않는다
+          const hZ = 215, gZ = I - p * hZ, Uz = C.U(hZ, gZ);
+          F.draw('#f-util', {
+            axes: { x: '주택', y: '여타의 재화 $' },
+            parts: [
+              F.line(S.x(0), S.y(I), S.x(I / p), S.y(0), { variant: 'demand' }),
+              F.curve(S.curve(C.ic(U, 46, 268))),
+              F.annot(S.x(60), S.y(C.ic(U, 60, 60)[0][1]) - 10, 'u*', { size: 12 }),
+              F.curve(S.curve(C.ic(Uz, 60, 268)), { variant: 'cap' }),
+              F.annot(S.x(74), S.y(C.ic(Uz, 74, 74)[0][1]) - 10, 'u′', { size: 12 }),
+              F.guide(...S.p([hS, gS]), { xtick: 'h*', ytick: 'g*' }),
+              F.dot(...S.p([hS, gS]), { label: 'a', lx: 9, ly: -9 }),
+              F.dot(...S.p([hZ, gZ]), { label: 'z', lx: 9, ly: 15 }),
+              // w 와 w − t·x 사이의 통근비용
+              F.raw(`<path class="guide" d="M${F.BOX.x0 - 30},${S.y(C.w)} L${S.x(6)},${S.y(C.w)}"/>`),
+              F.annot(F.BOX.x0 - 34, S.y(C.w) + 4, 'w', { anchor: 'end', size: 11 }),
+              F.annot(F.BOX.x0 - 34, S.y(I) + 4, 'w − t·x', { anchor: 'end', size: 11 }),
+              F.arrow(F.BOX.x0 - 24, S.y(I), F.BOX.x0 - 24, S.y(C.w)),
+              F.arrow(F.BOX.x0 - 24, S.y(C.w), F.BOX.x0 - 24, S.y(I)),
+              F.annot(F.BOX.x0 - 30, (S.y(I) + S.y(C.w)) / 2 + 4, '통근비용',
+                      { anchor: 'end', size: 11 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 43. 그림 12-2 감당할 수 있는 가격의 증가 (p.244~245) ══ -->
+<section class="s-split">
+  <h2>가까워지면 얼마를 더 낼 수 있나</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">x = 10 에서 x = 6 으로 4킬로미터 가까이 가면
+        통근비용이 줄어듦</p>
+      <p class="formula-key" style="margin-bottom:10px">
+        $\Delta\text{통근비용} = \Delta x \cdot t = 4 \times 50 = \$200$</p>
+      <p style="margin-bottom:12px">주거 입지에서 <strong>내쉬균형</strong>이 되려면 이 200달러가
+        다른 변화로 상쇄되어야 함. 그 변화가 <strong>주택가격의 증가</strong>임</p>
+      <p class="derive t-red">→ 가격이 2달러 오르면(p′ = 8) 예산이 정확히 상쇄되어
+        원래 묶음 <strong>점 a(h* = 100)</strong>를 여전히 살 수 있음</p>
+      <p class="derive t-red">→ 통근비용 200달러 감소 = 주택가격 2달러 증가 × 100평방미터</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-afford" viewBox="0 0 430 292" style="width:392px" role="img">
+        <title>통근비용이 200달러 줄어 예산선이 위로 올라가고 주택가격이 2달러 올라 안쪽으로 기울어 원래의 점 a를 지나는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CHOICE, F = Fig.withBox({ x0: 78, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 280], y: [0, 2150] });
+          const I1 = C.I(10), I2 = C.I(6), p1 = 6, p2 = 8;
+          const hS = C.h(I1, p1), gS = C.g(I1, p1), U = C.U(hS, gS);
+          F.draw('#f-afford', {
+            axes: { x: '주택', y: '여타의 재화 $' },
+            parts: [
+              F.line(S.x(0), S.y(I1), S.x(I1 / p1), S.y(0), { variant: 'demand' }),
+              F.annot(S.x(I1 / p1) - 6, S.y(0) - 10, 'p*', { anchor: 'end', size: 11, tone: 'blue' }),
+              F.line(S.x(0), S.y(I2), S.x(I2 / p2), S.y(0), { variant: 'supply' }),
+              F.annot(S.x(30), S.y(I2 - p2 * 30) - 9, 'p′ & △cc', { size: 11, tone: 'red' }),
+              F.curve(S.curve(C.ic(U, 46, 268))),
+              F.annot(S.x(58), S.y(C.ic(U, 58, 58)[0][1]) - 10, 'u*', { size: 12 }),
+              F.guide(...S.p([hS, gS]), { xtick: 'h* = 100', only: 'x' }),
+              F.dot(...S.p([hS, gS]), { label: 'a', lx: 9, ly: -9 }),
+              F.annot(S.x(196), S.y(1880), 'p′ > p*', { size: 12 }),
+              F.annot(F.BOX.x0 - 46, S.y(I1) + 4, '', { anchor: 'end', size: 11 }),
+              F.arrow(F.BOX.x0 - 24, S.y(I1), F.BOX.x0 - 24, S.y(I2)),
+              F.arrow(F.BOX.x0 - 24, S.y(I2), F.BOX.x0 - 24, S.y(I1)),
+              F.annot(F.BOX.x0 - 30, (S.y(I1) + S.y(I2)) / 2 + 4, '△통근비용\n= $200',
+                      { anchor: 'end', size: 11, lh: 14 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 44. 그림 12-3 내쉬균형을 위한 가격 (p.246) ═══════════ -->
+<section class="s-split">
+  <h2>내쉬균형을 위해서는 2달러로 모자란다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">p′ = 8 이면 점 a 를 여전히 살 수는 있으나,
+        그 예산선에서 합리적 선택은 <strong>점 b</strong> — 주택을 줄이는 것임</p>
+      <p style="margin-bottom:10px">점 b 의 효용 u″ 는 원래보다 <strong>높음</strong>.
+        그러면 x = 10 의 거주자가 x = 6 으로 옮길 유인이 남아 내쉬균형이 아님</p>
+      <p style="margin-bottom:12px">가격이 <strong>p**(&gt; p′)</strong> 까지 더 올라가야
+        예산선이 안쪽으로 기울어 원래 효용 u* 가 회복됨. 그 자리가 <strong>점 c</strong> 임</p>
+      <p class="derive t-red">→ 고정된 효용에서 가격이 오르면 주택소비는 줄어듦:
+        <strong>h** &lt; h*</strong></p>
+      <p class="derive t-red">→ 접근성에 대한 <strong>웃돈</strong>은 통근비용 차이를 상쇄하는 몫보다 큼</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-nash" viewBox="0 0 430 292" style="width:392px" role="img">
+        <title>예산선이 p*에서 p′을 거쳐 p**로 기울어지며 소비점이 a에서 b를 거쳐 c로 옮겨가고 주택소비가 줄어드는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CHOICE, F = Fig.withBox({ x0: 78, y0: 228, x1: 392, y1: 34 });
+          // 점 a·b·c 는 h 43~100 · g 900~1310 에 모인다. 축을 그 언저리로 좁힌다.
+          const S = F.scale({ x: [0, 200], y: [0, 1800] });
+          const XR = 200;
+          const I1 = C.I(10), I2 = C.I(6), p1 = 6, p2 = 8;
+          const hS = C.h(I1, p1), gS = C.g(I1, p1), U = C.U(hS, gS);
+          const hB = C.h(I2, p2), gB = C.g(I2, p2), Ub = C.U(hB, gB);
+          const p3 = C.pBack(U, I2), hC = C.h(I2, p3), gC = C.g(I2, p3);
+          F.draw('#f-nash', {
+            axes: { x: '주택', y: '여타의 재화 $' },
+            parts: [
+              F.line(S.x(0), S.y(I1), S.x(XR), S.y(I1 - p1 * XR), { variant: 'demand' }),
+              F.annot(S.x(XR) - 4, S.y(I1 - p1 * XR) - 9, 'p*',
+                      { anchor: 'end', size: 11, tone: 'blue' }),
+              F.line(S.x(0), S.y(I2), S.x(XR), S.y(I2 - p2 * XR), { variant: 'supply' }),
+              F.annot(S.x(30), S.y(I2 - p2 * 30) - 10, 'p′ & △cc', { size: 11, tone: 'red' }),
+              F.line(S.x(0), S.y(I2), S.x(I2 / p3), S.y(0), { dash: '6 4' }),
+              F.annot(S.x(152), S.y(I2 - p3 * 152) + 16, 'p** & △cc',
+                      { anchor: 'end', size: 11 }),
+              F.curve(S.curve(C.ic(U, 34, 198))),
+              F.annot(S.x(178), S.y(C.ic(U, 178, 178)[0][1]) - 11, 'u*',
+                      { anchor: 'middle', size: 12 }),
+              F.curve(S.curve(C.ic(Ub, 38, 198)), { variant: 'cap' }),
+              F.annot(S.x(142), S.y(C.ic(Ub, 142, 142)[0][1]) - 11, 'u″',
+                      { anchor: 'middle', size: 12 }),
+              F.guide(S.x(hC), S.y(gC), { xtick: 'h**', only: 'x' }),
+              F.guide(S.x(hS), S.y(gS), { xtick: 'h* = 100', only: 'x' }),
+              F.dot(...S.p([hC, gC]), { label: 'c', lx: -15, ly: -8 }),
+              F.dot(...S.p([hB, gB]), { label: 'b', lx: 13, ly: 19 }),
+              F.dot(...S.p([hS, gS]), { label: 'a', lx: 9, ly: -9 }),
+              F.annot(S.x(196), S.y(1700), 'p** > p′ > p*', { anchor: 'end', size: 12 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 45. 그림 12-4 · 12-5 볼록한 주택-가격곡선 (p.247~248) ═ -->
+<section>
+  <h2>주택-가격곡선은 직선이 아니라 볼록하다</h2>
+  <div class="body tight">
+    <p class="emph">안으로 이동하면 가격은 두 번 오름 — <strong>통근비용이 줄어서</strong> 한 번,
+      <strong>소비자 대체</strong>로 한 번 더</p>
+    <svg class="fig" id="f-hp" viewBox="0 0 700 272" style="width:620px;margin:4px 0 0 112px" role="img">
+      <title>안으로 이동하면 6달러에서 8달러를 거쳐 9달러로, 밖으로 이동하면 6달러에서 4달러를 거쳐 5달러로 움직여 주택가격곡선이 볼록해지는 그림</title></svg>
+    <script>
+      (function () {
+        const H = window.HOUSE, F = Fig;
+        const parts = [];
+        const mk = (box, xs, marks, note, labelX) => {
+          const B = Fig.withBox(box);
+          const S = B.scale({ x: [0, 18], y: [0, 11] });
+          const samp = (f, a, b, n = 40) => {
+            const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); }
+            return S.curve(o);
+          };
+          parts.push(F.raw(`<path class="axis" d="M${B.BOX.x0},${B.BOX.y1 - 6} L${B.BOX.x0},${B.BOX.y0} L${B.BOX.x1 + 10},${B.BOX.y0}"/>`));
+          parts.push(F.annot(B.BOX.x0, B.BOX.y1 - 11, '$', { anchor: 'middle', size: 11 }));
+          parts.push(F.curve(samp((x) => H.p(x), xs[0], xs[1])));
+          parts.push(F.annot(S.x(labelX), S.y(H.p(labelX)) - 11, '주택가격',
+                             { anchor: 'middle', size: 11 }));
+          parts.push(F.line(S.x(xs[0]), S.y(H.line(xs[0])), S.x(xs[1]), S.y(H.line(xs[1])),
+                            { variant: 'cap' }));
+          // 한 세로선 위에 점이 둘 놓이므로 이름표 자리를 점마다 지정한다.
+          // 기본 오프셋(ly −8)을 쓰면 아래 점의 이름이 위 점 옆에 인쇄된다.
+          marks.forEach(([nm, x, v, lx, ly]) => {
+            parts.push(F.raw(`<path class="guide" d="M${B.BOX.x0},${S.y(v)} L${S.x(x)},${S.y(v)} L${S.x(x)},${B.BOX.y0}"/>`));
+            parts.push(F.annot(B.BOX.x0 - 8, S.y(v) + 4, String(v), { anchor: 'end', size: 11 }));
+            parts.push(F.annot(S.x(x), B.BOX.y0 + 15, String(x), { anchor: 'middle', size: 11 }));
+            parts.push(F.dot(S.x(x), S.y(v), { label: nm, lx, ly }));
+          });
+          parts.push(F.annot(S.x(9), B.BOX.y0 + 31, '통근거리', { anchor: 'middle', size: 11 }));
+          parts.push(F.annot(S.x(9), B.BOX.y1 - 12, note, { anchor: 'middle', size: 12 }));
+          return S;
+        };
+        // 왼쪽 — 안으로의 이동 (그림 12-4)
+        const SA = mk({ x0: 60, y0: 190, x1: 320, y1: 46 }, [5, 15],
+                      [['d', 6, 9, -16, -5], ['c', 6, 8, 10, 6], ['a', 10, 6, 10, -8]],
+                      '안으로의 이동', 13.7);
+        parts.push(F.arrow(SA.x(6) - 40, SA.y(8), SA.x(6) - 40, SA.y(9), { tone: 'red' }));
+        parts.push(F.annot(SA.x(6) - 40, SA.y(9) - 7, '소비자 대체',
+                           { anchor: 'middle', size: 10, tone: 'red' }));
+        parts.push(F.arrow(SA.x(6) - 40, SA.y(6), SA.x(6) - 40, SA.y(8)));
+        parts.push(F.annot(SA.x(6) - 40, SA.y(6) + 15, '△통근비용',
+                           { anchor: 'middle', size: 10 }));
+        // 오른쪽 — 밖으로의 이동 (그림 12-5)
+        const SB = mk({ x0: 420, y0: 190, x1: 660, y1: 46 }, [5, 15],
+                      [['a', 10, 6, -16, -5], ['f', 14, 5, 10, -9], ['e', 14, 4, -17, 14]],
+                      '밖으로의 이동', 7.4);
+        // 두 화살표는 4~5 구간이 겹친다. 세로줄을 나누고 이름표는 화살표의 위·아래에 둔다.
+        parts.push(F.arrow(SB.x(14) + 34, SB.y(4), SB.x(14) + 34, SB.y(5), { tone: 'red' }));
+        parts.push(F.annot(SB.x(14) + 30, SB.y(5) - 7, '소비자 대체', { size: 10, tone: 'red' }));
+        parts.push(F.arrow(SB.x(14) + 16, SB.y(6), SB.x(14) + 16, SB.y(4)));
+        parts.push(F.annot(SB.x(14) + 12, SB.y(4) + 15, '△통근비용', { size: 10 }));
+        F.draw('#f-hp', { parts });
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:2px">→ 접근성이 <strong>늘면 가격이 3달러 오르는데</strong>
+      (6 → 9) 접근성이 <strong>줄면 1달러만 내려감</strong> (6 → 5)</p>
+      <p class="derive t-red" style="margin-top:2px">→ 회색 직선은 통근비용 변화만 반영한 것.
+      곡선과의 차이가 <strong>소비자 대체</strong>가 만든 웃돈임</p>
+  </div>
+</section>
+
+<!-- ══ 46. 주택-가격곡선의 기울기 (p.249~250) ═══════════════ -->
+<section>
+  <h2>주택-가격곡선의 기울기</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:10px">균형 주택-가격곡선은 거주자가 <strong>모든 입지에 무차별</strong>하게 만듦.
+      이동이 낳는 두 변화가 합해서 영(0)이 되어야 함</p>
+    <p class="formula-key" style="margin-bottom:10px">$\Delta p \cdot h(x) + \Delta x \cdot t = 0$</p>
+    <p class="formula-key" style="margin-bottom:14px">$\dfrac{\Delta p}{\Delta x} = -\dfrac{t}{h(x)}$</p>
+    <p class="emph" style="margin-bottom:4px">접근성이 늘면(x 감소) 가격이 올라 <strong>주택소비 h(x)가 줄어듦</strong>.
+      분모가 작아지므로 기울기의 절대값이 커짐</p>
+    <p class="derive t-red" style="margin-bottom:14px">→ 주택-가격곡선은 <strong>도시중심지에 가까울수록 가파르고</strong>,
+      멀어질수록 평평해짐. 그래서 볼록함</p>
+    <p class="emph" style="margin-bottom:6px">통근의 <strong>시간비용</strong> T 를 넣으면</p>
+    <p class="formula-key" style="margin-bottom:10px">$\dfrac{\Delta p}{\Delta x} = -\dfrac{t+T}{h(x)}$</p>
+    <p class="caption">T 는 통행시간의 기회비용·중심지로의 통행빈도·통행속도가 정함.
+      T 가 커지면 곡선이 더 가팔라진다</p>
+  </div>
+</section>
+
+<!-- ══ 47. 일자리 접근성 지수 (p.250~251) ═══════════════════ -->
+<section class="s-split">
+  <h2>일자리가 흩어져 있으면 접근성을 어떻게 재는가</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">이제까지는 모든 노동자가 <strong>중심상업지구로 통근한다</strong>고 가정했음.
+        현대 대도시지역에서 일자리는 넓게 퍼져 있음</p>
+      <p style="margin-bottom:8px">통근속도는 시간당 20km 이고 통근시간은 근무시간을 희생시킨다고 가정함</p>
+      <p class="formula-key" style="margin-bottom:10px">
+        $J^{*} = J \cdot \dfrac{8 - (i \to j\ \text{통근시간})}{8}$</p>
+      <p style="margin-bottom:10px">J = 800 개이고 통근이 1시간이면 J* = 700,
+        2시간이면 J* = 600. 거주지 i 의 총 접근성은 이들의 <strong>합</strong>임 (1,300)</p>
+      <p class="derive t-red">→ 지수는 <strong>도시중심지 인근에서 가장 높고</strong>
+        멀어질수록 감소함</p>
+    </div>
+    <div class="col-r">
+      <img src="../assets/tb-boston-employment-density.jpg"
+           alt="보스턴 대도시지역의 인구조사표준지역을 퍼즐조각으로 놓고 고용밀도만큼 기둥을 세운 3차원 지도. 도시중심지 부근에 검은 기둥이 솟아 있다"
+           style="display:block;height:150px;width:auto;margin:0 auto">
+      <p class="caption" style="margin-top:2px;text-align:center">그림 12−6 고용밀도, 2014년의 보스턴</p>
+      <img src="../assets/tb-boston-metro-access.jpg"
+           alt="경도와 위도를 바닥으로 하고 접근가능한 일자리 수를 높이로 한 3차원 표면. 도시중심지에서 봉우리가 솟아 있고 회색 원기둥이 중심지를 표시한다"
+           style="display:block;height:152px;width:auto;margin:6px auto 0">
+      <p class="caption" style="margin-top:2px;text-align:center">그림 12−7 2014년 보스턴에서의 대도시 접근성 ·
+        오설리반, 『오설리반의 도시경제학』 제9판, 박영사, 2022 (p.250, p.252)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 48. 그림 12-8 지역 일자리 접근성 (p.252~253) ═════════ -->
+<section class="s-split">
+  <h2>집수지역으로 좁혀 재어도 결론은 같다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">앞의 대도시 접근성 지수는 <strong>대도시지역 전체</strong>의
+        일자리를 셈</p>
+      <p style="margin-bottom:12px">거주지마다 <strong>10km 집수지역</strong>(catchment area)을 정하고
+        그 안의 일자리만 세는 방법도 있음</p>
+      <p class="derive t-red">→ 두 방법 모두 지수가 <strong>도시중심지 인근에서 가장 높고</strong>
+        중심지로의 거리가 늘수록 감소함</p>
+      <p class="derive t-red">→ 일자리가 중심상업지구에만 있지는 않지만
+        <strong>도시중심지까지의 거리는 여전히 쓸 만한 측정기준</strong>임</p>
+      <p class="derive t-red">→ 헤도닉 연구들은 중심지까지의 거리가 늘수록 주택가격이 낮아짐을 보이며,
+        일자리 접근성이 그 음(−)의 관계에서 중요한 몫을 함</p>
+    </div>
+    <div class="col-r">
+      <img src="../assets/tb-boston-local-access.jpg"
+           alt="그림 12-7과 같은 형식의 3차원 표면. 10km 집수지역 안의 일자리로 계산한 지역 접근성이 도시중심지에서 봉우리를 이룬다"
+           style="display:block;height:238px;width:auto;margin:0 auto">
+      <p class="caption" style="margin-top:4px;text-align:center">오설리반, 『오설리반의 도시경제학』 제9판,
+        박영사, 2022, 그림 12−8 (p.253)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 49. 섹션 — 02 범죄, 환경의 질, 학교들 ════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 범죄, 환경의 질, 학교들</p>
+  <p class="section-sub">일자리 말고 주택가격을 움직이는 것들 · 교재 p.254~258</p>
+</section>
+
+<!-- ══ 50. 그림 12-9 범죄비용과 효용극대화 (p.254~255) ══════ -->
+<section class="s-split">
+  <h2>범죄비용과 효용극대화</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">밤도둑으로부터의 재산손실이 L, 희생될 확률이 r 이면
+        기대비용은 그 곱임</p>
+      <p class="formula-key" style="margin-bottom:10px">
+        $r \cdot L = 0.005 \times \$8{,}000 = \$40$</p>
+      <p style="margin-bottom:12px">가처분소득은 시장소득에서 이 기대비용을 뺀 것 —
+        <strong>예산선의 수직절편이 40달러만큼 내려감</strong></p>
+      <p class="derive t-red">→ 주택가격 p* 가 주어지면 효용은 주택소비 h* 를 갖는
+        <strong>점 a</strong> 에서 극대화됨</p>
+      <p class="derive t-red">→ 일자리 접근성 모형과 같은 그림임 —
+        <strong>통근비용 자리에 기대범죄비용</strong>을 넣은 것뿐</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-crime" viewBox="0 0 430 292" style="width:392px" role="img">
+        <title>시장소득에서 기대범죄비용 40달러를 뺀 자리에서 시작하는 예산선이 무차별곡선과 점 a에서 접하는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CHOICE, R = window.RISK;
+          const F = Fig.withBox({ x0: 116, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 62], y: [0, 470] });
+          const I = R.net(), p = R.p0;
+          const hS = C.h(I, p), gS = C.g(I, p), U = C.U(hS, gS);
+          F.draw('#f-crime', {
+            axes: { x: '주택', y: '여타의 재화 $' },
+            parts: [
+              F.line(S.x(0), S.y(I), S.x(I / p), S.y(0), { variant: 'demand' }),
+              F.annot(S.x(36), S.y(I - p * 36) + 16, '높은-범죄와 p*',
+                      { anchor: 'end', size: 11, tone: 'blue' }),
+              F.curve(S.curve(C.ic(U, 9, 58))),
+              F.annot(S.x(52), S.y(C.ic(U, 52, 52)[0][1]) - 11, 'u*', { anchor: 'middle', size: 12 }),
+              F.guide(...S.p([hS, gS]), { xtick: 'h*', only: 'x' }),
+              F.dot(...S.p([hS, gS]), { label: 'a', lx: 9, ly: -9 }),
+              F.raw(`<path class="guide" d="M${F.BOX.x0 - 8},${S.y(R.w)} L${S.x(1.4)},${S.y(R.w)}"/>`),
+              F.annot(F.BOX.x0 - 8, S.y(R.w) + 4, 'w', { anchor: 'end', size: 11 }),
+              F.arrow(F.BOX.x0 - 32, S.y(I), F.BOX.x0 - 32, S.y(R.w)),
+              F.arrow(F.BOX.x0 - 32, S.y(R.w), F.BOX.x0 - 32, S.y(I)),
+              F.annot(F.BOX.x0 - 40, (S.y(I) + S.y(R.w)) / 2 + 4, '△범죄비용\n= $40',
+                      { anchor: 'end', size: 11, lh: 14 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 51. 그림 12-10 범죄와 주택가격 (p.255~256) ═══════════ -->
+<section class="s-split">
+  <h2>범죄가 낮으면 주택가격이 높다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">같은 가구가 높은-범죄 지역에서 <strong>범죄가 없는 지역</strong>으로
+        옮긴다고 하자. 희생될 확률이 영(0)이라 절편이 w 로 올라감</p>
+      <p style="margin-bottom:12px">내쉬균형이 되려면 <strong>주택가격이 올라</strong> 예산선이 다시 안쪽으로 기울어
+        원래 효용 u* 를 회복해야 함</p>
+      <p class="derive t-red">→ 효용은 <strong>점 d</strong> 에서 극대화됨 —
+        원래 효용 u*, 더 높은 주택가격 p**, 더 낮은 주택소비 h**</p>
+      <p class="derive t-red">→ <strong>범죄의 감소가 주택가격을 증가시킴</strong>.
+        아무도 일방적으로 옮길 유인을 갖지 않는 자리다</p>
+      <p class="derive t-red">→ 낮은-범죄 이웃의 거주자는 대체효과 때문에
+        <strong>주택을 더 적게 소비함</strong> (h** &lt; h*)</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-crime2" viewBox="0 0 430 292" style="width:392px" role="img">
+        <title>범죄비용이 사라져 예산선이 위로 올라가고 주택가격이 올라 안쪽으로 기울어 같은 무차별곡선 위의 점 d에서 접하는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CHOICE, R = window.RISK;
+          const F = Fig.withBox({ x0: 116, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 62], y: [0, 470] });
+          const I1 = R.net(), I2 = R.w, p1 = R.p0;
+          const hS = C.h(I1, p1), gS = C.g(I1, p1), U = C.U(hS, gS);
+          const p2 = C.pBack(U, I2), hD = C.h(I2, p2), gD = C.g(I2, p2);
+          F.draw('#f-crime2', {
+            axes: { x: '주택', y: '여타의 재화 $' },
+            parts: [
+              F.line(S.x(0), S.y(I1), S.x(I1 / p1), S.y(0), { variant: 'demand' }),
+              F.annot(S.x(36), S.y(I1 - p1 * 36) + 16, '높은-범죄와 p*',
+                      { anchor: 'end', size: 11, tone: 'blue' }),
+              F.line(S.x(0), S.y(I2), S.x(I2 / p2), S.y(0), { variant: 'supply' }),
+              F.annot(S.x(9), S.y(I2 - p2 * 9) - 9, '영(0)의 범죄와 p**', { size: 11, tone: 'red' }),
+              F.curve(S.curve(C.ic(U, 9, 58))),
+              F.annot(S.x(52), S.y(C.ic(U, 52, 52)[0][1]) - 11, 'u*', { anchor: 'middle', size: 12 }),
+              F.guide(S.x(hD), S.y(gD), { xtick: 'h**', only: 'x' }),
+              F.guide(S.x(hS), S.y(gS), { xtick: 'h*', only: 'x' }),
+              F.dot(...S.p([hD, gD]), { label: 'd', lx: -15, ly: -8 }),
+              F.dot(...S.p([hS, gS]), { label: 'a', lx: 9, ly: -9 }),
+              F.annot(S.x(44), S.y(430), 'p** > p*', { size: 12 }),
+              F.annot(F.BOX.x0 - 8, S.y(I2) + 4, 'w', { anchor: 'end', size: 11 }),
+              F.arrow(F.BOX.x0 - 32, S.y(I1), F.BOX.x0 - 32, S.y(I2)),
+              F.arrow(F.BOX.x0 - 32, S.y(I2), F.BOX.x0 - 32, S.y(I1)),
+              F.annot(F.BOX.x0 - 40, (S.y(I1) + S.y(I2)) / 2 + 4, '△범죄비용',
+                      { anchor: 'end', size: 11 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 52. 그림 12-11 대기의 질 · 학교 (p.256~258) ═══════════ -->
+<section class="s-split">
+  <h2>대기의 질과 학교도 같은 논리다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:2px">대기의 질</p>
+      <p>심하게 오염된 지역에서 덜 오염된 지역으로 옮기면 <strong>건강보호비용이 줄어</strong>
+        예산선이 위로 올라감</p>
+      <p style="margin-bottom:10px">원래 효용 u* 를 회복하려면 주택가격이 올라야 함 —
+        덜 오염된 지역은 <strong>p** &gt; p*</strong> 와 <strong>h** &lt; h*</strong> 를 가짐</p>
+      <p class="sub t-red" style="margin-bottom:2px">학교 생산성</p>
+      <p>학교의 "산출물"은 한 학년 동안 학생이 얻는 <strong>부가가치</strong>로 잴 수 있음.
+        시험점수의 증가가 한 측정임</p>
+      <p style="margin-bottom:10px">더 정교한 측정은 그 학교에 1년 다녀 생기는
+        <strong>생애소득의 변화</strong>임</p>
+      <p class="derive t-red">→ 한 학교의 생산성이 오르면 학령기 아동이 있는 가구가 옮겨 오려 하고,
+        내쉬균형을 회복하려 <strong>주택가격이 오름</strong></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-air" viewBox="0 0 430 292" style="width:392px" role="img">
+        <title>건강비용이 줄어 예산선이 올라가고 주택가격이 올라 같은 무차별곡선 위의 점 d에서 접하는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CHOICE, R = window.RISK;
+          const F = Fig.withBox({ x0: 116, y0: 228, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 62], y: [0, 470] });
+          const I1 = R.net(), I2 = R.w, p1 = R.p0;
+          const hS = C.h(I1, p1), gS = C.g(I1, p1), U = C.U(hS, gS);
+          const p2 = C.pBack(U, I2), hD = C.h(I2, p2), gD = C.g(I2, p2);
+          F.draw('#f-air', {
+            axes: { x: '주택', y: '여타의 재화 $' },
+            parts: [
+              F.line(S.x(0), S.y(I1), S.x(I1 / p1), S.y(0), { variant: 'demand' }),
+              F.annot(S.x(38), S.y(I1 - p1 * 38) + 16, '낮은 대기의 질과 p*',
+                      { anchor: 'end', size: 11, tone: 'blue' }),
+              F.line(S.x(0), S.y(I2), S.x(I2 / p2), S.y(0), { variant: 'supply' }),
+              F.annot(S.x(9), S.y(I2 - p2 * 9) - 9, '높은 대기의 질과 p**', { size: 11, tone: 'red' }),
+              F.curve(S.curve(C.ic(U, 9, 58))),
+              F.annot(S.x(52), S.y(C.ic(U, 52, 52)[0][1]) - 11, 'u*', { anchor: 'middle', size: 12 }),
+              F.guide(S.x(hD), S.y(gD), { xtick: 'h**', only: 'x' }),
+              F.guide(S.x(hS), S.y(gS), { xtick: 'h*', only: 'x' }),
+              F.dot(...S.p([hD, gD]), { label: 'd', lx: -15, ly: -8 }),
+              F.dot(...S.p([hS, gS]), { label: 'a', lx: 9, ly: -9 }),
+              F.annot(S.x(44), S.y(430), 'p** > p*', { size: 12 }),
+              F.arrow(F.BOX.x0 - 32, S.y(I1), F.BOX.x0 - 32, S.y(I2)),
+              F.arrow(F.BOX.x0 - 32, S.y(I2), F.BOX.x0 - 32, S.y(I1)),
+              F.annot(F.BOX.x0 - 40, (S.y(I1) + S.y(I2)) / 2 + 4, '△건강비용',
+                      { anchor: 'end', size: 11 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 53. 섹션 — 03 주택생산과 주거용 토지의 가격 ══════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 주택생산과 주거용 토지의 가격</p>
+  <p class="section-sub">주택가격이 정해지면 땅값과 밀도는 따라온다 · 교재 p.258~262</p>
+</section>
+
+<!-- ══ 54. 그림 12-12 · 12-13 주택생산 (p.258~260) ══════════ -->
+<section class="s-split">
+  <h2>주택의 이윤-극대화 수량</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">1헥타르 부지에 주택을 짓는 기업. 작은 집 한 채를 지을 수도,
+        1헥타르를 덮는 <strong>30층 주거용 타워</strong>를 지을 수도 있음</p>
+      <p style="margin-bottom:8px">토지가 고정되어 있으므로 주택생산은 <strong>체감하는 보수</strong> 아래 있음 —
+        한계비용이 우상향함</p>
+      <p style="margin-bottom:12px">한계편익은 그 부지의 주택가격 <strong>p(x′)</strong> 이라 수평임.
+        일자리 접근성·환경의 질·범죄율·학교생산성이 이 높이를 정함</p>
+      <p class="derive t-red">→ 한계의 원리가 충족되는 <strong>H*</strong> 에서 이윤이 극대화됨</p>
+      <p class="derive t-red fragment">→ 두 곡선 사이의 <strong>음영 면적이 경제적 이윤</strong>이고,
+        건설회사들 간 경쟁이 이를 토지의 가격으로 바꿈 — <strong>잉여의 원칙</strong></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-hprod" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>수평의 한계편익곡선과 우상향하는 한계비용곡선이 점 a에서 만나 주택의 이윤극대화 수량 H*를 정하고 두 곡선 사이가 경제적 이윤이 되는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.HPROD, F = Fig.withBox({ x0: 66, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 420], y: [0, 11] });
+          const L = P.price[0], H = P.Hstar(L.p);
+          // 한계비용은 2차식이다. 양 끝점을 직선으로 이으면 체감하는 보수가 보이지 않는다.
+          const samp = (a, b, k = 40) => {
+            const o = []; for (let i = 0; i <= k; i++) { const x = a + ((b - a) * i) / k; o.push([x, P.mc(x)]); }
+            return S.curve(o);
+          };
+          const mcPts = samp(0, 420);
+          const poly = S.curve([[0, L.p], [H, L.p]]).concat(samp(H, 0));
+          F.draw('#f-hprod', {
+            axes: { x: '주택(평방미터)', y: '$' },
+            parts: [
+              F.raw(`<path class="area-surplus fragment" d="${Fig.path(poly)} Z"/>`),
+              F.curve(mcPts),
+              F.annot(S.x(340), S.y(P.mc(340)) - 11, '한계비용', { anchor: 'end', size: 11 }),
+              F.line(S.x(0), S.y(L.p), S.x(410), S.y(L.p), { variant: 'demand' }),
+              F.annot(S.x(90), S.y(L.p) - 10, '한계편익', { size: 11, tone: 'blue' }),
+              F.guide(...S.p([H, L.p]), { xtick: 'H*', ytick: L.tag }),
+              F.dot(...S.p([H, L.p]), { label: L.dot, lx: 9, ly: -9 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 55. 그림 12-14 · 12-15 높은 주택가격 (p.260~262) ═════ -->
+<section class="s-split">
+  <h2>주택가격이 높으면 밀도가 높아진다</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">새 부지의 가격이 더 높은 이유는 넷 중 하나임 —
+        <strong>일자리 접근성 · 낮은 범죄율 · 높은 환경의 질 · 나은 학교</strong></p>
+      <p style="margin-bottom:12px">한계편익곡선이 위로 올라가 한계의 원리가 더 큰 수량에서 충족됨:
+        <strong>H** &gt; H*</strong></p>
+      <p class="derive t-red">→ 단위 토지당 주택이 늘어남. 곧 <strong>주택밀도가 높아짐</strong></p>
+      <p class="derive t-red">→ 토지의 더 큰 비중이 구조물로 덮이고, <strong>건물이 더 높아짐</strong></p>
+      <p class="derive t-red fragment">→ 음영 면적이 넓어짐. 주택생산업체들 간 경쟁이 이를 토지 임대료로 바꾸므로
+        <strong>주거용 토지의 가격도 높아짐</strong> — 지주가 편익을 얻음</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-hprod2" viewBox="0 0 430 288" style="width:392px" role="img">
+        <title>한계편익곡선이 p(x′)에서 p(x″)로 올라가 주택의 이윤극대화 수량이 H*에서 H**로 늘고 음영 면적이 넓어지는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.HPROD, F = Fig.withBox({ x0: 66, y0: 224, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 420], y: [0, 11] });
+          const L0 = P.price[0], L1 = P.price[1];
+          const H0 = P.Hstar(L0.p), H1 = P.Hstar(L1.p);
+          const samp = (a, b, k = 40) => {
+            const o = []; for (let i = 0; i <= k; i++) { const x = a + ((b - a) * i) / k; o.push([x, P.mc(x)]); }
+            return S.curve(o);
+          };
+          const mcPts = samp(0, 420);
+          const poly = S.curve([[0, L1.p], [H1, L1.p]]).concat(samp(H1, 0));
+          F.draw('#f-hprod2', {
+            axes: { x: '주택(평방미터)', y: '$' },
+            parts: [
+              F.raw(`<path class="area-surplus fragment" d="${Fig.path(poly)} Z"/>`),
+              F.curve(mcPts),
+              F.annot(S.x(360), S.y(P.mc(360)) - 11, '한계비용', { anchor: 'end', size: 11 }),
+              F.line(S.x(0), S.y(L0.p), S.x(410), S.y(L0.p), { variant: 'cap' }),
+              F.annot(S.x(60), S.y(L0.p) + 15, '한계편익: 원래 가격', { size: 10 }),
+              F.line(S.x(0), S.y(L1.p), S.x(410), S.y(L1.p), { variant: 'demand' }),
+              F.annot(S.x(60), S.y(L1.p) - 10, '한계편익: 보다 높은 가격', { size: 11, tone: 'blue' }),
+              F.guide(S.x(H0), S.y(L0.p), { xtick: 'H*', ytick: L0.tag }),
+              F.guide(...S.p([H1, L1.p]), { xtick: 'H**', ytick: L1.tag }),
+              F.dot(...S.p([H1, L1.p]), { label: L1.dot, lx: 11, ly: 16 }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 56. 섹션 — 04 인구밀도 ═══════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">04 인구밀도</p>
+  <p class="section-sub">가격의 공간적 차이가 밀도의 차이로 나타난다 · 교재 p.262~265</p>
+</section>
+
+<!-- ══ 57. 표 12-1 인구밀도 (p.262~263) ═════════════════════ -->
+<section>
+  <h2>두 번의 대체가 밀도를 열 배로 벌린다</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:6px">낮은-가격 지역에서 높은-가격 지역으로 옮기면
+      <strong>두 가지 이유</strong>로 인구밀도가 오름</p>
+    <table class="tbl-dens">
+      <thead><tr><th>주택가격 · 토지가격</th><th>주택<br>(평방미터)</th><th>단위 주택면적당 토지</th>
+        <th>주거당 토지</th><th>헥타르당 가구</th></tr></thead>
+      <tbody>
+        <tr><td>낮은 · 낮은</td><td>250</td><td>2</td><td>500</td><td>20</td></tr>
+        <tr><td>높은 · 높은</td><td>200</td><td>0.25</td><td>50</td><td><strong>200</strong></td></tr>
+      </tbody>
+    </table>
+    <div class="cols" style="margin-top:12px">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:2px">1. 소비자 대체</p>
+        <p>가구가 <strong>더 적은 평방미터</strong>를 소비함 — 250에서 200으로</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">2. 생산요소 대체</p>
+        <p>생산업체가 토지를 아낌 — 주택 1평방미터당 토지가 2에서 <strong>0.25</strong>로.
+          단층 주택 대신 <strong>4층 주거용 구조물</strong>이 됨</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:12px">→ 주거당 토지가 500에서 50평방미터로 줄어
+      헥타르당 가구가 <strong>20에서 200으로</strong> 열 배가 됨 (10,000 ÷ 500, 10,000 ÷ 50)</p>
+  </div>
+</section>
+
+<!-- ══ 58. 그림 12-16 보스턴 인구밀도 (p.263~264) ═══════════ -->
+<section class="s-split">
+  <h2>주거(인구)밀도, 보스턴, 2005</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">인구조사표준지역을 <strong>헥타르당 거주민수</strong>만큼
+        밀어 올린 지도. 리본은 고속도로이며 밀도 25 의 높이로 그렸음</p>
+      <p class="derive t-red">→ 밀도는 <strong>중심지에서 가장 높음</strong> — 높은 주택·토지가격이
+        거주민과 생산업체 모두에게 절약하게 만듦</p>
+      <p class="derive t-red" style="margin-bottom:10px">→ 중심까지의 거리가 늘수록 밀도는 감소함</p>
+      <p class="caption">파리는 중심지 밀도가 20km 거리의 약 여섯 배, 뉴욕은 약 네 배다.
+        예외는 <strong>모스크바</strong> — 계획된 도시라 중심에 가까울수록 밀도가 낮아진다
+        (20km 에서 헥타르당 300명, 3km 에서 약 150명)</p>
+    </div>
+    <div class="col-r">
+      <img src="../assets/tb-boston-population-density.jpg"
+           alt="보스턴 대도시지역의 인구조사표준지역을 퍼즐조각으로 놓고 인구밀도만큼 기둥을 세운 3차원 지도. 중심부에 기둥이 빽빽하고 고속도로가 리본으로 지난다"
+           style="display:block;height:230px;width:auto;margin:0 auto">
+      <p class="caption" style="margin-top:4px;text-align:center">오설리반, 『오설리반의 도시경제학』 제9판,
+        박영사, 2022, 그림 12−16 (p.264)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 59. 그림 12-17 세계 도시들의 건설밀도 (p.265) ════════ -->
+<section>
+  <h2>세계 도시들의 건설밀도</h2>
+  <div class="body tight">
+    <p class="emph">건설밀도 = 대도시지역의 총인구 ÷ 도시에 이용되는 토지
+      (주거지역·산업지구·상업지역·도로·학교·도시공원을 포함)</p>
+    <svg class="fig" id="f-built" viewBox="0 0 640 286" style="width:552px;margin:2px 0 0 148px" role="img">
+      <title>베를린 36부터 상하이 303까지 여덟 도시의 헥타르당 인구를 가로 막대로 비교한 그림</title></svg>
+    <script>
+      (function () {
+        const D = window.BUILT, F = Fig;
+        const X0 = 116, X1 = 596, Y0 = 26, BH = 18, GAP = 26;
+        const sx = (v) => X0 + (v / 400) * (X1 - X0);
+        const parts = [];
+        D.forEach(([nm, v], i) => {
+          const y = Y0 + i * GAP;
+          const t = v / 303;
+          parts.push(F.raw(`<rect x="${X0}" y="${y}" width="${sx(v) - X0}" height="${BH}" ` +
+                           `fill="var(--accent-blue)" opacity="${(0.32 + 0.68 * t).toFixed(2)}"/>`));
+          parts.push(F.annot(X0 - 8, y + 14, nm, { anchor: 'end', size: 12 }));
+          parts.push(F.annot(sx(v) + 7, y + 14, String(v), { size: 12 }));
+        });
+        const yAx = Y0 + D.length * GAP + 4;
+        parts.push(F.raw(`<path class="axis" d="M${X0},${Y0 - 6} L${X0},${yAx} L${X1 + 10},${yAx}"/>`));
+        [0, 100, 200, 300, 400].forEach((v) =>
+          parts.push(F.annot(sx(v), yAx + 16, String(v), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot((X0 + X1) / 2, yAx + 33, '건설밀도: 헥타르당 인구수',
+                           { anchor: 'middle', size: 11 }));
+        F.draw('#f-built', { parts, check: false });
+      })();
+    </script>
+    <p class="caption" style="margin-top:2px">출처: Bertaud, Alain, “Metropolis: A Measure of the Spatial
+      Organization of 7 Large Cities,” 2001 (교재 그림 12−17, p.265)</p>
+    <p class="derive t-red" style="margin-top:6px">→ 아시아 도시들이 목록의 위쪽, 미국 도시들이 아래쪽에 있음.
+      뉴욕은 미국에서 가장 밀도가 높지만 <strong>파리의 절반, 바르셀로나의 1/4, 상하이의 약 1/8</strong>임</p>
+  </div>
+</section>
+
+<!-- ══ 60. Q & A ════════════════════════════════════════════ -->
 <section class="s-closing">
   <p class="qa">Q &amp; A</p>
   <div class="qa-rule"></div>
