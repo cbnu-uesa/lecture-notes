@@ -31,9 +31,15 @@
                         background: var(--brand-crimson); color: #FFF;
                         font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
   .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
-  .src { font-size: 13px; line-height: 1.72; color: var(--ink-2); margin: 4px 0 0; }
-  .src li { margin-bottom: 8px; }
-  .src .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; }
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+              letter-spacing: .04em; color: #4A4741; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 11px; line-height: 1.7; color: #4A4741; white-space: pre-wrap; }
+  .doc .h { color: var(--brand-crimson); font-weight: 700; }
   .brief { border: 1px solid var(--rule); background: #FAF8F5; padding: 12px 16px; margin-top: 6px; }
   .brief .row { display: flex; gap: 14px; }
   .brief .row + .row { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); }
@@ -48,57 +54,51 @@
 <body>
 <div class="reveal"><div class="slides">
 
-  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <!-- ══ 1. 표지 ════════════════════════════════════════════════════════ -->
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <h1>4강. 연구질문</h1>
+    <h1>4강. 연구질문<br>AI와 함께 도시문제 정의하기</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
-  <!-- ══ 2. 발문 ══════════════════════════════════════════ -->
-  <section class="s-question">
-    <h2>당신이 바꾸고 싶은 도시의 문제는 무엇인가?</h2>
-    <div class="body">
-      <ul>
-        <li>지난주에 세 개로 좁혀 왔다</li>
-        <li>그중 하나를 오늘 <span class="mark">분석할 수 있는 문제</span>로 바꾼다</li>
-        <li>혼자 하지 않는다 — 클로드와 같이 한다</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- ══ 3. 주장의 구조 ═══════════════════════════════════ -->
+  <!-- ══ 2. 발문 — 무엇을 고를 것인가 ═══════════════════════════════════ -->
   <section>
-    <h2>주장에는 세 부분이 있다</h2>
+    <h2>당신이 바꾸고 싶은 도시의 문제는 무엇인가?</h2>
     <div class="body stack">
-      <svg class="fig" id="f-claim" viewBox="0 0 840 240" style="width:790px" role="img"
-           aria-label="주장, 증거, 논거 세 상자가 삼각형으로 놓이고 증거와 논거가 주장을 떠받치는 도식">
-        <title>주장 · 증거 · 논거의 관계</title>
-        <rect x="300" y="18" width="240" height="62" fill="#A02948"/>
-        <text class="on-dark" x="420" y="47" text-anchor="middle" font-size="19" font-weight="700" fill="#FFF">주장</text>
-        <text class="on-dark" x="420" y="68" text-anchor="middle" font-size="12.5" fill="#FFF">"이렇게 해야 한다"</text>
+      <svg class="fig" id="f-pick" viewBox="0 0 840 234" style="width:800px" role="img"
+           aria-label="지방소멸 대응부터 재해·재난 대비까지 여섯 개의 도시·지역문제 상자가 왼쪽에 놓이고, 그중 하나를 골라 오른쪽의 분석할 수 있는 문제 상자로 옮기는 도식">
+        <title>여러 도시·지역문제 중 하나를 골라 분석할 수 있는 문제로 바꾸는 과정</title>
+        <g font-size="15" text-anchor="middle" fill="#16181C">
+          <rect x="0"   y="8"   width="250" height="56" fill="#EDE9E3"/>
+          <text x="125" y="42">지방소멸 대응</text>
+          <rect x="262" y="8"   width="250" height="56" fill="#EDE9E3"/>
+          <text x="387" y="42">도시경쟁력 강화</text>
+          <rect x="0"   y="72"  width="250" height="56" fill="#EDE9E3"/>
+          <text x="125" y="106">효율적인 생활인프라 공급</text>
+          <rect x="262" y="72"  width="250" height="56" fill="#EDE9E3"/>
+          <text x="387" y="106">교통체증 완화</text>
+          <rect x="0"   y="136" width="250" height="56" fill="#EDE9E3"/>
+          <text x="125" y="170">대중교통 시스템 정비</text>
+          <rect x="262" y="136" width="250" height="56" fill="#EDE9E3"/>
+          <text x="387" y="170">재해·재난 대비</text>
+        </g>
+        <text x="256" y="216" text-anchor="middle" font-size="13" fill="#6E6A63">…&#8202;그 밖에 당신이 곤란하다고 느낀 것</text>
 
-        <rect x="70"  y="150" width="240" height="62" fill="#EDE9E3"/>
-        <text x="190" y="179" text-anchor="middle" font-size="19" font-weight="700" fill="#16181C">증거</text>
-        <text x="190" y="200" text-anchor="middle" font-size="12.5" fill="#4A4741">분석해서 얻은 결과</text>
+        <text x="546" y="88" text-anchor="middle" font-size="12" fill="#6E6A63">하나를 고른다</text>
+        <path class="axis" d="M524,100 L566,100" stroke-width="1.4"/>
+        <path d="M572,100 L558,94 L558,106 Z" fill="#16181C"/>
 
-        <rect x="530" y="150" width="240" height="62" fill="#EDE9E3"/>
-        <text x="650" y="179" text-anchor="middle" font-size="19" font-weight="700" fill="#16181C">논거</text>
-        <text x="650" y="200" text-anchor="middle" font-size="12.5" fill="#4A4741">증거가 주장을 받치는 이유</text>
-
-        <path class="axis" d="M190,150 L370,84" stroke-width="1.4"/>
-        <path d="M373,82 L361,83 L365,92 Z" fill="#16181C"/>
-        <path class="axis" d="M650,150 L470,84" stroke-width="1.4"/>
-        <path d="M467,82 L479,83 L475,92 Z" fill="#16181C"/>
+        <rect x="584" y="56" width="252" height="88" fill="#A02948"/>
+        <text class="on-dark" x="710" y="92"  text-anchor="middle" font-size="18" font-weight="700" fill="#FFF">분석할 수 있는 문제</text>
+        <text class="on-dark" x="710" y="118" text-anchor="middle" font-size="12.5" fill="#FFF">오늘 이걸 만든다</text>
       </svg>
-      <p class="emph" style="text-align:center;margin-top:14px">
-        셋 중 하나라도 비면 설득이 안 된다.
-        <span class="hl">문제 정의는 이 셋을 미리 정해 두는 일이다.</span></p>
+      <p class="emph" style="text-align:center;margin-top:12px">
+        <span class="hl">혼자 하지 않는다 — 클로드와 같이 한다.</span></p>
     </div>
   </section>
 
-  <!-- ══ 4. 카파시 ════════════════════════════════════════ -->
+  <!-- ══ 3. 카파시 ══════════════════════════════════════════════════════ -->
   <section class="s-split">
     <h2>정리해서 말하려다 아무 말도 못 한다</h2>
     <div class="body tight">
@@ -110,19 +110,21 @@
           다시 정리해 달라고 맡긴다. 직접 정리해 전달하는 것보다 결과가 낫고
           이어지는 대화도 매끄럽다고 말한다.</p>
         <p class="caption" style="margin-top:10px">
-          카파시의 X 게시물 (2026. 7. 21.) — 주소는 마지막 장에</p>
+          안드레이 카파시의 X 게시물 (2026. 7. 21.)<br>
+          <span class="u">x.com/karpathy/status/2079610838143623371</span></p>
       </div>
       <div class="col-r" style="text-align:center">
         <figure class="shot" style="width:190px;margin:0 auto">
           <img src="../assets/cc-karpathy.png" alt="안드레이 카파시">
           <figcaption style="text-align:center">안드레이 카파시<br>
-            Gladwin Analytics, 2019<br>Wikimedia Commons · CC BY 3.0</figcaption>
+            Gladwin Analytics, 2019<br>Wikimedia Commons · CC BY 3.0<br>
+            <span class="u">commons.wikimedia.org</span></figcaption>
         </figure>
       </div>
     </div>
   </section>
 
-  <!-- ══ 5. 왜 그게 되는가 ════════════════════════════════ -->
+  <!-- ══ 4. 왜 그게 되는가 ══════════════════════════════════════════════ -->
   <section class="s-definition">
     <h2>왜 두서없이 말하는 편이 나은가</h2>
     <div class="body">
@@ -134,7 +136,7 @@
     </div>
   </section>
 
-  <!-- ══ 6. 실습 절차 도식 ════════════════════════════════ -->
+  <!-- ══ 5. 실습 절차 도식 ══════════════════════════════════════════════ -->
   <section>
     <h2>오늘 밟을 여섯 단계</h2>
     <div class="body stack">
@@ -180,7 +182,7 @@
     </div>
   </section>
 
-  <!-- ══ 7. 실제 공모전 과제 원문 ═════════════════════════ -->
+  <!-- ══ 6. 실제 공모전 과제 원문 ═══════════════════════════════════════ -->
   <section>
     <h2>실제 공모전 과제는 이렇게 쓰여 있다</h2>
     <div class="body tight">
@@ -211,12 +213,11 @@
         </div>
       </div>
       <p class="caption" style="margin-top:8px">
-        과제 개요 원문 중 세 항목 · compas.lh.or.kr · 2026. 8. 27. 열람.
-        <span class="hl">9·10주차에 이 과제의 데이터로 진단적 분석을 한다.</span></p>
+        <span class="u">compas.lh.or.kr/subj/past/info?subjNo=SBJ_2405_001</span> · 2026. 8. 27. 열람</p>
     </div>
   </section>
 
-  <!-- ══ 8. 잘 쓰인 문제정의 실물 ═════════════════════════ -->
+  <!-- ══ 7. 잘 쓰인 문제정의 실물 ═══════════════════════════════════════ -->
   <section>
     <h2>잘 쓰인 문제 정의는 이렇게 생겼다</h2>
     <div class="body">
@@ -236,15 +237,12 @@
       <p class="emph" style="margin-top:12px">
         읽어 보면 <span class="hl">판단이 필요한 자리가 전부 문장으로 드러나 있다.</span>
         오늘 만들 문제정의서의 목표 형태다.</p>
-      <p class="caption" style="margin-top:8px">
-        아산 과제는 "선정기준을 제시하라"고만 하고 <span class="hl">기준 자체는 주지 않는다.</span>
-        그 빈자리를 채우는 것이 참가자의 몫이고, 오늘 연습하는 일이다.</p>
     </div>
   </section>
 
-  <!-- ══ 9. 분석내용에서 분석방법으로 ═════════════════════ -->
+  <!-- ══ 8. 어떻게 분석할 것인가 ════════════════════════════════════════ -->
   <section>
-    <h2>분석내용까지가 과제다. 방법은 여기서부터 정한다</h2>
+    <h2>어떻게 분석할 것인가?</h2>
     <div class="body tight">
       <p class="sub">과제는 무엇을 도출하라고만 적는다 — 어떻게 도출할지는 비어 있다</p>
       <table style="width:100%;table-layout:fixed;margin-top:6px">
@@ -273,7 +271,7 @@
     </div>
   </section>
 
-  <!-- ══ 10. 증거의 형식 ═══════════════════════════════════ -->
+  <!-- ══ 9. 증거의 형식 ═════════════════════════════════════════════════ -->
   <section>
     <h2>주장마다 어울리는 증거가 다르다</h2>
     <div class="body">
@@ -287,20 +285,21 @@
           <tr><td>"이 대안이 낫다"</td><td>대안 간 비교</td><td>시나리오 표 · 비용편익</td></tr>
         </tbody>
       </table>
-      <p class="caption" style="margin-top:14px">
-        마지막 두 줄은 9주차 이후에 배운다. 오늘은 <span class="hl">내 주장이 어느 줄인지</span>만 정하면 된다.</p>
     </div>
   </section>
 
-  <!-- ══ 11. 산출물 규격 ═══════════════════════════════════ -->
+  <!-- ══ 10. 산출물 규격 ════════════════════════════════════════════════ -->
   <section>
-    <h2>문제정의서 — 한 쪽짜리</h2>
+    <h2>문제정의서</h2>
     <div class="body tight">
       <table style="width:100%;table-layout:fixed;margin-top:6px">
         <thead><tr><th style="width:24%">칸</th><th>쓰는 법</th></tr></thead>
         <tbody>
-          <tr><td>문제</td><td>누가 어떻게 곤란한가. 한 문장</td></tr>
-          <tr><td>주장</td><td>"…해야 한다" 로 끝나는 한 문장</td></tr>
+          <tr><td>배경</td><td>왜 지금 이 문제인가 — 누가 어떻게 곤란한가, 무엇이 달라졌나.
+            한 문장으로 끝낼 필요는 없다</td></tr>
+          <tr><td>주장</td><td>이 문제를 두고 <span class="hl">내가 내놓는 의견</span>.
+            "…해야 한다" 처럼 강하게 쓰지 않아도 된다 —
+            "…가 필요해 보인다", "…쪽이 낫다고 본다" 도 주장이다</td></tr>
           <tr><td>필요한 증거</td><td>주장을 받치려면 무엇을 보여야 하나. 2~3개</td></tr>
           <tr><td>제시 방식</td><td>증거마다 표·그래프·지도 중 무엇으로</td></tr>
           <tr><td>데이터</td><td>어떤 자료가 있어야 하나 (5주차에 실제로 찾는다)</td></tr>
@@ -308,36 +307,36 @@
         </tbody>
       </table>
       <p class="emph" style="margin-top:12px">
-        이 한 쪽이 <span class="hl">학기 끝까지 따라간다.</span> 5주차에 데이터를 찾고,
-        14주차에 증거 패키지로 완성한다.</p>
+        <span class="hl">문제정의서를 바탕으로 학기말 과제를 작성하고 제출한다.</span></p>
     </div>
   </section>
 
-  <!-- ══ 12. 실습 구분 ════════════════════════════════════ -->
+  <!-- ══ 11. 실습 구분 ══════════════════════════════════════════════════ -->
   <section class="s-section">
     <div class="section-rule"></div>
     <p class="section-label">실습</p>
     <p class="section-sub">문제정의서 만들기 — 약 1시간 30분</p>
   </section>
 
-  <!-- ══ 13. 실습 ① 준비 ═════════════════════════════════ -->
+  <!-- ══ 12. 실습 ① 준비 ════════════════════════════════════════════════ -->
   <section>
     <h2>실습 ① — 준비</h2>
     <div class="body tight">
       <ol class="steps">
         <li><span class="hl">claude.ai</span> 계정을 만든다. 실습은 Pro 구독 기준이다
           <span class="t">10분</span></li>
-        <li><span class="hl">compas.lh.or.kr</span> 회원가입 — 5주차부터 데이터를 받는다
+        <li>클로드 코드에서 <span class="code">my-wiki</span> 폴더를
+          <span class="hl">프로젝트 폴더로 설정</span>한다
           <span class="t">5분</span></li>
-        <li>음성 입력을 켜 둔다. 손으로 치면 저절로 정리하게 되어 램블링이 안 된다
+        <li><span class="hl">음성 입력을 켜 둔다.</span> 손으로 치면 저절로 정리하게 되어
+          램블링이 안 된다. 프로젝트 폴더를 <span class="code">remote-control</span> 로
+          활성화한 뒤 휴대폰으로 입력해도 된다
           <span class="t">5분</span></li>
       </ol>
-      <p class="caption" style="margin-top:16px">
-        2주차에 만든 위키의 <span class="code">questions/</span> 에 오늘 정한 문제를 남긴다.</p>
     </div>
   </section>
 
-  <!-- ══ 14. 실습 ② 램블링 ═══════════════════════════════ -->
+  <!-- ══ 13. 실습 ② 램블링 ══════════════════════════════════════════════ -->
   <section>
     <h2>실습 ② — 10분 동안 두서없이 말한다</h2>
     <div class="body tight">
@@ -361,7 +360,7 @@
     </div>
   </section>
 
-  <!-- ══ 15. 실습 ③ 구조화 ═══════════════════════════════ -->
+  <!-- ══ 14. 실습 ③ 구조화 ══════════════════════════════════════════════ -->
   <section>
     <h2>실습 ③ — 여섯 단계로 좁힌다</h2>
     <div class="body tight">
@@ -369,7 +368,8 @@
       <div class="prompt-box">
         <p class="who">이어지는 프롬프트</p>
         <p><b>③</b> "정리해 준 것 중에서 내가 진짜 주장하고 싶은 건 ○○야.
-          이걸 '…해야 한다' 는 한 문장으로 다듬어 줘."</p>
+          <span class="mark">내 의견으로 읽히게</span> 다듬어 줘.
+          단정해서 말할 만한 근거가 아직 없으면 그렇게 말해 줘."</p>
         <p><b>④</b> "이 주장을 받치려면 어떤 증거가 필요할까?
           <span class="mark">각각 왜 필요한지도 같이 적어 줘.</span> 3개 이내로."</p>
         <p><b>⑤</b> "증거마다 표·그래프·지도 중 무엇으로 보여 주는 게 설득력 있을까?"</p>
@@ -383,7 +383,7 @@
     </div>
   </section>
 
-  <!-- ══ 16. 실습 ④ 제출 ═════════════════════════════════ -->
+  <!-- ══ 15. 실습 ④ 제출 ════════════════════════════════════════════════ -->
   <section>
     <h2>실습 ④ — 한 쪽으로 옮긴다</h2>
     <div class="body">
@@ -396,31 +396,32 @@
         <li>지적받은 곳을 고치거나, 고치지 않기로 했다면 그 이유를 아래에 적는다
           <span class="t">10분</span></li>
       </ol>
-      <p class="emph" style="margin-top:20px">
-        제출: <span class="t-red">문제정의서 1쪽</span> (과제 반영)</p>
-      <p class="caption" style="margin-top:6px">
-        다음 주에는 여기 적은 데이터를 실제로 찾아 받는다. 구할 수 없는 데이터를 적어 두면
-        5주차에 막힌다 — 그것도 배움이니 그대로 가져와도 좋다.</p>
     </div>
   </section>
 
-  <!-- ══ 17. 출처 ═════════════════════════════════════════ -->
+  <!-- ══ 16. 제출물 ═════════════════════════════════════════════════════ -->
   <section>
-    <h2>자료 출처</h2>
+    <h2>제출물</h2>
     <div class="body tight">
-      <ul class="src">
-        <li>램블링 방식 — 안드레이 카파시의 X 게시물 (2026. 7. 21.)<br>
-          <span class="u">x.com/karpathy/status/2079610838143623371</span></li>
-        <li>카파시 사진 (4쪽) — Gladwin Analytics, 2019 · <span class="hl">CC BY 3.0</span><br>
-          <span class="u">commons.wikimedia.org</span> · File:Andrej Karpathy, OpenAI (cropped).png</li>
-        <li>공모전 과제 원문과 그 분해 (7·8쪽) — COMPAS 「(아산시) 보건의료 불균형 해소를 위한
-          의료 취약지역 도출 분석」 (2024) · 과제번호 SBJ_2405_001<br>
-          <span class="u">compas.lh.or.kr/subj/past/info?subjNo=SBJ_2405_001</span></li>
+      <p class="sub">문제정의서와 클로드와 나눈 대화 내용 전체를
+        <span class="hl">각각 별도 파일로</span> 낸다</p>
+      <ul>
+        <li><span class="code">문제정의서.md</span></li>
+        <li><span class="code">대화내용 전체.md</span></li>
       </ul>
+      <p class="emph" style="margin-top:14px">제출기한 —
+        <span class="t-red">10월 10일(토) 23시 59분 59초</span></p>
+      <div class="doc" style="margin-top:10px">
+        <div class="bar">데이터사이언스 과제 제출 — 한 학기 내내 같은 주소</div>
+        <pre style="font-size:13px;line-height:1.9"><span class="h">docs.google.com/forms/d/e/1FAIpQLSc7AWYdgrGn1gKGoo7VkC6vsDZNXANo-CWokVjY2dm2pucIew/viewform</span></pre>
+      </div>
+      <p class="caption" style="margin-top:8px">
+        2주차와 같은 주소다. 주차 선택에서 <span class="hl">4주차</span>를 고르고,
+        학번 열 자리와 이름을 띄어쓰기 없이 적는다.</p>
     </div>
   </section>
 
-  <!-- ══ 18. 마무리 ═══════════════════════════════════════ -->
+  <!-- ══ 17. 마무리 ═════════════════════════════════════════════════════ -->
   <section class="s-closing">
     <p class="qa">Q &amp; A</p>
     <div class="qa-rule"></div>

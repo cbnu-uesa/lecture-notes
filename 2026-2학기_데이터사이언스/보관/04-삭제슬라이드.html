@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4강 보관 — 뺀 슬라이드</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>4강 보관 — 뺀 슬라이드</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <section>
+    <h2>이 파일은 무엇인가</h2>
+    <div class="body tight">
+      <p class="emph">4강 <span class="code">04-연구질문.html</span> 에서 뺀 한 장이다</p>
+      <table style="width:100%;table-layout:fixed;margin-top:8px">
+        <thead><tr><th style="width:36%">뺀 장</th><th>왜 뺐나</th></tr></thead>
+        <tbody>
+          <tr><td>주장에는 세 부분이 있다<br>
+              <span class="caption">주장 · 증거 · 논거 도식</span></td>
+            <td>2026-09-28 에 뺐다. <span class="hl">문제정의서의 주장 규격을 누그러뜨리면서
+              이 도식의 "이렇게 해야 한다" 가 어긋났다.</span> 세 부분을 따로 설명하지 않아도
+              「주장마다 어울리는 증거가 다르다」 표와 문제정의서의 여섯 칸이
+              같은 일을 한다고 판단했다</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:12px">
+        되살리려면 본편의 표지 다음, 「정리해서 말하려다 아무 말도 못 한다」 앞에 도로 넣는다.
+        <span class="hl">되살릴 때는 도식 안의 "이렇게 해야 한다" 를 문제정의서의 주장 규격과
+        맞춰야 한다</span> — 지금 규격은 "…해야 한다" 로 끝내지 않아도 된다고 적혀 있다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 뺀 장 1 — 주장의 구조 ════════════════════════════ -->
+  <section>
+    <h2>주장에는 세 부분이 있다</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-claim" viewBox="0 0 840 240" style="width:790px" role="img"
+           aria-label="주장, 증거, 논거 세 상자가 삼각형으로 놓이고 증거와 논거가 주장을 떠받치는 도식">
+        <title>주장 · 증거 · 논거의 관계</title>
+        <rect x="300" y="18" width="240" height="62" fill="#A02948"/>
+        <text class="on-dark" x="420" y="47" text-anchor="middle" font-size="19" font-weight="700" fill="#FFF">주장</text>
+        <text class="on-dark" x="420" y="68" text-anchor="middle" font-size="12.5" fill="#FFF">"이렇게 해야 한다"</text>
+
+        <rect x="70"  y="150" width="240" height="62" fill="#EDE9E3"/>
+        <text x="190" y="179" text-anchor="middle" font-size="19" font-weight="700" fill="#16181C">증거</text>
+        <text x="190" y="200" text-anchor="middle" font-size="12.5" fill="#4A4741">분석해서 얻은 결과</text>
+
+        <rect x="530" y="150" width="240" height="62" fill="#EDE9E3"/>
+        <text x="650" y="179" text-anchor="middle" font-size="19" font-weight="700" fill="#16181C">논거</text>
+        <text x="650" y="200" text-anchor="middle" font-size="12.5" fill="#4A4741">증거가 주장을 받치는 이유</text>
+
+        <path class="axis" d="M190,150 L370,84" stroke-width="1.4"/>
+        <path d="M373,82 L361,83 L365,92 Z" fill="#16181C"/>
+        <path class="axis" d="M650,150 L470,84" stroke-width="1.4"/>
+        <path d="M467,82 L479,83 L475,92 Z" fill="#16181C"/>
+      </svg>
+      <p class="emph" style="text-align:center;margin-top:14px">
+        셋 중 하나라도 비면 설득이 안 된다.
+        <span class="hl">문제 정의는 이 셋을 미리 정해 두는 일이다.</span></p>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
