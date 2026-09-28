@@ -243,6 +243,130 @@
     </div>
   </section>
 
+
+  <!-- ══ 5-d. 사례 ① 손으로 ═══════════════════════════════ -->
+  <section>
+    <h2>사례 — 청주시 인구 2000~2024, ① 손으로 받는다</h2>
+    <div class="body tight">
+      <p class="sub">질문은 하나다 — <span class="hl">청주시 인구는 25년 동안 어떻게 변했나?</span></p>
+      <ol class="steps">
+        <li><span class="code">kosis.kr</span> → <b>국내통계</b> → <b>주제별 통계</b>
+          <span class="t">왼쪽 트리에서 주제를 타고 내려간다</span></li>
+        <li><b>인구</b> → <b>주민등록인구현황</b> → <b>행정구역(시군구)별, 성별 인구수</b>
+          <span class="t">여기까지가 표를 찾는 일이다</span></li>
+        <li>표가 열리면 <b>조회설정</b>에서 셋을 고른다 —
+          행정구역 <span class="hl">충청북도 &gt; 청주시</span> · 항목 <span class="hl">총인구수</span> ·
+          시점 <span class="hl">2000 ~ 2024 (년)</span></li>
+        <li><b>다운로드</b> → CSV 또는 EXCEL
+          <span class="t">파일 이름에 조회 조건이 남지 않으므로 따로 적어 둔다</span></li>
+      </ol>
+      <div class="stuck"><b>여기서 걸리는 것.</b> 처음 눈에 띄는 표는
+        「행정구역(시군구)별/1세별 주민등록인구」다. 열어 보면 <b>2008년부터</b>라
+        2000년이 없다. <span class="hl">표를 바꿔야 한다</span> — 1992년부터 있는 것은
+        「행정구역(시군구)별, 성별 인구수」쪽이다.</div>
+      <p class="caption" style="margin-top:8px">
+        한 번 받는 데 5분이면 된다. 다만 <span class="hl">다음 학기에 2025년을 더하려면 같은 클릭을 다시 한다.</span>
+        어디를 눌렀는지는 아무 데도 남지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 5-e. 사례 ③ 맡긴다 ══════════════════════════════ -->
+  <section class="s-split">
+    <h2>사례 — 같은 질문, ③ MCP 에 맡긴다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <div class="prompt-box">
+          <p class="who">이렇게 묻는다</p>
+          <p>"청주시 총인구를 <b>2000년부터 2024년까지</b> 연도별로 받아 줘.
+            어느 통계표에서 왔는지도 같이 알려 줘."</p>
+        </div>
+        <p class="sub" style="margin-top:12px">클로드가 한 일 — 다섯 번 불렀다</p>
+        <ol class="steps" style="margin-top:6px">
+          <li><span class="code">kosis_local_search</span> 로 표를 찾음
+            <span class="t">→ DT_1B04006, 그런데 2008년부터다</span></li>
+          <li><span class="code">kosis_search</span> 로 다시 찾음
+            <span class="t">→ DT_1B040A3, 1992년부터 ✓</span></li>
+          <li><span class="code">kosis_region_code</span> 로 청주시 = <span class="code">43110</span></li>
+          <li><span class="code">kosis_get_data</span> — <b class="bad">실패</b>
+            <span class="t">항목ID 를 T2 로 넣었다. 유효값은 T20·T21·T22 였다</span></li>
+          <li><span class="code">kosis_get_data</span> — 25줄이 왔다</li>
+        </ol>
+        <p class="caption" style="margin-top:6px">
+          <span class="hl">①의 「표를 바꿔야 한다」가 여기서는 2번이다.</span> 걸리는 자리는 같다.</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">돌아온 값 (일부)</p>
+        <table class="tt">
+          <thead><tr><th style="width:38%">연도</th><th>총인구(명)</th></tr></thead>
+          <tbody>
+            <tr><td>2000</td><td>580,861</td></tr>
+            <tr><td>2005</td><td>630,939</td></tr>
+            <tr><td>2010</td><td>655,971</td></tr>
+            <tr><td>2013</td><td>672,904</td></tr>
+            <tr><td>2014</td><td class="hl">831,521</td></tr>
+            <tr><td>2020</td><td>844,993</td></tr>
+            <tr><td>2024</td><td>854,537</td></tr>
+          </tbody>
+        </table>
+        <div class="ck"><b>2013 → 2014 에 158,617명이 늘었다.</b>
+          1년 만에 <b>23.6%</b>다. <span class="hl">이런 숫자가 나오면 멈춘다.</span></div>
+        <p class="caption" style="margin-top:8px">
+          출처: KOSIS 「행정구역(시군구)별, 성별 인구수」(행정안전부,
+          <span class="code">DT_1B040A3</span>), KOSIS MCP 로 2026-09-28 조회</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 5-f. 사례 — 왜 절벽이 생겼나 ═════════════════════ -->
+  <section>
+    <h2>둘 다 맞는 숫자다 — 도시가 바뀐 것이다</h2>
+    <div class="body tight">
+      <svg class="fig" id="f-cj" viewBox="0 0 860 246" style="width:790px" role="img"
+           aria-label="청주시 총인구가 2000년 58만에서 2013년 67만으로 오르다가 2014년 83만으로 뛰고 이후 완만히 느는 꺾은선그래프">
+        <title>청주시 주민등록인구 2000~2024</title></svg>
+      <script>
+        (function () {
+          const P = [[2000,580861],[2001,592504],[2002,603941],[2003,615155],[2004,624288],
+                     [2005,630939],[2006,626679],[2007,633286],[2008,638663],[2009,643161],
+                     [2010,655971],[2011,661946],[2012,666852],[2013,672904],[2014,831521],
+                     [2015,831912],[2016,835197],[2017,835590],[2018,837749],[2019,839566],
+                     [2020,844993],[2021,848482],[2022,849573],[2023,852189],[2024,854537]];
+          const F = Fig.withBox({ x0: 78, y0: 186, x1: 800, y1: 26 });
+          const S = F.scale({ x: [1999, 2025], y: [540000, 880000] });
+          // 2014 년 이전과 이후는 「같은 청주시」가 아니다. 한 선으로 잇지 않는다
+          const before = S.curve(P.filter(([y]) => y <= 2013));
+          const after  = S.curve(P.filter(([y]) => y >= 2014));
+          const parts = [
+            F.raw(`<path class="guide" d="M${S.x(2013.5)},${F.BOX.y1} L${S.x(2013.5)},${F.BOX.y0}"/>`),
+            F.curve(before, { variant: 'demand' }),
+            F.curve(after, { variant: 'demand' }),
+            F.annot(S.x(2006), S.y(600000) + 18, '청주시 (청원군 제외)', { size: 11.5 }),
+            F.annot(S.x(2024), S.y(820000) + 18, '통합 청주시', { anchor: 'end', size: 11.5 }),
+            F.annot(S.x(2013.5), S.y(890000), '2014. 7. 1. 청주시·청원군 통합',
+                    { anchor: 'middle', size: 11.5, tone: 'red' }),
+            F.dot(...S.p([2013, 672904]), { label: '672,904', lx: -10, ly: 16 }),
+            F.dot(...S.p([2014, 831521]), { label: '831,521', lx: 9, ly: -9 }),
+          ];
+          [600000, 700000, 800000].forEach((v) => {
+            parts.push(F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(v)} L${F.BOX.x1},${S.y(v)}"/>`));
+            parts.push(F.annot(F.BOX.x0 - 8, S.y(v) + 4, (v / 10000) + '만', { anchor: 'end', size: 11 }));
+          });
+          [2000, 2005, 2010, 2015, 2020, 2024].forEach((y) =>
+            parts.push(F.annot(S.x(y), F.BOX.y0 + 17, String(y), { anchor: 'middle', size: 11 })));
+          F.draw('#f-cj', { parts, check: false });
+        })();
+      </script>
+      <div class="ck" style="margin-top:6px"><b>2013년 청주시 672,904 + 청원군 155,002 = 827,906.</b>
+        이듬해 통합 청주시가 831,521 이니 한 해치 증가분만큼 차이가 난다.
+        <span class="hl">인구가 뛴 것이 아니라 시의 경계가 넓어진 것이다.</span>
+        청원군은 2014년부터 이 표에서 사라진다.</div>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">웹으로 받아도 똑같이 나온다.</span> 두 경로의 차이는 숫자가 아니라 품이다 —
+        <b>틀린 것을 알아채는 일은 어느 쪽에서도 사람이 한다.</b>
+        한 선으로 이어 그리면 「25년간 47% 성장한 도시」가 되고, 그 문장은 사실이 아니다.</p>
+    </div>
+  </section>
+
   <!-- ══ 6. 형식과 함정 ═══════════════════════════════════ -->
   <section>
     <h2>받고 나서 겪는 것들</h2>
@@ -394,6 +518,8 @@
         <li>국토교통부 실거래가 공개시스템 — <span class="u">rt.molit.go.kr</span></li>
         <li>법정동코드 · 청주시 상당구 4311100000 — 행정표준코드관리시스템<br>
           <span class="u">code.go.kr/stdcode/regCodeL.do</span> (2026. 8. 26. 조회)</li>
+        <li>KOSIS 「행정구역(시군구)별, 성별 인구수」(행정안전부, <span class="code">DT_1B040A3</span>)<br>
+          <span class="u">kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B040A3</span> (2026. 9. 28. 조회)</li>
         <li>그 밖의 소스 — KOSIS <span class="u">kosis.kr</span> · 공공데이터포털 <span class="u">data.go.kr</span> ·
           SGIS <span class="u">sgis.kostat.go.kr</span> · KTDB <span class="u">ktdb.go.kr</span> ·
           COMPAS <span class="u">compas.lh.or.kr</span></li>
