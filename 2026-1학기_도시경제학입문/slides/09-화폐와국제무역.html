@@ -1,0 +1,1185 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9강. 화폐와 국제무역</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+<script>
+  // ── 이 강의에서 되풀이되는 세 그림 ───────────────────────
+  // 화폐시장(이자율-화폐량), 총수요-총공급, 외환시장.
+  // 교차점은 언제나 Fig.cross 로 구한다 — 손으로 찍으면 곡선에서 어긋난다.
+  window.money = function (sel, o) {
+    const F = Fig.withBox(o.box || { x0: 66, y0: 240, x1: 356, y1: 22 });
+    const S = F.scale({ x: [0, 10], y: [0, 10] });
+    // 화폐수요: 이자율이 낮아질수록 완만해진다 (투기적 동기)
+    const MD = (dx, flat) => {
+      const a = [];
+      for (let x = 1.2; x <= 9.4; x += 0.2)
+        a.push([x + dx, flat ? 2.4 + 16 / (x + 2.6) : 1.2 + 22 / (x + 1.4)]);
+      return S.curve(a);
+    };
+    const MS = (x) => S.curve([[x, 0.3], [x, 9.6]]);
+    const parts = [];
+    (o.ms || [4.4]).forEach((x, i) => parts.push(F.curve(MS(x),
+      { variant: 'supply', dash: (o.msDash || [])[i] ? '9 7' : '' })));
+    (o.md || [0]).forEach((dx, i) => parts.push(F.curve(MD(dx, (o.mdFlat || [])[i]),
+      { variant: 'demand', dash: (o.mdDash || [])[i] ? '9 7' : '' })));
+    (o.marks || []).forEach((m) => {
+      // 화폐공급곡선은 수직선이라 Fig.cross 로는 구할 수 없다 (겹치는 x 구간이 한 점).
+      // 그 x 에서 화폐수요곡선의 높이를 읽으면 그게 곧 교차점이다.
+      const p = Fig.at(MD(m.md || 0, m.flat), { x: S.x(m.ms) });
+      parts.push(F.guide(p[0], p[1], { xtick: m.xt, ytick: m.yt }),
+        F.dot(...p, { label: m.label, lx: m.lx ?? -4, ly: m.ly ?? -12, free: true }));
+    });
+    (o.notes || []).forEach((n) => parts.push(F.annot(S.x(n[0]), S.y(n[1]), n[2],
+      { size: n[3] || 12, lh: 14, tone: n[4] })));
+    (o.arrows || []).forEach((a) => parts.push(F.arrow(S.x(a[0]), S.y(a[1]), S.x(a[2]), S.y(a[3]),
+      { tone: 'blue' })));
+    F.draw(sel, { axes: { x: '화폐량', y: '이자율' }, parts });
+  };
+
+  window.adas = function (sel, o) {
+    const F = Fig.withBox(o.box || { x0: 66, y0: 240, x1: 356, y1: 22 });
+    const S = F.scale({ x: [0, 10], y: [0, 10] });
+    const AD = (dx) => S.curve([[0.6 + dx, 9.0], [9.4 + dx, 2.0]]);
+    const AS = (dx) => {
+      const a = [];
+      for (let x = 0.8; x <= 8.05; x += 0.2) a.push([x + dx, 1.4 + 0.105 * Math.pow(x - 0.8, 2.2)]);
+      return S.curve(a);
+    };
+    const parts = [];
+    (o.as || [0]).forEach((dx, i) => parts.push(F.curve(AS(dx),
+      { variant: 'supply', dash: (o.asDash || [])[i] ? '9 7' : '' })));
+    (o.ad || [0]).forEach((dx, i) => parts.push(F.curve(AD(dx),
+      { variant: 'demand', dash: (o.adDash || [])[i] ? '9 7' : '' })));
+    (o.marks || []).forEach((m) => {
+      const p = Fig.cross(AD(m.ad || 0), AS(m.as || 0));
+      parts.push(F.guide(p[0], p[1], { xtick: m.xt, ytick: m.yt }),
+        F.dot(...p, { label: m.label, lx: m.lx ?? -4, ly: m.ly ?? -12, free: true }));
+    });
+    (o.notes || []).forEach((n) => parts.push(F.annot(S.x(n[0]), S.y(n[1]), n[2],
+      { size: n[3] || 12, lh: 14, tone: n[4] })));
+    F.draw(sel, { axes: { x: '실질국민소득(Y)', y: '물가' }, parts });
+  };
+
+  window.forex = function (sel, o) {
+    const F = Fig.withBox(o.box || { x0: 66, y0: 236, x1: 350, y1: 22 });
+    const S = F.scale({ x: [0, 10], y: [0, 10] });
+    const D = (dx) => S.curve([[0.6 + dx, 8.8], [9.2 + dx, 1.8]]);
+    const SP = (dx) => S.curve([[0.8 + dx, 1.4], [9.4 + dx, 8.6]]);
+    const parts = [];
+    (o.s || [0]).forEach((dx, i) => parts.push(F.curve(SP(dx),
+      { variant: 'supply', dash: (o.sDash || [])[i] ? '9 7' : '' })));
+    (o.d || [0]).forEach((dx, i) => parts.push(F.curve(D(dx),
+      { variant: 'demand', dash: (o.dDash || [])[i] ? '9 7' : '' })));
+    (o.marks || []).forEach((m) => {
+      const p = Fig.cross(D(m.d || 0), SP(m.s || 0));
+      parts.push(F.guide(p[0], p[1], { xtick: m.xt, ytick: m.yt }),
+        F.dot(...p, { label: m.label, lx: m.lx ?? -4, ly: m.ly ?? -12, free: true }));
+    });
+    (o.notes || []).forEach((n) => parts.push(F.annot(S.x(n[0]), S.y(n[1]), n[2],
+      { size: n[3] || 12, lh: 14, tone: n[4] })));
+    F.draw(sel, { axes: { x: '거래량', y: '환율\n(W/$)' }, parts });
+  };
+</script>
+
+<style>
+  /* .s-numbered .body ol > li 의 40px 가 ol.dense 의 18px 를 이긴다.
+     지면 테마의 짧아진 본문에서는 6줄이 푸터를 넘으므로 여기서 다시 좁힌다. */
+  .s-numbered .body ol.dense > li { margin-bottom: 24px; }
+
+  /* 국제수지표(28번): 표가 본문 폭의 절반만 쓰고 "예" 칸이 접혀 길이가 늘어난다.
+     전폭을 쓰게 하면 줄바꿈이 사라져 tight 로도 들어간다. */
+  .tbl-bop { width: 100%; }
+  .tbl-bop td:last-child { width: auto; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 (p.1) ════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>9강. 화폐와 국제무역</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 화폐 (p.2) ════════════════════════════════════════ -->
+<section>
+  <h2>화폐</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:44px">교환의 매개물 또는 거래의 지불수단</p>
+    <p class="sub t-red" style="margin-bottom:8px">화폐의 세 가지 기능</p>
+    <ul style="margin-bottom:48px">
+      <li>교환매개의 기능: 거래비용의 절감</li>
+      <li>가치척도의 기능: 가치의 화폐단위 측정</li>
+      <li>가치저장의 기능: 시공간 극복 가능</li>
+    </ul>
+    <p class="sub t-red">화폐시장에 관심을 갖는 이유: 화폐시장에서 이자율(interest rate)이 결정되기 때문!</p>
+  </div>
+</section>
+
+<!-- ══ 3. 통화량의 측정 (p.3) ═══════════════════════════════ -->
+<section>
+  <h2>통화량의 측정</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">통화지표: 한 경제에 유통되는 화폐의 양 → 유동성(liquidity)의 차이에 따라 구분</p>
+    <p class="sub t-red" style="margin-bottom:12px">통화관리 중심지표: M2 → Lf 이동 (관계의 밀접성 + 통제가능성 고려)</p>
+    <table class="tbl-money">
+      <thead><tr><th>구분</th><th>구성내역</th><th>총량(조원)</th><th>GDP대비(%)</th></tr></thead>
+      <tbody>
+        <tr><td>현금통화</td><td>민간이 보유하는 지폐 및 주화</td><td>147.6</td><td>7.7</td></tr>
+        <tr><td>M1(협의의 통화)</td><td>현금통화+요구불예금+수시 입출식 저축성 예금</td><td>1,197.8</td><td>62.2</td></tr>
+        <tr><td>M2(광의의 통화)</td><td>M1+정기예적금 및 부금 + 시장형 상품 + 실적배당형 상품 + 금융채 및 기타</td><td>3,199.8</td><td>166.3</td></tr>
+        <tr><td>Lf(금융기관 유동성)</td><td>M2+만기 2년 이상 정기예적금 및 금융채 + 한국증권금융의 예수금 + 생명보험회사의 보험계약준비금 및 기타</td><td>4,477.5</td><td>232.7</td></tr>
+        <tr><td>L(광의유동성)</td><td>Lf+정부 및 기업 등이 발행한 유동성 시장금융 상품 (국채, 지방채, 기업어음, 회사채 등)</td><td>5,678.7</td><td>295.1</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 4. 화폐에 대한 수요 (p.4) ════════════════════════════ -->
+<section>
+  <h2>화폐에 대한 수요</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:16px">여러 가지 자산(주식, 채권, 부동산 등) 중 화폐로 보유하려는 금액</p>
+    <p class="sub t-red" style="margin-bottom:6px">화폐수요의 동기</p>
+    <ul style="margin-bottom:22px">
+      <li>거래적 동기: 일상생활의 거래에 사용하기 위해 화폐를 보유 (거래용)</li>
+      <li>예비적 동기: 예기치 않게 일어날 일에 대비하기 위해 화폐를 보유 (준비금, 유보금)</li>
+      <li>투기적 동기: 자산보유형태로서 투자에 유리하다는 측면에서 화폐를 보유 (주식의 현금화)</li>
+    </ul>
+    <p class="sub t-red" style="margin-bottom:6px">화폐수요의 결정요인</p>
+    <ul style="margin:0">
+      <li>물가수준: 물가수준이 높을수록 거래적 동기로 인해 화폐수요량이 증가</li>
+      <li>물가상승률: 물가상승률이 높을수록 투기적 동기로 인해 화폐수요량이 감소</li>
+      <li>이자율: 이자율이 상승할수록 투기적 동기로 인해 화폐수요량이 감소</li>
+      <li>국민소득: 국민소득이 증가할수록 거래적 동기로 인해 화폐수요량이 증가</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 5. 화폐수요곡선 (p.5) ════════════════════════════════ -->
+<section class="s-pair">
+  <h2>화폐수요곡선</h2>
+  <p class="pd-lead sub t-red">화폐수요에 영향을 주는 다른 요인들이 불변임을 가정하고 도출한
+    이자율(r)과 화폐수요량 사이의 관계</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-md" viewBox="0 0 420 260" role="img">
+        <title>이자율이 낮아질수록 완만해지는 화폐수요곡선</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-md2" viewBox="0 0 420 260" role="img">
+        <title>물가나 국민소득이 오르면 화폐수요곡선이 오른쪽으로 이동하는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    money('#f-md', { box: { x0: 62, y0: 226, x1: 348, y1: 20 }, ms: [],
+      notes: [[8.4, 2.6, 'MD'], [7.0, 1.2, '투기적 동기', 11],
+              [4.4, 8.4, '기울기는 화폐수요의\n이자율 탄력성', 11]] });
+    money('#f-md2', { box: { x0: 62, y0: 226, x1: 348, y1: 20 }, ms: [], md: [0, 1.8],
+      notes: [[8.4, 3.4, 'MD']],
+      arrows: [[3.4, 5.4, 5.0, 5.4]] });
+  </script>
+  <p class="caption" style="position:absolute;left:520px;top:396px">물가상승 / 국민소득 상승 등</p>
+</section>
+
+<!-- ══ 6. 화폐공급곡선 (p.6) ════════════════════════════════ -->
+<section class="s-pair">
+  <h2>화폐공급곡선</h2>
+  <p class="pd-lead sub t-red">중앙은행(한국은행)이 화폐공급의 주요 주체로 기능</p>
+  <p class="pd-sub caption">* 실제로는 중앙은행 뿐만 아니라 개인(자산선택)이나 은행(상품이자 결정)도 화폐공급에 영향</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-ms" viewBox="0 0 420 260" role="img">
+        <title>중앙은행이 정하므로 수직인 화폐공급곡선</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-ms2" viewBox="0 0 420 260" role="img">
+        <title>중앙은행이 화폐공급을 늘려 공급곡선이 오른쪽으로 이동하는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    money('#f-ms', { box: { x0: 62, y0: 226, x1: 348, y1: 20 }, md: [],
+      notes: [[4.7, 9.8, 'MS']] });
+    money('#f-ms2', { box: { x0: 62, y0: 226, x1: 348, y1: 20 }, md: [], ms: [4.4, 6.6],
+      notes: [[4.7, 9.8, 'MS'], [5.4, 3.4, '중앙은행의\n화폐공급 증가', 11, 'red']],
+      arrows: [[4.6, 5.4, 6.4, 5.4]] });
+  </script>
+</section>
+
+<!-- ══ 7. 화폐시장의 균형 (p.7) ═════════════════════════════ -->
+<section>
+  <h2>화폐시장의 균형</h2>
+  <div class="body">
+    <p class="lead t-define">화폐수요와 공급곡선이 만나는 지점에서 균형이자율(r*)이 결정</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 42%">
+        <p class="sub t-red" style="margin-bottom:8px">유동성 선호이론(liquidity preference theory)</p>
+        <p>화폐를 얼마나 보유할지에 대한 선택이<br>이자율을 결정한다는 이론</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-meq" viewBox="0 0 430 270" style="width:430px" role="img">
+          <title>화폐수요와 화폐공급이 만나 균형이자율이 정해지는 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>money('#f-meq', { box: { x0: 62, y0: 236, x1: 356, y1: 20 },
+    marks: [{ ms: 4.4, label: 'F', yt: 'r*' }],
+    notes: [[4.7, 9.8, 'MS'], [8.4, 2.6, 'MD'], [2.0, 7.6, '초과수요', 11], [6.4, 6.6, '초과공급', 11]] });</script>
+</section>
+
+<!-- ══ 8. 채권 (p.8) ════════════════════════════════════════ -->
+<section>
+  <h2>채권</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">액면가</p>
+    <p style="margin-bottom:34px">채권에 적혀 있는 원금</p>
+    <p class="sub t-red" style="margin-bottom:2px">표면이자율(coupon rate)</p>
+    <p style="margin-bottom:34px">액면가에 대해 지급하기로 한 이자의 비율</p>
+    <p class="sub t-red" style="margin-bottom:10px">실제 채권 수익률</p>
+    <p style="font-size:20px;margin-bottom:10px">= (액면가 × 표면이자율) / 채권구입가격</p>
+    <p class="sub t-red">= 화폐시장의 이자율</p>
+  </div>
+</section>
+
+<!-- ══ 9. 통화정책과 이자율 (p.9) ═══════════════════════════ -->
+<section>
+  <h2>통화정책과 이자율</h2>
+  <div class="body">
+    <p class="lead t-define">중앙은행이 통화량을 늘리거나 줄임으로써 이자율을 조정할 수 있음</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="sub t-red" style="margin-bottom:6px">중앙은행의 통화량 조정 수단</p>
+        <ul style="margin-bottom:24px">
+          <li>과거: 은행의 이자율 직접 통제</li>
+          <li>현재: 국채발행량을 조절하여 통제</li>
+        </ul>
+        <p class="sub t-red">이자율이 조정되면 국민소득, 물가 등이 변동하므로,<br>화폐수요 또한 우측 혹은 좌측으로 이동</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-mpol" viewBox="0 0 430 260" style="width:430px" role="img">
+          <title>화폐공급이 늘어 이자율이 내려가는 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>money('#f-mpol', { box: { x0: 62, y0: 226, x1: 356, y1: 20 }, ms: [4.4, 6.6],
+    marks: [{ ms: 4.4, label: 'F', yt: 'r0' }, { ms: 6.6, label: 'F’', yt: 'r1', lx: 6, ly: -6 }],
+    notes: [[4.7, 9.8, 'MS0'], [6.9, 9.8, 'MS2'], [8.4, 2.6, 'MD']] });</script>
+</section>
+
+<!-- ══ 10. 통화정책의 단기효과 (p.10) ═══════════════════════ -->
+<section class="s-pair">
+  <h2>통화정책의 단기효과</h2>
+  <p class="pd-lead sub t-red">중앙은행이 통화량을 늘리거나 줄임으로써 이자율을 조정할 수 있음</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-ms-short" viewBox="0 0 420 250" role="img">
+        <title>화폐공급이 늘어 이자율이 내려가는 화폐시장</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-adas-short" viewBox="0 0 420 250" role="img">
+        <title>이자율이 내려 투자와 소비가 늘고 총수요곡선이 오른쪽으로 이동한 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    money('#f-ms-short', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ms: [4.4, 6.6],
+      marks: [{ ms: 4.4, label: 'F', yt: 'r0' }, { ms: 6.6, label: 'F’', yt: 'r1', lx: 6, ly: -6 }],
+      notes: [[4.7, 9.6, 'MS0'], [6.9, 9.6, 'MS2'], [8.4, 2.4, 'MD(Y0)', 11]] });
+    adas('#f-adas-short', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ad: [0, 1.8],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' }, { label: 'F’', ad: 1.8, xt: 'Y1', yt: 'P1', lx: -4, ly: -12 }],
+      notes: [[8.2, 9.4, 'AS'], [8.4, 1.8, 'AD0', 11], [9.2, 3.4, 'AD1', 11],
+              [1.4, 7.4, '기업투자 증가\n+ 소비증가', 11, 'red']] });
+  </script>
+</section>
+
+<!-- ══ 11. 통화정책의 전달경로와 유동성 함정 (p.11) ═════════ -->
+<section>
+  <h2>통화정책의 단기효과</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:4px">통화정책의 전달경로(transmission mechanism)</p>
+    <p style="margin-bottom:2px">화폐공급 증가 → 이자율 하락 → 투자증가 → 〈승수효과〉 → 총수요증가 → 국민소득 증가</p>
+    <p style="margin-bottom:8px">화폐공급 감소 → 이자율 상승 → 투자감소 → 〈승수효과〉 → 총수요감소 → 국민소득 감소</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 52%">
+        <svg class="fig" id="f-trap" viewBox="0 0 430 250" style="width:430px" role="img">
+          <title>화폐수요의 이자율 탄력성이 클 때 통화공급을 늘려도 이자율이 내려가지 않는 그림</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:6px">유동성 함정(liquidity trap)</p>
+        <p>: 화폐수요의 이자율 탄력성이 무한히 커서<br>통화공급이 아무리 커도<br>이자율이 감소하지 않는 경우</p>
+        <p class="derive t-red">→ 통화정책 전달경로 작동 X</p>
+      </div>
+    </div>
+  </div>
+  <script>money('#f-trap', { box: { x0: 62, y0: 216, x1: 356, y1: 18 }, ms: [4.4, 6.6],
+    md: [0, 0], mdFlat: [false, true],
+    notes: [[4.7, 9.6, 'MS0'], [6.9, 9.6, 'MS2'],
+            [8.6, 2.2, 'MD0(Y0): 낮은 이자율탄력성', 10], [8.6, 4.6, 'MD1(Y0): 높은 이자율탄력성', 10]] });</script>
+</section>
+
+<!-- ══ 12. 화폐의 장기 중립성 (p.12) ════════════════════════ -->
+<section class="s-pair">
+  <h2>통화정책의 장기효과: 화폐의 장기 중립성 <span class="en">(long-run neutrality)</span></h2>
+  <p class="pd-lead sub t-red">화폐공급변화가 물가변화만 가져올 뿐 장기에는 투자지출이나 국민소득에 영향을 주지 못하는 현상</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-ms-long" viewBox="0 0 420 250" role="img">
+        <title>물가가 오르면서 화폐수요곡선이 오른쪽으로 밀려 이자율이 되돌아오는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-adas-long" viewBox="0 0 420 250" role="img">
+        <title>총공급곡선이 왼쪽으로 이동해 국민소득이 원래대로 돌아오고 물가만 오른 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    money('#f-ms-long', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ms: [4.4, 6.6],
+      md: [0, 2.2], marks: [{ ms: 4.4, label: 'F', yt: 'r0' }],
+      notes: [[4.7, 9.6, 'MS0'], [6.9, 9.6, 'MS2'], [8.4, 2.2, 'MD(Y0−P1)', 10],
+              [1.0, 1.2, '물가상승 + 소득감소의\n크기에 따라 이동', 10, 'red']] });
+    adas('#f-adas-long', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ad: [0, 1.8], as: [0, -1.8],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' },
+              { label: 'F’', ad: 1.8, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+              { label: 'F’’', ad: 1.8, as: -1.8, yt: 'P2', lx: -4, ly: -12 }],
+      notes: [[8.0, 9.4, 'AS0', 11], [5.4, 9.4, 'AS1', 11], [8.4, 1.8, 'AD0', 11], [9.2, 3.4, 'AD1', 11],
+              [0.6, 7.6, '물가상승\n→ 임금 및 생산요소\n가격 상승', 10, 'red']] });
+  </script>
+</section>
+
+<!-- ══ 13. 구축효과 (p.13) ══════════════════════════════════ -->
+<section class="s-pair">
+  <h2>재정정책의 단기효과: 구축효과 <span class="en">(crowding-out effect)</span></h2>
+  <p class="pd-lead sub t-red">정부지출 증가는 총수요 증가로 거래동기에 따른 화폐수요증가를 불러오지만
+    이자율 증가로 인해 그 효과가 일부 상쇄</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-ms-crowd" viewBox="0 0 420 250" role="img">
+        <title>화폐수요가 늘어 이자율이 오르는 화폐시장</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-adas-crowd" viewBox="0 0 420 250" role="img">
+        <title>총수요가 늘었다가 이자율 상승으로 일부 되돌아오는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    money('#f-ms-crowd', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ms: [4.4], md: [0, 2.0],
+      marks: [{ ms: 4.4, label: 'E', yt: 'r0' }, { ms: 4.4, md: 2.0, label: 'E’', yt: 'r1', lx: 6, ly: -6 }],
+      notes: [[4.7, 9.6, 'MS0'], [8.4, 2.2, 'MD0(Y0)', 10], [8.6, 4.6, 'MD1(Y1)', 10]] });
+    adas('#f-adas-crowd', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ad: [0, 3.4, 1.8],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' },
+              { label: 'F’', ad: 3.4, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+              { label: 'F’’', ad: 1.8, xt: 'Y2', yt: 'P2', lx: -14, ly: -8 }],
+      notes: [[8.0, 9.4, 'AS', 11], [8.4, 1.8, 'AD0', 10], [9.2, 3.2, 'AD2', 10], [9.8, 4.8, 'AD1', 10]] });
+  </script>
+</section>
+
+<!-- ══ 14. 재정정책의 장기효과 (p.14) ═══════════════════════ -->
+<section class="s-pair">
+  <h2>재정정책의 장기효과</h2>
+  <p class="pd-lead sub t-red">재정정책은 화폐와 같이 장기중립성이 성립하지 않음
+    (계속 이자율이 높은 상태를 유지해 실물경제에 영향)</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-ms-fl" viewBox="0 0 420 250" role="img">
+        <title>화폐수요가 두 차례 이동해 이자율이 계속 높은 상태로 남는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-adas-fl" viewBox="0 0 420 250" role="img">
+        <title>총공급곡선이 왼쪽으로 이동해 물가가 더 오르는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    money('#f-ms-fl', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ms: [4.4], md: [0, 2.0, 3.2],
+      marks: [{ ms: 4.4, label: 'E', yt: 'r0' }, { ms: 4.4, md: 2.0, label: 'E’', lx: 6, ly: -6 },
+              { ms: 4.4, md: 3.2, label: 'E’’', yt: 'r2', lx: -4, ly: -12 }],
+      notes: [[4.7, 9.6, 'MS0'], [8.4, 2.2, 'MD0(Y0−P0)', 10], [8.6, 4.4, 'MD1(Y1)', 10],
+              [1.0, 1.2, '물가상승 + 소득감소의\n크기에 따라 이동', 10, 'red']] });
+    adas('#f-adas-fl', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ad: [0, 2.4], as: [0, -1.8],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' },
+              { label: 'F’', ad: 2.4, xt: 'Y2', yt: 'P2', lx: 6, ly: -6 },
+              { label: 'F’’', ad: 2.4, as: -1.8, yt: 'P3', lx: -4, ly: -12 }],
+      notes: [[8.0, 9.4, 'AS0', 11], [5.4, 9.4, 'AS1', 11], [8.4, 1.8, 'AD0', 10], [9.4, 4.4, 'AD2', 10],
+              [0.6, 7.6, '물가상승\n→ 임금 및 생산요소\n가격 상승', 10, 'red']] });
+  </script>
+</section>
+
+<!-- ══ 15. 재정정책과 통화정책의 비교 (p.15) ════════════════ -->
+<section>
+  <h2>재정정책과 통화정책의 비교</h2>
+  <div class="body">
+    <p class="lead t-define">정책혼합(policy mix)의 필요성</p>
+    <table class="tbl-compare">
+      <thead><tr><th>비교기준</th><th>케인즈경제학자</th><th>통화주의자</th></tr></thead>
+      <tbody>
+        <tr><td>통화정책의 효과</td>
+            <td>효과가 약함: 이자율을 통해 간접적으로 실물부문에 영향을 주나, 화폐시장에 유동성 함정이 존재하거나 투자가 이자율에 비탄력적이면 경기조절 효과 X</td>
+            <td>효과가 큼: 통화량 변동은 이자율 변화를 통하지 않고 실물시장에 직접적으로 영향을 줌</td></tr>
+        <tr><td>재정정책의 효과</td>
+            <td>효과가 큼: 실물시장에 직접적으로 영향을 미침</td>
+            <td>효과가 약함: 정부지출 증가에 따른 이자율 상승으로 인한 구축효과가 발생해 경기조절효과가 상쇄됨</td></tr>
+        <tr><td>정책시차</td><td>통화정책의 외부시차가 길다</td><td>재정정책의 내부시차가 길다</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 16. 은행의 기능 (p.16) ═══════════════════════════════ -->
+<section>
+  <h2>은행의 기능</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">금융중개 기능</p>
+    <p style="margin-bottom:4px">자금 여유가 있는 사람 ↔ 자금이 필요한 사람</p>
+    <p class="derive t-red" style="margin-bottom:40px">→ 저축과 투자의 확대</p>
+    <p class="sub t-red" style="margin-bottom:2px">예금창조 기능</p>
+    <p style="margin-bottom:10px">보관된 금을 일시에 찾아가지 않으면 빌려줘서 이윤을 남길 수 있다.</p>
+    <p class="sub t-red" style="margin-bottom:4px">예. 보관된 1억원 = 지급준비금 3천만원 + 대출 7천만원</p>
+    <p class="derive t-blue" style="font-weight:700;margin-bottom:26px">→ 시중 통화량 증가!</p>
+    <p class="t-blue" style="font-weight:700;margin-bottom:2px">부분준비제도</p>
+    <p class="t-blue">: 예금 일부만을 지급준비금으로 보유하도록 허용하는 제도</p>
+  </div>
+</section>
+
+<!-- ══ 17. 예금창조와 통화승수 (p.17) ═══════════════════════ -->
+<section>
+  <h2>예금창조와 통화승수 <span class="en">(monetary multiplier)</span></h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:10px">통화승수</p>
+    <p style="font-size:20px;margin-bottom:10px">$= \dfrac{\text{통화량}}{\text{본원통화}} = \dfrac{1}{\text{지급준비율}}$</p>
+    <p style="margin-bottom:44px">은행의 예금창조의 결과 중앙은행이 늘린 화폐의 양(본원통화)에 비해<br>
+      훨씬 더 큰 폭으로 증가하는 현상</p>
+    <p class="sub t-red" style="margin-bottom:2px">본원통화</p>
+    <p>중앙은행의 창구를 통해 빠져나가는 일차적 화폐량<br>(민간보유 현금 + 은행 지급준비금)</p>
+  </div>
+</section>
+
+<!-- ══ 18. 뱅크런 (p.18) ════════════════════════════════════ -->
+<section>
+  <h2>뱅크런 <span class="en">(bank run)</span></h2>
+  <div class="body">
+    <p class="lead t-define">은행파산의 불안감으로 인해 예금을 일시에 인출해가려는 현상</p>
+    <img class="photo" src="../assets/bank-run.jpeg" alt="은행 앞에 예금을 찾으려는 사람들이 길게 줄을 선 모습"
+         style="height:320px;margin:14px auto 0">
+  </div>
+</section>
+
+<!-- ══ 19. 중앙은행의 통화관리 방식 (p.19) ══════════════════ -->
+<section class="s-numbered">
+  <h2>중앙은행의 통화관리 방식</h2>
+  <div class="body">
+    <ol>
+      <li>재할인율 정책: 시중은행에 자금을 빌려주는 금리 조정 (실제로는 중앙은행 예치금 조정)</li>
+      <li>지급준비율 정책: 법정지급준비율을 조정</li>
+      <li>공개시장 운영: 공개시장에서 국공채나 유가증권을 사고 팔아 통화량 조정</li>
+      <li>직접규제: 시중은행의 행동에 직접 규제 (예. 여신한도 설정, 대출조건 조정 등)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 20. 교역의 이득과 비교우위론 (p.20) ══════════════════ -->
+<section>
+  <h2>교역의 이득과 비교우위론</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">교역의 이득</p>
+    <p style="margin-bottom:2px">무역이 이루어지면서 각 나라 국민이 소비할 수 있는 상품의 양이 증가</p>
+    <p class="derive t-red" style="margin-bottom:16px">→ 비교우위에 따른 특화(specialization)로 가능</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 34%">
+        <p class="caption" style="margin-bottom:4px">〈일주일 노동투자의 상품량〉</p>
+        <table class="tbl-trade">
+          <thead><tr><th></th><th>한국</th><th>인도네시아</th></tr></thead>
+          <tbody>
+            <tr><td>쌀(섬)</td><td>5</td><td>4</td></tr>
+            <tr><td>옷(벌)</td><td>5</td><td>2</td></tr>
+          </tbody>
+        </table>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-top:14px">
+          한국은 인도네시아에 비해 절대우위(absolute advantage)를 가짐</p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">비교우위(comparative advantage)</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">
+          한 나라가 다른 나라에 대해 어떤 상품을 생산하는 데 상대적으로 더욱 효율적일 경우</p>
+        <p class="derive t-red" style="margin-bottom:14px">→ 핵심은 어떤 나라라도 최소한 하나 이상의 산업에서 비교우위를 가질 수 있다는 것</p>
+        <p style="margin-bottom:2px">한국의 쌀 1섬 생산의 기회비용: 옷 1벌</p>
+        <p style="margin-bottom:2px">인도네시아 쌀 1섬 생산의 기회비용: 옷 1/2벌</p>
+        <p class="derive t-red" style="margin-bottom:14px">→ 인도네시아가 쌀 생산에서 상대적으로 더 효율적</p>
+        <p class="sub t-red" style="font-size:var(--fs-body)">
+          인도네시아가 쌀에, 한국이 옷에 특화하고 이를 일정비율로 교환하면 더 많은 이득을 얻을 수 있음</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 21. 무역의 이득과 교역조건 (p.21) ════════════════════ -->
+<section>
+  <h2>무역의 이득과 교역조건</h2>
+  <div class="body">
+    <div class="cols" style="margin-top:0;align-items:flex-start">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="caption" style="margin-bottom:4px">〈일주일 노동투자의 상품량〉</p>
+        <table class="tbl-trade">
+          <thead><tr><th></th><th>한국</th><th>인도네시아</th></tr></thead>
+          <tbody>
+            <tr><td>쌀(섬)</td><td>5</td><td>4</td></tr>
+            <tr><td>옷(벌)</td><td>5</td><td>2</td></tr>
+          </tbody>
+        </table>
+        <p class="sub t-red" style="margin:16px 0 2px">교역조건</p>
+        <p style="margin-bottom:2px">국제무역에서 통용되는 상품과 상품사이의 가격비율</p>
+        <p style="margin-bottom:2px">한국: 쌀 1섬의 가격은 옷 1벌</p>
+        <p style="margin-bottom:8px">인도네시아: 쌀 1섬의 가격은 옷 1/2벌</p>
+        <p class="derive t-red" style="margin-bottom:2px">→ 두 나라 사이의 쌀 1섬의 가격은 옷 ½ ~ 1벌 사이여야 함</p>
+        <p class="caption">(∵ 인도네시아에서 쌀 1섬에 옷 1/3벌만 주면 국내생산)</p>
+      </div>
+      <div class="col-r">
+        <p style="margin-bottom:2px">한국: 옷에 특화하면 30만벌 생산</p>
+        <p style="margin-bottom:8px">인도네시아: 쌀에 특화하면 32만섬 생산</p>
+        <p class="derive t-red" style="margin-bottom:12px">→ 교환비율: 쌀 1섬 = 옷 3/4벌</p>
+        <table class="tbl-trade2">
+          <thead>
+            <tr><th rowspan="2"></th><th colspan="2">자급자족체계</th><th colspan="2">국제무역</th></tr>
+            <tr><th>쌀</th><th>옷</th><th>쌀</th><th>옷</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>한국</td><td>10만섬</td><td>20만벌</td><td>11만 2천섬</td><td>21만 6천벌</td></tr>
+            <tr><td>인도네시아</td><td>20만섬</td><td>6만벌</td><td>20만 8천섬</td><td>8만 4천벌</td></tr>
+          </tbody>
+        </table>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-top:14px">
+          → 인도네시아가 쌀 11만 2천섬을 팔고, 한국이 옷 8만 4천벌을 그 값으로 주면
+          자급자족체계보다 더 높은 소비가능집합을 가짐</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 22. 비교우위의 결정요인 (p.22) ═══════════════════════ -->
+<section class="s-numbered">
+  <h2>비교우위의 결정요인</h2>
+  <div class="body">
+    <ol>
+      <li>상이한 부존자원: 노동집약적 / 자본집약적</li>
+      <li>상이한 기술</li>
+      <li>특화의 역사: 행동에 의한 학습효과(learning by doing) (예. 스위스 시계)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 23. 무역에서 나오는 추가적 이득 (p.23) ═══════════════ -->
+<section class="s-numbered">
+  <h2>무역에서 나오는 추가적 이득</h2>
+  <div class="body">
+    <ol>
+      <li>규모의 경제: 특화에 따른 생산규모 증가로 평균비용 하락</li>
+      <li>학습효과: 생산경험에 따른 노하우</li>
+      <li>경쟁의 압력: 해외기업 유입으로 인한 독과점 문제 억제</li>
+      <li>다양한 소비의 기회</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 24. 보호무역론의 근거 (p.24) ═════════════════════════ -->
+<section class="s-numbered">
+  <h2>보호무역론의 근거</h2>
+  <div class="body">
+    <ol class="dense">
+      <li>실업의 방지: 국내시장 산업보호 (반박: 자원재분배와 생산성 향상의 비용)</li>
+      <li>생산다변화의 이득: 특화에 따른 다양성의 상실</li>
+      <li>국방상의 이유: 식량의 무기화 등</li>
+      <li>외국의 불공정한 정책에 대한 대응: 해외기업 보조금 및 장벽(예. 미국 내 전기차 보조금)</li>
+      <li>환경과 자원보존의 문제: 선진국의 엄격한 환경규제로 인한 사다리 걷어차기</li>
+      <li>유치산업 보호: 미성숙 산업의 보호 (예. 국내 및 중국 자동차 시장)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 25. 무역규제의 구체적 방식 (p.25) ════════════════════ -->
+<section>
+  <h2>무역규제의 구체적 방식</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">관세(tariff) 부과: 수입품에 일정 비율의 세금을 부과하여 가격을 상승</p>
+    <ul style="margin-bottom:18px">
+      <li>반덤핑관세: 외국기업이 고의로 싼 가격에 수출하는 의심에 따른 관세</li>
+      <li>상계관세: 타 국이 지급하는 보조금 상쇄를 위한 관세</li>
+    </ul>
+    <p class="sub t-red" style="margin-bottom:2px">수입할당제(import quota): 어떤 상품에 대해 수입할 수 있는 최대의 양을 할당</p>
+    <ul style="margin-bottom:4px"><li>관세에 비해 정부수입은 줄어들고 수입업자의 이득으로 전환</li></ul>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:18px">
+      수입할당제의 경우 관세에 비해 나쁜 품질 상품 유입 가능성 높음</p>
+    <p class="sub t-red" style="margin-bottom:2px">수출자유규제: 수출기업의 자율적으로 수출물량을 줄이도록 유도하는 정책</p>
+    <ul style="margin-bottom:18px"><li>수출나라의 기업에 압력을 가해 스스로 억제하도록 강제</li></ul>
+    <p class="sub t-red" style="margin-bottom:2px">비관세무역장벽: 관세 이외 수단을 통해 비공식적으로 무역 규제</p>
+    <ul style="margin:0"><li>예. 해외 자동차에 대한 까다로운 기준 적용(자국 내 배터리사용, 환경보호, 안전기준 상향 등)</li></ul>
+  </div>
+</section>
+
+<!-- ══ 26. 자유무역 방식 (p.26) ═════════════════════════════ -->
+<section>
+  <h2>자유무역 방식</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:6px">범세계적 차원</p>
+    <ul style="margin-bottom:48px">
+      <li>관세 및 무역에 관한 일반협정(GATT)</li>
+      <li>세계무역기구(WTO)</li>
+    </ul>
+    <p class="sub t-red" style="margin-bottom:6px">지역적 차원</p>
+    <ul style="margin:0">
+      <li>자유무역지역(FTA): NAFTA 등의 다자간, 한-미 FTA 등의 양자간</li>
+      <li>관세동맹: 참가국 사이의 관세 철폐 + 타 지역에서 유입되는 상품에 동일 관세 부과(관세회피 방지)</li>
+      <li>공동시장: 상품 및 노동, 자본의 자유로운 이동, ECM → EU</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 27. 국제수지표 — 정의 (p.27) ═════════════════════════ -->
+<section>
+  <h2>국제수지표 <span class="en">(balance of payment accounts)</span></h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:48px">일정기간 동안에 일어난 한 나라의 모든 대외거래를 요약해 놓은 통계표</p>
+    <p class="sub t-red" style="margin-bottom:2px">경상계정(current accounts)</p>
+    <p style="margin-bottom:34px">나라와 나라 사이 재화, 서비스의 교역, 임금, 이자, 배당 등과 관련된 경상거래 기록</p>
+    <p class="sub t-red" style="margin-bottom:2px">자본계정(capital accounts)</p>
+    <p style="margin-bottom:34px">나라와 나라 사이 무상 자본이전과 비생산-비금융자산 거래를 기록</p>
+    <p class="sub t-red" style="margin-bottom:2px">금융계정(financial accounts)</p>
+    <p>나라와 나라사이 금융자산 거래를 기록</p>
+  </div>
+</section>
+
+<!-- ══ 28. 국제수지표 — 표 (p.28) ═══════════════════════════ -->
+<section>
+  <h2>국제수지표 <span class="en">(balance of payment accounts)</span></h2>
+  <div class="body tight">
+    <table class="tbl-bop">
+      <thead><tr><th>상위계정</th><th>하위계정</th><th>예</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="4">경상계정</td><td>상품</td><td>일반상품의 수출과 수입, 중개무역 순수출</td></tr>
+        <tr><td>서비스</td><td>가공서비스, 운송, 여행, 건설, 통신, 지적재산권 사용료</td></tr>
+        <tr><td>본원소득</td><td>급료 및 임금, 배당 및 이자 등의 투자소득</td></tr>
+        <tr><td>이전소득</td><td>무상원조, 증여성 송금</td></tr>
+        <tr><td rowspan="2">자본계정</td><td>자본이전</td><td>자산 소유권의 무상이전, 채권자에 의한 채무변제</td></tr>
+        <tr><td>비생산-비금융자산</td><td>상표권과 같은 무형자산의 취득과 처분</td></tr>
+        <tr><td rowspan="5">금융계정</td><td>직접투자</td><td>경영참여를 통해 지속적인 이익을 얻으려는 목적의 직접투자</td></tr>
+        <tr><td>증권투자</td><td>주식 및 채권</td></tr>
+        <tr><td>파생상품투자</td><td>선도형, 옵션형 파생상품</td></tr>
+        <tr><td>기타투자</td><td>무역신용, 장단기 대출 및 차입, 현금 및 예금 등</td></tr>
+        <tr><td>준비자산증감</td><td>거래적 요인에 의한 외환보유액의 변화</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 29. 저축, 투자와 경상수지 (p.29) ═════════════════════ -->
+<section>
+  <h2>저축, 투자와 경상수지</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">경상수지(current accounts balance) 흑자는 반드시 바람직한가? 적자는 바람직하지 않은가?</p>
+    <p class="derive t-red" style="margin-bottom:22px">→ 경상수지 적자는 수출부족이 아닌 <span class="mark">투자지출의 확대, 해외투자 확대</span>일 수 있음</p>
+    <div class="cols" style="margin-top:0;align-items:flex-start">
+      <div class="col-l" style="flex:0 0 52%">
+        <p style="margin-bottom:16px">$Y = C + I + G + X_n$</p>
+        <p style="margin-bottom:16px">$X_n = Y - C - I - G$</p>
+        <p style="margin-bottom:2px">$X_n = [\,Y - T - C\,] + [\,T - G\,] - I$</p>
+        <p class="caption" style="margin-bottom:10px">
+          <span style="margin-left:32px">민간저축</span>
+          <span style="margin-left:74px">정부저축(재정흑자)</span></p>
+        <p style="margin-bottom:22px">$\;\;\;\; = S - I$</p>
+        <p style="margin-bottom:4px">$S > I$ <span class="t-red">경상수지 흑자</span></p>
+        <p>$S < I$ <span class="t-red">경상수지 적자</span></p>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:26px">
+          경상수지 흑자, 적자 그 자체보다<br>흑자 및 적자의 원인 파악이 더 중요</p>
+        <p class="sub t-red" style="font-size:var(--fs-body)">
+          단 지속적인 적자는 외환위기 가능성이 있으므로 관리 필요</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 30. 환율 (p.30) ══════════════════════════════════════ -->
+<section>
+  <h2>환율</h2>
+  <div class="body">
+    <p class="lead t-define">두 나라 화폐사이의 교환비율 = 외국화폐의 가격</p>
+    <div class="callout">
+      <p style="margin-bottom:2px">예1. 원-달러 환율이 1,200원</p>
+      <p style="margin-bottom:20px">→ 1달러를 가져가면 1200원을 준다. = 1200원을 지불해야 1달러를 살 수 있다.</p>
+      <p style="margin-bottom:2px">예2. 원-달러 환율이 1,200원에서 1,300원으로 오른 경우</p>
+      <p style="margin:0">→ 원화의 가치가 떨어졌다.</p>
+    </div>
+    <p class="sub t-red" style="margin-top:34px;margin-bottom:2px">환율이 중요한 이유</p>
+    <p>상품의 수출과 수입의 상대가격 변화, 자본의 양에도 영향 → 상품시장과 자본시장 등 여러 시장에 영향을 미침</p>
+  </div>
+</section>
+
+<!-- ══ 31. 기축통화 (p.31) ══════════════════════════════════ -->
+<section>
+  <h2>기축통화 <span class="en">(key currency, reserve currency)</span></h2>
+  <div class="body">
+    <p class="lead t-define">통화 사이의 교환수단이 되는 통화. 타 국과 삼각 거래할 때 매개할 수 있는 통화</p>
+    <img class="photo" src="../assets/key-currency.png"
+         alt="달러 88%, 유로 30%, 엔 17%, 파운드 13%, 위안 7% 순으로 거래되는 5대 통화 막대그래프"
+         style="height:300px;margin:14px auto 0">
+    <p class="caption" style="margin-top:6px">출처: Triennial Central Bank Survey of foreign exchange and
+      Over-the-counter (OTC) derivatives markets in 2022 (bis.org)</p>
+  </div>
+</section>
+
+<!-- ══ 32. 환율의 결정과정 (p.32) ═══════════════════════════ -->
+<section>
+  <h2>환율의 결정과정</h2>
+  <div class="body">
+    <p class="lead t-define">외환의 수요와 공급이 만나는 지점에서 균형환율이 결정</p>
+    <svg class="fig" id="f-fx" viewBox="0 0 460 290" style="width:460px;margin:10px 0 0 230px" role="img">
+      <title>외환수요와 외환공급이 만나 균형환율이 정해지는 그림</title></svg>
+    <script>forex('#f-fx', { box: { x0: 76, y0: 250, x1: 380, y1: 22 },
+      marks: [{ label: 'E' }],
+      notes: [[8.8, 9.0, 'S'], [8.8, 1.6, 'D'], [2.0, 7.6, '초과공급', 11], [6.6, 3.0, '초과수요', 11]] });</script>
+  </div>
+</section>
+
+<!-- ══ 33. 수요곡선과 공급곡선의 이동 (p.33) ════════════════ -->
+<section class="s-pair">
+  <h2>수요곡선과 공급곡선의 이동</h2>
+  <p class="pd-lead sub t-red">외환수요 증가: 국민소득 증가 → 소비지출증가 → 수입증가<br>
+    외환공급 증가: 국내 이자율 증가 → 외환유입</p>
+  <div class="body" style="margin-top:52px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-fx-d" viewBox="0 0 420 250" role="img">
+        <title>외환수요가 늘어 환율이 오르는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-fx-s" viewBox="0 0 420 250" role="img">
+        <title>외환공급이 늘어 환율이 내리는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    forex('#f-fx-d', { box: { x0: 62, y0: 216, x1: 348, y1: 18 }, d: [0, 1.8],
+      marks: [{ label: 'E' }, { label: 'E’', d: 1.8, lx: 6, ly: -6 }],
+      notes: [[8.6, 9.0, 'S'], [8.4, 1.6, 'D0', 11], [9.4, 3.0, 'D1', 11]] });
+    forex('#f-fx-s', { box: { x0: 62, y0: 216, x1: 348, y1: 18 }, s: [0, 1.8],
+      marks: [{ label: 'E' }, { label: 'E’', s: 1.8, lx: 6, ly: 12 }],
+      notes: [[8.0, 9.0, 'S0', 11], [9.4, 7.4, 'S1', 11], [8.6, 1.6, 'D0', 11]] });
+  </script>
+</section>
+
+<!-- ══ 34. 변동환율제도와 고정환율제도 (p.34) ═══════════════ -->
+<section>
+  <h2>변동환율제도와 고정환율제도</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">변동환율제도(floating exchange rate system)</p>
+    <p style="margin-bottom:26px">환율이 외환의 수요와 공급에 의해 자유롭게 결정되도록 한 제도</p>
+    <p class="sub t-red" style="margin-bottom:2px">고정환율제도(fixed exchange rate system)</p>
+    <p style="margin-bottom:30px">정부가 환율을 일정한 수준에 정해놓고 외환시장 개입을 통해 이를 유지하는 제도</p>
+    <p class="sub t-red" style="margin-bottom:8px">〈대표적 사례〉</p>
+    <ul style="margin:0">
+      <li>금본위제: 일정한 금무게 = 화폐가치 설정 → 금을 기준으로 환율이 고정</li>
+      <li>브레튼우즈체제(Bretton Woods System): 일정한 금무게 = 미국 달러가치 설정(1온스 = 35불)<br>
+        → 달러를 기준으로 환율이 고정<br>
+        → 미국 달러가치의 안정성이 생명 (∵ 달러가치 폭락 → 금태환 시 더 많은 금을 내어주어야 함)</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 35. 두 제도의 장단점 (p.35) ══════════════════════════ -->
+<section>
+  <h2>변동환율제도와 고정환율제도의 장단점</h2>
+  <div class="body">
+    <table class="tbl-fxsys">
+      <thead><tr><th></th><th>고정환율제도</th><th>변동환율제도</th></tr></thead>
+      <tbody>
+        <tr><td>장점</td>
+            <td>환율변화의 불확실성 낮음<br>국제거래 촉진 가능</td>
+            <td>해외 경기변동에 대한 완충역할<br>
+              (예. 해외 불황 → 순수출 감소 → 외환공급 감소 → 환율 상승 → 수출품 상대가격 하락 → 순수출 증가)<br>
+              외환시장 관계없이 국내 정책목표 달성을 위해 통화 및 재정정책 사용 가능</td></tr>
+        <tr><td>단점</td>
+            <td>정부의 환율재조정 시 투기가 오히려 심각<br>
+              해외 경기변동이 국내경기변동으로 바로 파급됨<br>
+              (예. 해외 불황 → 순수출 감소 → 외환공급 감소 → 외환수요 감축을 위한 강제 긴축 → 국내 불황발생)</td>
+            <td>환율변화의 불확실성 높음<br>환율변동의 위험부담 비용 높음<br>환율변동에 따른 투기 위험</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 36~39. 개방경제의 통화 및 재정정책 (p.36~39) ═════════ -->
+<section>
+  <h2>개방경제의 통화 및 재정정책</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">변동환율제도 하의 상황: 단기의 환율변동은 이자율에 의해 결정</p>
+    <p style="margin-bottom:10px">통화 및 재정정책 → 이자율 변동 → 환율변동 → 총수요 및 공급 변동</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="sub t-red" style="margin-bottom:6px">통화정책의 효과: 화폐공급 증가 → 이자율 하락</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">1. 수요곡선의 변화</p>
+        <p style="margin-bottom:2px">1) 투자 증가 → AD1로 이동</p>
+        <p style="margin-bottom:14px">2) 해외자본 유입 감소 → 환율 상승 → 순수출 증가 → AD2로 이동</p>
+        <p class="sub t-red" style="font-size:var(--fs-body)">2. 공급곡선의 변화: 생산요소 가격 증가 → AS1로 이동</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-open1" viewBox="0 0 430 260" style="width:430px" role="img">
+          <title>변동환율제에서 통화정책이 총수요를 두 번 밀어올리고 총공급이 왼쪽으로 이동하는 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>adas('#f-open1', { box: { x0: 62, y0: 226, x1: 356, y1: 20 }, ad: [0, 1.6, 3.0], as: [0, -1.4],
+    marks: [{ label: 'E0', xt: 'Y0', yt: 'P0' },
+            { label: 'E1', ad: 1.6, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+            { label: 'E2', ad: 3.0, as: -1.4, xt: 'Y2', yt: 'P2', lx: -4, ly: -12 }],
+    notes: [[7.8, 9.4, 'AS0', 10], [5.6, 9.4, 'AS1', 10],
+            [8.2, 1.8, 'AD0', 10], [9.2, 3.0, 'AD1', 10], [9.6, 4.4, 'AD2', 10]] });</script>
+</section>
+
+<section>
+  <h2>개방경제의 통화 및 재정정책</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">변동환율제도 하의 상황: 단기의 환율변동은 이자율에 의해 결정</p>
+    <p style="margin-bottom:10px">통화 및 재정정책 → 이자율 변동 → 환율변동 → 총수요 및 공급 변동</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="sub t-red" style="margin-bottom:6px">재정정책의 효과: 정부지출증가</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">1. 수요곡선의 변화</p>
+        <p style="margin-bottom:2px">정부지출 증가 → AD1로 이동</p>
+        <p style="margin-bottom:14px">이자율 상승 → 환율 하락 → 순수출 감소(정부지출의 구축효과)</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:20px">
+          2. 공급곡선의 변화: 생산요소 가격 하락 → AS1로 이동</p>
+        <p class="sub t-red">재정정책은 재정적자와 경상수지 적자가 동시발생 가능성이 높음</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-open2" viewBox="0 0 430 260" style="width:430px" role="img">
+          <title>변동환율제에서 재정정책의 효과가 구축효과로 일부 되돌아오는 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>adas('#f-open2', { box: { x0: 62, y0: 226, x1: 356, y1: 20 }, ad: [0, 3.0, 1.6], as: [0, 1.4],
+    marks: [{ label: 'E0', xt: 'Y0', yt: 'P0' },
+            { label: 'E1', ad: 3.0, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+            { label: 'E2', ad: 1.6, as: 1.4, xt: 'Y2', yt: 'P2', lx: -4, ly: -12 }],
+    notes: [[7.8, 9.4, 'AS0', 10], [9.6, 8.4, 'AS1', 10],
+            [8.2, 1.8, 'AD0', 10], [9.6, 4.4, 'AD1', 10], [9.2, 3.0, 'AD2', 10]] });</script>
+</section>
+
+<section>
+  <h2>개방경제의 통화 및 재정정책</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">고정환율제도 하의 상황: 정부는 통화량을 조정하여 환율변동을 억제해야 함</p>
+    <p style="margin-bottom:10px">통화 및 재정정책 → 이자율 변동 → 환율고정 → 총수요 및 공급 변동</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="sub t-red" style="margin-bottom:6px">통화정책의 효과: 화폐공급 증가 → 이자율 하락</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">1. 수요곡선의 변화</p>
+        <p style="margin-bottom:2px">1) 투자 증가 → AD1로 이동</p>
+        <p style="margin-bottom:14px">2) 해외자본 유입 감소 → 환율고정을 위해 외환공급 → 화폐공급 감소 → AD2로 이동</p>
+        <p class="sub t-red" style="font-size:var(--fs-body)">2. 공급곡선의 변화: 생산요소 가격 불변(∵환율불변) → AS0에서 유지</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-open3" viewBox="0 0 430 260" style="width:430px" role="img">
+          <title>고정환율제에서 통화정책의 효과가 되돌려지는 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>adas('#f-open3', { box: { x0: 62, y0: 226, x1: 356, y1: 20 }, ad: [0, 2.6, 1.0],
+    marks: [{ label: 'E0', xt: 'Y0', yt: 'P0' },
+            { label: 'E1', ad: 2.6, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+            { label: 'E2', ad: 1.0, xt: 'Y2', yt: 'P2', lx: -4, ly: -12 }],
+    notes: [[7.8, 9.4, 'AS0', 10], [8.2, 1.8, 'AD0', 10], [9.6, 4.2, 'AD1', 10], [9.0, 2.8, 'AD2', 10]] });</script>
+</section>
+
+<section>
+  <h2>개방경제의 통화 및 재정정책</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">고정환율제도 하의 상황: 정부는 통화량을 조정하여 환율변동을 억제해야 함</p>
+    <p style="margin-bottom:10px">통화 및 재정정책 → 이자율 변동 → 환율고정 → 총수요 및 공급 변동</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="sub t-red" style="margin-bottom:6px">재정정책의 효과: 정부지출 증가</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">1. 수요곡선의 변화</p>
+        <p style="margin-bottom:2px">1) 정부지출 증가 → AD1로 이동</p>
+        <p style="margin-bottom:14px">2) 이자율 상승 → 환율고정을 위해 외환흡수 → 화폐공급 증가 → 이자율 하락 → 투자증가 → AD2로 이동</p>
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:20px">
+          2. 공급곡선의 변화: 생산요소 가격 불변(∵환율불변) → AS0에서 유지</p>
+        <p class="sub t-red">고정환율제에서는 재정정책이 더욱 효과적이지만 환율방어를 위한 충분한 외환보유가 필수!</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-open4" viewBox="0 0 430 260" style="width:430px" role="img">
+          <title>고정환율제에서 재정정책이 두 번에 걸쳐 총수요를 더 밀어올리는 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>adas('#f-open4', { box: { x0: 62, y0: 226, x1: 356, y1: 20 }, ad: [0, 1.4, 2.8],
+    marks: [{ label: 'E0', xt: 'Y0', yt: 'P0' },
+            { label: 'E1', ad: 1.4, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+            { label: 'E2', ad: 2.8, xt: 'Y2', yt: 'P2', lx: -4, ly: -12 }],
+    notes: [[7.8, 9.4, 'AS0', 10], [8.2, 1.8, 'AD0', 10], [9.0, 2.8, 'AD1', 10], [9.6, 4.2, 'AD2', 10]] });</script>
+</section>
+
+<!-- ══ 40. Q & A (p.40) ═════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+<!-- ══ 41. 국민경제의 두 가지 숙제 (p.41) ═══════════════════ -->
+<section>
+  <h2>국민경제의 두 가지 숙제</h2>
+  <div class="body stack" style="text-align:center">
+    <p class="define-big" style="margin-bottom:44px">고용안정</p>
+    <p class="define-big">물가안정</p>
+  </div>
+</section>
+
+<!-- ══ 42. 실업의 정의와 측정 (p.42) ════════════════════════ -->
+<section>
+  <h2>실업의 정의와 측정</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">생산가능인구(P)</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:26px">
+      일할 능력을 갖추었다고 생각하는 사람으로서 우리나라의 경우 15세 이상의 사람들</p>
+    <p class="sub t-red" style="margin-bottom:2px">경제활동인구(L)</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:26px">생산가능연령인구 중 일하려는 의사가 있는 사람들</p>
+    <p class="sub t-red" style="margin-bottom:2px">실업자(U)</p>
+    <p style="margin-bottom:26px">15세 이상이고 일하려는 의사가 있음에도 일자리를 얻지 못한 사람</p>
+    <p class="sub t-red" style="margin-bottom:2px">실업률(U/L)</p>
+    <p style="margin-bottom:26px">경제활동인구 중 일자리를 얻지 못한 사람의 비율</p>
+    <p class="sub t-red" style="margin-bottom:2px">구직단념자</p>
+    <p>아무리 노력해도 일자리를 찾을 수 없어 일자리 찾기를 포기한 사람들. 비경제활동인구로 분류</p>
+  </div>
+</section>
+
+<!-- ══ 43. 실업의 측정 — 구조 (p.43) ════════════════════════ -->
+<section>
+  <h2>실업의 정의와 측정</h2>
+  <div class="body">
+    <div class="cols" style="margin-top:20px;align-items:flex-start">
+      <div class="col-l" style="flex:0 0 60%">
+        <div class="pop-tree">
+          <div class="tag wide">생산가능인구: P<br><span class="num">(4,478만명)</span></div>
+          <div class="row2">
+            <div class="tag">경제활동인구: L<br><span class="num">(2,801만명)</span></div>
+            <div class="tag">비경제활동인구: NL<br><span class="num">(1,677만명)</span></div>
+          </div>
+          <div class="row2">
+            <div class="tag">취업자: E<br><span class="num">(2,690만명)</span></div>
+            <div class="tag">실업자: U<br><span class="num">(111만명)</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-r" style="padding-top:20px">
+        <p style="margin-bottom:26px">경제활동참가율 $= \dfrac{\text{경제활동인구: } L}{\text{생산가능인구: } P}$</p>
+        <p>실업률 $= \dfrac{\text{실업자: } U}{\text{경제활동인구: } L}$</p>
+      </div>
+    </div>
+    <p class="caption" style="margin-top:22px">자료: 한국은행, 2021, 경제통계시스템(괄호 안 숫자는 2021년 수치)</p>
+  </div>
+</section>
+
+<!-- ══ 44. 실업의 종류 (p.44) ═══════════════════════════════ -->
+<section>
+  <h2>실업의 종류</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">1. 경기적 실업</p>
+    <p style="margin-bottom:40px">불황이 원인이 되어 발생하는 실업. 정부의 경제안정정책 목표 대상</p>
+    <p class="sub t-red" style="margin-bottom:2px">2. 마찰적 실업</p>
+    <p style="margin-bottom:10px">이사 혹은 이직을 위해서 일시적으로 발생하는 실업. 자발적 실업</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:40px">
+      * 완전고용실업률 / 자연실업률: 실업 내 마찰적 실업만 존재하는 경우</p>
+    <p class="sub t-red" style="margin-bottom:2px">3. 구조적 실업</p>
+    <p>산업구조 재편 등 경제구조의 변화 때문에 발생하는 실업. 비자발적 실업</p>
+  </div>
+</section>
+
+<!-- ══ 45. 인플레이션의 사회적 편익 (p.45) ══════════════════ -->
+<section class="s-numbered">
+  <h2>인플레이션의 사회적 편익</h2>
+  <div class="body">
+    <ol>
+      <li>고용증가: 실질임금 하락에 따른 고용상승</li>
+      <li>실질이자율 하락: 투자 증가 유발</li>
+      <li>정부 수입 증가: 정부화폐발행 + 민간의 자산가치 감소로 인해 더 많은 재화와 서비스 구매 가능</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 46. 인플레이션의 사회적 비용 (p.46) ══════════════════ -->
+<section>
+  <h2>인플레이션의 사회적 비용</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:6px">1. 예상한 인플레이션의 경우: 명목변수만 변화시키므로 사회적 비용을 초래하지 않음</p>
+    <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:6px">
+      * 피셔가설: 명목이자율(i)은 실질이자율(r)에 예상물가상승률($\pi^e$)을 더한 것과 같아진다
+      ($i = r + \pi^e$) = 사회적 비용 X</p>
+    <p style="margin-bottom:34px">→ 비판: 누진세율, 메뉴비용(가격조정비용), 구두창비용(은행거래비용),
+      계산단위 비용(계산복잡성) 발생 가능</p>
+    <p class="sub t-red" style="margin-bottom:8px">2. 예상치 못한 인플레이션의 경우: 사회적 비용을 발생시킴</p>
+    <ul style="margin:0">
+      <li>소득재분배 효과: 예상보다 물가상승이 클 경우 채권자와 채무자 간 자산소득 조정</li>
+      <li>장기계약 문제: 인플레이션이 예상되지 못할 경우 소득재분배효과로 인해 장기계약 어려움</li>
+      <li>투기 성행: 국제수지 적자, 불확실성의 증가 및 가격이 오를 것으로 예상되는 품목의 투기 성행
+        → 실제 예상보다 더 상승</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 47. 인플레이션의 발생원인 (p.47) ═════════════════════ -->
+<section class="s-pair">
+  <h2>인플레이션의 발생원인</h2>
+  <p class="pd-lead sub t-red">수요견인(demand-pull) 인플레이션: 총수요의 증가가 주요한 원인이 되어 발생하는 인플레이션<br>
+    비용상승(cost-push) 인플레이션: 총공급 감소가 주요 원인이 되어 발생한 인플레이션</p>
+  <div class="body" style="margin-top:52px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-inf1" viewBox="0 0 420 250" role="img">
+        <title>총수요가 늘어 물가와 국민소득이 함께 오르는 수요견인 인플레이션</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-inf2" viewBox="0 0 420 250" role="img">
+        <title>총공급이 줄어 물가는 오르고 국민소득은 줄어드는 비용상승 인플레이션</title></svg>
+    </div>
+  </div>
+  <script>
+    adas('#f-inf1', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ad: [0, 2.0],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' }, { label: 'F’', ad: 2.0, xt: 'Y1', yt: 'P1', lx: -4, ly: -12 }],
+      notes: [[8.0, 9.4, 'AS', 11], [8.2, 1.8, 'AD0', 10], [9.4, 3.2, 'AD1', 10],
+              [1.2, 7.6, '기업투자 증가\n+ 소비증가', 10, 'red']] });
+    adas('#f-inf2', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, as: [0, -2.0],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' }, { label: 'F’', as: -2.0, xt: 'Y1', yt: 'P1', lx: -4, ly: -12 }],
+      notes: [[8.0, 9.4, 'AS0', 11], [5.2, 9.4, 'AS1', 11], [8.6, 1.8, 'AD0', 10]] });
+  </script>
+</section>
+
+<!-- ══ 48. 총수요억제정책의 효과 (p.48) ═════════════════════ -->
+<section class="s-pair">
+  <h2>총수요억제정책의 효과</h2>
+  <p class="pd-lead sub t-red">수요견인(demand-pull) 인플레이션: 원래대로 이동 가능<br>
+    비용상승(cost-push) 인플레이션: 물가하락을 위해서 상당한 소득감소를 희생</p>
+  <div class="body" style="margin-top:52px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-sup1" viewBox="0 0 420 250" role="img">
+        <title>수요견인 인플레이션에서는 총수요를 되돌리면 원래 상태로 복귀하는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-sup2" viewBox="0 0 420 250" role="img">
+        <title>비용상승 인플레이션에서는 총수요를 줄이면 국민소득이 더 줄어드는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    adas('#f-sup1', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, ad: [0, 2.0], adDash: [false, true],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' }, { label: 'F’', ad: 2.0, xt: 'Y1', yt: 'P1', lx: -4, ly: -12 }],
+      notes: [[8.0, 9.4, 'AS', 11], [8.2, 1.8, 'AD0', 10], [9.4, 3.2, 'AD1', 10]] });
+    adas('#f-sup2', { box: { x0: 58, y0: 216, x1: 344, y1: 18 }, as: [0, -2.0], ad: [0, -1.8],
+      marks: [{ label: 'F', xt: 'Y0', yt: 'P0' },
+              { label: 'F’', as: -2.0, xt: 'Y1', yt: 'P1', lx: 6, ly: -6 },
+              { label: 'F’’', as: -2.0, ad: -1.8, xt: 'Y2', lx: -4, ly: -12 }],
+      notes: [[8.0, 9.4, 'AS0', 11], [5.2, 9.4, 'AS1', 11], [8.6, 1.8, 'AD0', 10], [6.8, 1.4, 'AD1', 10]] });
+  </script>
+</section>
+
+<!-- ══ 49. 필립스 곡선 (p.49) ═══════════════════════════════ -->
+<section>
+  <h2>필립스 곡선 <span class="en">(Phillips Curve)</span></h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">실업률과 물가상승률 간의 음의 상관관계를 보여주는 곡선</p>
+    <p class="derive t-red">→ 경기변동의 원인이 수요충격에 있음을 시사 (∵ 공급충격이면 실업과 물가가 동시에 상승)</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 52%">
+        <svg class="fig" id="f-phillips" viewBox="0 0 430 250" style="width:430px" role="img">
+          <title>실업률이 높을수록 물가상승률이 낮아지는 필립스곡선</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:2px">오쿤의 법칙</p>
+        <p style="margin-bottom:26px">미국의 경우 실업률 1% 증가 시<br>국내총생산은 2% 감소한다는 경험적 법칙</p>
+        <p class="sub t-red" style="margin-bottom:2px">희생비율</p>
+        <p>물가상승률 1%를 낮추는데 따르는 국민소득 감소비율</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 66, y0: 216, x1: 356, y1: 18 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      F.draw('#f-phillips', {
+        axes: { x: '실업률(%)', y: '물가상승률(%)' },
+        parts: [F.curve(S.curve(Fig.hyper(16, 1.8, 9.4)), { variant: 'demand' })],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 50. 경기의 미세조정 (p.50) ═══════════════════════════ -->
+<section>
+  <h2>경기의 미세조정</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:56px">통화정책이나 재정정책의 방향과 강도를 조절해서 경제를 안정된 상태에 유지하려는 정책</p>
+    <p class="sub t-red" style="margin-bottom:36px">
+      통화주의자: 시장의 자동조정에 대한 믿음. 필요할 때 준칙에 입각하여 통화정책만을 소극적으로 사용</p>
+    <p class="sub t-red">케인즈주의자: 시장실패의 가능성. 경제상황에 따라 정부가 재량적으로 적극적인 개입 필요</p>
+  </div>
+</section>
+
+<!-- ══ 51. 합리적 기대가설과 정책무력성 (p.51) ══════════════ -->
+<section>
+  <h2>합리적 기대가설과 정책무력성</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">
+      합리적인 사람이라면 미래예측을 위한 모든 정보를 적절하게 활용하여 물가상승률을 예측하므로</p>
+    <p class="sub t-red" style="margin-bottom:8px">총수요확장정책은 실업률에는 아무런 영향을 주지 못할 것</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 52%">
+        <svg class="fig" id="f-ratex" viewBox="0 0 430 250" style="width:430px" role="img">
+          <title>단기 필립스곡선을 따라 B로 갔다가 수직인 장기 곡선 위 C로 되돌아오는 그림</title></svg>
+      </div>
+      <div class="col-r">
+        <p style="margin-bottom:22px">실업감소를 위해 정책당국이 총수요확장정책 사용<br>(A → B로 이동)</p>
+        <p style="margin-bottom:22px">합리적 기대가설 하에서 모든 사람들이<br>물가상승을 예상하고 명목임금상승 요구<br>(B → C로 이동)</p>
+        <p class="sub t-red" style="font-size:var(--fs-body)">
+          하지만 현실에서는 명목임금이 즉각 오르지 못하고,<br>
+          모든 정보가 확실하지 않기 때문에 단기곡선에 따라 일정부분 효과가 나타남</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 66, y0: 216, x1: 356, y1: 18 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      const SR = S.curve(Fig.hyper(20, 2.6, 9.4));
+      const A = Fig.at(SR, { x: S.x(5.6) });
+      const B = Fig.at(SR, { x: S.x(3.6) });
+      const C = [A[0], B[1]];
+      F.draw('#f-ratex', {
+        axes: { x: '실업률(%)', y: '물가상승률(%)' },
+        parts: [
+          F.curve(S.curve([[5.6, 0.4], [5.6, 9.6]]), { variant: 'supply' }),
+          F.curve(SR, { variant: 'demand' }),
+          F.dot(...A, { label: 'A', lx: 7, ly: 12 }),
+          F.dot(...B, { label: 'B', lx: -4, ly: -12 }),
+          F.dot(...C, { label: 'C', lx: 7, ly: -6, free: true }),
+          F.arrow(B[0] + 8, B[1], C[0] - 8, C[1], { tone: 'blue' }),
+          F.annot(S.x(5.9), S.y(9.6), '합리적 기대 하의\n필립스곡선', { size: 11, lh: 13 }),
+          F.annot(S.x(8.2), S.y(2.6), '단기 필립스곡선', { size: 11 }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

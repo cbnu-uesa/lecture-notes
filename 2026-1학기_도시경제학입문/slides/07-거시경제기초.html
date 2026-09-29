@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7강. 거시경제이론의 기초</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 (p.1) ════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>7강. 거시경제이론의 기초</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 기본 개념 ① 국민소득·경제성장·경기변동 (p.2) ══════ -->
+<section>
+  <h2>거시경제이론의 기본 개념</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">국민소득</p>
+    <p style="margin-bottom:30px">대체로 국내총생산(gross domestic product)으로 측정.
+      즉 한해동안 그 나라에서 생산된 상품의 총 부가가치</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 52%">
+        <p class="sub t-red" style="margin-bottom:2px">경제성장(economic growth)</p>
+        <p style="margin-bottom:28px">국내 총생산의 장기적 추세</p>
+        <p class="sub t-red" style="margin-bottom:2px">경기변동(business fluctuation)</p>
+        <p>국내 총생산의 단기적 동향.<br>
+          국내총생산이 장기추세치보다 높거나(호황기) 낮은(불황기) 일이 반복되는 현상</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-cycle" viewBox="0 0 400 260" style="width:400px" role="img">
+          <title>장기추세선 위아래로 물결치는 실제 국내총생산과 정점 P, 저점 T</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 58, y0: 226, x1: 350, y1: 24 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      const TREND = S.curve([[0.4, 3.0], [9.6, 7.6]]);
+      const ACT = S.curve([[1.0, 0.6], [1.5, 3.4], [2.4, 5.8], [3.4, 6.6], [4.6, 5.6],
+                           [5.8, 3.6], [6.6, 3.0], [7.6, 5.6], [8.4, 8.4], [9.4, 9.4]]);
+      F.draw('#f-cycle', {
+        axes: { x: 'T', y: 'GDP' },
+        parts: [
+          F.curve(ACT, { variant: 'i3' }),
+          F.curve(TREND, { variant: 'supply' }),
+          F.dot(...S.p([3.4, 6.6]), { r: 4, label: 'P', lx: -4, ly: -12, free: true }),
+          F.dot(...S.p([6.6, 3.0]), { r: 4, label: 'T', lx: -4, ly: 20, free: true }),
+          F.annot(S.x(6.2), S.y(9.8), '실제 국내총생산', { size: 12, tone: 'red' }),
+          F.annot(S.x(8.0), S.y(6.4), '장기추세', { size: 12, tone: 'red' }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 3. 기본 개념 ② 공행성 (p.3) ══════════════════════════ -->
+<section>
+  <h2>거시경제이론의 기본 개념</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">공행성(co-movement)</p>
+    <p>경기변동과정에서 여러 변수가 일정한 관련을 갖고 함께 움직이는 경향 (예. 실업률 ~ GDP갭)</p>
+    <img class="photo" src="../assets/gdp-gap.jpeg"
+         alt="1970년부터 2020년까지 GDP갭과 실업률갭이 서로 반대 방향으로 움직여 온 그래프"
+         style="height:302px;margin:12px auto 0">
+  </div>
+</section>
+
+<!-- ══ 4. 기본 개념 ③ 물가·인플레이션 (p.4) ═════════════════ -->
+<section>
+  <h2>거시경제이론의 기본 개념</h2>
+  <div class="body">
+    <div class="cols" style="align-items:flex-start;margin-top:0">
+      <div class="col-l" style="flex:0 0 52%">
+        <p class="sub t-red" style="margin-bottom:2px">물가(price level)</p>
+        <p style="margin-bottom:36px">모든 상품가격의 평균적인 수준<br>(예. 소비자물가, 생산자물가, 근원물가 등)</p>
+        <p class="sub t-red" style="margin-bottom:2px">인플레이션(inflation)</p>
+        <p style="margin-bottom:36px">물가가 지속적으로 상승하는 현상</p>
+        <p class="sub t-red" style="margin-bottom:2px">디플레이션(deflation)</p>
+        <p>물가가 지속적으로 하락하는 현상</p>
+      </div>
+      <div class="col-r" style="padding-top:56px">
+        <p style="margin-bottom:44px">Q1) 인플레이션은 반드시 나쁜 것일까?</p>
+        <p>Q2) 디플레이션은 좋은 것일까?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 5. 기본 개념 ④ 대외의존도 (p.5) ══════════════════════ -->
+<section>
+  <h2>거시경제이론의 기본 개념</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">대외의존도</p>
+    <p>총수출액과 총수입액의 합을 국내총생산으로 나눈 비율</p>
+    <img class="photo" src="../assets/trade-dependency.png"
+         alt="1970년 37%에서 2022년 103%까지 오르내린 GDP 대비 수출입 비율 그래프"
+         style="height:278px;margin:10px auto 0">
+    <p class="caption" style="margin-top:8px">출처: 국가지표체계
+      (https://www.index.go.kr/unity/potal/indicator/IndexInfo.do?cdNo=210&amp;clasCd=2&amp;idxCd=4207)</p>
+  </div>
+</section>
+
+<!-- ══ 6. 기본 개념 ⑤ 국제수지·환율 (p.6) ═══════════════════ -->
+<section>
+  <h2>거시경제이론의 기본 개념</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">대외의존도</p>
+    <p style="margin-bottom:44px">총수출액과 총수입액의 합을 국내총생산으로 나눈 비율</p>
+    <p class="sub t-red" style="margin-bottom:2px">국제수지(balance of payments)</p>
+    <p style="margin-bottom:6px">한 나라에 들어오고 나가는 화폐의 흐름을 함께 모아 정리해 놓은 것</p>
+    <ul style="margin-bottom:44px">
+      <li>국제수지 흑자: 유입외화 〉 유출외화</li>
+      <li>국제수지 적자: 유입외화 〈 유출외화</li>
+    </ul>
+    <p class="sub t-red" style="margin-bottom:2px">환율(exchange rate)</p>
+    <p style="margin-bottom:6px">한 나라 화폐와 다른 나라 화폐 간 교환 비율 → 수출품과 수입품의 상대가격 변화에 영향</p>
+    <ul style="margin:0">
+      <li>원-달러 환율: 1,000원/달러 → 1달러를 가져가면 한화 1000원으로 바꿔준다는 것</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 7. 총수요와 총공급 — 개별시장 vs 대표상품시장 (p.7) ══ -->
+<section class="s-pair">
+  <h2>총수요와 총공급</h2>
+  <p class="pd-lead sub t-red">총수요/총공급</p>
+  <p class="pd-sub">국민경제 전체에서 생산되는 상품에 대한 총체적 수요/공급</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <p class="pair-title t-red" style="text-align:center;font-weight:700">개별상품시장</p>
+      <svg class="fig" id="f-micro" viewBox="0 0 420 280" role="img">
+        <title>개별상품시장의 수요·공급과 균형가격</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title t-red" style="text-align:center;font-weight:700">대표상품 시장</p>
+      <svg class="fig" id="f-macro" viewBox="0 0 420 280" role="img">
+        <title>총수요·총공급이 만나 균형물가와 균형국내총생산이 정해지는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const B = { x0: 66, y0: 244, x1: 356, y1: 22 };
+      const mk = (sel, ax, ay, xt, yt, dl, sl, lab) => {
+        const F = Fig.withBox(B);
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const D = S.curve([[0.6, 8.8], [9.4, 1.8]]);
+        const Sp = S.curve([[0.8, 1.4], [9.2, 8.6]]);
+        const E = Fig.cross(D, Sp);
+        F.draw(sel, {
+          axes: { x: ax, y: ay },
+          parts: [
+            F.curve(D, { variant: 'demand' }), F.curve(Sp, { variant: 'supply' }),
+            F.guide(E[0], E[1], { xtick: xt, ytick: yt }),
+            F.dot(E[0], E[1], { label: lab, lx: -4, ly: -12, free: true }),
+            F.annot(S.x(6.6), S.y(9.6), sl, { size: 12 }),
+            F.annot(S.x(6.6), S.y(1.2), dl, { size: 12 }),
+          ],
+        });
+      };
+      mk('#f-micro', '생산량', '가격', 'Q*', 'P*', '수요곡선', '공급곡선', 'E');
+      mk('#f-macro', '국내총생산', '물가', '균형\n국내총생산', '균형\n물가', '총수요곡선', '총공급곡선', 'F');
+    })();
+  </script>
+</section>
+
+<!-- ══ 8. 총수요 증가효과와 총공급 감소효과 (p.8) ═══════════ -->
+<section class="s-pair">
+  <h2>총수요와 총공급</h2>
+  <p class="pd-lead sub t-red">총수요/총공급</p>
+  <p class="pd-sub">국민경제 전체에서 생산되는 상품에 대한 총체적 수요/공급</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <p class="pair-title t-red" style="text-align:center;font-weight:700">총수요증가효과</p>
+      <svg class="fig" id="f-adup" viewBox="0 0 420 280" role="img">
+        <title>총수요곡선이 오른쪽으로 이동해 물가와 생산이 함께 오르는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title t-red" style="text-align:center;font-weight:700">총공급감소효과</p>
+      <svg class="fig" id="f-asdn" viewBox="0 0 420 280" role="img">
+        <title>총공급곡선이 왼쪽으로 이동해 물가는 오르고 생산은 줄어드는 스태그플레이션</title></svg>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const B = { x0: 66, y0: 244, x1: 356, y1: 22 };
+      // 총수요 증가: AD 가 오른쪽으로 → 물가·생산 모두 증가
+      {
+        const F = Fig.withBox(B);
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const AD0 = S.curve([[0.6, 7.8], [9.4, 0.8]]);
+        const AD1 = S.curve([[0.6, 9.4], [9.4, 2.4]]);
+        const AS = S.curve([[0.8, 1.0], [9.2, 8.2]]);
+        const F0 = Fig.cross(AD0, AS), F1 = Fig.cross(AD1, AS);
+        F.draw('#f-adup', {
+          axes: { x: 'Y', y: 'P' },
+          parts: [
+            F.curve(AD0, { variant: 'demand', dash: '9 7' }),
+            F.curve(AD1, { variant: 'demand' }),
+            F.curve(AS, { variant: 'supply' }),
+            F.guide(F0[0], F0[1], { xtick: 'Y', ytick: 'P' }),
+            F.guide(F1[0], F1[1], { xtick: 'Y’', ytick: 'P’' }),
+            F.dot(...F0, { label: 'F', lx: -14, ly: -6, free: true }),
+            F.dot(...F1, { label: 'F’', lx: -4, ly: -12, free: true }),
+            F.annot(S.x(8.2), S.y(8.8), 'AS', { size: 12 }),
+            F.annot(S.x(9.5), S.y(2.4), 'AD’', { size: 12 }),
+            F.annot(S.x(9.5), S.y(0.8), 'AD', { size: 12 }),
+          ],
+        });
+      }
+      // 총공급 감소: AS 가 왼쪽으로 → 물가는 오르고 생산은 줄어든다
+      {
+        const F = Fig.withBox(B);
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const AD = S.curve([[0.6, 8.6], [9.4, 1.6]]);
+        const AS0 = S.curve([[1.4, 0.8], [9.4, 7.6]]);
+        const AS1 = S.curve([[0.6, 2.6], [8.6, 9.4]]);
+        const F0 = Fig.cross(AD, AS0), F1 = Fig.cross(AD, AS1);
+        F.draw('#f-asdn', {
+          axes: { x: 'Y', y: '물가' },
+          parts: [
+            F.curve(AS0, { variant: 'supply', dash: '9 7' }),
+            F.curve(AS1, { variant: 'supply' }),
+            F.curve(AD, { variant: 'demand' }),
+            F.guide(F0[0], F0[1], { xtick: 'Y', ytick: 'P' }),
+            F.guide(F1[0], F1[1], { xtick: 'Y’', ytick: 'P’' }),
+            F.dot(...F0, { label: 'F', lx: 7, ly: -6, free: true }),
+            F.dot(...F1, { label: 'F’', lx: -4, ly: -12, free: true }),
+            F.annot(S.x(8.8), S.y(9.8), 'AS’', { size: 12 }),
+            F.annot(S.x(9.6), S.y(7.6), 'AS', { size: 12 }),
+            F.annot(S.x(9.6), S.y(1.6), 'AD', { size: 12 }),
+            F.annot(S.x(2.6), S.y(7.2), '스태그플레이션', { size: 12, tone: 'red' }),
+          ],
+        });
+      }
+    })();
+  </script>
+</section>
+
+<!-- ══ 9. 국내총생산 — 정의 (p.9) ═══════════════════════════ -->
+<section>
+  <h2>국내총생산</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:16px">일정 기간 동안 한 나라 안에서 생산되어 최종적인 용도로 사용되는 재화와 서비스의 총 가치</p>
+    <ol class="tight" style="margin-bottom:36px">
+      <li>일정기간: 1년</li>
+      <li>한 나라: 국적 불문</li>
+      <li>최종용도: 중간재(다른 상품생산에 사용되는 재화와 서비스) 제외,
+        즉 부가가치(value added)만 포함 (이중계상문제)</li>
+    </ol>
+    <p class="sub t-red" style="margin-bottom:2px">중간재(intermediate goods)</p>
+    <p style="margin-bottom:30px">다른 상품의 생산과정에 사용되는 중간투입물의 성격을 가진 재화 (예. 빵 생산을 위해 투입된 기계)</p>
+    <p class="sub t-red" style="margin-bottom:2px">부가가치(value added)</p>
+    <p>각 생산단계에서 새로이 창출된 가치</p>
+  </div>
+</section>
+
+<!-- ══ 10. 국내총생산 — 부가가치의 흐름 (p.10) ══════════════ -->
+<section>
+  <h2>국내총생산</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:14px">일정 기간 동안 한 나라 안에서 생산되어 최종적인 용도로 사용되는 재화와 서비스의 총 가치</p>
+    <ol class="tight" style="margin-bottom:0">
+      <li>일정기간: 1년</li>
+      <li>한 나라: 국적 불문</li>
+      <li>최종용도: 중간재(다른 상품생산에 사용되는 재화와 서비스) 제외,
+        즉 부가가치(value added)만 포함 (이중계상문제)</li>
+    </ol>
+    <div class="chain">
+      <div class="node">농민<br>(밀)<span class="va">부가가치: 17억원</span></div>
+      <div class="link">17억원</div>
+      <div class="node">제분업자<br>(밀가루)<span class="va">7억원</span></div>
+      <div class="link">24억원</div>
+      <div class="node">빵제조업자<br>(빵)<span class="va">6억원</span></div>
+      <div class="link">30억원</div>
+      <div class="node">소비자</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 11. 명목 vs 실질 (p.11) ══════════════════════════════ -->
+<section>
+  <h2>명목<span class="en">(nominal)</span> vs. 실질<span class="en">(real)</span></h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:4px">명목국내총생산(nominal GDP): 경상가격(current price)</p>
+    <p style="margin-bottom:4px">국내총생산을 구하는 해의 상품생산량에 <span class="mark">그 해의 가격</span>을 곱해 구한 화폐가치</p>
+    <p class="derive t-red" style="margin-bottom:56px">→ 화폐 상의 숫자 반영 그 자체가 중요</p>
+    <p class="sub t-red" style="margin-bottom:4px">실질국내총생산(real GDP): 불변가격(constant price)</p>
+    <p style="margin-bottom:4px">국내총생산을 구하는 해의 상품생산량에 <span class="mark">기준이 되는 해의 가격</span>을 곱해 구한 화폐가치</p>
+    <p class="derive t-red">→ 물가변동을 제거한 생산물의 구매력이 중요</p>
+  </div>
+</section>
+
+<!-- ══ 12. 삼면등가의 법칙 — 순환도 (p.12) ══════════════════ -->
+<section>
+  <h2>국내총생산 삼면등가의 법칙</h2>
+  <div class="body">
+    <p class="lead t-define">생산, 지출, 분배국민소득이 언제나 서로 같은 값을 갖는 항등관계에 있다는 것</p>
+    <svg class="fig" id="f-flow" viewBox="0 0 880 330" style="width:880px;margin:4px 0 0 -6px" role="img">
+      <title>가계·정부·기업·해외 사이를 도는 소득과 지출의 순환</title></svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 0, y0: 330, x1: 880, y1: 0 });
+        const box = (x, y, w, h, t) =>
+          `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--brand-crimson)"/>` +
+          `<text x="${x + w / 2}" y="${y + h / 2 + 6}" text-anchor="middle" fill="#FFF"` +
+          ` style="font-size:16px;font-weight:700;stroke:none">${t}</text></g>`;
+        const arc = (d) => `<path d="${d}" fill="none" stroke="var(--chart-blue)" stroke-width="1.4" marker-end="url(#ah-blue)"/>`;
+        F.draw('#f-flow', {
+          parts: [
+            box(120, 200, 116, 56, '가계'),
+            box(392, 200, 116, 56, '정부'),
+            box(700, 196, 116, 56, '기업'),
+            box(700, 26, 116, 46, '해외'),
+            // 가계 → 소비 → 국내민간지출
+            arc('M236,206 C300,170 300,150 396,132'),
+            F.annot(258, 190, '소비(C)', { size: 13 }),
+            // 저축
+            arc('M186,196 C186,170 176,160 168,150'),
+            F.annot(120, 148, '저축(S)', { size: 13 }),
+            // 투자
+            arc('M228,140 C300,108 340,120 396,128'),
+            F.annot(226, 132, '투자(I)', { size: 13 }),
+            // 정부지출
+            arc('M450,196 C450,170 450,160 450,142'),
+            F.annot(454, 176, '정부지출(G)', { size: 13 }),
+            // 국내민간지출 → 수입 → 해외
+            arc('M540,124 C600,96 640,60 696,50'),
+            F.annot(566, 62, '수입(Q)', { size: 13 }),
+            // 해외 → 기업 (수출)
+            arc('M792,72 C812,110 812,150 792,192'),
+            F.annot(796, 138, '수출(X)', { size: 13 }),
+            // 국내민간지출 → 국내총지출 → 기업
+            arc('M540,132 C630,150 690,170 746,192'),
+            F.annot(596, 148, '국내총지출\n(E=C+I+G)', { size: 13, lh: 16 }),
+            // 기업 → 국민소득 → 가계
+            arc('M756,258 C740,290 700,300 640,300'),
+            F.annot(646, 306, '국민소득(Y)', { size: 13, tone: 'red', anchor: 'end' }),
+            arc('M470,300 C380,306 300,300 178,268'),
+            F.annot(180, 306, '가처분소득(Yd=Y−T)', { size: 13 }),
+            // 조세
+            arc('M450,296 C450,280 450,272 450,262'),
+            F.annot(456, 306, '조세(T)', { size: 13 }),
+            F.annot(468, 124, '국내민간지출(C+I)', { size: 13, anchor: 'middle' }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 13. 삼면등가의 법칙 — 세 소득 (p.13) ═════════════════ -->
+<section>
+  <h2>국내총생산 삼면등가의 법칙</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:22px">생산, 지출, 분배국민소득이 언제나 서로 같은 값을 갖는 항등관계에 있다는 것</p>
+    <ul style="margin-bottom:32px">
+      <li><strong>생산국민소득:</strong> 어떤 나라가 한 해 동안 생산해낸 최종재의 총 가치 (Y)</li>
+      <li><strong>분배국민소득:</strong> 임금, 이자, 지대, 이윤 등 한 해 동안 국민이 얻은 소득의 총 가치 (Y = C+S+T)</li>
+      <li><strong>지출국민소득:</strong> 경제주체인 가계, 기업, 정부, 해외부문이 지출한 최종재의 총 가치 (E = C+I+G+(X−M))</li>
+    </ul>
+    <div class="triple">
+      <div class="cell"><div class="tag">지출국민소득</div><p>소비지출+투자지출+정부지출+순수출</p></div>
+      <div class="cell"><div class="tag">생산국민소득</div><p>국내총생산<br>= 부가가치의 합</p></div>
+      <div class="cell"><div class="tag">분배국민소득</div><p>임금+이자+지대+이윤</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 14. 한국의 국민계정 (p.14) ═══════════════════════════ -->
+<section class="s-pair">
+  <h2>한국의 국민계정</h2>
+  <div class="body">
+    <div class="pair-cell">
+      <p class="pair-title t-red" style="font-weight:700">〈한국의 국민계정(2019년) (단위: 조원)〉</p>
+      <img src="../assets/national-accounts.jpeg" style="height:330px"
+           alt="2018년과 2019년 항목별 금액과 구성비를 담은 한국 국민계정 표">
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title t-red" style="font-weight:700">〈국민소득의 구성 (2019년)〉</p>
+      <img src="../assets/income-composition.jpeg" style="height:330px"
+           alt="생산·지출·분배 국민소득이 모두 1,919조원으로 같음을 보이는 누적막대 그래프">
+    </div>
+  </div>
+</section>
+
+<!-- ══ 15. 국민소득의 여러 개념 (p.15) ══════════════════════ -->
+<section>
+  <h2>국민소득의 여러 개념</h2>
+  <div class="body">
+    <img class="photo" src="../assets/income-concepts.jpeg"
+         alt="GDP에서 GNP, GNI, 처분가능소득으로 넘어가며 무엇이 더해지고 빠지는지 보이는 막대 그림"
+         style="height:362px;margin:6px auto 0">
+  </div>
+</section>
+
+<!-- ══ 16. 물가지수 (p.16) ══════════════════════════════════ -->
+<section>
+  <h2>물가지수</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">물가지수</p>
+    <p class="lead t-define" style="margin-bottom:52px">기준시점의 물가를 100으로 잡고 다른 시점의 물가를 이의 백분비로 표시한 지수</p>
+    <p class="sub t-red" style="margin-bottom:2px">소비자물가지수(consumer price index: CPI)</p>
+    <p class="lead t-define" style="margin-bottom:52px">전국의 가구가 사용하는 대표적 소비재의 가격동향을 보여주는 물가지수</p>
+    <p class="sub t-red" style="margin-bottom:2px">생산자물가지수(produce price index: PPI)</p>
+    <p class="lead t-define">기업 사이에서 거래되는 대표적 원자재 및 자본재, 서비스의 가격 동향을 보여주는 물가지수</p>
+  </div>
+</section>
+
+<!-- ══ 17. 물가지수의 계산 (p.17) ═══════════════════════════ -->
+<section>
+  <h2>물가지수의 계산</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:8px">물가지수 계산 시에는 바스켓에 담긴 물품의 거래량을 고려하여 상품비중에 가중치(weight)를 부여</p>
+    <table class="tbl-basket">
+      <tr><th rowspan="2"></th><th colspan="2">2015년(기준시점)</th><th colspan="2">2021년</th></tr>
+      <tr><th>생산량</th><th>가격(원)</th><th>생산량</th><th>가격(원)</th></tr>
+      <tr><td>쌀</td><td>200가마</td><td>5만원</td><td>400가마</td><td>7만원</td></tr>
+      <tr><td>옷</td><td>300벌</td><td>2만원</td><td>200벌</td><td>3만원</td></tr>
+    </table>
+    <div class="cols" style="margin-top:16px">
+      <div class="col-l" style="flex:0 0 50%">
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">라스파이레스 지수: 기준시점의 가중치를 사용하는 지수</p>
+      </div>
+      <div class="col-r"><p class="formula-key" style="margin:0">$= \dfrac{P_1 \cdot Q_0}{P_0 \cdot Q_0}$</p></div>
+    </div>
+    <p style="margin:2px 0 18px">2021년 소비자물가지수 $= \dfrac{200 \times 7만원 + 300 \times 3만원}{200 \times 5만원 + 300 \times 2만원} \times 100
+      = \dfrac{2300만원}{1600만원} \times 100 = 143.8$</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 50%">
+        <p class="sub t-red" style="font-size:var(--fs-body);margin-bottom:2px">파셰 지수: 대상연도의 거래량을 가중치로 사용하는 지수</p>
+      </div>
+      <div class="col-r"><p class="formula-key" style="margin:0">$= \dfrac{P_1 \cdot Q_1}{P_0 \cdot Q_1}$</p></div>
+    </div>
+    <p style="margin:2px 0 0">2021년 소비자물가지수 $= \dfrac{400 \times 7만원 + 200 \times 3만원}{400 \times 5만원 + 200 \times 2만원} \times 100
+      = \dfrac{3400만원}{2400만원} \times 100 = 141.7$</p>
+  </div>
+</section>
+
+<!-- ══ 18. GDP 디플레이터와 물가상승률 (p.18) ═══════════════ -->
+<section>
+  <h2>GDP 디플레이터와 물가상승률</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">GDP 디플레이터(GDP deflator)</p>
+    <p style="margin-bottom:20px">한 나라 안에서 생산되는 <span class="mark">모든 상품의 가격</span>을 고려 대상으로 삼아 산출한 물가지수</p>
+    <p style="margin-bottom:2px">GDP 디플레이터 $= \dfrac{\text{명목국내총생산}}{\text{실질국내총생산}} \times 100$</p>
+    <p class="caption" style="margin-bottom:56px">(해마다 다른 가중치(그 해의 상품거래량)으로 산출하는 지수 = 파셰 지수)</p>
+    <p class="sub t-red" style="margin-bottom:2px">물가상승률/인플레이션율(inflation rate)</p>
+    <p style="margin-bottom:16px">일정기간 동안 물가지수가 증가한 비율 (전년 동월, 전월 대비)</p>
+    <p>$\pi = \dfrac{CPI_{23} - CPI_{22}}{CPI_{22}}$</p>
+  </div>
+</section>
+
+<!-- ══ 19. 물가지수에 대한 궁금증 (p.19 + p.20) ═════════════
+     원본은 질문만 보인 장과 답을 덧붙인 장 두 개다. fragment 로 합친다. -->
+<section>
+  <h2>물가지수에 대한 궁금증</h2>
+  <div class="body">
+    <p style="margin-bottom:2px">Q1) 바스켓 물품은 변하나요?</p>
+    <p class="qa-ans fragment" data-fragment-index="0" style="margin-bottom:26px">
+      : CPI는 2년 단위 조정, PCE(개인소비지출) 지수는 분기단위 조정(* 일부는 월단위 조정)</p>
+    <p style="margin-bottom:38px">Q2) 과거에는 많이 팔리다가 지금은 모두 사용하지만 덜 팔리는 제품은 어떻게 바뀌나요?</p>
+    <p style="margin-bottom:2px">Q3) 라스파이레스 지수의 문제점은 무엇일까요?</p>
+    <p class="qa-ans fragment" data-fragment-index="0" style="margin-bottom:32px">
+      : 상대가격변화에 따른 소비거래량 변화(소득 및 대체효과)를 고려하지 않음 → 물가를 과대평가
+      (반대로 파셰지수는 물가를 과소평가) → 이에 대한 대안이 이 둘을 기하평균 한 피셔지수</p>
+    <p class="t-red" style="font-weight:700;margin-bottom:2px">
+      Q4) “물가가 높다는 것”과 “물가상승률”이 높다는 것은 같은 의미인가요?</p>
+    <p style="margin-left:26px">(참고: 1990년대 일본은 물가는 높았지만 상승률은 매우 낮았음)</p>
+  </div>
+</section>
+
+<!-- ══ 20. Q & A (p.21) ═════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
