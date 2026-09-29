@@ -1,0 +1,22 @@
+/* 편집 도구줄 — 슬라이드 테마(tokens.css)와 따로 논다. 도구줄은 저장·배포 대상이 아니다 */
+:root { --ed-bg: #FFFFFF; --ed-fg: #2A2226; --ed-muted: #7A6E73; --ed-line: #E4DADD; --ed-accent: #A02948; --ed-dirty: #FCEFD2; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ed-bg: #221C1F; --ed-fg: #F1E9EC; --ed-muted: #B5A8AD; --ed-line: #43383C; --ed-accent: #E0708C; --ed-dirty: #FCEFD2; color-scheme: dark } }
+:root[data-theme="dark"] { --ed-bg: #221C1F; --ed-fg: #F1E9EC; --ed-muted: #B5A8AD; --ed-line: #43383C; --ed-accent: #E0708C; --ed-dirty: #FCEFD2; color-scheme: dark }
+body { background: var(--bg, #fff); }
+.ed-bar { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); right: 8px; z-index: 50;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: calc(100vw - 16px);
+  padding: 6px 8px; background: var(--ed-bg); color: var(--ed-fg); border: 1px solid var(--ed-line);
+  border-radius: 6px; font: 13px/1.3 Pretendard, system-ui, sans-serif; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+.ed-bar button { font: inherit; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--ed-line);
+  background: var(--ed-bg); color: var(--ed-fg); cursor: pointer; }
+.ed-bar button:focus-visible { outline: 2px solid var(--ed-accent); outline-offset: 1px; }
+.ed-bar button.primary { background: var(--ed-accent); border-color: var(--ed-accent); color: #fff; }
+.ed-bar button:disabled { opacity: .45; cursor: default; }
+.ed-bar .ed-status { color: var(--ed-muted); font-variant-numeric: tabular-nums; }
+.ed-bar .ed-status.warn { color: var(--ed-accent); }
+body.deck-editing .reveal [data-eid] { outline: 1px dashed rgba(160,41,72,.35); outline-offset: 2px; cursor: text; }
+body.deck-editing .reveal [data-eid]:hover { outline-color: rgba(160,41,72,.7); }
+body.deck-editing .reveal [data-eid]:focus { outline: 2px solid #A02948; }
+body.deck-editing .reveal [data-eid][data-dirty] { background: var(--ed-dirty); }
+body.deck-editing .reveal .slides section .fragment { opacity: 1 !important; visibility: inherit !important; }
+@media (prefers-reduced-motion: reduce) { .reveal .fragment { transition: none !important; } }
