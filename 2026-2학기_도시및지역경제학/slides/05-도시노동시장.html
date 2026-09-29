@@ -86,6 +86,151 @@
   <p class="cover-date" data-course-date>&nbsp;</p>
 </section>
 
+<!-- ══ 지난 시간 — 2~4강을 한 장의 인포그래픽으로 (2026-09-30) ═════
+     출발점 → ① 왜 모이는가 → ② 어디에(줄다리기) → ③ 얼마나·몇 개. 연결 근거는 교재:
+     5장 p.89 「외적인 경제를 창출하는 다른 기업들」, p.102 「규모의 경제 … 이동 불가능한 자원」,
+     6장 p.119·121 중심지이론 = 「시장−지향적 기업들의 입지선정」 · 「이전의 장에서 보았듯이 … 중위입지」,
+     7장 p.133 생산·소비에서의 집적의 경제. 색이 같은 것끼리 이어진다 (크림슨 = 집적, 파랑 = 시장·소비).
+     중심지 원의 배치는 개수(1·2·8)만 맞춘 모식도다. 5강 내용은 맨 아래 예고 줄에만 둔다 (design.md §5). -->
+<section>
+  <h2>지난 시간: 도시는 왜, 어디에, 얼마나 크게 생기는가</h2>
+  <div class="body" style="padding-top:0">
+    <svg class="fig" id="f-recap" viewBox="0 0 848 330" style="width:848px;display:block;margin:0" role="img">
+      <title>2~4강 요약 인포그래픽. 도시가 없는 세계에서 출발해, 기업 안의 규모의 경제와 기업 사이의 집적의 경제로 모이고, 자원·시장·노동과 에너지·집적의 줄다리기로 입지가 정해지며, 시장 지향 기업의 중위입지가 중심지 위계를 만들고, 집적과 다양성과 불경제가 도시효용곡선을 정한다</title></svg>
+    <p class="derive t-red" style="margin-top:6px">→ 오늘은 도시들을 잇는 노동시장에서 균형임금과 총 고용이 어떻게 정해지는지 봄</p>
+  </div>
+  <script>
+    (function () {
+        const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        const RED = 'var(--brand-crimson)', BLUE = 'var(--chart-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)',
+              MUTED = 'var(--muted)', GUIDE = 'var(--guide)', RULE = 'var(--rule)', ORANGE = 'var(--chart-orange)', GREEN = 'var(--accent-green)';
+        const T = (x, y, t, st) => `<text x="${x}" y="${y}" style="${st}">${t}</text>`;
+        const t = (x, y, str, size, fill, o = {}) =>
+          T(x, y, esc(str), `font-size:${size}px;fill:${fill}${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}`);
+        let s = `<defs>
+          <marker id="i-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${INK2}"/></marker>
+          <marker id="i-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${RED}"/></marker>
+          <marker id="i-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="${BLUE}"/></marker></defs>`;
+        const arrow = (d, c = 'ink', w = 1.5, dash) =>
+          (s += `<path d="${d}" fill="none" stroke="${c === 'red' ? RED : c === 'blue' ? BLUE : INK2}" stroke-width="${w}"` +
+                `${dash ? ` stroke-dasharray="${dash}"` : ''} marker-end="url(#i-${c})"/>`);
+
+        // 아이콘
+        const house = (x, y, k = 1, fill = GUIDE) =>
+          `<path d="M${x - 5 * k},${y} L${x - 5 * k},${y - 6 * k} L${x},${y - 11 * k} L${x + 5 * k},${y - 6 * k} L${x + 5 * k},${y} Z" fill="${fill}"/>`;
+        const factory = (x, y, fill = RED) =>
+          `<path d="M${x},${y} L${x},${y - 22} L${x + 9},${y - 16} L${x + 9},${y - 22} L${x + 18},${y - 16} L${x + 18},${y - 22} L${x + 27},${y - 16}` +
+          ` L${x + 27},${y - 36} L${x + 33},${y - 36} L${x + 33},${y} Z" fill="${fill}"/>`;
+        const tower = (x, y, h, fill = BLUE) => `<rect x="${x}" y="${y - h}" width="12" height="${h}" rx="1.5" fill="${fill}"/>` +
+          [0.25, 0.55].map((f) => `<rect x="${x + 3}" y="${y - h + h * f}" width="6" height="3" fill="#FFF" fill-opacity="0.7"/>`).join('');
+        const person = (x, y, fill = INK2) => `<circle cx="${x}" cy="${y - 11}" r="3.2" fill="${fill}"/><path d="M${x - 5},${y} Q${x},${y - 12} ${x + 5},${y} Z" fill="${fill}"/>`;
+        const rock = (x, y) => `<path d="M${x - 11},${y} L${x - 5},${y - 12} L${x + 2},${y - 7} L${x + 7},${y - 15} L${x + 13},${y} Z" fill="${MUTED}"/>`;
+        const bolt = (x, y) => `<path d="M${x + 2},${y - 18} L${x - 6},${y - 6} L${x},${y - 6} L${x - 3},${y + 4} L${x + 7},${y - 9} L${x + 1},${y - 9} Z" fill="${ORANGE}"/>`;
+
+        // 칸 머리
+        const COLS = [[0, 132], [146, 222], [382, 226], [622, 226]];   // [x, 너비]
+        const panel = (i, num, q, why) => {
+          const [x, w] = COLS[i];
+          s += `<rect x="${x}" y="0" width="${w}" height="288" rx="6" fill="${i === 0 ? RULE : '#FFF'}" fill-opacity="${i === 0 ? 0.45 : 1}" stroke="${i === 0 ? 'none' : GUIDE}"/>`;
+          if (num) s += `<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>` + `<text class="on-dark" x="${x + 18}" y="24.5" style="font-size:13px;font-weight:700;fill:#FFF;text-anchor:middle">${num}</text>`;
+          s += t(x + (num ? 35 : 12), 25, q, 14, num ? RED : INK, { w: 700 });
+          s += t(x + 12, 43, why, 10.5, MUTED);
+        };
+
+        // ── 출발점: 고른 격자 ────────────────────────────────
+        panel(0, '', '출발점', '가내생산모형 (2강)');
+        for (let r = 0; r < 6; r++) for (let c = 0; c < 5; c++) s += house(26 + c * 20, 88 + r * 26, 0.8);
+        s += t(66, 256, '세 가정이 도시를 배제', 11, INK2, { a: 'middle', w: 600 });
+        s += t(66, 272, '모두가 같은 곳에서 만들고 씀', 10.5, MUTED, { a: 'middle' });
+        arrow('M 132,150 L 144,150');
+
+        // ── ① 왜 모이는가 (그림 위, 글 아래) ─────────────────
+        panel(1, '1', '왜 모이는가', '집중된 생산의 편익이 고밀도의 비용을 압도');
+        const X1 = 146, M1 = X1 + 111;
+        s += factory(M1 - 17, 100);
+        [[-44, 100], [-32, 90], [30, 100], [42, 90], [54, 100]].forEach(([dx, y]) => { s += house(M1 + dx, y, 0.9); });
+        s += t(M1, 122, '기업 안의 규모의 경제', 12, INK, { w: 700, a: 'middle' });
+        s += t(M1, 137, '교역도시 · 공장도시 (2강 3장)', 10.5, INK2, { a: 'middle' });
+        s += `<line x1="${X1 + 14}" y1="150" x2="${X1 + 208}" y2="150" stroke="${RULE}"/>`;
+        s += t(M1, 164, '설명하지 못한 것: 기업들 사이', 10, MUTED, { a: 'middle' });
+        s += `<path d="M${M1 - 24},198 L${M1},184 L${M1 + 24},202 M${M1 - 24},198 L${M1 + 24},202" stroke="${RED}" stroke-width="1.2" stroke-dasharray="3 2" fill="none"/>`;
+        s += tower(M1 - 30, 226, 30, RED) + tower(M1 - 6, 226, 42, RED) + tower(M1 + 18, 226, 26, RED);
+        s += t(M1, 244, '기업 사이: 집적의 경제', 12, RED, { w: 700, a: 'middle' });
+        s += t(M1, 259, '중간재 · 노동풀 · 숙련매칭 · 지식 (3강 4장)', 10, INK2, { a: 'middle' });
+        s += t(M1, 273, '→ 이웃 기업의 생산비용이 내려감', 10, INK2, { a: 'middle' });
+        arrow(`M ${X1 + 222},150 L ${X1 + 234},150`);
+
+        const cut1 = s.length;
+        // ── ② 어디에 생기는가: 줄다리기 ─────────────────────
+        panel(2, '2', '어디에 생기는가', '기업을 상이한 방향으로 끄는 줄다리기 (3강 5장)');
+        const P0 = 382, PW = 226, CX = P0 + 113, CY = 160;
+        const PULL = [
+          { k: '자원 지향', v: '이동 불가능한 자원', x: CX - 62, y: CY - 58, icon: rock, side: 'L' },
+          { k: '시장 지향', v: '소비자 · 중위입지', x: CX + 62, y: CY - 58, icon: (x, y) => person(x - 7, y) + person(x + 7, y), side: 'R' },
+          { k: '노동 · 에너지', v: '기업이 노동자를 따라감', x: CX - 62, y: CY + 58, icon: bolt, side: 'L' },
+          { k: '집적', v: '다른 기업의 외적인 경제', x: CX + 62, y: CY + 58, icon: (x, y) => tower(x - 13, y, 22, RED) + tower(x + 1, y, 16, RED), side: 'R' },
+        ];
+        PULL.forEach((p) => {
+          const dx = p.x - CX, dy = p.y - CY, L = Math.hypot(dx, dy);
+          s += `<path d="M${CX + dx * 22 / L},${CY + dy * 22 / L} L${p.x - dx * 18 / L},${p.y - dy * 18 / L}" stroke="${INK2}" stroke-width="2" marker-end="url(#i-ink)"/>`;
+          s += p.icon(p.x, p.y + (dy < 0 ? -2 : 10));
+          const ty = dy < 0 ? p.y - 30 : p.y + 30;
+          const tx = p.side === 'L' ? P0 + 10 : P0 + PW - 10, an = p.side === 'L' ? 'start' : 'end';
+          s += t(tx, ty, p.k, 12, p.k === '집적' ? RED : p.k === '시장 지향' ? BLUE : INK, { w: 700, a: an });
+          s += t(tx, ty + 13, p.v, 10, MUTED, { a: an });
+        });
+        s += `<circle cx="${CX}" cy="${CY}" r="20" fill="#FFF" stroke="${INK}" stroke-width="1.6"/>` + t(CX, CY + 4, '기업', 12, INK, { w: 700, a: 'middle' });
+        // ① → ②
+        arrow(`M ${M1 + 58},96 C ${X1 + 250},92 ${P0 - 10},${PULL[0].y} ${PULL[0].x - 20},${PULL[0].y - 4}`, 'ink', 1.2, '4 3');
+        arrow(`M ${M1 + 44},216 C ${X1 + 250},${292} ${P0 + 150},${290} ${P0 + PW - 58},${274}`, 'red', 1.2, '4 3');
+        arrow(`M ${P0 + PW},150 L ${P0 + PW + 12},150`);
+
+        const cut2 = s.length;
+        // ── ③ 얼마나 커지고, 몇 개인가 ─────────────────────────
+        panel(3, '3', '얼마나 커지고, 몇 개인가', '생산에서 소비로, 도시 하나에서 지역체계로 (4강)');
+        const X3 = 622, M3 = X3 + 113, HY = 90;
+        s += `<circle cx="${M3}" cy="${HY}" r="15" fill="${BLUE}" fill-opacity="0.85"/>`;
+        [[-38, 0], [38, 0]].forEach(([dx]) => { s += `<circle cx="${M3 + dx}" cy="${HY}" r="9" fill="${BLUE}" fill-opacity="0.6"/>`; });
+        [[-60, -18], [-60, 18], [-20, -26], [-20, 26], [20, -26], [20, 26], [60, -18], [60, 18]]
+          .forEach(([dx, dy]) => { s += `<circle cx="${M3 + dx}" cy="${HY + dy}" r="4.5" fill="${BLUE}" fill-opacity="0.4"/>`; });
+        s += t(M3, 136, '중심지 위계: 큰 1 · 중간 2 · 작은 8', 12, BLUE, { w: 700, a: 'middle' });
+        s += t(M3, 151, '시장 지향 기업의 중위입지가 반복된 결과 (6장)', 10, INK2, { a: 'middle' });
+        s += t(M3, 165, '큰 도시일수록 재화가 다양함 (엔터테인먼트 기계)', 10, INK2, { a: 'middle' });
+        s += `<line x1="${X3 + 14}" y1="176" x2="${X3 + 212}" y2="176" stroke="${RULE}"/>`;
+        // ② 시장 지향 → 중심지
+        arrow(`M ${P0 + PW - 10},${PULL[1].y - 50} C ${X3 - 6},${60} ${X3 + 10},${HY} ${M3 - 68},${HY}`, 'blue', 1.3, '4 3');
+        // 도시효용곡선 — 언덕 모양 u(n) = n·e^(1−n), 정점 n = 1
+        const B = { x0: X3 + 22, y0: 272, x1: X3 + 112, y1: 190 };
+        const u = (n) => n * Math.exp(1 - n);
+        const px = (n) => B.x0 + (n / 2.6) * (B.x1 - B.x0), py = (v) => B.y0 - v * (B.y0 - B.y1) * 0.9;
+        let d = '';
+        for (let i = 0; i <= 52; i++) { const n = (2.6 * i) / 52; d += (i ? ' L' : 'M') + px(n).toFixed(1) + ',' + py(u(n)).toFixed(1); }
+        s += `<path d="M${B.x0},${B.y1 - 4} L${B.x0},${B.y0} L${B.x1 + 4},${B.y0}" stroke="${INK2}" stroke-width="1" fill="none"/>`;
+        s += `<path d="${d}" stroke="${INK}" stroke-width="2.2" fill="none"/>`;
+        s += t(B.x0 + 4, B.y1 - 2, '효용', 9.5, MUTED) + t(B.x1 + 2, B.y0 + 12, '규모', 9.5, MUTED, { a: 'end' });
+        s += t(px(0.4), py(u(0.4)) - 8, '↑', 13, RED, { w: 700, a: 'middle' });
+        s += t(px(2.0), py(u(2.0)) - 8, '↓', 13, ORANGE, { w: 700, a: 'middle' });
+        const LX = X3 + 124;
+        s += t(LX, 198, '도시효용곡선', 12, INK, { w: 700 });
+        s += t(LX, 213, '↑ 집적 (생산)', 10.5, RED);
+        s += t(LX, 227, '↑ 다양성 (소비)', 10.5, BLUE);
+        s += t(LX, 241, '↓ 집적의 불경제', 10.5, ORANGE);
+        s += t(LX, 259, '같은 효용 →', 10.5, INK2);
+        s += t(LX, 273, '다른 규모 (7장)', 10.5, INK2);
+
+        const cut3 = s.length;
+        // ── 도구 ─────────────────────────────────────────────
+        s += `<rect x="0" y="298" width="848" height="28" rx="5" fill="none" stroke="${GUIDE}" stroke-dasharray="4 3"/>`;
+        s += T(12, 316, `<tspan style="font-weight:700;fill:${RED}">도구 (2강 2장)</tspan>   내쉬균형: 어디서나 같은 효용   ·   자기−강화적 변화: 군집과 그 안정성   ·   파레토 비효율: 지나치게 큰 군집`, `font-size:11px;fill:${INK2}`);
+      // 누적 공개 — 출발점·① 은 처음부터, ② → ③ → 도구 순서로 (design.md §8)
+      const frag = (str, i) => `<g class="fragment fade-in" data-fragment-index="${i}">${str}</g>`;
+      const svg = document.getElementById('f-recap');
+      const title = svg.querySelector('title').outerHTML;
+      svg.innerHTML = title + s.slice(0, cut1) + frag(s.slice(cut1, cut2), 0) + frag(s.slice(cut2, cut3), 1) + frag(s.slice(cut3), 2);
+    })();
+  </script>
+</section>
+
 <!-- ══ 2. 발문 (p.153) ══════════════════════════════════════ -->
 <section class="s-question">
   <div class="body stack">
