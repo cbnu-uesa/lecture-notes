@@ -13,6 +13,17 @@
   <link rel="stylesheet" href="../../_shared/theme/print.css">
 
   <script src="../../_shared/js/charts.js"></script>
+<script>
+  // ── 회귀효과 (2026-09-29) ────────────────────────────────────
+  // 수치는 ysyblog.tistory.com/404 (류근관 교수 강의 정리)의 예제를 그대로 쓴다.
+  // 그림 두 장과 회귀오류 예제가 모두 이 상수에서 나온다 (design.md §6.5).
+  window.REGEFF = {
+    mean: 50, sd: 10, r: 0.5,                          // 중간·기말 평균 50, 표준편차 10, 상관계수 0.5
+    sdLine(x) { return this.mean + (x - this.mean); },            // SD선: 기울기 SDy/SDx = 1
+    reg(x) { return this.mean + this.r * (x - this.mean); },      // 회귀직선: 기울기 r·SDy/SDx
+    low: 35, high: 65,                                  // 왼쪽·오른쪽 띠 (중간고사 점수, 평균 ±1.5 표준편차)
+  };
+</script>
 <style>
   /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
   .body > .cols.top { align-items: flex-start; }
@@ -518,36 +529,69 @@
     </div>
   </section>
 
-  <!-- 원본 p.18 -->
+  <!-- 회귀효과 1/2 — 2026-09-29 에 ysyblog.tistory.com/404 를 바탕으로 다시 씀 (이전 판은 보관/) -->
   <section>
     <h2>회귀효과</h2>
-    <div class="body tighter">
-      <p class="sub">평범(평균)으로의 회귀(regression to mediocrity (mean)): 결국엔 평균으로 모인다.</p>
+    <div class="body tight">
+      <p class="lead t-define" style="margin-bottom:8px">평범(평균)으로의 회귀: 측정한 값이 극단값이면,<br>
+        <span class="mark">다음에 측정할 때 평균에 더 가까워지는 현상</span></p>
       <div class="cols top">
         <div class="col-l">
-          <img src="../assets/tb-regression-effect-exam.png" style="width:100%;max-width:330px"
-               alt="중간고사 점수를 가로축, 기말고사 점수를 세로축에 놓은 산포도. 실선인 회귀직선이 점선인 표준편차선보다 완만하다">
+          <p class="lbl" style="margin-bottom:10px"><strong>SD선:</strong><span>기말고사에서도 같은 정도의 운이 반복될 때의 선</span></p>
+          <p class="sub t-red" style="margin-bottom:2px">중간고사를 잘 본 학생 (오른쪽 띠)</p>
+          <p style="margin-bottom:10px">운 좋았던 학생이 많이 섞임 → 기말고사에서 운이 반복된다는
+            보장이 없음<br>
+            → SD선보다 <strong>아래</strong></p>
+          <p class="sub t-red" style="margin-bottom:2px">중간고사를 못 본 학생 (왼쪽 띠)</p>
+          <p style="margin-bottom:10px">운 나빴던 학생이 많이 섞임 → 나쁜 운도 보통 반복되지 않음<br>
+            → SD선보다 <strong>위</strong></p>
+          <p class="derive t-red hang">→ 그래서 회귀직선은 SD선보다 완만함<br>
+            기울기 = r × SD<sub>y</sub>/SD<sub>x</sub>, 상관계수 r이 +1이 아니기 때문</p>
         </div>
         <div class="col-r">
-          <div class="fx-row" style="justify-content:flex-start;gap:12px">
-            <div class="fx">$\dfrac{SD_y}{SD_x}$</div>
-            <p class="side-note" style="margin:0">직선 위의 점들은 평균에서 x가 1*X표준편차
-              떨어져 있을 경우, y도 1*Y표준편차 떨어져 있음</p>
-          </div>
-          <div class="fx-row" style="justify-content:flex-start;gap:12px;margin-top:4px">
-            <div class="fx">$r * \dfrac{SD_y}{SD_x}$</div>
-            <p class="side-note" style="margin:0">실제 회귀직선은 평균에서 x가 1*X표준편차
-              떨어져 있을 경우, y는 r*1*Y표준편차 떨어져 있음</p>
-          </div>
-          <p class="emph" style="margin:14px 0 4px">상관계수는 $-1 \le r \le +1$ 이므로</p>
-          <ul class="slim">
-            <li>중간고사에서 평균보다 높았던 학생은 기말고사에서 그만큼 높지 않아
-              <em>평균 쪽으로 당겨지고</em>,</li>
-            <li>중간고사에서 평균보다 낮았던 학생도 기말고사에서 그만큼 낮지 않아
-              <em>평균 쪽으로 당겨진다</em></li>
-          </ul>
-          <p class="sub" style="margin:10px 0 2px">→ 하나의 극단적인 값은 실력과 더불어 운이 작용</p>
-          <p class="sub" style="margin:0">→ 운은 확률적이기 때문에 다음번에 나타나지 않을 가능성이 높음</p>
+          <svg class="fig" id="f-regeff" viewBox="0 0 440 300" style="width:410px" role="img">
+            <title>중간고사와 기말고사 산포도. 회귀직선이 SD선보다 완만해서, 중간고사 30점과 70점인 학생의 기말고사 평균이 SD선보다 평균 쪽으로 당겨진다</title></svg>
+          <script>
+            (function () {
+              const R = window.REGEFF;
+              const F = Fig.withBox({ x0: 50, y0: 262, x1: 392, y1: 26 });
+              const LO = 15, HI = 85;
+              const S = F.scale({ x: [LO, HI], y: [LO, HI] });
+              const inside = ([x, y]) => x > LO + 1 && x < HI - 1 && y > LO + 1 && y < HI - 1;
+              const pts = Fig.scatter({ n: 150, mx: R.mean, my: R.mean, sx: R.sd, sy: R.sd, r: R.r, seed: 7 })
+                .filter(inside);
+              const seg = (f, o) => F.line(...S.p([20, f(20)]), ...S.p([82, f(82)]), o);
+              const band = (x, frag) => F.raw(
+                `<rect x="${S.x(x - 2.2)}" y="${S.y(HI - 2)}" width="${S.x(x + 2.2) - S.x(x - 2.2)}" ` +
+                `height="${S.y(LO + 2) - S.y(HI - 2)}" fill="var(--chart-orange)" fill-opacity="0.16"/>`,
+                { fragment: frag });
+              const pull = (x, frag) => {
+                const [xs, ys] = S.p([x, R.sdLine(x)]), [, yr] = S.p([x, R.reg(x)]);
+                const dir = yr < ys ? 1 : -1;
+                return [
+                  F.dot(xs, ys, { open: true, r: 5, fragment: frag }),
+                  F.arrow(xs, ys - dir * 6, xs, yr + dir * 7, { tone: 'red', fragment: frag }),
+                  F.dot(xs, yr, { r: 5, fragment: frag }),
+                  F.guide(xs, yr, { xtick: String(x), ytick: String(R.reg(x)), fragment: frag }),
+                ];
+              };
+              F.draw('#f-regeff', {
+                axes: { x: '중간고사', y: '기말고사' },
+                parts: [
+                  band(R.low, 1), band(R.high, 1),
+                  F.dots(S.curve(pts), { r: 2 }),
+                  seg((x) => R.sdLine(x), { variant: 'cap', dash: '6 4' }),
+                  F.annot(S.x(80), S.y(R.sdLine(80)) - 8, 'SD선', { size: 12, anchor: 'end' }),
+                  seg((x) => R.reg(x), { variant: 'supply', fragment: 0 }),
+                  F.annot(S.x(82) + 4, S.y(R.reg(82)) + 4, '회귀직선', { size: 12, tone: 'red', fragment: 0 }),
+                  ...pull(R.low, 1), ...pull(R.high, 1),
+                  F.guide(...S.p([R.mean, R.mean]), { xtick: '50', ytick: '50', fragment: 1 }),
+                  F.annot(S.x(R.low + 2.2) + 6, S.y(R.low - 4), '평균\n쪽으로', { size: 11, tone: 'red', lh: 13, fragment: 1 }),
+                  F.annot(S.x(R.high - 2.2) - 6, S.y(R.high + 6), '평균\n쪽으로', { size: 11, tone: 'red', anchor: 'end', lh: 13, fragment: 1 }),
+                ],
+              });
+            })();
+          </script>
         </div>
       </div>
     </div>
@@ -609,26 +653,6 @@
     <div class="qa-rule"></div>
     <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
       <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
-  </section>
-
-  <!-- 원본 p.22 — 원본에서는 숨김 슬라이드라 배포 PDF(21쪽)에는 없다. 부록으로 살려 둔다 -->
-  <section>
-    <h2>&lt;부록&gt; 회귀계수의 유도</h2>
-    <div class="body">
-      <div class="cols top" style="margin-top:20px">
-        <div class="col-l">
-          <p style="margin:0">$\dfrac{\partial \sum e_i^{\,2}}{\partial b_0}
-            = -2\sum (Y_i - b_0 - b_1 X_i) \;\; = 0$</p>
-          <p style="margin:22px 0 0">$\dfrac{\partial \sum e_i^{\,2}}{\partial b_1}
-            = -2\sum (Y_i - b_0 - b_1 X_i)X_i \;\; = 0$</p>
-        </div>
-        <div class="col-r">
-          <p style="margin:0">$$b_0 = \bar{Y} - b_1 \bar{X}$$</p>
-          <p style="margin:10px 0 0">
-            $$b_1 = \frac{\sum(X_i - \bar{X})(Y_i - \bar{Y})}{\sum(X_i - \bar{X})^2}$$</p>
-        </div>
-      </div>
-    </div>
   </section>
 
 </div></div>
