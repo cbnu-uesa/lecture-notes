@@ -11,7 +11,8 @@
 
 제약
 - 아티팩트는 밑줄로 시작하는 최상위 폴더를 받지 않는다. _shared/ 를 shared/ 로 옮겨 싣는다.
-- 수식(MathJax) 덱은 아직 싣지 않는다. mathjax-tex-svg.js 가 2MB 라 빼 두었다.
+- 수식이 있는 덱은 mathjax-tex-svg.js(2MB)와 math 플러그인을 함께 싣는다.
+  수식이 든 문단은 편집 대상에서 빠진다 (렌더링된 수식을 고치면 TeX 로 되돌릴 수 없다).
 - course.json 을 싣지 않고 표지 라벨·날짜·kicker·푸터를 미리 채운다.
 - PDF 내려받기 단추는 만들지 않는다. 아티팩트 안에서는 동작하지 않는다.
 """
@@ -34,8 +35,7 @@ def main(rel):
     body = src.split("<body>", 1)[1].split("</body>", 1)[0]
 
     text_only = re.sub(r"<script.*?</script>", "", body, flags=re.S)
-    if re.search(r"\\\(|\\\[|\$\$|\$[^$<\s][^$<]{0,60}\$", text_only):
-        sys.exit("수식이 있는 덱이다. 아직 싣지 못한다 (build.py 머리말 참조).")
+    has_math = bool(re.search(r"\\\(|\\\[|\$\$|\$[^$<\s][^$<]{0,60}\$", text_only))
 
     links = re.findall(r'<link rel="stylesheet"[^>]*>', head)
     head_scripts = re.findall(r"<script>.*?</script>", head, re.S)
@@ -63,6 +63,9 @@ def main(rel):
     for f in ("Pretendard-Regular", "Pretendard-Medium", "Pretendard-Bold", "BookkMyungjo-Bold"):
         ship(f"../../_shared/fonts/{f}.woff2")
     ship("../../_shared/vendor/reveal/reveal.js")
+    if has_math:
+        ship("../../_shared/vendor/reveal/plugin/math.js")
+        ship("../../_shared/vendor/mathjax-tex-svg.js")
 
     if me.get("date"):
         deck = re.sub(r"(<[^>]*data-course-date[^>]*>)[^<]*(</p>)", lambda m: m.group(1) + me["date"] + m.group(2), deck)
@@ -72,7 +75,8 @@ def main(rel):
     tpl = "".join(f'<script src="{ship(s)}"></script>\n' for s in ext_scripts) + "\n".join(head_scripts) + "\n" + deck
     boot = open(os.path.join(HERE, "boot.js"), encoding="utf8").read()
     editor_css = open(os.path.join(HERE, "editor.css"), encoding="utf8").read()
-    meta = {"no": no, "title": me.get("title", course.get("title", "")), "footer": course.get("footer", "")}
+    meta = {"no": no, "title": me.get("title", course.get("title", "")), "footer": course.get("footer", ""),
+            "math": has_math}
     title = f"{no}강 {meta['title']} 편집본"
 
     page = (

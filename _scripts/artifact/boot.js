@@ -21,6 +21,8 @@
         if (el.namespaceURI !== 'http://www.w3.org/1999/xhtml') continue;
         if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE') continue;
         if (el.matches('[data-course-date],[data-course-label]')) continue;
+        // 수식이 든 덩어리는 고치지 않는다 — 렌더링된 수식을 TeX 로 되돌릴 수 없다. 안쪽도 뒤지지 않는다
+        if (/\$|\\\(|\\\[/.test(el.textContent)) { if (!el.querySelector('p,li,td,th')) continue; walk(el); continue; }
         const blocked = el.querySelector('svg,script,canvas,img,table');
         const direct = [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
         if (!blocked && (TEXT_TAGS.has(el.tagName) || direct)) { out.push(el); continue; }
@@ -57,6 +59,7 @@
     }
   }
   await load('shared/vendor/reveal/reveal.js');
+  if (meta.math) await load('shared/vendor/reveal/plugin/math.js');
 
   // ── deck-init.js 와 같은 크롬 (course.json 대신 #deck-meta) ──
   const sections = document.querySelectorAll('.reveal .slides > section');
@@ -89,6 +92,13 @@
     width: 960, height: 540, margin: 0, minScale: 0.2, maxScale: 2.0,
     hash: true, controls: false, progress: false, slideNumber: false,
     transition: 'none', backgroundTransition: 'none', fragmentInURL: true,
+    // deck-init.js 와 같은 수식 설정
+    plugins: meta.math ? [RevealMath.MathJax3] : [],
+    mathjax3: {
+      mathjax: 'shared/vendor/mathjax-tex-svg.js',
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'svg'] },
+    },
   });
   ['ready', 'slidechanged', 'fragmentshown', 'fragmenthidden'].forEach((ev) => Reveal.on(ev, paintPageNumber));
   paintPageNumber();
