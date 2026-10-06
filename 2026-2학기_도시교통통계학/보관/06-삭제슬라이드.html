@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6강. 회귀분석 (2)</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols.top { align-items: flex-start; }
+  ol.dense { margin: 0 0 0 2px; padding-left: 22px; }
+  ol.dense > li { margin-bottom: 5px; }
+  ul.slim { margin: 0; padding-left: 18px; }
+  ul.slim > li { margin-bottom: 3px; }
+
+  /* 퀴즈 문제 발문 — 원본은 본문과 같은 크기의 검은 글씨다 */
+  .qz { font-size: 14px; line-height: 1.5; margin: 0 0 8px; color: var(--ink); }
+  .qz + .qz { margin-top: -4px; }
+  .qz-item { font-size: 14px; line-height: 1.5; margin: 0 0 14px; color: var(--ink); }
+  .qz-item .in { display: block; padding-left: 20px; }
+
+  /* 퀴즈 2 — 표준정규분포표 · 그림 · 풀이 세 칸 */
+  .quiz2 { display: flex; gap: 18px; align-items: flex-start; margin-top: 4px; }
+  .quiz2 .ztab { flex: 0 0 108px; }
+  .quiz2 .ztab img { width: 100%; display: block; }
+  .quiz2 .fig-col { flex: 0 0 auto; }
+  .quiz2 .sol { flex: 1 1 auto; font-size: 13px; line-height: 1.55; color: var(--ink); }
+  .quiz2 .sol p { margin: 0 0 6px; }
+  .quiz2 .sol .ans { font-size: 22px; font-weight: 700; color: var(--brand-crimson); margin-top: 10px; }
+
+  /* 도수분포표 (퀴즈 1-1) */
+  .tbl-freq { font-size: 12px; width: 100%; table-layout: fixed; }
+  .reveal .tbl-freq th, .reveal .tbl-freq td { padding: 2px 6px; text-align: center; }
+
+  /* 원본이 수식 옆·아래에 작은 회색 글씨로 붙여 둔 각주 */
+  .side-note { font-size: 11px; line-height: 1.45; color: var(--muted); }
+  .fx-row { display: flex; align-items: center; gap: 34px; }
+  .fx-row .fx { flex: 0 0 auto; }
+
+  /* 원본 p.16 — 교육연수 아래 (X), 소득 아래 (Y) */
+  .xy { color: var(--brand-crimson); font-weight: 700; font-size: 12px; }
+
+  /* 원본 p.22 — 우측 크림슨 설명 묶음 */
+  .brace-note { font-size: 13px; line-height: 1.6; color: var(--brand-crimson);
+                font-weight: 700; }
+  .brace-note .thin { font-weight: 400; }
+
+  /* 원본 p.13 — 종속변수 / 설명변수 두 덩이 */
+  .var-block { margin-top: 22px; }
+  .var-block .name { font-size: 21px; font-weight: 700; color: var(--brand-crimson);
+                     margin: 0 0 4px; letter-spacing: -.02em; }
+  .var-block .desc { font-size: 15px; color: var(--ink-2); margin: 0; }
+
+  /* 원본 p.29 — 등분산성 / 이분산성 두 판 */
+  .pair-fig { display: flex; gap: 24px; justify-content: center; margin-top: 8px; }
+  .pair-fig .cell { flex: 1 1 0; text-align: center; }
+  .pair-fig .cell img { width: 100%; max-width: 316px; }
+  .pair-fig .cell .ttl { font-size: 15px; font-weight: 700; color: var(--brand-crimson);
+                         margin: 0 0 4px; }
+</style>
+
+<script>
+  /* ─────────────────────────────────────────────────────────────
+     한 곳에서만 선언하는 상수. 표·그림·본문 숫자가 모두 여기서 나온다
+     (design.md §6.5). 손으로 옮겨 적으면 반드시 어긋난다. */
+
+  /* 소수 첫째 자리까지. 유도값을 화면에 찍기 전에 반드시 통과시킨다
+     (7.2*11 = 79.19999999999999 같은 것을 막는다) */
+  window.r1 = (v) => Math.round(v * 10) / 10;
+  window.r2 = (v) => Math.round(v * 100) / 100;
+  window.fmt = (v) => String(window.r1(v));
+  window.fmt2 = (v) => String(window.r2(v));
+
+  /* 퀴즈 1-1 (원본 p.3~4) — 인쇄된 것은 계급경계와 괄호 안의 밀도, 그리고 200명뿐이다.
+     빈도·상대빈도는 밀도에서 되돌려 구한다. */
+  window.EDU_HIST = [[0, 5, 0.4], [5, 8, 2], [8, 9, 4], [9, 12, 4],
+                     [12, 13, 34], [13, 16, 6], [16, 20, 6]]
+    .map(([lo, hi, den]) => {
+      const rel = den * (hi - lo);          // 상대빈도(%)
+      return { lo, hi, den, rel, f: (rel / 100) * 200 };
+    });
+
+  /* 퀴즈 1-2 (원본 p.5~8) — TOEIC 점수 */
+  window.TOEIC = { mu: 750, sd: 100, a: 500, b: 600 };
+
+  /* 원본 p.14 — 30-40세 도시남성 198명 */
+  window.MEN = (() => {
+    const mx = 12.5, sdx = 2, my = 163, sdy = 77, r = 0.33;
+    const b1 = window.r1(r * sdy / sdx);    // 12.7 만원/년
+    return { mx, sdx, my, sdy, r, b1, b0: window.r2(my - b1 * mx), rsdy: window.r1(r * sdy) };
+  })();
+
+  /* 원본 p.15~19, p.21 — 도시여성 근로자 108명 */
+  window.WOMEN = (() => {
+    const mx = 11, sdx = 3.6, my = 89, sdy = 60, r = 0.43;
+    const b1 = window.r1(r * sdy / sdx);    // 7.2 만원/년
+    return { mx, sdx, my, sdy, r, b1, b0: window.r1(my - b1 * mx) };
+  })();
+
+  /* 원본 p.23~25 결정계수 도해 — 회귀직선 하나에서 관측치·추정치·평균을 모두 유도한다.
+     T = R + E 가 그림에서 저절로 성립한다. */
+  window.R2FIG = (() => {
+    const a = 2.0, b = 0.55;                // 회귀직선 y = a + b x
+    const xbar = 4.5, xi = 7.6, yi = 8.3;
+    const ybar = a + b * xbar;              // (x̄, ȳ) 는 회귀직선 위에 있다
+    const yhat = a + b * xi;
+    return { a, b, xbar, ybar, xi, yi, yhat, line: (x) => a + b * x };
+  })();
+
+  /* 히스토그램 하나를 그리는 공용 함수 (2강과 같은 방식).
+     계급 폭이 제각각(5, 3, 1, 3, 1, 3, 4)이라 막대 폭은 x축 눈금에서 계산한다. */
+  window.Hist = function (sel, o) {
+    const B = o.box;
+    const px = (v) => B.x0 + ((v - o.x[0]) / (o.x[1] - o.x[0])) * (B.x1 - B.x0);
+    const py = (v) => B.y0 - (v / o.yMax) * (B.y0 - B.y1);
+    let s = '';
+    (o.yTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${B.x0 - 7}" y="${py(t) + 4}" text-anchor="end">${t}</text>`;
+      s += `<path class="axis" d="M${B.x0 - 4},${py(t)} L${B.x0},${py(t)}"/>`;
+    });
+    o.bins.forEach((b, i) => {
+      const [lo, hi, v] = b;
+      s += `<rect class="area-bar" x="${px(lo)}" y="${py(v)}" ` +
+           `width="${px(hi) - px(lo)}" height="${B.y0 - py(v)}"/>`;
+      if (o.barLabel) {
+        const t = o.barLabel(i);
+        if (t) s += `<text class="annot muted" x="${(px(lo) + px(hi)) / 2}" y="${py(v) - 6}" ` +
+                    `text-anchor="middle" style="font-size:10px">${t}</text>`;
+      }
+    });
+    s += `<path class="axis" d="M${B.x0},${B.y1 - 4} L${B.x0},${B.y0} L${B.x1 + 8},${B.y0}"/>`;
+    (o.xTicks || []).forEach((t) => {
+      s += `<text class="tick" x="${px(t)}" y="${B.y0 + 15}" text-anchor="middle" ` +
+           `style="font-size:10px">${t}</text>`;
+    });
+    if (o.xLabel) s += `<text class="axis-name" x="${B.x1 + 12}" y="${B.y0 + 15}">${o.xLabel}</text>`;
+    if (o.yLabel) s += `<text class="axis-name" x="${B.x0 - 6}" y="${B.y1 - 8}" text-anchor="end">${o.yLabel}</text>`;
+    document.querySelector(sel).innerHTML = s;
+  };
+
+  /* 세로 중괄호 — 결정계수 도해의 T · R · E 표시.
+     dir = -1 이면 왼쪽으로, +1 이면 오른쪽으로 뾰족하게 나온다. */
+  window.brace = function (x, y1, y2, w, dir) {
+    const m = (y1 + y2) / 2;
+    const q = Math.min(w, (m - y1) / 2);
+    const d = dir * w;
+    return `<path d="M${x},${y1} Q${x + d},${y1} ${x + d},${y1 + q} ` +
+           `L${x + d},${m - q} Q${x + d},${m} ${x + 2 * d},${m} ` +
+           `Q${x + d},${m} ${x + d},${m + q} L${x + d},${y2 - q} ` +
+           `Q${x + d},${y2} ${x},${y2}" fill="none" ` +
+           `stroke="var(--accent-blue)" stroke-width="1.3"/>`;
+  };
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 표지 — 이 파일의 성격 ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>6강에서 뺀 슬라이드</h1>
+    <p class="cover-date">2026-10-07 보관</p>
+  </section>
+
+  <!-- ══ 무엇을 왜 뺐나 ═══════════════════════════════════════ -->
+  <section>
+    <h2>이 파일은 무엇인가</h2>
+    <div class="body stack">
+      <p class="lead t-define">6강 「회귀분석 (2)」에서 뺀 슬라이드를 버리지 않고 모아 둔 것</p>
+      <ul>
+        <li><strong>퀴즈 1 풀이 (2025-2학기 퀴즈)</strong> — 2026-10-07 에 뺌 (본편 3~6쪽).
+          교수 요청으로 2026-2학기 퀴즈 1(참·거짓 · 표준점수 · 회귀직선의 기울기) 풀이 세 장으로 바꿨다.
+          도수분포표 · TOEIC 정규분포 · 참·거짓 문항과 표준정규분포표(tb-reg2-z-table.png)는 여기에만 남는다</li>
+      </ul>
+      <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 3. 퀴즈 1-1 (원본 p.3~4 합침) ═══════════════════════
+       빈 도수분포표가 채워지는 것이 전부라 한 장의 fragment 로 만든다 -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body tight">
+      <p class="qz">1. 다음의 히스토그램은 200명의 교육연수에 대한 분포이다(괄호 안은 밀도).
+        이를 참고하여 아래의 도수분포표를 작성하시오.</p>
+      <p class="qz">(단, 계급구간은 좌측경계는 포함하되 우측경계는 포함하지 않음)</p>
+      <div class="cols top" style="margin-top:4px">
+        <div class="col-l">
+          <svg class="fig" id="f-quiz-hist" viewBox="0 0 400 240" style="width:400px" role="img">
+            <title>교육연수 200명의 밀도 히스토그램. 계급별 밀도가 괄호 안에 적혀 있다</title>
+          </svg>
+        </div>
+        <div class="col-r">
+          <table class="tbl-freq">
+            <thead><tr><th>계급</th><th>절대빈도(명)</th><th>상대빈도(%)</th><th>밀도</th></tr></thead>
+            <tbody id="tb-quiz"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const T = window.EDU_HIST;
+        document.getElementById('tb-quiz').innerHTML = T.map((b) =>
+          `<tr><td>${b.lo}-${b.hi}</td>` +
+          `<td><span class="fragment" data-fragment-index="0">${b.f}</span></td>` +
+          `<td><span class="fragment" data-fragment-index="0">${b.rel}</span></td>` +
+          `<td><span class="fragment" data-fragment-index="0">${b.den}</span></td></tr>`).join('');
+        Hist('#f-quiz-hist', {
+          box: { x0: 44, y0: 196, x1: 344, y1: 30 }, x: [0, 20], yMax: 42,
+          yTicks: [10, 20, 30, 40], xTicks: [0, 5, 8, 9, 12, 13, 16, 20],
+          bins: T.map((b) => [b.lo, b.hi, b.den]),
+          barLabel: (i) => `(${T[i].den})`,
+          xLabel: '교육연수', yLabel: '(%)',
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 4. 퀴즈 1-2 문제 (원본 p.5~6 합침) ══════════════════
+       p.5 는 표만, p.6 은 거기에 정규분포곡선이 얹힌다 → fragment -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body tight">
+      <p class="qz">2. TOEIC 시험의 점수를 집계한 결과 평균이 750점이고, 표준편차는 100인
+        정규분포곡선을 따른다고 한다.</p>
+      <p class="qz">500점~600점 사이에는 대략 몇 %의 학생이 있겠는가?
+        답과 풀이과정을 쓰시오(아래 그림은 표준정규분포표이다).</p>
+      <div class="quiz2">
+        <div class="ztab">
+          <img src="../assets/tb-reg2-z-table.png"
+               alt="표준정규분포표. 세로로 z 값 0.0부터 3.0까지, 가로로 소수 둘째 자리 0.00·0.01·0.02가 놓인 표">
+        </div>
+        <div class="fig-col">
+          <svg class="fig" id="f-toeic-sd" viewBox="0 0 420 250" style="width:420px" role="img">
+            <title>평균 750점, 표준편차 100점인 정규분포곡선. 650점과 850점이 평균에서 ±1표준편차 떨어져 있다</title>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const { mu, sd } = window.TOEIC;
+        const F = Fig.withBox({ x0: 24, y0: 190, x1: 396, y1: 60 });
+        const S = F.scale({ x: [mu - 3.6 * sd, mu + 3.6 * sd], y: [0, 0.0045] });
+        const pdf = F.normal(mu, sd, mu - 3.6 * sd, mu + 3.6 * sd,
+                             { through: [mu - sd, mu, mu + sd] });
+        let s = `<path class="axis" d="M${S.x(mu - 3.6 * sd)},${S.y(0)} L${S.x(mu + 3.6 * sd)},${S.y(0)}"/>`;
+        // 곡선과 눈금선은 같은 함수에서 나오므로 높이가 어긋날 수 없다
+        [mu - sd, mu, mu + sd].forEach((v) => {
+          const y = Fig.at(S.curve(pdf), { x: S.x(v) })[1];
+          s += `<path d="M${S.x(v)},${S.y(0)} L${S.x(v)},${y}" stroke="var(--accent-blue)" ` +
+               `stroke-width="0.9" fill="none"/>`;
+          s += `<text class="tick" x="${S.x(v)}" y="${S.y(0) + 22}" text-anchor="middle" ` +
+               `style="font-size:14px">${v}</text>`;
+        });
+        s += F.curve(S.curve(pdf), { variant: 'demand' });
+        // ±1SD 양쪽 화살표
+        const yTop = S.y(0.00435);
+        [[mu - sd, mu, '−1SD'], [mu, mu + sd, '+1SD']].forEach(([p, q, lab]) => {
+          s += `<path d="M${S.x(p)},${yTop} L${S.x(q)},${yTop}" stroke="var(--accent-blue)" ` +
+               `stroke-width="1.2" fill="none" marker-start="url(#ah-blue)" marker-end="url(#ah-blue)"/>`;
+          s += `<text class="annot blue" x="${(S.x(p) + S.x(q)) / 2}" y="${yTop - 7}" ` +
+               `text-anchor="middle" style="font-size:12px">${lab}</text>`;
+        });
+        Fig.draw('#f-toeic-sd', { parts: [Fig.raw(s, { fragment: 0 })] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 5. 퀴즈 1-2 풀이 (원본 p.7~8 합침) ══════════════════
+       p.7 은 500~600 구간을 칠한 원자료 분포, p.8 은 거기에 표준화한 분포와
+       풀이가 더해진다 → 한 장의 2단계 -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body tight">
+      <p class="qz">2. TOEIC 시험의 점수를 집계한 결과 평균이 750점이고, 표준편차는 100인
+        정규분포곡선을 따른다고 한다.</p>
+      <p class="qz">500점~600점 사이에는 대략 몇 %의 학생이 있겠는가?
+        답과 풀이과정을 쓰시오(아래 그림은 표준정규분포표이다).</p>
+      <div class="quiz2">
+        <div class="ztab">
+          <img src="../assets/tb-reg2-z-table.png"
+               alt="표준정규분포표. 세로로 z 값 0.0부터 3.0까지, 가로로 소수 둘째 자리 0.00·0.01·0.02가 놓인 표">
+        </div>
+        <div class="fig-col">
+          <svg class="fig" id="f-toeic-sol" viewBox="0 0 300 336" style="width:272px" role="img">
+            <title>위는 평균 750점 분포에서 500~600점 구간을 칠한 그림, 아래는 그것을 표준화해 −2.5~−1.5 구간을 칠한 표준정규분포</title>
+          </svg>
+        </div>
+        <div class="sol">
+          <p>$X \sim N(750,\ 100^2)$</p>
+          <p style="margin-top:10px">〈정규분포를 따르는 자료의 표준화〉</p>
+          <p id="sol-z1"></p>
+          <p id="sol-z2"></p>
+          <div class="fragment" data-fragment-index="0">
+            <p style="margin-top:10px">P(−2.5 ≤ Z ≤ −1.5)</p>
+            <p>= 0.4938 − 0.4332 = 0.0606</p>
+            <p class="ans">답: 6.06%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const { mu, sd, a, b } = window.TOEIC;
+        const za = (a - mu) / sd, zb = (b - mu) / sd;
+        document.getElementById('sol-z1').textContent =
+          `Z(${a}) = (${a}−${mu})/${sd} = ${za}`;
+        document.getElementById('sol-z2').textContent =
+          `Z(${b}) = (${b}−${mu})/${sd} = ${zb}`;
+
+        /* 두 판이 같은 분포다 — 위는 원자료 단위, 아래는 표준화 단위.
+           같은 z 구간을 칠하므로 두 그림의 빨간 넓이가 저절로 같아진다. */
+        function panel(top, bot, m, s, lo, hi, ticks) {
+          const F = Fig.withBox({ x0: 16, y0: bot, x1: 284, y1: top });
+          const SC = F.scale({ x: [m - 3.6 * s, m + 3.6 * s], y: [0, 0.0042 / (s / 100)] });
+          const full = F.normal(m, s, m - 3.6 * s, m + 3.6 * s, { through: [lo, hi, m] });
+          const cut = full.filter((p) => p[0] >= lo && p[0] <= hi);
+          let g = `<path class="axis" d="M${SC.x(m - 3.6 * s)},${SC.y(0)} L${SC.x(m + 3.6 * s)},${SC.y(0)}"/>`;
+          g += F.under(SC.curve(cut), { cls: 'area-loss', baseY: SC.y(0) });
+          [lo, hi].forEach((v) => {
+            g += `<path d="M${SC.x(v)},${SC.y(0)} L${SC.x(v)},${top + 4}" ` +
+                 `stroke="var(--brand-crimson)" stroke-width="1.4" stroke-dasharray="5 4" fill="none"/>`;
+          });
+          g += `<path d="M${SC.x(m)},${SC.y(0)} L${SC.x(m)},${top + 4}" ` +
+               `stroke="var(--accent-blue)" stroke-width="0.9" fill="none"/>`;
+          g += F.curve(SC.curve(full), { variant: 'demand' });
+          ticks.forEach(([v, lab]) => {
+            g += `<text class="tick" x="${SC.x(v)}" y="${SC.y(0) + 20}" text-anchor="middle" ` +
+                 `style="font-size:13px">${lab}</text>`;
+          });
+          return g;
+        }
+
+        const up = panel(20, 124, mu, sd, a, b,
+                         [[a, a], [b, b], [mu, mu]]);
+        const dn = panel(196, 300, 0, 1, za, zb,
+                         [[za, '−2.5'], [zb, '−1.5'], [0, '0']]);
+        const arr = `<path class="arrow" d="M150,144 L150,182" marker-end="url(#ah-ink)" ` +
+                    `stroke-width="3"/>`;
+        Fig.draw('#f-toeic-sol', {
+          parts: [Fig.raw(up), Fig.raw(dn + arr, { fragment: 0 })],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 6. 퀴즈 1-3 (원본 p.9) ══════════════════════════════ -->
+  <section>
+    <h2>퀴즈 1 풀이</h2>
+    <div class="body">
+      <p class="qz" style="margin-bottom:18px">3. 다음 명제의 참과 거짓을 판별하시오.</p>
+      <p class="qz-item">(1) 어떤 데이터 분포가 왼쪽으로 길게 늘어진(left-skewed) 형태를 보일 때
+        <span class="in">평균, 중앙값, 최빈값의 일반적인 크기 관계는 최빈값 &gt; 중앙값 &gt; 평균이다.
+          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span>
+        <span class="fragment" data-fragment-index="0" style="color:var(--brand-crimson);font-weight:700">→ 참</span></p>
+      <p class="qz-item">(2) 히스토그램에서 상대도수가 아닌 밀도를 활용하는 이유는
+        <span class="in">모든 막대의 높이를 비슷하게 만들어 미적으로 보기좋게 하기 위함이다.
+          (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)</span>
+        <span class="fragment" data-fragment-index="0" style="color:var(--brand-crimson);font-weight:700">→ 거짓 — 계급폭이 다른 구간을 견주기 위해서다</span></p>
+      <p class="qz-item">(3) 자료의 표준화는 자료에서 평균을 빼고 표준편차로 나누어 평균은 1,
+        표준편차는 0으로 만드는 과정이다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment" data-fragment-index="0" style="color:var(--brand-crimson);font-weight:700">→ 거짓 — 평균 0, 표준편차 1 이다</span></p>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
