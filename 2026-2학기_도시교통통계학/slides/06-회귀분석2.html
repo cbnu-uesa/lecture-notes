@@ -56,12 +56,6 @@
                      margin: 0 0 4px; letter-spacing: -.02em; }
   .var-block .desc { font-size: 15px; color: var(--ink-2); margin: 0; }
 
-  /* 원본 p.29 — 등분산성 / 이분산성 두 판 */
-  .pair-fig { display: flex; gap: 24px; justify-content: center; margin-top: 8px; }
-  .pair-fig .cell { flex: 1 1 0; text-align: center; }
-  .pair-fig .cell img { width: 100%; max-width: 316px; }
-  .pair-fig .cell .ttl { font-size: 15px; font-weight: 700; color: var(--brand-crimson);
-                         margin: 0 0 4px; }
 </style>
 
 <script>
@@ -662,6 +656,21 @@
     </div>
   </section>
 
+  <!-- ══ 22. 주의사항 (원본 p.30) — 2026-10-07 교수 요청으로 단순회귀와 (다)중회귀 뒤로 옮김 ════════════════════════════ -->
+  <section>
+    <h2>회귀분석을 사용할 때 주의사항</h2>
+    <div class="body stack">
+      <ul class="slim" style="font-size:16px">
+        <li style="margin-bottom:22px">회귀분석은 변수 간의 선형관계를 파악:
+          비선형(non-linear) 관계 X</li>
+        <li>선형관계의 존재(즉, 높은 상관계수)만으로 유의미한 결과라고 볼 수 없음
+          <p class="emph" style="margin:8px 0 0 4px">예. 아이스크림 판매량이 증가하면
+            일사병이 많이 걸린다.</p>
+          <p class="sub" style="margin:8px 0 0 4px">→ 이론적 토대 + 설명 가능여부의 중요성</p></li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ══ 17. 결정계수 (원본 p.23~25 합침) ════════════════════
        같은 도해에 R(설명되는 부분) → 분해식 → R² 수식이 차례로 얹힌다 → 2단계 -->
   <section>
@@ -804,59 +813,6 @@
         회귀분석은 어떠한 상황을 만족해야(어떤 조건 하에서만) 신뢰할 만한 분석일까?</p>
       <p class="sub" style="font-size:18px;margin:0 0 0 22px">
         → 회귀분석의 조건과 조건에 위배될 경우에 적합한 다른 방법들</p>
-    </div>
-  </section>
-
-  <!-- ══ 20. 잔차도 (원본 p.28) ══════════════════════════════ -->
-  <section>
-    <h2>잔차도 <span class="en">(residual plot)</span></h2>
-    <div class="body tight">
-      <p class="sub">실제값과 회귀직선의 추정치 간의 차이인 잔차의 크기를 y축에 두고,
-        x값의 변화에 따라 표시한 것</p>
-      <p class="sub">→ 잔차도에서 체계적인 패턴(우상향, 우하향, 곡선 등)이 나타날 경우
-        회귀직선이 y를 충분히 추정하지 못함을 의미</p>
-      <img src="../assets/tb-reg2-residual-plot.png"
-           style="width:600px;display:block;margin:12px auto 0"
-           alt="왼쪽은 산포도와 회귀직선, 오른쪽은 같은 자료의 잔차도. 회귀직선에서 점까지의 세로 거리와 잔차도에서 0선까지의 거리가 같은 길이임을 보여 준다">
-    </div>
-  </section>
-
-  <!-- ══ 21. 등분산성과 이분산성 (원본 p.29) ═════════════════ -->
-  <section>
-    <h2>등분산성과 이분산성</h2>
-    <div class="body tight">
-      <p class="sub">회귀직선은 x의 각 부분집합 내에서 y값들이 평균을 중심으로
-        일정간격(표준오차)으로 퍼져 있다고 간주</p>
-      <p class="sub">→ 만약 표준오차가 모든 x의 부분집합에서 일정하지 않을 경우,
-        회귀직선은 x의 부분집합별로 서로 다른 오차를 지님</p>
-      <p class="sub">→ 이분산성이 존재할 경우 y값을 추정하기 위한 회귀직선의 신뢰성에 문제</p>
-      <div class="pair-fig">
-        <div class="cell">
-          <p class="ttl">등분산성<span class="en">(homoscedasticity)</span></p>
-          <img src="../assets/tb-reg2-homoscedastic.jpg"
-               alt="키와 몸무게의 산포도. 몇 개의 키 구간마다 같은 폭의 종모양 분포가 그려져 있다">
-        </div>
-        <div class="cell">
-          <p class="ttl">이분산성<span class="en">(heteroscedasticity)</span></p>
-          <img src="../assets/tb-reg2-heteroscedastic.png"
-               alt="교육수준과 소득의 산포도. 교육수준이 높아질수록 종모양 분포의 폭이 점점 넓어진다">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ 22. 주의사항 (원본 p.30) ════════════════════════════ -->
-  <section>
-    <h2>회귀분석을 사용할 때 주의사항</h2>
-    <div class="body stack">
-      <ul class="slim" style="font-size:16px">
-        <li style="margin-bottom:22px">회귀분석은 변수 간의 선형관계를 파악:
-          비선형(non-linear) 관계 X</li>
-        <li>선형관계의 존재(즉, 높은 상관계수)만으로 유의미한 결과라고 볼 수 없음
-          <p class="emph" style="margin:8px 0 0 4px">예. 아이스크림 판매량이 증가하면
-            일사병이 많이 걸린다.</p>
-          <p class="sub" style="margin:8px 0 0 4px">→ 이론적 토대 + 설명 가능여부의 중요성</p></li>
-      </ul>
     </div>
   </section>
 
