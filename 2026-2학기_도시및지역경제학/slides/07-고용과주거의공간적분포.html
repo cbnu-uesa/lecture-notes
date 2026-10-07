@@ -95,6 +95,56 @@
     K: { b: 30, g: 21 },
     prem(x, t) { return this.K[t] * Math.sqrt(Math.max(0, x - 6)); },
   };
+
+  // ── 단일도심 도시의 입찰지대곡선 [이성원 강의노트 p.165·167·168] — 2026-10-07 6강에서 옮겨 왔다.
+  // 7강 교재 그림의 window.MONO 와 이름이 겹쳐 MONO_LEE 로 바꿨다 ────────────
+  // 모식도다. 곡선은 R(x) = A·e^(−bx) 꼴로 두고 경계는 교점에서 구한다 (design.md §6.5).
+  //   상업 Rc = 43e^(−0.983x) · 주거 R1 = 24e^(−0.40x) · 농업 Ra = 5
+  //   모든 곡선이 세로축(x = 0)에서 눈금 안(YMAX = 45)에 닿는다 (2026-10-06 교수 요청)
+  //   통근비 감소 후 주거 R2 = 18e^(−0.28x) — R1 을 Xb = 2.4 에서 시계방향으로 돈 곡선
+  //   상업 지대 하락(점선) Rc′ = 38e^(−0.983x)
+  //   → X1 = 1.00 · X1** = 1.06 · X1* = 1.24 · Xb = 2.40 · X2 = 3.92 · X2* = 4.58
+  window.MONO_LEE = {
+    ra: 5, YMAX: 45, XMAX: 5.5,
+    rc(x)  { return 43 * Math.exp(-0.983 * x); },
+    rc2(x) { return 38 * Math.exp(-0.983 * x); },
+    r1(x)  { return 24 * Math.exp(-0.40 * x); },
+    r2(x)  { return 18 * Math.exp(-0.28 * x); },
+    cross(f, g, lo = 0.01, hi = 8) { for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; (f(m) - g(m)) * (f(lo) - g(lo)) > 0 ? (lo = m) : (hi = m); } return (lo + hi) / 2; },
+    // p.167·168 그림 — second 가 참이면 상업 지대 하락(점선)과 X1** 를 더한다
+    drawClosed(sel, second) {
+      const M = this, F = Fig.withBox({ x0: 46, y0: 236, x1: 410, y1: 24 });
+      const S = F.scale({ x: [0, M.XMAX], y: [0, M.YMAX] });
+      const from = (f) => { let x = 0; while (f(x) > M.YMAX) x += 0.01; return x; };
+      const samp = (f, a, b) => { const o = []; for (let i = 0; i <= 80; i++) { const x = a + ((b - a) * i) / 80; o.push([x, f(x)]); } return S.curve(o); };
+      const ra = () => M.ra;
+      const X1 = M.cross(M.rc, M.r1), X1s = M.cross(M.rc, M.r2), Xb = M.cross(M.r1, M.r2, 0.5, 5);
+      const X2 = M.cross(M.r1, ra), X2s = M.cross(M.r2, ra), X1ss = M.cross(M.rc2, M.r2);
+      const tick = (x, t, row) => [
+        Fig.raw(`<path class="guide" d="M${S.x(x)},${S.y(0)} L${S.x(x)},${S.y(M.YMAX * 0.92)}"/>`),
+        F.annot(S.x(x), S.y(0) + 15 + row * 14, t, { size: 10.5, anchor: 'middle' }),
+      ];
+      const parts = [
+        F.curve(samp(M.rc, from(M.rc), 3), { variant: 'supply' }),
+        F.curve(samp(M.r1, 0, M.XMAX), { variant: 'demand' }),
+        F.curve(samp(M.r2, 0, M.XMAX), { variant: 'i2' }),
+        F.line(...S.p([0, M.ra]), ...S.p([M.XMAX, M.ra]), { variant: 'i1' }),
+        F.annot(S.x(0) + 6, S.y(M.rc(0)) + 2, 'Rc', { size: 11, tone: 'red' }),
+        F.annot(S.x(1.6), S.y(M.r1(1.6)) - 6, 'R1', { size: 11, tone: 'blue' }),
+        F.annot(S.x(1.6), S.y(M.r2(1.6)) + 14, 'R2', { size: 11, tone: 'orange' }),
+        F.annot(S.x(M.XMAX), S.y(M.ra) - 6, 'Ra', { size: 11, anchor: 'end' }),
+        ...tick(X1, 'X1', 0), ...tick(X1s, 'X1*', 1), ...tick(Xb, 'Xb', 0), ...tick(X2, 'X2', 0), ...tick(X2s, 'X2*', 1),
+        F.arrow(S.x(X2) + 3, S.y(M.ra) + 14, S.x(X2s) - 3, S.y(M.ra) + 14, {}),
+      ];
+      if (second) {
+        parts.push(F.curve(samp(M.rc2, from(M.rc2), 3), { variant: 'supply', dash: '5 4' }));
+        parts.push(...tick(X1ss, 'X1**', 2));
+      }
+      parts.push(F.annot(S.x(M.XMAX / 2), S.y(0) + 58, '도시 중심으로부터의 거리', { size: 11, anchor: 'middle' }));
+      F.draw(sel, { axes: { y: '입찰지대' }, parts, check: false });
+    },
+  };
+
 </script>
 
 <style>
@@ -121,7 +171,7 @@
 
 <!-- ══ 지난 시간 — 6주차 요약 ════════════════════════════════ -->
 <section>
-  <h2>지난 시간 — 도시토지이용과 분포</h2>
+  <h2>지난 시간 — 도시토지이용과 입찰지대</h2>
   <div class="body tight">
     <div class="cols" style="align-items:flex-start">
       <div class="col-l">
@@ -646,6 +696,198 @@
     </div>
   </div>
 </section>
+
+<!-- ══ 이성원 강의노트의 단일도심 모형 (p.159~168) — 2026-10-07 6강 「05 단일도심 도시 모형」에서 옮겨 왔다 ══ -->
+
+
+<!-- ══ 단일 도심 모형 (이성원 p.159) ══════════════════════════════════
+     원본의 「1920년대 시카고」 지도는 다시 그릴 수 없어 옮기지 않았다. 동심원 모형만 다시 그렸다. -->
+<section class="s-split">
+  <h2>단일 도심 모형</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px;white-space:nowrap"><strong>20C 초, 세계 대다수의 모든 도시는 도시 중심지역 인근에 집중됨</strong></p>
+      <ul style="margin:0">
+        <li><strong>제조업</strong> 관련 기업은 도시 중심부에 입지<br>→ 물품의 수입과 수출 시 통행 비용 절감 목표를 위해</li>
+        <li><strong>오피스</strong> 중심의 기업도 중심부에 입지<br>→ 빠른 의사결정과 빠른 정보교환 목적</li>
+      </ul>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-burgess" viewBox="0 0 430 300" style="width:400px" role="img">
+        <title>도심을 중심으로 공장 지대, 전이 지대, 노동자 주거 지대, 주거 지대, 통근자 지대가 차례로 둘러싼 동심원 모형</title></svg>
+      <script>
+        (function () {
+          // 동심원 모형 — 반지름은 안쪽부터 같은 간격
+          const ZONE = [
+            ['I', '도심 (루프)', '#9B3A1E'], ['II', '공장 지대', '#E07A1F'], ['III', '전이 지대', '#F2C14E'],
+            ['IV', '노동자 주거 지대', '#7FAE3E'], ['V', '주거 지대', '#C7E3A6'], ['VI', '통근자 지대', '#FFFFFF'],
+          ];
+          const CX = 130, CY = 150, DR = 20;
+          let s = '';
+          for (let i = ZONE.length - 1; i >= 0; i--)
+            s += `<circle cx="${CX}" cy="${CY}" r="${DR * (i + 1)}" fill="${ZONE[i][2]}" stroke="var(--guide)" stroke-width="1"/>`;
+          ZONE.forEach(([n, name, col], i) => {
+            const y = 70 + i * 30;
+            s += `<rect x="272" y="${y - 11}" width="14" height="14" fill="${col}" stroke="var(--guide)"/>` +
+                 `<text x="294" y="${y}" style="font-size:12px;fill:var(--ink-2)">${n} · ${name}</text>`;
+          });
+          Fig.draw('#f-burgess', { parts: [Fig.raw(s)], check: false });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 단일 도심 모형: 단순한 가정 (이성원 p.160) ═══════════════════════ -->
+<section>
+  <h2>단일 도심 모형: 단순한 가정</h2>
+  <div class="body stack">
+    <ul style="margin:0">
+      <li><strong>기업</strong>은 그들의 생산품을 <strong>도시 중심지에 있는 항구 또는 기차 역으로 수송</strong>하기 위한 비용 지불</li>
+      <li>각 <strong>고용자(노동자)</strong>는 <strong>도시 중심지까지 통근·통행에 대한 비용을 지불</strong>해야 함</li>
+      <li>19C의 세계 모든 도시는 대부분 <strong>단일 도심의 도시공간구조 형태</strong>를 띔</li>
+    </ul>
+    <ul style="margin:18px 0 0">
+      <li>현재 시점 기준으로 <strong>현실성이 크지 않을 수</strong>도 있음</li>
+      <li>하지만 도시의 <strong>토지시장이 어떤 방식으로 작동되는지 이해</strong>하는데 도움이 됨</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 입찰지대곡선: 요소 대체가 없을 때 (이성원 강의노트 p.161) — 2026-10-06 추가 ═══
+     영어 병기와 출처는 옮기지 않았다 (교수 지시). 직선은 R = (p − c)Q − (tQ)x 에서 그린다. -->
+<section class="s-split">
+  <h2>입찰지대곡선: 요소 대체가 없을 때</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="formula-key" style="margin-bottom:6px">$\Pi\ (\text{에이커당 이윤}) = pQ - (cQ + txQ + R)$</p>
+      <ul class="dense" style="margin:0 0 10px">
+        <li><strong>p:</strong> 최종 생산물 가격</li>
+        <li><strong>c:</strong> 단위 생산물 당 토지 이외의 비용</li>
+        <li><strong>Q:</strong> 에이커 당 생산물 수량</li>
+        <li><strong>t:</strong> 마일 당 배송 비용</li>
+        <li><strong>x:</strong> 도시 중심지까지 거리</li>
+        <li><strong>R:</strong> 에이커 당 지대</li>
+      </ul>
+      <p class="emph" style="margin-bottom:6px"><strong>잉여의 원칙:</strong> 이윤이 0인 점까지 기업 진입</p>
+      <p class="formula-key" style="margin:0">$R = (p - c)Q - (tQ)x$</p>
+      <p class="caption" style="margin-left:14px">이윤이 0일 때</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-bidrent" viewBox="0 0 430 280" style="width:400px" role="img">
+        <title>절편이 (p − c)Q, 기울기가 −tQ 인 우하향 직선의 기업 입찰지대곡선</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 70, y0: 240, x1: 400, y1: 34 });
+          const S = F.scale({ x: [0, 10], y: [0, 10] });
+          const R = (x) => 9 - 1.0 * x;          // 모식도: 절편 (p − c)Q, 기울기 −tQ
+          F.draw('#f-bidrent', {
+            axes: { x: '항구까지의 거리', y: '입찰지대' },
+            parts: [
+              F.line(...S.p([0, R(0)]), ...S.p([9, R(9)]), { variant: 'supply' }),
+              F.annot(F.BOX.x0 - 8, S.y(R(0)) + 4, '(p − c)Q*', { anchor: 'end', size: 11 }),
+              F.annot(S.x(5.2), S.y(R(5.2)) - 10, '기울기 = −tQ*', { size: 12, tone: 'red' }),
+            ],
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 단일도심도시에서의 토지이용 (이성원 p.165) ════════════════════ -->
+<section>
+  <h2>단일도심도시에서의 토지이용</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:4px">토지는 각 위치별 <span class="mark">더 높은 비용을 지불할 수 있는 자</span>에게 할당 됨</p>
+    <svg class="fig" id="f-mono-use" viewBox="0 0 720 270" style="width:620px;margin:0 0 0 110px" role="img">
+      <title>도심에서 가장 가파른 상업 입찰지대, 그 다음 주거, 평평한 농업 입찰지대가 차례로 가장 높아 CBD 경계와 도시지역 경계가 정해지는 그림</title></svg>
+    <script>
+      (function () {
+        const M = window.MONO_LEE;
+        const F = Fig.withBox({ x0: 70, y0: 220, x1: 660, y1: 20 });
+        const S = F.scale({ x: [0, M.XMAX], y: [0, M.YMAX] });
+        const samp = (f, a, b) => { const o = []; for (let i = 0; i <= 80; i++) { const x = a + ((b - a) * i) / 80; o.push([x, f(x)]); } return S.curve(o); };
+        const x1 = M.cross(M.rc, M.r1), x2 = M.cross(M.r1, () => M.ra);
+        F.draw('#f-mono-use', {
+          axes: { x: '도시 중심으로부터의 거리 (x)', y: '지대' },
+          parts: [
+            F.curve(samp(M.rc, 0, 2.6), { variant: 'supply' }),
+            F.curve(samp(M.r1, 0, M.XMAX), { variant: 'demand' }),
+            F.line(...S.p([0, M.ra]), ...S.p([M.XMAX, M.ra]), { variant: 'i1' }),
+            F.annot(S.x(0.35), S.y(M.rc(0.35)) - 6, 'R 상업', { size: 12, tone: 'red' }),
+            F.annot(S.x(2.6), S.y(M.r1(2.6)) - 8, 'R 주거', { size: 12, tone: 'blue' }),
+            F.annot(S.x(M.XMAX) - 4, S.y(M.ra) - 8, 'R 농업', { size: 12, anchor: 'end' }),
+            F.guide(S.x(x1), S.y(M.r1(x1)), { xtick: 'X1 = CBD 경계', only: 'x' }),
+            F.guide(S.x(x2), S.y(M.ra), { xtick: 'X2 = 도시지역 경계', only: 'x' }),
+          ],
+          check: false,
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 단일도심 도시의 예측 (이성원 p.166) ══════════════════════════ -->
+<section>
+  <h2>단일도심 도시의 예측</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:8px">단일 도심 도시 모형을 통한 예측</p>
+    <ul style="margin:0">
+      <li>지대(임대료), 건물 높이(현금 자본이 토지 자산으로 전환되는 정도), 단위 주택 가격,
+        중심지로부터 거리가 증가할수록 인구밀도 감소 정도 등을 추정할 수 있음</li>
+      <li><strong>인구가 성장한다면?</strong> 임대료와 밀도 곡선을 상승시키고 도시 경계를 확장시킴</li>
+      <li><strong>농업의 지대가 상승한다면?</strong> 도시 경계는 축소하면서 임대료와 밀도 곡선은 상승시킴</li>
+      <li>만약 <strong>통행 비용이 감소</strong>한다면 어떤 변화가 생길까?</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 통행비용 감소: 닫힌도시 모형 (이성원 p.167) ═══════════════════ -->
+<section class="s-split">
+  <h2>단일도심 도시 모형: 통행비용 감소와 닫힌도시</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <svg class="fig" id="f-closed1" viewBox="0 0 430 300" style="width:400px" role="img">
+        <title>통근비용이 줄면 주거 입찰지대곡선의 기울기가 줄어 CBD 경계가 X1 에서 X1* 로, 도시 경계가 X2 에서 X2* 로 넓어지는 그림</title></svg>
+      <script>window.MONO_LEE.drawClosed('#f-closed1', false);</script>
+    </div>
+    <div class="col-r">
+      <p class="sub t-red" style="margin-bottom:4px">닫힌 도시에서 통근 비용의 감소</p>
+      <ul class="dense" style="margin:0 0 10px">
+        <li>역사적으로 보행에서 전차, 전차에서 기차, 기차에서 자동차로 통행수단 전환</li>
+        <li>주택 수요는 중심부에 가까울수록 떨어지고 외곽에 위치할수록 증가</li>
+        <li>통근비용 감소 시 주택가격에 대한 입찰지대곡선의 <strong>기울기는 감소</strong></li>
+      </ul>
+      <p class="derive t-red hang">→ 주택의 지대가 하락하나, 도시 외곽의 넓은 면적 주거에 대한 선호가 더 큼</p>
+      <p class="caption" style="margin-top:12px"><strong>※ 참고</strong><br>
+        열린도시: 도시 외부에 대해 열려 있어 주민의 이주가 자유로운 도시<br>
+        닫힌도시: 도시 내외부로의 인구이동이 불가능한 도시</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 통행비용 감소: 닫힌도시 모형 (계속) (이성원 p.168) ═════════════ -->
+<section class="s-split">
+  <h2>단일도심 도시 모형: 통행비용 감소와 닫힌도시</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <svg class="fig" id="f-closed2" viewBox="0 0 430 300" style="width:400px" role="img">
+        <title>주거 수요가 도심 근처에서 줄어 상업 입찰지대가 점선으로 내려가고, CBD 와 도시지역이 함께 넓어지는 그림</title></svg>
+      <script>window.MONO_LEE.drawClosed('#f-closed2', true);</script>
+    </div>
+    <div class="col-r">
+      <ul style="margin:0">
+        <li>주택수요 감소에 따라 도심부 인근 상업 가용지 증가 (밀도 감소)</li>
+        <li>상업용지의 지대 하락 (점선)</li>
+        <li>도시지역과 CBD지역 확대 예상 가능</li>
+        <li>도시지역은 <strong>중심성 감소</strong></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
 
 <!-- ══ 섹션 — 02 ═════════════════════════════════════════════ -->
 <section class="s-section">
