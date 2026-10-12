@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>5주차. 데이터 구하기 — 도시 데이터 수집과 git · github</title>
+  <title>5주차. 도시 데이터수집과 깃(git)</title>
 
   <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
   <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
@@ -80,6 +80,75 @@
   figure.shot { margin: 0; }
   figure.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
   figure.shot figcaption { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  /* ── 지난 시간 인포그래픽 · 묻기 안내 (2026-10-12) — 표지 뒤 세 장 ── */
+  .flow4 { display: flex; align-items: stretch; }
+  .flow4 .st { flex: 1 1 0; border-top: 3px solid var(--brand-crimson); background: #FAF8F5;
+               padding: 8px 11px 9px; }
+  .flow4 .ar { flex: 0 0 16px; align-self: center; text-align: center; color: #9A958D; font-size: 14px; }
+  .flow4 .n { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: var(--brand-crimson); margin: 0 0 2px; }
+  .flow4 .h { font-size: 14.5px; font-weight: 700; color: var(--ink); margin: 0 0 5px; }
+  .flow4 p { font-size: 12px; line-height: 1.5; color: var(--ink-2); margin: 0 0 3px; }
+  .flow4 .code { font-size: 11px; }
+  .rcb { margin-top: 10px; border: 1.5px solid var(--chart-blue); border-radius: 4px;
+         background: #F4F7FA; padding: 8px 14px 9px; }
+  .rcb .top { display: flex; align-items: baseline; gap: 10px; margin: 0 0 7px; }
+  .rcb .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: #FFF;
+              background: var(--chart-blue); padding: 2px 7px; border-radius: 2px; }
+  .rcb .ttl { font-size: 14.5px; font-weight: 700; color: var(--chart-blue); }
+  .rcb .row { display: flex; gap: 14px; align-items: flex-start; }
+  .rcb .dia { flex: 0 0 250px; display: flex; align-items: center; gap: 4px; }
+  .rcb .dev { flex: 1 1 0; border: 1px solid #B9C9D8; background: #FFF; border-radius: 3px;
+              padding: 5px 7px; font-size: 11px; line-height: 1.4; color: var(--ink-2); text-align: center; }
+  .rcb .dev b { display: block; font-size: 12px; color: var(--ink); }
+  .rcb .lk { flex: 0 0 34px; text-align: center; font-size: 10px; color: var(--chart-blue); line-height: 1.2; }
+  .rcb .col { flex: 1 1 0; font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+  .rcb .col .k { font-weight: 700; color: var(--chart-blue); margin: 0 0 1px; font-size: 12px; }
+  .rcb .col p { margin: 0; }
+  .ext4 { display: flex; gap: 10px; }
+  .ext4 .cd { flex: 1 1 0; border: 1px solid var(--rule); border-top: 3px solid var(--brand-crimson);
+              background: #FAF8F5; padding: 8px 11px 6px; }
+  .ext4 .h { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0 0 6px; }
+  .ext4 .h .n { color: var(--brand-crimson); margin-right: 4px; }
+  .ext4 .k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--brand-crimson); margin: 0; }
+  .ext4 p { font-size: 12px; line-height: 1.5; color: var(--ink-2); margin: 0 0 6px; }
+  .ext4 .code { font-size: 10.5px; }
+  .ask5 { display: flex; align-items: stretch; margin-top: 10px; }
+  .ask5 .st { flex: 1 1 0; text-align: center; padding: 0 4px; }
+  .ask5 .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-crimson); color: #FFF;
+               font-size: 12px; font-weight: 700; line-height: 24px; margin: 0 auto 5px; }
+  .ask5 .st p { font-size: 12.5px; line-height: 1.45; color: var(--ink); margin: 0; }
+  .ask5 .st .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .flow4 .code, .rcb .code, .ext4 .code, .ask5 .code { white-space: nowrap; }
+  .ask5 .ar { flex: 0 0 14px; padding-top: 3px; color: #9A958D; font-size: 14px; text-align: center; }
+  /* ── 출처를 슬라이드 좌측 하단 푸터 위에 (2026-10-12, 교수 요청 — 출처 장을 없앴다) ── */
+  .src-foot { position: absolute; left: var(--gutter-l); right: var(--gutter-r); top: 489px; margin: 0;
+              font-size: 11px; line-height: 1.3; }
+  /* 깃과 깃허브 */
+  .gg { display: flex; gap: 0; align-items: stretch; }
+  .gg .cell { flex: 1 1 0; border: 1px solid var(--rule); border-top: 3px solid var(--brand-crimson);
+              background: #FAF8F5; padding: 10px 14px 8px; }
+  .gg .nm { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0 0 6px; }
+  .gg .nm .en { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 4px; }
+  .gg p { font-size: 13px; line-height: 1.55; margin: 0 0 4px; color: var(--ink-2); }
+  .gg .mid { flex: 0 0 84px; align-self: center; text-align: center; font-size: 11.5px;
+             color: var(--brand-crimson); font-weight: 700; line-height: 1.45; }
+  .inst { margin-top: 10px; }
+  .inst .k { font-size: 12px; font-weight: 700; color: var(--brand-crimson); margin: 0 0 4px; }
+  .inst td, .inst th { font-size: 12px; line-height: 1.6; vertical-align: top; }
+  .inst .code { font-size: 11px; white-space: nowrap; }
+  /* 깃 용어 한 장 */
+  .terms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .terms .t { border: 1px solid var(--rule); border-left: 3px solid var(--brand-crimson);
+              background: #FAF8F5; padding: 6px 10px 7px; }
+  .terms .t.place { border-left-color: var(--chart-blue); }
+  .terms .t.keep { border-left-color: var(--accent-green); }
+  .terms .nm { font-size: 14px; font-weight: 700; color: var(--ink); margin: 0; }
+  .terms .nm .en { font-size: 11px; color: var(--muted); font-weight: 400; margin-left: 5px; }
+  .terms p { font-size: 11.5px; line-height: 1.5; margin: 2px 0 0; color: var(--ink-2); }
+  .terms .code { font-size: 10.5px; white-space: nowrap; }
+  /* 상자 안 글은 어절 단위로만 접는다 · 코드는 접지 않는다 (2026-10-12) */
+  .prompt-box, .ck, .stuck { word-break: keep-all; }
+  .ck .code, .stuck .code { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -89,8 +158,121 @@
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <h1>5주차. 데이터 구하기<br>도시 데이터 수집과 git · github</h1>
+    <h1>5주차. 도시 데이터수집과 깃(git)</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 지난 시간 ① — 2강 (2026-10-12 교수 요청) ═════════════════════
+       위 네 칸은 2강 6·8·10·14·18쪽을 간추린 것 (2026-10-12 교수 수정: 위키 전용 표현을 일반 프로젝트로, 모드 원칙은 계획 먼저 → 자동). 아래 띠의 리모트 컨트롤은 2강에서 다루지 않았다 —
+       design.md §5 의 「지난 시간」 규칙과 갈리지 않게 「2강에 더하는 것」으로 표시한다.
+       리모트 컨트롤 사실은 공식 문서 code.claude.com/docs/en/remote-control (2026. 10. 12. 확인) -->
+  <section>
+    <h2>지난 시간 ①: 내 컴퓨터에서 프로젝트를 굴리는 틀</h2>
+    <div class="body tight">
+      <div class="flow4">
+        <div class="st"><p class="n">① 폴더를 만든다</p>
+          <p class="h">폴더 하나 = 프로젝트 하나</p>
+          <p><span class="code">mkdir my-project</span><br><span class="code">cd my-project</span></p>
+          <p><b>CLAUDE.md</b> 규칙<br><b>.claude/</b> 설정 · 스킬 · 에이전트<br><b>자료 폴더 · 결과 폴더</b>를 나눠 둔다</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><p class="n">② 클로드를 연다</p>
+          <p class="h">그 폴더에서 시작한다</p>
+          <p><span class="code">claude</span> 로 연다<br>데스크탑 앱 Code 탭도 같은 엔진</p>
+          <p><b>Shift+Tab</b> 으로 모드 설정<br>원칙: <b>계획 먼저</b> 보고,<br>맞으면 <b>자동</b>으로 바꾼다</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><p class="n">③ 일을 시킨다</p>
+          <p class="h">에이전트 루프가 돈다</p>
+          <p>지시 → 맥락 수집 → 도구 실행 → 검증</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><p class="n">④ 이어 간다</p>
+          <p class="h">대화는 사라지고 파일은 남는다</p>
+          <p>필요한 내용은 <b>파일로 남겨</b><br>다음 세션에서도 이어 한다<br>규칙은 CLAUDE.md 에 적는다</p>
+          <p><span class="code">claude --continue</span> 이어서<br><span class="code">/compact</span> 접기 · <b>Esc 두 번</b> 되감기</p></div>
+      </div>
+      <div class="rcb">
+        <p class="top"><span class="tag">2강에 더하는 것</span>
+          <span class="ttl">리모트 컨트롤 — 내 컴퓨터에서 도는 세션을 휴대폰 · 브라우저에서 이어 쓴다</span></p>
+        <div class="row">
+          <div class="dia">
+            <div class="dev"><b>내 컴퓨터</b>여기서 실행된다<br>파일 · MCP · 설정 그대로</div>
+            <div class="lk">⇄<br>HTTPS</div>
+            <div class="dev"><b>휴대폰 · 브라우저</b>claude.ai/code<br>Claude 앱</div>
+          </div>
+          <div class="col"><p class="k">켜기</p>
+            <p>세션 안에서 <span class="code">/rc</span><br>
+              (<span class="code">/remote-control</span> 과 같다)<br>
+              처음부터 <span class="code">claude --remote-control</span></p></div>
+          <div class="col"><p class="k">연결</p>
+            <p>터미널에 뜬 주소를 열거나<br>QR 을 Claude 앱으로 찍는다</p></div>
+          <div class="col"><p class="k">알아 둘 것</p>
+            <p>컴퓨터와 터미널은 켜 둔다<br>승인 창이 휴대폰에도 뜬다<br>Pro 이상 구독 · claude.ai 로그인<br>
+              늘 켜려면 <span class="code">/config</span></p></div>
+        </div>
+      </div>
+      <p class="caption" style="margin-top:5px">리모트 컨트롤: 클로드 코드 공식 문서 code.claude.com/docs/en/remote-control (2026. 10. 12. 확인)</p>
+    </div>
+  </section>
+
+  <!-- ══ 지난 시간 ② — 3강 (2026-10-12 교수 요청) ═════════════════════
+       3강 3·4·7·8·10·12·13·14·16쪽을 네 칸으로 간추린 것. 새 사실은 넣지 않았다 -->
+  <section>
+    <h2>지난 시간 ②: 클로드 코드를 넓히는 네 가지</h2>
+    <div class="body tight">
+      <div class="ext4">
+        <div class="cd"><p class="h"><span class="n">①</span>스킬</p>
+          <p class="k">무엇인가</p><p>정해진 절차를 파일 하나로 묶은 것</p>
+          <p class="k">만드는 법</p><p><span class="code">.claude/skills/이름/SKILL.md</span><br>
+            name · description 아래에 절차<br>skill-creator 에게<br>"○○ 스킬을 만들어 줘"</p>
+          <p class="k">부르는 법</p><p><span class="code">/이름</span> 으로 부르거나,<br>description 을 보고 클로드가 꺼낸다</p></div>
+        <div class="cd"><p class="h"><span class="n">②</span>MCP</p>
+          <p class="k">무엇인가</p><p>바깥 도구 · 데이터를 꽂는 규격<br>(법령 · KOSIS · 브라우저 · QGIS 등)</p>
+          <p class="k">붙이는 법</p><p>저장소 주소를 주고 "붙여 줘"<br>또는 <span class="code">claude mcp add 이름 주소</span></p>
+          <p class="k">확인하는 법</p><p><span class="code">/mcp</span> 로 연결을 본다<br>인증키는 파일에 적지 않는다<br>받은 숫자는 사람이 확인한다</p></div>
+        <div class="cd"><p class="h"><span class="n">③</span>에이전트</p>
+          <p class="k">무엇인가</p><p>대화창을 따로 가진 클로드<br>시킨 일을 하고 요약만 돌려준다</p>
+          <p class="k">만드는 법</p><p><span class="code">.claude/agents/이름.md</span><br>tools 로 쓸 도구를 좁힌다<br>검사역에게는 읽기만 준다</p>
+          <p class="k">부르는 법</p><p>이름을 말하거나<br><span class="code">@agent-이름</span> 으로 못 박는다</p></div>
+        <div class="cd"><p class="h"><span class="n">④</span>플러그인</p>
+          <p class="k">무엇인가</p><p>앞의 셋을 한 폴더에 묶어<br>남과 나눠 쓰는 것</p>
+          <p class="k">만드는 법</p><p><span class="code">.claude-plugin/plugin.json</span><br>+ skills/ · agents/ · .mcp.json</p>
+          <p class="k">설치하는 법</p><p><span class="code">/plugin</span> 에서 찾아 설치<br>예: <span class="code">skill-creator</span><br><span class="code">claude-md-management</span></p></div>
+      </div>
+      <p class="derive t-red" style="margin-top:10px">→ CLAUDE.md 는 "항상 이렇게", 이 넷은 "필요할 때 이것을".
+        만드는 기준은 하나 — 세 번 넘게 반복하는 일인가</p>
+    </div>
+  </section>
+
+  <!-- ══ 모르면 클로드에게 묻는다 (2026-10-12 교수 요청) ═══════════════
+       예시의 필요 프로그램은 3강 11쪽 표에서 가져왔다 (Playwright · QGIS MCP) -->
+  <section>
+    <h2>모르면 클로드에게 묻는다 — 설치도, 뜻도</h2>
+    <div class="body tight">
+      <p class="emph" style="margin-bottom:2px">MCP 나 스킬이 돌려면 내 컴퓨터에 먼저 깔려 있어야 하는 프로그램이 있다</p>
+      <p class="caption" style="margin:0">예: Playwright MCP 는 Node.js 18 이상, QGIS MCP 는 QGIS 플러그인과 uv 가 있어야 돈다 (3강 11쪽)</p>
+      <div class="ask5">
+        <div class="st"><div class="dot">1</div><p>하고 싶은 일을 말한다</p><p class="s">"○○ 를 하고 싶어"</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><div class="dot">2</div><p>무엇이 필요한지 묻는다</p><p class="s">깔려 있는지도 확인시킨다</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><div class="dot">3</div><p>설치한다</p><p class="s">방법을 듣고 직접 하거나<br>"설치해 줘"</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><div class="dot">4</div><p>모르는 말은 묻는다</p><p class="s">"이게 뭐야?"</p></div>
+        <div class="ar">▶</div>
+        <div class="st"><div class="dot">5</div><p>됐는지 확인한다</p><p class="s"><span class="code">/mcp</span> · 버전 확인</p></div>
+      </div>
+      <div class="cols" style="margin-top:6px;gap:14px;align-items:stretch">
+        <div class="col-l"><div class="prompt-box" style="height:100%;box-sizing:border-box;margin-top:0"><p class="who">그대로 쓴다 — 설치 전</p>
+          <p>"○○ MCP 를 붙이고 싶어. 내 컴퓨터에 먼저 설치해야 할 프로그램이 있는지 확인하고,
+            없으면 설치 방법을 알려 줘. 각각이 무엇을 하는 프로그램인지 한 줄씩 설명해 줘."</p></div></div>
+        <div class="col-r"><div class="prompt-box" style="height:100%;box-sizing:border-box;margin-top:0"><p class="who">그대로 쓴다 — 모를 때</p>
+          <p>"방금 나온 uv 가 뭐야? 이걸 설치하면 내 컴퓨터에서 무엇이 바뀌는지,
+            필요 없어지면 어떻게 지우는지도 알려 줘."</p></div></div>
+      </div>
+      <div class="stuck"><b>2강에서 본 두 가지는 그대로다.</b>
+        설치 명령도 승인 전에 무엇을 하는지 한 줄 읽는다 · 인증키는 대화창에 붙여 넣지 않는다</div>
+      <p class="derive t-red" style="margin-top:8px">→ 오늘은 데이터를 구하고 git · github 로 기록을 남긴다.
+        필요한 프로그램은 이 순서로 갖춘다</p>
+    </div>
   </section>
 
   <!-- ══ 2. 발문 ════════════════════════════════════════════════════════ -->
@@ -112,27 +294,23 @@
       <table style="width:100%;table-layout:fixed;margin-top:2px">
         <thead><tr><th style="width:23%">어디</th><th style="width:39%">무엇이 있나</th><th>받는 방식</th></tr></thead>
         <tbody>
-          <tr><td>KOSIS 국가통계포털</td><td>인구·가구·산업 통계표</td><td>화면 조회 · CSV · <span class="hl">MCP</span></td></tr>
-          <tr><td>공공데이터포털</td><td>부처·지자체가 여는 거의 전부</td><td>파일 · <span class="hl">API</span></td></tr>
-          <tr><td>SGIS 통계지리정보</td><td>격자·행정동 단위 공간통계</td><td>화면 · API</td></tr>
-          <tr><td>실거래가 공개시스템</td><td>부동산 매매·전월세 거래</td><td>CSV · <span class="hl">API</span></td></tr>
-          <tr><td>브이월드 <span class="code">vworld.kr</span></td>
+          <tr><td>KOSIS 국가통계포털<br><span class="u">kosis.kr</span></td><td>인구·가구·산업 통계표</td><td>화면 조회 · CSV · <span class="hl">MCP</span></td></tr>
+          <tr><td>공공데이터포털<br><span class="u">data.go.kr</span></td><td>부처·지자체가 여는 거의 전부</td><td>파일 · <span class="hl">API</span></td></tr>
+          <tr><td>SGIS 통계지리정보<br><span class="u">sgis.mods.go.kr</span></td><td>격자·행정동 단위 공간통계</td><td>화면 · API</td></tr>
+          <tr><td>실거래가 공개시스템<br><span class="u">rt.molit.go.kr</span></td><td>부동산 매매·전월세 거래</td><td>CSV · <span class="hl">API</span></td></tr>
+          <tr><td>브이월드<br><span class="u">vworld.kr</span></td>
             <td>2D·3D 국가공간정보 — 용도지역지구·건축물·지형·경사도</td>
             <td>지도 조회는 가입 없이 · <span class="hl">다운로드와 오픈API 는 가입 후 인증키</span></td></tr>
-          <tr><td>국토정보플랫폼 <span class="code">map.ngii.go.kr</span></td>
+          <tr><td>국토정보플랫폼<br><span class="u">map.ngii.go.kr</span></td>
             <td>수치지도·항공사진·정사영상·국토통계지도. 대동여지도·북한지도 같은 역사자료도 있다</td>
             <td>열람은 무료 · <span class="hl">내려받기는 가입 후 신청</span> (일부는 공문)</td></tr>
-          <tr><td>KTDB 국가교통DB <span class="code">ktdb.go.kr</span></td>
+          <tr><td>KTDB 국가교통DB<br><span class="u">ktdb.go.kr</span></td>
             <td>여객·화물 통행실태조사, 교통통계DB (수송실적·교통시설규모·접근성지표)</td>
             <td><span class="hl">자료신청 → 심사 뒤 제공.</span> 즉시 받지 못한다</td></tr>
-          <tr><td>COMPAS</td><td>과제별로 정제된 도시 데이터</td><td>과제 단위 일괄</td></tr>
-          <tr><td>지자체 데이터포털</td><td>그 도시에만 있는 것</td><td>제각각</td></tr>
+          <tr><td>COMPAS<br><span class="u">compas.lh.or.kr</span></td><td>과제별로 정제된 도시 데이터</td><td>과제 단위 일괄</td></tr>
+          <tr><td>지자체 데이터포털<br><span class="u">예: data.seoul.go.kr</span></td><td>그 도시에만 있는 것</td><td>제각각</td></tr>
         </tbody>
       </table>
-      <p class="caption" style="margin-top:8px">
-        <span class="hl">받는 방식이 곧 일정이다.</span> 위 넷은 오늘 당장 받을 수 있고,
-        국토정보플랫폼·KTDB 는 신청부터 해 두어야 한다.<br>
-        오늘은 <span class="hl">실거래가</span> 하나를 세 방식으로 받아 본다 — 방식을 익히면 나머지도 같다.</p>
     </div>
   </section>
 
@@ -228,13 +406,10 @@
 → 청주시 상당구 2026년 8월 아파트 매매 <span class="h">182건</span></pre>
       </div>
       <p class="emph" style="margin-top:10px">
-        <span class="hl">앞 장의 주소에는 없던 것이 여기 다 있다.</span> 이 한 줄을 적어 두면
-        같은 파일이 언제든 다시 나온다. 조건 셋을 바꾸면 다른 지역·다른 달이고,
-        열두 달은 열두 번 부르면 된다 — 그것이 프로그램이 할 일이다.</p>
-      <p class="caption" style="margin-top:6px">
-        무료이고 활용신청은 자동 승인, 개발계정은 하루 10,000건까지다.
-        법정동코드는 code.go.kr 에서 찾는다 —
-        <span class="hl">코드를 찾는 일 자체가 오늘 배울 기술이다.</span></p>
+        공공데이터포털에 <span class="hl">가입한 뒤 서비스키(인증키)를 발급받고</span>,
+        쓰려는 데이터마다 <span class="hl">활용신청</span>을 해야 쓸 수 있다.</p>
+      <p class="emph" style="margin-top:6px">
+        <span class="hl">조건을 바꾸면</span> 다른 지역, 다른 달의 데이터를 가져올 수 있다.</p>
     </div>
   </section>
 
@@ -270,6 +445,10 @@
         <div class="ck"><b>스킬로 만들면 그것이 ②다.</b> 지역코드와 연월만 바꿔 같은 절차를
           다시 돌리는 것 — <span class="hl">그게 API 를 부르는 일이다.</span>
           ③은 ②를 없애는 것이 아니라 ②를 쓰기 쉽게 만든다.</div>
+        <div class="stuck"><b>원격으로 시킬 때 — 인증키는 미리 넣어 둔다.</b>
+          리모트 컨트롤로 휴대폰에서 시키면 키를 넣을 안전한 자리가 없다 (대화창에는 붙여 넣지 않는다).
+          <b>세션이 도는 PC 에서</b> 미리 <span class="code">.env</span> 에 키를 넣어 두고,
+          클로드에게는 "인증키는 .env 에 있어" 라고만 말한다.</div>
       </div>
     </div>
   </section>
@@ -333,6 +512,40 @@
       </ol>
     </div>
   </section>
+  <!-- ══ KOSIS MCP 를 전역으로 붙이기 (2026-10-12 교수 요청) ══════════════════
+       주소와 범위 옵션은 3강 10·21쪽과 같다 (2026. 9. 17. 확인) -->
+  <section class="s-split">
+    <h2>KOSIS MCP 를 붙인다 — 모든 프로젝트에서 쓰게</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">3주차에는 한 프로젝트에 붙였다<br>이번에는 <span class="hl">전역(user)</span>으로 붙인다</p>
+        <div class="doc" style="margin-top:8px">
+          <div class="bar">클로드가 실행하는 명령</div>
+          <pre><span class="h">claude mcp add</span> --transport http \
+  kosis https://kosismcp2026.vercel.app/api/mcp \
+  <span class="h">--scope user</span>
+
+<span class="h"># 범위</span>
+--scope local     나 · 이 프로젝트에서만 (기본값)
+--scope project   .mcp.json 으로 저장소에 함께
+--scope user      내 모든 프로젝트</pre>
+        </div>
+        <p class="caption" style="margin-top:6px">인증키가 없는 원격 서버라 리모트 컨트롤로 시켜도 된다</p>
+      </div>
+      <div class="col-r">
+        <div class="prompt-box" style="margin-top:0"><p class="who">세션을 열고 이렇게 시킨다</p>
+          <p>"https://kosismcp2026.vercel.app/api/mcp — 이 KOSIS 원격 MCP 를
+            <b>내 모든 프로젝트에서 쓸 수 있게 user 범위(전역)로</b> 붙여 줘. 인증키는 없어.</p>
+          <p>붙인 뒤에 /mcp 로 연결을 확인하고, <b>청주시 총인구 2024년 값</b>을 하나 받아서
+            실제로 숫자가 오는지 보여 줘."</p></div>
+        <div class="ck"><b>✓ 확인 지점</b> — 새 세션을 열어 <span class="code">/mcp</span> 에
+          kosis 가 연결됨으로 뜬다. <b>다른 폴더에서 열어도 뜨면</b> 전역으로 붙은 것이다.
+          숫자는 다음 장의 2024년 값과 같아야 한다.</div>
+      </div>
+    </div>
+    <p class="caption src-foot">출처: 클로드 코드 공식 문서 <span class="u">code.claude.com/docs/en/mcp</span> · KOSIS MCP 시범서비스 (KOSIS 공지, 2026-07-08)</p>
+  </section>
+
 
   <!-- ══ 11. AI 에 맡기기 — 청주시 인구 ══════════════════════════════════════════════ -->
   <section class="s-split">
@@ -478,8 +691,6 @@
     <div class="body tight">
       <p class="sub">대상</p>
       <p class="emph">청주시 상당구 아파트 매매 실거래가 · 최근 12개월</p>
-      <p class="caption" style="margin-top:6px">
-        원도심이 있는 구다. 4주차에 정한 연구질문과 이어지고, 6주차부터 내내 이 파일을 쓴다.</p>
       <p class="sub" style="margin-top:16px">왜 세 번이나 받나</p>
       <ul>
         <li>같은 데이터가 나와야 <span class="hl">내가 제대로 받았는지</span> 알 수 있다</li>
@@ -555,6 +766,10 @@
     <h2>실습 ④ — 출처를 적는다 <span class="en" style="font-size:16px;color:var(--muted)">15분</span></h2>
     <div class="body tight">
       <p class="sub">데이터 옆에 <span class="hl">메타데이터</span>를 같이 둔다 — 앞 장의 일곱 줄이다</p>
+      <div class="prompt-box" style="margin-top:6px;padding:9px 15px"><p class="who">이렇게 만들게 한다</p>
+        <p>"방금 받은 CSV 옆에 같은 이름의 <b>출처 문서(.md)</b> 를 만들어 줘.
+          출처 · 주소 · 받은 날 · 범위 · 단위 · 집계 기준 · 결측·한계 일곱 칸으로 쓰고,
+          <b>내가 준 조건과 API 문서에서 확인한 것만</b> 적어. 확인하지 못한 칸은 「확인 필요」로 남겨 줘."</p></div>
       <table style="width:100%;table-layout:fixed;margin-top:6px">
         <thead><tr><th style="width:20%">칸</th><th>예</th></tr></thead>
         <tbody>
@@ -567,12 +782,6 @@
           <tr><td>결측·한계</td><td>거래 없는 달은 행이 아예 없다. 신고 시차가 있고, 취소 거래 처리 방식은 확인 필요</td></tr>
         </tbody>
       </table>
-      <p class="emph" style="margin-top:16px">
-        제출: <span class="t-red">cheongju-apt.csv + 출처 문서</span> —
-        <span class="hl">다음 주에 이 파일을 저장소에 올리고, 7주차에 이 파일로 첫 분석을 한다.</span></p>
-      <p class="caption" style="margin-top:6px">
-        과제: 자기 문제정의서에 필요한 데이터도 하나 찾아 둔다. 없으면 없다고 적어 온다.<br>
-        <span class="hl">그리고 다음 장의 사전 과제를 반드시 해 온다.</span></p>
     </div>
   </section>
 
@@ -588,7 +797,7 @@
           <span class="u">code.go.kr/stdcode/regCodeL.do</span> (2026. 8. 26. 조회)</li>
         <li>KOSIS 「행정구역(시군구)별, 성별 인구수」(행정안전부, <span class="code">DT_1B040A3</span>)<br>
           <span class="u">kosis.kr/statHtml/statHtml.do?orgId=101&amp;tblId=DT_1B040A3</span> (2026. 9. 28. 조회)</li>
-        <li>실거래가 공개시스템 「조건별 자료제공」 화면 갈무리 (5쪽) — 2026. 9. 28. 갈무리<br>
+        <li>실거래가 공개시스템 「조건별 자료제공」 화면 갈무리 (8쪽) — 2026. 9. 28. 갈무리<br>
           <span class="u">rt.molit.go.kr/pt/xls/xls.do?mobileAt=</span></li>
         <li>브이월드 (국토교통부 · 공간정보산업진흥원) — <span class="u">vworld.kr</span><br>
           국토정보플랫폼 (국토지리정보원) — <span class="u">map.ngii.go.kr</span> (2026. 9. 28. 확인)</li>
@@ -614,6 +823,44 @@
       </ul>
     </div>
   </section>
+  <!-- ══ 깃과 깃허브 (2026-10-12 교수 요청) ═════════════════════════════
+       로고: Git Logo by Jason Long, CC BY 3.0 (git-scm.com/community/logos, 2026. 10. 12. 확인).
+       깃허브 로고는 상표라 싣지 않았다. 설치 명령은 git-scm.com/install 과 cli.github.com 에서 확인 -->
+  <section>
+    <h2>깃과 깃허브 — 기록하는 프로그램, 올려 두는 곳</h2>
+    <div class="body tight">
+      <div class="gg">
+        <div class="cell">
+          <img src="../assets/cc-git-logo.svg" alt="Git 로고. 주황색 마름모 안에 갈라지는 가지 모양과 git 글자" style="height:46px;display:block;margin:0 0 2px">
+          <p style="font-size:10px;color:var(--muted);margin:0 0 8px">Git Logo by Jason Long · CC BY 3.0 · <span class="u" style="font-size:10px">git-scm.com/community/logos</span></p>
+          <p class="nm">깃 <span class="en">Git</span></p>
+          <p>폴더 안 파일이 <b>언제, 어떻게 바뀌었는지</b> 기록하는 프로그램</p>
+          <p>내 컴퓨터에서 돈다 · 무료 · 인터넷 없이도 쓴다</p>
+        </div>
+        <div class="mid">push →<br>올린다<br><br>← pull<br>내려받는다</div>
+        <div class="cell">
+          <p class="nm" style="margin-top:4px">깃허브 <span class="en">GitHub</span></p>
+          <p>깃의 기록을 <b>인터넷에 올려 두는 서비스</b></p>
+          <p>백업 · 공유 · 협업. 저장소마다 공개 / 비공개를 정한다</p>
+          <p><span class="u">github.com</span> · 가입하면 기본 기능은 무료</p>
+        </div>
+      </div>
+      <div class="inst">
+        <p class="k">설치하는 법 — 실습에서는 이 명령을 클로드가 실행한다</p>
+        <table style="width:100%;table-layout:fixed">
+          <thead><tr><th style="width:22%">맥</th><th style="width:44%">윈도우</th><th>깃허브</th></tr></thead>
+          <tbody><tr>
+            <td><span class="code">brew install git gh</span><br>또는 <span class="code">xcode-select --install</span></td>
+            <td><span class="code">winget install --id Git.Git -e --source winget</span><br>
+              <span class="code">winget install --id GitHub.cli --source winget</span></td>
+            <td>github.com 에서 가입한 뒤<br><span class="code">gh auth login</span> 으로 잇는다</td>
+          </tr></tbody>
+        </table>
+      </div>
+    </div>
+    <p class="caption src-foot">출처: 깃 공식 사이트 <span class="u">git-scm.com/install</span> · 깃허브 CLI <span class="u">cli.github.com</span> (2026. 10. 12. 확인)</p>
+  </section>
+
 
   <!-- ══ 3. 왜 지금 배우나 ════════════════════════════════ -->
   <section class="s-definition">
@@ -638,7 +885,7 @@
               <td>AI 가 고친 것을 되돌린다</td></tr>
           <tr><td>② 깃허브</td><td><span class="hl">남과 나누기</span>와 백업</td>
               <td>분석을 제출하고 재현시킨다</td></tr>
-          <tr><td>③ 클로드 + 깃</td><td>커밋·PR 을 <span class="hl">맡기기</span></td>
+          <tr><td>③ 클로드 + 깃</td><td>커밋·올리기를 <span class="hl">맡기기</span></td>
               <td>기록을 남기는 품을 줄인다</td></tr>
         </tbody>
       </table>
@@ -778,6 +1025,7 @@
           석 달 뒤에 이 목록만 읽고도 분석의 흐름이 보여야 한다.</p>
       </div>
     </div>
+    <p class="caption src-foot">출처: 깃 공식 문서 <span class="u">git-scm.com/doc</span></p>
   </section>
 
   <!-- ══ 7. ① 무엇을 넣지 않나 ═══════════════════════════ -->
@@ -840,10 +1088,9 @@ output/*.png    <span class="h"># 스크립트로 다시 만든다</span></pre>
         <p class="emph" style="margin-top:12px">
           <span class="hl">공개는 되돌리기 어렵다.</span> 헷갈리면 비공개로 만들고 나중에 바꾼다 —
           반대 방향은 이미 늦다.</p>
-        <p class="caption" style="margin-top:8px">
-          COMPAS 비공개 데이터는 <span class="mark">어느 쪽에도 올리지 않는다.</span></p>
       </div>
     </div>
+    <p class="caption src-foot">출처: 깃허브 CLI <span class="u">cli.github.com</span></p>
   </section>
 
   <!-- ══ 9. ② README ═════════════════════════════════════ -->
@@ -855,9 +1102,6 @@ output/*.png    <span class="h"># 스크립트로 다시 만든다</span></pre>
         <p>남이 이 저장소를 열었을 때 <span class="hl">가장 먼저 보는 화면</span>이다.</p>
         <p style="margin-top:10px">이 수업의 기준은 하나다 —
           <span class="mark">이것만 읽고 내 결과를 다시 만들 수 있는가.</span></p>
-        <p class="emph" style="margin-top:12px">
-          원본 데이터를 올리지 않는 대신 <span class="hl">받는 방법을 적는다.</span>
-          그것이 5주차 "데이터 출처 문서" 가 여기로 오는 자리다.</p>
       </div>
       <div class="col-r">
         <div class="doc">
@@ -884,32 +1128,13 @@ CLAUDE.md 참조 (60㎡ 초과 · 중앙값)
     </div>
   </section>
 
-  <!-- ══ 10. ③ 클로드 + 깃 ═══════════════════════════════ -->
-  <section>
-    <p class="mth">③ 클로드 + 깃</p>
-    <h2>기록하는 품을 맡긴다</h2>
-    <div class="body tight">
-      <p class="sub">클로드 코드는 터미널에서 돌므로 깃 명령을 그대로 쓸 수 있다</p>
-      <div class="prompt-box">
-        <p class="who">이렇게 시킨다</p>
-        <p>"지금까지 바뀐 걸 <span class="mark">무엇을 왜 바꿨는지 알 수 있게</span> 커밋해 줘.
-          <b>커밋하기 전에 무엇을 담을지 목록으로 보여 줘.</b>"</p>
-        <p>"<span class="mark">.env 는 빼고</span> 커밋해."</p>
-        <p>"이 저장소의 커밋 기록을 읽고 <span class="mark">분석이 어떻게 바뀌어 왔는지</span> 정리해 줘."</p>
-      </div>
-      <p class="emph" style="margin-top:14px">
-        굵게 표시한 부분이 핵심이다. <span class="hl">커밋 전에 목록을 보여 달라고 한다</span> —
-        무엇이 올라가는지 모르고 승인하면 인증키가 함께 간다.</p>
-      <p class="caption" style="margin-top:8px">
-        마지막 줄은 이 수업다운 쓰임이다 — 커밋 기록 자체가 <span class="hl">분석 과정의 증거</span>가 된다.</p>
-    </div>
-  </section>
-
   <!-- ══ 11. ③ 브랜치와 PR ═══════════════════════════════ -->
   <section>
     <p class="mth">③ 클로드 + 깃</p>
     <h2>브랜치 — 망칠 각오로 해 보기</h2>
     <div class="body stack">
+      <p class="emph" style="margin-bottom:8px">브랜치(branch)는 main 을 그대로 둔 채
+        <span class="hl">갈라져 나와 실험하는 작업 줄기</span>다. 좋으면 main 에 합치고(merge), 아니면 버린다</p>
       <svg class="fig" id="f-br" viewBox="0 0 840 235" style="width:790px" role="img"
            aria-label="주 흐름에서 갈라져 나온 브랜치에서 실험한 뒤 좋으면 합치고 아니면 버리는 도식">
         <title>브랜치에서 실험하고 합치기</title>
@@ -1048,45 +1273,63 @@ CLAUDE.md 참조 (60㎡ 초과 · 중앙값)
       </svg>
     </div>
   </section>
-
-  <!-- ══ 12. ③ PR 과 @claude ═════════════════════════════ -->
-  <section class="s-split">
-    <p class="mth">③ 클로드 + 깃</p>
-    <h2>PR — 합치기 전에 보여 주기</h2>
+  <!-- ══ 깃 용어 한 장 (2026-10-12 교수 요청) — 앞 장들에서 쓴 말만 모았다 ══ -->
+  <section>
+    <p class="mth">정리</p>
+    <h2>깃 용어 한 장 정리</h2>
     <div class="body tight">
-      <div class="col-l">
-        <p>풀 리퀘스트(PR)는 <span class="hl">"이렇게 바꾸려는데 봐 주세요"</span> 라는 요청이다.
-          바뀐 부분이 한눈에 보이고, 줄마다 의견을 달 수 있다.</p>
-        <div class="doc" style="margin-top:10px">
-          <div class="bar">터미널</div>
-          <pre>git switch -c 면적하한-실험
-<span class="h"># … 작업 …</span>
-git push -u origin 면적하한-실험
-<span class="h">gh pr create</span></pre>
-        </div>
-        <p class="caption" style="margin-top:8px">
-          클로드에게 "브랜치 만들고 PR 까지 올려 줘" 라고 해도 된다.
-          <span class="hl">올리기 전에 무엇을 담을지 확인한다.</span></p>
+      <div class="terms">
+        <div class="t place"><p class="nm">깃<span class="en">Git</span></p><p>폴더의 변경 기록을 남기는 프로그램<br>내 컴퓨터에서 돈다</p></div>
+        <div class="t place"><p class="nm">깃허브<span class="en">GitHub</span></p><p>그 기록을 올려 두는 인터넷 서비스<br>백업 · 공유</p></div>
+        <div class="t place"><p class="nm">저장소<span class="en">repository</span></p><p>기록이 쌓이는 곳. 폴더 안의 .git<br><span class="code">git init</span></p></div>
+        <div class="t place"><p class="nm">README</p><p>저장소의 설명서<br>남이 가장 먼저 보는 화면</p></div>
+        <div class="t"><p class="nm">스테이징<span class="en">add</span></p><p>이번 기록에 담을 것을 골라 둔다<br><span class="code">git add</span></p></div>
+        <div class="t"><p class="nm">커밋<span class="en">commit</span></p><p>"이 시점의 전부" 를 이름 붙여 남긴다<br><span class="code">git commit -m "…"</span></p></div>
+        <div class="t"><p class="nm">푸시<span class="en">push</span></p><p>내 커밋을 깃허브로 올린다<br><span class="code">git push</span></p></div>
+        <div class="t"><p class="nm">풀<span class="en">pull</span></p><p>깃허브의 새 커밋을 내려받는다<br><span class="code">git pull</span></p></div>
+        <div class="t keep"><p class="nm">.gitignore</p><p>올리지 않을 파일 목록 — 인증키 · 원자료</p></div>
+        <div class="t keep"><p class="nm">브랜치<span class="en">branch</span></p><p>main 을 두고 갈라져 나온 실험 줄기<br><span class="code">git switch -c 이름</span></p></div>
+        <div class="t keep"><p class="nm">머지<span class="en">merge</span></p><p>실험이 쓸 만하면 main 으로 합친다<br><span class="code">git merge 이름</span></p></div>
+        <div class="t keep"><p class="nm">상태 · 기록<span class="en">status · log</span></p><p>무엇이 바뀌었나, 지금까지 무엇을 남겼나<br><span class="code">git status</span> · <span class="code">git log</span></p></div>
       </div>
-      <div class="col-r">
-        <p class="sub">깃허브에서 클로드를 부르기</p>
-        <p><span class="code">/install-github-app</span> 을 실행해 두면
-          이슈나 PR 댓글에 <span class="hl">@claude</span> 로 부를 수 있다.</p>
-        <div class="doc" style="margin-top:8px">
-          <div class="bar">PR 댓글</div>
-          <pre>@claude 이 분석 로직에서
-빠뜨린 예외가 있는지 봐 줘</pre>
-        </div>
-        <p class="caption" style="margin-top:8px">
-          GitHub Actions 위에서 돌기 때문에 <span class="hl">저장소 관리자 권한</span>과
-          인증 설정이 필요하다. 팀으로 일할 때 쓰는 기능이라 오늘은 개념만 본다.</p>
+      <p class="caption" style="margin-top:8px"><span style="color:var(--chart-blue);font-weight:700">■</span> 도구와 자리 ·
+        <span style="color:var(--brand-crimson);font-weight:700">■</span> 기록을 옮기는 동작 ·
+        <span style="color:var(--accent-green);font-weight:700">■</span> 지키고 나누는 법</p>
+    </div>
+  </section>
+
+
+  <!-- ══ 10. ③ 클로드 + 깃 ═══════════════════════════════ -->
+  <section>
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>깃 관리는 모두 클로드에게 맡기기</h2>
+    <div class="body tight">
+      <p class="emph">위 명령은 <span class="hl">알고만 있는다.</span> 실제로는 모두
+        <span class="hl">클로드에게 요청하거나, 클로드의 판단을 확인</span>하는 형태로 진행한다</p>
+      <div class="cols" style="gap:14px;align-items:stretch;margin-top:4px">
+        <div class="col-l"><div class="prompt-box" style="height:100%;box-sizing:border-box;margin-top:0">
+          <p class="who">이렇게 시킨다 — 한 마디면 된다</p>
+          <p>"커밋해 줘."</p>
+          <p>"깃허브에 올려 줘."</p>
+          <p>"어제 커밋한 상태로 되돌려 줘."</p>
+          <p>"이 저장소의 커밋 기록을 읽고<br>분석이 어떻게 바뀌어 왔는지 정리해 줘."</p>
+          <p class="caption" style="margin-top:8px">무엇을 담을지, 메시지를 어떻게 쓸지는 클로드가 바뀐 내용을 보고 정한다</p></div></div>
+        <div class="col-r"><div class="prompt-box" style="height:100%;box-sizing:border-box;margin-top:0;background:#F4F7FA;border-color:#B9C9D8">
+          <p class="who" style="color:var(--chart-blue)">클로드가 먼저 확인을 청할 때 (예)</p>
+          <p>"올라갈 목록에 <b>.env</b> 가 있습니다. 인증키가 든 파일 같습니다.<br>
+            .gitignore 에 넣고 빼고 커밋할까요?"</p>
+          <p>"이렇게 되돌리면 <b>아직 커밋하지 않은 변경 3개 파일이 사라집니다.</b><br>진행할까요?"</p>
+          <p class="caption" style="margin-top:8px">이때가 내가 판단하는 자리다 — 무엇이 지워지고 무엇이 올라가는지 읽고 승인한다</p></div></div>
       </div>
+      <p class="emph" style="margin-top:12px">
+        커밋 전에 <span class="hl">무엇이 담기는지 한 번 본다</span> —
+        모르고 승인하면 인증키가 함께 간다.</p>
     </div>
   </section>
 
   <!-- ══ 13. 주의 ════════════════════════════════════════ -->
   <section>
-    <h2>주의 — 이 수업에서 실제로 겪는 사고</h2>
+    <h2>깃 사용시 주의사항</h2>
     <div class="body tight">
       <table style="width:100%;table-layout:fixed;margin-top:4px">
         <thead><tr><th style="width:30%">사고</th><th>막는 법</th></tr></thead>
@@ -1107,142 +1350,196 @@ git push -u origin 면적하한-실험
     </div>
   </section>
 
+  <!-- ══ 습관 (2026-10-12 교수 요청) ═════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>앞으로의 프로젝트는 깃으로 관리한다</h2>
+    <div class="body">
+      <p class="define">이 수업의 모든 프로젝트는 <span class="t-red">깃으로 기록하고 깃허브에 올린다</span><br>
+        습관으로 만든다</p>
+      <p class="conclusion">→ 시작할 때 "커밋해 줘" · 끝날 때 "커밋하고 깃허브에 올려 줘" ·
+        다른 컴퓨터에서는 "깃허브에서 받아 와 줘"</p>
+    </div>
+  </section>
+
   <!-- ══ 14. 실습 구분 ═══════════════════════════════════ -->
   <section class="s-section">
     <div class="section-rule"></div>
     <p class="section-label">실습</p>
-    <p class="section-sub">내 분석을 저장소로 만들기 — 약 1시간 30분</p>
+    <p class="section-sub">2주차부터 쌓은 내 위키를 깃허브에 올리기 — 약 1시간 30분</p>
   </section>
-
-  <!-- ══ 15. 실습 개요 ═══════════════════════════════════ -->
+  <!-- ══ 실습 개요 (2026-10-12 교수 요청으로 다시 씀 — 위키를 깃허브에 올린다) ═══
+       위키 폴더는 이미 프로젝트 폴더이고 리모트 컨트롤로 연결돼 있다고 본다.
+       명령은 화면에 보이되 실행은 클로드가 한다. 옛 판은 보관/05-삭제슬라이드.html -->
   <section>
     <h2>오늘 실습의 도착점</h2>
     <div class="body tight">
-      <p class="emph"><span class="hl">남이 README 만 보고 내 결과를 다시 만들 수 있는 저장소</span></p>
+      <p class="emph"><span class="hl">2주차부터 쌓은 내 위키가 깃허브 비공개 저장소에 올라가 있고,
+        브라우저에서 눈으로 확인된다</span></p>
       <table class="tt">
-        <thead><tr><th style="width:18%">시각</th><th style="width:36%">할 일</th><th>끝났다는 신호</th></tr></thead>
+        <thead><tr><th style="width:18%">시각</th><th style="width:38%">할 일</th><th>끝났다는 신호</th></tr></thead>
         <tbody>
-          <tr><td>0:00–0:25</td><td>① 기록을 시작한다</td><td>첫 커밋이 남았다</td></tr>
-          <tr><td>0:25–0:55</td><td>② 브랜치로 실험하고 되돌린다</td><td>main 이 <span class="hl">그대로</span>다</td></tr>
-          <tr><td>0:55–1:30</td><td>③ 서로 재현해 본다</td><td>남의 결과를 <span class="hl">내가</span> 만들었다</td></tr>
+          <tr><td>0:00–0:20</td><td>⓪ 깃 설치 · 깃허브 가입</td><td><span class="code">git --version</span> 이 찍히고 <span class="code">gh auth status</span> 가 로그인을 보인다</td></tr>
+          <tr><td>0:20–0:45</td><td>① 기록을 시작한다</td><td>첫 커밋에 <span class="hl">raw/ 와 인증키가 없다</span></td></tr>
+          <tr><td>0:45–1:05</td><td>② 깃허브에 올린다</td><td>저장소 주소가 나왔다</td></tr>
+          <tr><td>1:05–1:30</td><td>③ 깃허브에서 확인한다</td><td>브라우저에 wiki/ 가 보이고 raw/ 는 없다</td></tr>
         </tbody>
       </table>
       <p class="sub" style="margin-top:12px">시작 전 확인</p>
       <ul>
-        <li>지난주 <span class="code">ds2026/</span> 폴더 (CLAUDE.md · 스킬 · 에이전트가 들어 있다)</li>
-        <li>깃 설치 · 깃허브 계정 · <span class="code">gh</span> 설치</li>
+        <li><span class="code">my-wiki/</span> — 이미 프로젝트 폴더이고 리모트 컨트롤로 이어져 있다</li>
+        <li>명령은 <span class="hl">화면에서 읽고 확인만</span> 한다. 실행은 클로드에게 시킨다</li>
       </ul>
-      <p class="caption" style="margin-top:8px">
-        <span class="hl">③은 짝이 필요하다.</span> 홀수면 셋이 한 조로 돌려 가며 한다.</p>
     </div>
   </section>
 
-  <!-- ══ 16. 실습 ① ══════════════════════════════════════ -->
-  <section>
-    <h2>① 기록을 시작한다 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:25</span></h2>
+  <!-- ══ 깃 설치 — 클로드에게 맡긴다 (2026-10-12) ══════════════════════
+       명령은 git-scm.com/install · cli.github.com (2026. 10. 12. 확인) -->
+  <section class="s-split">
+    <h2>⓪-1 깃 설치 — 클로드에게 맡긴다</h2>
     <div class="body tight">
-      <ol class="steps">
-        <li><span class="code">gh auth login</span> 으로 로그인한다 (브라우저가 열린다) <span class="t">5분</span></li>
-        <li><span class="code">ds2026/</span> 에서 <span class="code">git init</span> <span class="t">1분</span></li>
-        <li><span class="hl">커밋하기 전에</span> <span class="code">.gitignore</span> 를 만든다 <span class="t">8분</span></li>
-        <li><span class="code">git status</span> 로 <span class="mark">올라갈 목록을 눈으로 읽는다</span> <span class="t">3분</span></li>
-        <li><span class="code">git add .</span> → <span class="code">git commit -m "…"</span> <span class="t">3분</span></li>
-      </ol>
-      <div class="prompt-box">
-        <p class="who">3번을 이렇게 시킨다</p>
-        <p>"이 폴더를 깃 저장소로 만들려고 해. 먼저
-          <span class="mark">어떤 파일이 올라가면 안 되는지 목록으로</span> 알려 주고
-          .gitignore 초안을 보여 줘. 내가 확인하면 커밋하자."</p>
+      <div class="col-l">
+        <p class="emph">원격으로 돌릴 때가 많다. 설치는 내 손이 아니라
+          <span class="hl">세션이 도는 PC</span> 에서 일어난다</p>
+        <div class="prompt-box"><p class="who">이렇게 시킨다</p>
+          <p>"이 컴퓨터에 <b>git 과 gh(깃허브 CLI)</b> 가 설치돼 있는지 확인해 줘.
+            없으면 이 운영체제에 맞는 방법으로 설치하되, <b>설치 명령을 실행하기 전에 무엇을 하는지 먼저 알려 줘.</b>
+            끝나면 두 프로그램의 버전을 보여 줘."</p></div>
+        <div class="ck"><b>✓ 확인 지점</b> — 버전 두 줄이 찍힌다<br>
+          <span class="code">git version 2.…</span> · <span class="code">gh version …</span></div>
       </div>
-      <div class="ck"><b>✓ 확인 지점</b> — <span class="code">git status</span> 목록에
-        <b>인증키·원본 CSV 가 없다.</b> 보이면 <span class="code">.gitignore</span> 를 고치고 다시 본다.</div>
+      <div class="col-r">
+        <div class="doc">
+          <div class="bar">클로드가 실행하는 명령 — 운영체제마다 다르다</div>
+          <pre><span class="h"># 맥 (Homebrew 가 있을 때)</span>
+brew install git gh
+
+<span class="h"># 윈도우</span>
+winget install --id Git.Git -e --source winget
+winget install --id GitHub.cli --source winget</pre>
+        </div>
+        <div class="stuck"><b>PC 화면에 확인 창이 뜨는 경우</b> — 맥의
+          <span class="code">xcode-select --install</span> 이나 윈도우의 관리자 권한 창은
+          <b>PC 앞에서 눌러야 한다.</b> 원격으로는 누를 수 없으니 수업 전에 PC 에서 한 번 해 둔다.
+          막히면 오류 메시지를 그대로 클로드에게 준다.</div>
+      </div>
+    </div>
+    <p class="caption src-foot">출처: 깃 공식 사이트 <span class="u">git-scm.com/install</span> · 깃허브 CLI <span class="u">cli.github.com</span> (2026. 10. 12. 확인)</p>
+  </section>
+
+  <!-- ══ 깃허브 가입 — 내가 직접 한다 (2026-10-12) ════════════════════
+       gh auth login 은 브라우저를 열 수 없으면 일회용 코드와 주소를 찍고 기다린다
+       (cli/cli internal/authflow/flow.go, 2026. 10. 12. 확인) -->
+  <section class="s-split">
+    <h2>⓪-2 깃허브 가입 — 내가 직접 한다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">계정은 내가 만든다<br>내 이메일과 비밀번호라 클로드에게 시키지 않는다</p>
+        <ol class="steps">
+          <li><span class="code">github.com</span> → <b>Sign up</b></li>
+          <li>이메일 · 비밀번호 · <b>사용자 이름</b>을 정한다<br>
+            <span class="t" style="margin-left:0">사용자 이름이 저장소 주소가 된다 — github.com/사용자이름</span></li>
+          <li>이메일로 온 <b>인증 코드</b>를 넣는다</li>
+          <li><b>Free</b> 로 시작한다</li>
+        </ol>
+      </div>
+      <div class="col-r">
+        <p class="sub">그다음, 클로드와 깃허브를 연동한다</p>
+        <div class="prompt-box" style="margin-top:6px"><p class="who">이렇게 시킨다</p>
+          <p>"이 컴퓨터의 클로드가 <b>내 깃허브 계정으로 일할 수 있게 연동</b>해 줘.
+            앞으로 내가 <b>"깃허브에 올려 줘", "깃허브에서 받아 와 줘"</b> 라고만 해도
+            push 와 pull 이 바로 되도록 설정해 줘.</p>
+          <p>로그인할 때 일회용 코드가 나오면 바로 보여 주고,
+            끝나면 연동이 됐는지 확인해서 알려 줘."</p></div>
+        <p class="caption" style="margin-top:4px;white-space:nowrap">클로드가 실행하는 명령 —
+          <span class="code">gh auth login --web</span> · <span class="code">gh auth setup-git</span></p>
+        <p style="margin-top:8px;font-size:13px">코드가 나오면 휴대폰이나 브라우저로
+          <span class="code">github.com/login/device</span> 에 들어가<br>코드를 넣고 승인한다.
+          <span class="hl">원격이어도 된다.</span></p>
+        <div class="ck"><b>✓ 확인 지점</b> — <span class="code">gh auth status</span> 에
+          <b>Logged in to github.com</b> 이 뜬다</div>
+      </div>
+    </div>
+    <p class="caption src-foot">출처: 깃허브 CLI 매뉴얼 <span class="u">cli.github.com/manual/gh_auth_login</span> (2026. 10. 12. 확인)</p>
+  </section>
+
+  <!-- ══ 실습 ① 기록 시작 — 위키 (2026-10-12) ═══════════════════════════ -->
+  <section class="s-split">
+    <h2>① 기록을 시작한다 <span class="en" style="font-size:16px;color:var(--muted)">0:20–0:45</span></h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub"><span class="hl">올리지 않을 것부터 정한다</span> — 비공개인 것은 .gitignore 로</p>
+        <div class="doc" style="margin-top:6px">
+          <div class="bar">.gitignore</div>
+          <pre>raw/      <span class="h"># 원자료 — 강의노트·논문 원문, 저작권 자료</span>
+.env      <span class="h"># 인증키</span></pre>
+        </div>
+        <p style="margin-top:8px;font-size:13px">나머지 — <b>wiki/ · CLAUDE.md · .claude/ 의 스킬과 에이전트</b> — 는 올린다</p>
+        <div class="doc" style="margin-top:8px">
+          <div class="bar">클로드가 실행하는 명령 — 알고만 있는다</div>
+          <pre>git init
+git status
+git add .
+git commit -m "위키 첫 기록"</pre>
+        </div>
+      </div>
+      <div class="col-r">
+        <div class="prompt-box" style="margin-top:0"><p class="who">이렇게 시킨다</p>
+          <p>"이 위키 폴더를 깃 저장소로 만들어 줘. <b>raw/ 와 인증키가 든 파일(.env 같은 것)은
+            .gitignore 로 빼고</b>, 나머지는 올리게 해 줘.
+            <b>커밋하기 전에 올라갈 파일 목록을 보여 줘.</b>"</p></div>
+        <div class="ck"><b>✓ 확인 지점</b> — 보여 준 목록에 <b>raw/ 도 .env 도 없다.</b>
+          보이면 .gitignore 를 고치게 하고 목록을 다시 본다.</div>
+        <div class="stuck"><b>raw/ 를 빼는 이유</b> — 강의노트·논문 원문은 저작권 자료다 (2주차).
+          비공개 저장소라도 올리지 않는다. 받는 법은 wiki/ 의 출처에 이미 적혀 있다.</div>
+      </div>
     </div>
   </section>
 
-  <!-- ══ 17. 실습 ② ══════════════════════════════════════ -->
-  <section>
-    <h2>② 실험하고 되돌린다 <span class="en" style="font-size:16px;color:var(--muted)">0:25–0:55</span></h2>
+  <!-- ══ 실습 ② 깃허브에 올린다 (2026-10-12) ═══════════════════════════ -->
+  <section class="s-split">
+    <h2>② 깃허브에 올린다 <span class="en" style="font-size:16px;color:var(--muted)">0:45–1:05</span></h2>
     <div class="body tight">
+      <div class="col-l">
+        <div class="prompt-box" style="margin-top:0"><p class="who">이렇게 시킨다</p>
+          <p>"깃허브에 <b>my-wiki 라는 비공개 저장소</b>를 만들고 지금 커밋을 올려 줘.
+            README.md 가 없으면 이 위키가 무엇인지 세 줄로 써서 함께 올려 줘.
+            <b>올리기 전에 저장소 이름과 공개 여부를 한 번 확인해 줘.</b>"</p></div>
+        <div class="ck"><b>✓ 확인 지점</b> — 올리기가 끝났다는 메시지와 함께
+          <span class="code">github.com/사용자이름/my-wiki</span> 주소가 나온다</div>
+      </div>
+      <div class="col-r">
+        <div class="doc">
+          <div class="bar">클로드가 실행하는 명령 — 알고만 있는다</div>
+          <pre>gh repo create my-wiki <span class="h">--private</span> \
+  --source=. --push</pre>
+        </div>
+        <p class="emph" style="margin-top:10px"><span class="hl">비공개(private)로 둔다.</span><br>
+          위키 페이지도 강의노트에서 나온 내용이라 저작권이 걸린다</p>
+        <p class="caption" style="margin-top:6px">공개로 바꾸는 것은 나중에도 된다. 반대 방향은 이미 늦다 (34쪽)</p>
+      </div>
+    </div>
+    <p class="caption src-foot">출처: 깃허브 CLI 매뉴얼 <span class="u">cli.github.com/manual/gh_repo_create</span></p>
+  </section>
+
+  <!-- ══ 실습 ③ 깃허브에서 확인한다 (2026-10-12, 옛 「제출물」 자리) ══════ -->
+  <section>
+    <h2>③ 깃허브에서 확인한다 <span class="en" style="font-size:16px;color:var(--muted)">1:05–1:30</span></h2>
+    <div class="body tight">
+      <p class="sub">클로드가 "올렸다" 고 해도 <span class="hl">내 눈으로 본다</span> — 휴대폰 브라우저로도 된다</p>
       <ol class="steps">
-        <li><span class="code">git switch -c 면적하한-실험</span> <span class="t">2분</span></li>
-        <li>CLAUDE.md 의 면적 하한을 <span class="hl">85㎡ 로 바꾸고</span> 분석을 다시 돌린다 <span class="t">10분</span></li>
-        <li><span class="code">git diff</span> 로 무엇이 바뀌었는지 보고 커밋한다 <span class="t">5분</span></li>
-        <li><span class="code">git switch main</span> 으로 돌아간다 <span class="t">2분</span></li>
-        <li>CLAUDE.md 를 열어 본다. 분석도 다시 돌려 본다 <span class="t">6분</span></li>
-        <li>실험을 살릴지 버릴지 정하고, 버릴 거면 브랜치를 지운다 <span class="t">5분</span></li>
+        <li><span class="code">github.com</span> 에 로그인 → 오른쪽 위 프로필 → <b>Your repositories</b></li>
+        <li><b>my-wiki</b> 를 연다. 이름 옆에 <span class="hl">Private</span> 표시가 있는지 본다</li>
+        <li>파일 목록을 본다 — <b>wiki/ · CLAUDE.md · README.md 는 있고, raw/ · .env 는 없다</b></li>
+        <li>wiki/ 에서 페이지 하나를 열어 본다. 출처가 붙은 그대로 보인다</li>
+        <li><b>Commits</b> 를 눌러 내 커밋 메시지가 남았는지 본다</li>
       </ol>
-      <div class="ck"><b>✓ 확인 지점</b> — 5번에서 CLAUDE.md 가 <b>60㎡ 로 돌아와 있다.</b>
-        결과표도 원래 값이다. <b>실험이 본 작업을 건드리지 않았다.</b></div>
-      <div class="stuck"><b>switch 가 거부되면</b> — 저장하지 않은 변경이 있는 것이다.
-        커밋하거나 되돌린 뒤 다시 한다. <b>무엇을 어떻게 할지는 클로드에게 물어보고 설명을 듣고 승인한다.</b></div>
+      <div class="ck"><b>✓ 확인 지점</b> — 3번에서 <b>raw/ 나 .env 가 보이면</b> 바로 클로드에게 알린다.
+        인증키가 올라갔으면 <b>그 키를 폐기하고 새로 발급받는다</b> (깃 사용시 주의사항).</div>
+      <p class="emph" style="margin-top:12px">다음 주부터 위키를 갱신할 때마다
+        <span class="hl">"커밋하고 깃허브에 올려 줘"</span> 한 마디를 붙인다.</p>
     </div>
   </section>
 
-  <!-- ══ 18. 실습 ③ 올리기 ═══════════════════════════════ -->
-  <section>
-    <h2>③-1 올리고 설명서를 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">0:55–1:15</span></h2>
-    <div class="body tight">
-      <ol class="steps">
-        <li><span class="code">gh repo create</span> 로 저장소를 만들고 올린다.
-          <span class="hl">공개 여부를 스스로 정하고 이유를 한 줄 적는다</span> <span class="t">7분</span></li>
-        <li><span class="code">README.md</span> 를 쓴다 <span class="t">10분</span></li>
-        <li>커밋하고 올린다. <span class="mark">브라우저로 저장소를 열어 눈으로 확인한다</span> <span class="t">3분</span></li>
-      </ol>
-      <p class="sub" style="margin-top:10px">README 에 반드시 들어갈 넷</p>
-      <table style="width:100%;table-layout:fixed;margin-top:4px">
-        <tbody>
-          <tr><td style="width:28%">무엇을 했나</td><td>한두 문장</td></tr>
-          <tr><td class="hl">데이터 받는 법</td><td>출처 · 조건 · 인증키를 어디에 넣나 (5주차 출처 문서를 옮긴다)</td></tr>
-          <tr><td>분석 규칙</td><td>CLAUDE.md 를 가리키고 요점만</td></tr>
-          <tr><td class="hl">다시 만드는 순서</td><td>실행할 명령을 순서대로</td></tr>
-        </tbody>
-      </table>
-      <div class="ck"><b>✓ 확인 지점</b> — 브라우저에서 저장소를 열었을 때
-        <b>인증키도 원본 데이터도 보이지 않는다.</b></div>
-    </div>
-  </section>
-
-  <!-- ══ 19. 실습 ③ 교환 ═════════════════════════════════ -->
-  <section>
-    <h2>③-2 서로 재현해 본다 <span class="en" style="font-size:16px;color:var(--muted)">1:15–1:30</span></h2>
-    <div class="body tight">
-      <ol class="steps">
-        <li>옆 사람과 저장소 주소를 바꾼다 <span class="t">1분</span></li>
-        <li>상대 저장소를 받는다 — <span class="code">git clone &lt;주소&gt;</span> <span class="t">2분</span></li>
-        <li><span class="hl">README 만 보고</span> 상대의 결과를 다시 만들어 본다.
-          <span class="mark">막히면 물어보지 말고 그 지점을 적는다</span> <span class="t">8분</span></li>
-        <li>막힌 지점을 상대에게 알려 준다. 받은 지적으로 자기 README 를 고친다 <span class="t">4분</span></li>
-      </ol>
-      <div class="ck"><b>✓ 확인 지점</b> — 상대의 결과표와 <b>같은 숫자</b>가 나온다.
-        안 나오면 README 에 빠진 것이 있다는 뜻이고, <b>그 발견이 오늘의 성과다.</b></div>
-      <div class="stuck"><b>시간이 모자라면</b> — 3번의 <b>막힌 지점 목록까지만</b> 하고 4번은 집에서.
-        <b>일찍 끝났으면</b> 상대 저장소에 브랜치를 만들어 README 를 고치고 PR 을 올려 본다.</div>
-    </div>
-  </section>
-
-  <!-- ══ 20. 제출 ════════════════════════════════════════ -->
-  <section>
-    <h2>제출물</h2>
-    <div class="body tight">
-      <table style="width:100%;table-layout:fixed;margin-top:6px">
-        <thead><tr><th style="width:32%">무엇</th><th>어느 정도면 되나</th></tr></thead>
-        <tbody>
-          <tr><td>저장소 주소</td><td>공개 여부와 <span class="hl">그렇게 정한 이유 한 줄</span></td></tr>
-          <tr><td>커밋 기록</td><td><span class="code">git log --oneline</span> 결과.
-            <span class="hl">메시지만 읽고 흐름이 보여야 한다</span></td></tr>
-          <tr><td>README</td><td>넷이 다 있고 <span class="hl">③-2 로 고친 흔적</span>이 있을 것</td></tr>
-          <tr><td class="hl">재현 후기</td><td>상대 저장소에서 <span class="hl">어디서 막혔는지</span>와
-            내 README 를 어떻게 고쳤는지</td></tr>
-        </tbody>
-      </table>
-      <p class="emph" style="margin-top:14px">
-        마지막 줄이 이 강의의 핵심이다. <span class="hl">내가 아는 것과 적어 둔 것은 다르다</span> —
-        남이 막히는 자리에서만 그 차이가 드러난다.</p>
-      <p class="caption" style="margin-top:10px">
-        <span class="hl">다음 주부터 매주 실습 결과를 이 저장소에 커밋한다.</span>
-        14주차에는 이 기록 전체가 증거 패키지의 바탕이 된다.</p>
-    </div>
-  </section>
 
   <!-- ══ 20-b. 과제 ══════════════════════════════════════ -->
   <section class="s-split">
@@ -1255,13 +1552,14 @@ git push -u origin 면적하한-실험
         <p class="emph" style="margin-top:10px">감쌀 것은 <span class="hl">두세 개</span>면 된다</p>
         <ol class="steps" style="margin-top:6px">
           <li><span class="hl">인증키를 오늘 신청한다</span>
-            <span class="t">sgis.mods.go.kr · 사용기간을 학기 끝까지 덮게</span></li>
+            <span class="t">사용기간을 학기 끝까지 덮게</span><br>
+            <span class="u">https://sgis.mods.go.kr/developer/html/main.html</span></li>
           <li>자기 연구질문에 필요한 API 를 두세 개 고른다</li>
           <li>클로드에게 스킬을 만들게 한다</li>
           <li>실제로 받아 보고 <span class="mark">자릿수가 그럴듯한지</span> 본다</li>
         </ol>
         <p class="caption" style="margin-top:8px">출처: 통계지리정보서비스 개발지원센터
-          <span class="u">sgis.kostat.go.kr</span> (2026. 9. 6. 확인). API 93종 · 인증키당 하루 50,000회</p>
+          <span class="u">sgis.mods.go.kr/developer/html/main.html</span> (2026. 9. 6. 확인). API 93종 · 인증키당 하루 50,000회</p>
       </div>
       <div class="col-r">
         <p class="sub">보는 것 넷 — 분량은 세지 않는다</p>
@@ -1274,28 +1572,9 @@ git push -u origin 면적하한-실험
             <span class="t">API 이름 · 기관 · 조회 날짜</span></li>
           <li><span class="hl">토큰 4시간을 사람이 안 만지는가</span></li>
         </ol>
-        <div class="ck"><b>마감은 6주차 수업 시작.</b>
+        <div class="ck"><b>마감은 토요일(17일) 23시 59분 59초.</b>
           <b>키 발급에 시간이 걸린다</b> — 사용기간을 짧게 잡으면 쓰기도 전에 만료된다.</div>
-        <p class="caption" style="margin-top:8px">
-          자세한 것은 <span class="code">과제-SGIS스킬.md</span> 에 있다.
-          <span class="hl">6주차에 이 스킬로 자기 데이터를 받는다.</span></p>
       </div>
-    </div>
-  </section>
-
-  <!-- ══ 18. 출처 ════════════════════════════════════════ -->
-  <section>
-    <h2>자료 출처</h2>
-    <div class="body tight">
-      <ul class="src" style="font-size:13px;color:var(--ink-2)">
-        <li>깃 명령 — 공식 문서 <span class="code">git-scm.com/doc</span></li>
-        <li>깃허브 CLI — <span class="code">cli.github.com</span></li>
-        <li><span class="code">/install-github-app</span> 과 <span class="code">@claude</span> 멘션 —
-          클로드 코드 공식 문서 (2026. 8. 27. 확인)<br>
-          <span class="code">code.claude.com/docs/en/github-actions</span> ·
-          저장소 관리자 권한과 인증 설정이 필요하다</li>
-        <li>5·11쪽 그림은 원리를 보이는 개념도다</li>
-      </ul>
     </div>
   </section>
 

@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5주차. 데이터 구하기 — 도시 데이터 수집과 git · github</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .src { font-size: 13px; line-height: 1.72; color: var(--ink-2); margin: 4px 0 0; }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  .src li { margin-bottom: 8px; }
+  .src .u { color: var(--accent-blue); font-family: 'SFMono-Regular', Menlo, monospace; font-size: 11.5px; }
+
+  /* ── 아래는 06-깃과깃허브 에서 옮겨 온 것 ── */
+.prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 9px; font-size: var(--fs-body); line-height: 1.56; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+              color: var(--ink-2); letter-spacing: .04em; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 11px; line-height: 1.72; color: #4A4741; white-space: pre-wrap; }
+  .doc .h { color: var(--brand-crimson); font-weight: 700; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+  .bad { color: var(--brand-crimson); }
+  .ck { border-left: 3px solid var(--brand-crimson); background: #FBF7F8;
+        padding: 9px 14px; margin-top: 10px; font-size: 13px; line-height: 1.6; }
+  .ck b { color: var(--brand-crimson); }
+  .stuck { border-left: 3px solid #B4B0A9; background: #F7F5F2;
+           padding: 9px 14px; margin-top: 8px; font-size: 12.5px; line-height: 1.58;
+           color: var(--ink-2); }
+  .stuck b { color: #6E6A63; }
+  .tt { width: 100%; table-layout: fixed; margin-top: 6px; }
+  .tt td, .tt th { font-variant-numeric: tabular-nums; }
+  figure.shot { margin: 0; }
+  figure.shot img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); }
+  figure.shot figcaption { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  /* ── 지난 시간 인포그래픽 · 묻기 안내 (2026-10-12) — 표지 뒤 세 장 ── */
+  .flow4 { display: flex; align-items: stretch; }
+  .flow4 .st { flex: 1 1 0; border-top: 3px solid var(--brand-crimson); background: #FAF8F5;
+               padding: 8px 11px 9px; }
+  .flow4 .ar { flex: 0 0 16px; align-self: center; text-align: center; color: #9A958D; font-size: 14px; }
+  .flow4 .n { font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: var(--brand-crimson); margin: 0 0 2px; }
+  .flow4 .h { font-size: 14.5px; font-weight: 700; color: var(--ink); margin: 0 0 5px; }
+  .flow4 p { font-size: 12px; line-height: 1.5; color: var(--ink-2); margin: 0 0 3px; }
+  .flow4 .code { font-size: 11px; }
+  .rcb { margin-top: 10px; border: 1.5px solid var(--chart-blue); border-radius: 4px;
+         background: #F4F7FA; padding: 8px 14px 9px; }
+  .rcb .top { display: flex; align-items: baseline; gap: 10px; margin: 0 0 7px; }
+  .rcb .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: #FFF;
+              background: var(--chart-blue); padding: 2px 7px; border-radius: 2px; }
+  .rcb .ttl { font-size: 14.5px; font-weight: 700; color: var(--chart-blue); }
+  .rcb .row { display: flex; gap: 14px; align-items: flex-start; }
+  .rcb .dia { flex: 0 0 250px; display: flex; align-items: center; gap: 4px; }
+  .rcb .dev { flex: 1 1 0; border: 1px solid #B9C9D8; background: #FFF; border-radius: 3px;
+              padding: 5px 7px; font-size: 11px; line-height: 1.4; color: var(--ink-2); text-align: center; }
+  .rcb .dev b { display: block; font-size: 12px; color: var(--ink); }
+  .rcb .lk { flex: 0 0 34px; text-align: center; font-size: 10px; color: var(--chart-blue); line-height: 1.2; }
+  .rcb .col { flex: 1 1 0; font-size: 12px; line-height: 1.5; color: var(--ink-2); }
+  .rcb .col .k { font-weight: 700; color: var(--chart-blue); margin: 0 0 1px; font-size: 12px; }
+  .rcb .col p { margin: 0; }
+  .ext4 { display: flex; gap: 10px; }
+  .ext4 .cd { flex: 1 1 0; border: 1px solid var(--rule); border-top: 3px solid var(--brand-crimson);
+              background: #FAF8F5; padding: 8px 11px 6px; }
+  .ext4 .h { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0 0 6px; }
+  .ext4 .h .n { color: var(--brand-crimson); margin-right: 4px; }
+  .ext4 .k { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; color: var(--brand-crimson); margin: 0; }
+  .ext4 p { font-size: 12px; line-height: 1.5; color: var(--ink-2); margin: 0 0 6px; }
+  .ext4 .code { font-size: 10.5px; }
+  .ask5 { display: flex; align-items: stretch; margin-top: 10px; }
+  .ask5 .st { flex: 1 1 0; text-align: center; padding: 0 4px; }
+  .ask5 .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-crimson); color: #FFF;
+               font-size: 12px; font-weight: 700; line-height: 24px; margin: 0 auto 5px; }
+  .ask5 .st p { font-size: 12.5px; line-height: 1.45; color: var(--ink); margin: 0; }
+  .ask5 .st .s { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .flow4 .code, .rcb .code, .ext4 .code, .ask5 .code { white-space: nowrap; }
+  .ask5 .ar { flex: 0 0 14px; padding-top: 3px; color: #9A958D; font-size: 14px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 표지 — 이 파일의 성격 ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>5강에서 뺀 슬라이드</h1>
+    <p class="cover-date">2026-10-12 보관</p>
+  </section>
+
+  <!-- ══ 무엇을 왜 뺐나 ═══════════════════════════════════════ -->
+  <section>
+    <h2>이 파일은 무엇인가</h2>
+    <div class="body stack">
+      <p class="lead t-define">5강 「데이터 구하기」에서 뺀 슬라이드를 버리지 않고 모아 둔 것</p>
+      <ul>
+        <li><strong>PR — 합치기 전에 보여 주기</strong> — 2026-10-12 교수 요청으로 뺌 (본편 43쪽).
+          <span class="code">/install-github-app</span> · <span class="code">@claude</span> 의 출처
+          (code.claude.com/docs/en/github-actions, 2026. 8. 27. 확인)는 여기에만 남는다</li>
+        <li><strong>실습 — 분석 저장소 만들기 · 브랜치 실험 · 서로 재현 · 제출물</strong> — 2026-10-12 에
+          「위키를 깃허브에 올리기」 실습으로 바꾸며 뺌 (본편 46~51쪽)</li>
+        <li><strong>자료 출처 (깃 부분)</strong> — 2026-10-12 에 출처를 각 장 아래로 옮기며 뺌 (본편 53쪽)</li>
+      </ul>
+      <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+    </div>
+  </section>
+
+
+
+  <!-- ══ 12. ③ PR 과 @claude ═════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">③ 클로드 + 깃</p>
+    <h2>PR — 합치기 전에 보여 주기</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p>풀 리퀘스트(PR)는 <span class="hl">"이렇게 바꾸려는데 봐 주세요"</span> 라는 요청이다.
+          바뀐 부분이 한눈에 보이고, 줄마다 의견을 달 수 있다.</p>
+        <div class="doc" style="margin-top:10px">
+          <div class="bar">터미널</div>
+          <pre>git switch -c 면적하한-실험
+<span class="h"># … 작업 …</span>
+git push -u origin 면적하한-실험
+<span class="h">gh pr create</span></pre>
+        </div>
+        <p class="caption" style="margin-top:8px">
+          클로드에게 "브랜치 만들고 PR 까지 올려 줘" 라고 해도 된다.
+          <span class="hl">올리기 전에 무엇을 담을지 확인한다.</span></p>
+      </div>
+      <div class="col-r">
+        <p class="sub">깃허브에서 클로드를 부르기</p>
+        <p><span class="code">/install-github-app</span> 을 실행해 두면
+          이슈나 PR 댓글에 <span class="hl">@claude</span> 로 부를 수 있다.</p>
+        <div class="doc" style="margin-top:8px">
+          <div class="bar">PR 댓글</div>
+          <pre>@claude 이 분석 로직에서
+빠뜨린 예외가 있는지 봐 줘</pre>
+        </div>
+        <p class="caption" style="margin-top:8px">
+          GitHub Actions 위에서 돌기 때문에 <span class="hl">저장소 관리자 권한</span>과
+          인증 설정이 필요하다. 팀으로 일할 때 쓰는 기능이라 오늘은 개념만 본다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 15. 실습 개요 ═══════════════════════════════════ -->
+  <section>
+    <h2>오늘 실습의 도착점</h2>
+    <div class="body tight">
+      <p class="emph"><span class="hl">남이 README 만 보고 내 결과를 다시 만들 수 있는 저장소</span></p>
+      <table class="tt">
+        <thead><tr><th style="width:18%">시각</th><th style="width:36%">할 일</th><th>끝났다는 신호</th></tr></thead>
+        <tbody>
+          <tr><td>0:00–0:25</td><td>① 기록을 시작한다</td><td>첫 커밋이 남았다</td></tr>
+          <tr><td>0:25–0:55</td><td>② 브랜치로 실험하고 되돌린다</td><td>main 이 <span class="hl">그대로</span>다</td></tr>
+          <tr><td>0:55–1:30</td><td>③ 서로 재현해 본다</td><td>남의 결과를 <span class="hl">내가</span> 만들었다</td></tr>
+        </tbody>
+      </table>
+      <p class="sub" style="margin-top:12px">시작 전 확인</p>
+      <ul>
+        <li>지난주 <span class="code">ds2026/</span> 폴더 (CLAUDE.md · 스킬 · 에이전트가 들어 있다)</li>
+        <li>깃 설치 · 깃허브 계정 · <span class="code">gh</span> 설치</li>
+      </ul>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">③은 짝이 필요하다.</span> 홀수면 셋이 한 조로 돌려 가며 한다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>① 기록을 시작한다 <span class="en" style="font-size:16px;color:var(--muted)">0:00–0:25</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">gh auth login</span> 으로 로그인한다 (브라우저가 열린다) <span class="t">5분</span></li>
+        <li><span class="code">ds2026/</span> 에서 <span class="code">git init</span> <span class="t">1분</span></li>
+        <li><span class="hl">커밋하기 전에</span> <span class="code">.gitignore</span> 를 만든다 <span class="t">8분</span></li>
+        <li><span class="code">git status</span> 로 <span class="mark">올라갈 목록을 눈으로 읽는다</span> <span class="t">3분</span></li>
+        <li><span class="code">git add .</span> → <span class="code">git commit -m "…"</span> <span class="t">3분</span></li>
+      </ol>
+      <div class="prompt-box">
+        <p class="who">3번을 이렇게 시킨다</p>
+        <p>"이 폴더를 깃 저장소로 만들려고 해. 먼저
+          <span class="mark">어떤 파일이 올라가면 안 되는지 목록으로</span> 알려 주고
+          .gitignore 초안을 보여 줘. 내가 확인하면 커밋하자."</p>
+      </div>
+      <div class="ck"><b>✓ 확인 지점</b> — <span class="code">git status</span> 목록에
+        <b>인증키·원본 CSV 가 없다.</b> 보이면 <span class="code">.gitignore</span> 를 고치고 다시 본다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 17. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>② 실험하고 되돌린다 <span class="en" style="font-size:16px;color:var(--muted)">0:25–0:55</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">git switch -c 면적하한-실험</span> <span class="t">2분</span></li>
+        <li>CLAUDE.md 의 면적 하한을 <span class="hl">85㎡ 로 바꾸고</span> 분석을 다시 돌린다 <span class="t">10분</span></li>
+        <li><span class="code">git diff</span> 로 무엇이 바뀌었는지 보고 커밋한다 <span class="t">5분</span></li>
+        <li><span class="code">git switch main</span> 으로 돌아간다 <span class="t">2분</span></li>
+        <li>CLAUDE.md 를 열어 본다. 분석도 다시 돌려 본다 <span class="t">6분</span></li>
+        <li>실험을 살릴지 버릴지 정하고, 버릴 거면 브랜치를 지운다 <span class="t">5분</span></li>
+      </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 5번에서 CLAUDE.md 가 <b>60㎡ 로 돌아와 있다.</b>
+        결과표도 원래 값이다. <b>실험이 본 작업을 건드리지 않았다.</b></div>
+      <div class="stuck"><b>switch 가 거부되면</b> — 저장하지 않은 변경이 있는 것이다.
+        커밋하거나 되돌린 뒤 다시 한다. <b>무엇을 어떻게 할지는 클로드에게 물어보고 설명을 듣고 승인한다.</b></div>
+    </div>
+  </section>
+
+  <!-- ══ 18. 실습 ③ 올리기 ═══════════════════════════════ -->
+  <section>
+    <h2>③-1 올리고 설명서를 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">0:55–1:15</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li><span class="code">gh repo create</span> 로 저장소를 만들고 올린다.
+          <span class="hl">공개 여부를 스스로 정하고 이유를 한 줄 적는다</span> <span class="t">7분</span></li>
+        <li><span class="code">README.md</span> 를 쓴다 <span class="t">10분</span></li>
+        <li>커밋하고 올린다. <span class="mark">브라우저로 저장소를 열어 눈으로 확인한다</span> <span class="t">3분</span></li>
+      </ol>
+      <p class="sub" style="margin-top:10px">README 에 반드시 들어갈 넷</p>
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <tbody>
+          <tr><td style="width:28%">무엇을 했나</td><td>한두 문장</td></tr>
+          <tr><td class="hl">데이터 받는 법</td><td>출처 · 조건 · 인증키를 어디에 넣나 (5주차 출처 문서를 옮긴다)</td></tr>
+          <tr><td>분석 규칙</td><td>CLAUDE.md 를 가리키고 요점만</td></tr>
+          <tr><td class="hl">다시 만드는 순서</td><td>실행할 명령을 순서대로</td></tr>
+        </tbody>
+      </table>
+      <div class="ck"><b>✓ 확인 지점</b> — 브라우저에서 저장소를 열었을 때
+        <b>인증키도 원본 데이터도 보이지 않는다.</b></div>
+    </div>
+  </section>
+
+  <!-- ══ 19. 실습 ③ 교환 ═════════════════════════════════ -->
+  <section>
+    <h2>③-2 서로 재현해 본다 <span class="en" style="font-size:16px;color:var(--muted)">1:15–1:30</span></h2>
+    <div class="body tight">
+      <ol class="steps">
+        <li>옆 사람과 저장소 주소를 바꾼다 <span class="t">1분</span></li>
+        <li>상대 저장소를 받는다 — <span class="code">git clone &lt;주소&gt;</span> <span class="t">2분</span></li>
+        <li><span class="hl">README 만 보고</span> 상대의 결과를 다시 만들어 본다.
+          <span class="mark">막히면 물어보지 말고 그 지점을 적는다</span> <span class="t">8분</span></li>
+        <li>막힌 지점을 상대에게 알려 준다. 받은 지적으로 자기 README 를 고친다 <span class="t">4분</span></li>
+      </ol>
+      <div class="ck"><b>✓ 확인 지점</b> — 상대의 결과표와 <b>같은 숫자</b>가 나온다.
+        안 나오면 README 에 빠진 것이 있다는 뜻이고, <b>그 발견이 오늘의 성과다.</b></div>
+      <div class="stuck"><b>시간이 모자라면</b> — 3번의 <b>막힌 지점 목록까지만</b> 하고 4번은 집에서.
+        <b>일찍 끝났으면</b> 상대 저장소에 브랜치를 만들어 README 를 고치고 PR 을 올려 본다.</div>
+    </div>
+  </section>
+
+  <!-- ══ 20. 제출 ════════════════════════════════════════ -->
+  <section>
+    <h2>제출물</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:6px">
+        <thead><tr><th style="width:32%">무엇</th><th>어느 정도면 되나</th></tr></thead>
+        <tbody>
+          <tr><td>저장소 주소</td><td>공개 여부와 <span class="hl">그렇게 정한 이유 한 줄</span></td></tr>
+          <tr><td>커밋 기록</td><td><span class="code">git log --oneline</span> 결과.
+            <span class="hl">메시지만 읽고 흐름이 보여야 한다</span></td></tr>
+          <tr><td>README</td><td>넷이 다 있고 <span class="hl">③-2 로 고친 흔적</span>이 있을 것</td></tr>
+          <tr><td class="hl">재현 후기</td><td>상대 저장소에서 <span class="hl">어디서 막혔는지</span>와
+            내 README 를 어떻게 고쳤는지</td></tr>
+        </tbody>
+      </table>
+      <p class="emph" style="margin-top:14px">
+        마지막 줄이 이 강의의 핵심이다. <span class="hl">내가 아는 것과 적어 둔 것은 다르다</span> —
+        남이 막히는 자리에서만 그 차이가 드러난다.</p>
+      <p class="caption" style="margin-top:10px">
+        <span class="hl">다음 주부터 매주 실습 결과를 이 저장소에 커밋한다.</span>
+        14주차에는 이 기록 전체가 증거 패키지의 바탕이 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 18. 출처 ════════════════════════════════════════ -->
+  <section>
+    <h2>자료 출처</h2>
+    <div class="body tight">
+      <ul class="src" style="font-size:13px;color:var(--ink-2)">
+        <li>깃 명령 — 공식 문서 <span class="code">git-scm.com/doc</span></li>
+        <li>깃허브 CLI — <span class="code">cli.github.com</span></li>
+        <li><span class="code">/install-github-app</span> 과 <span class="code">@claude</span> 멘션 —
+          클로드 코드 공식 문서 (2026. 8. 27. 확인)<br>
+          <span class="code">code.claude.com/docs/en/github-actions</span> ·
+          저장소 관리자 권한과 인증 설정이 필요하다</li>
+        <li>29·35쪽 그림은 원리를 보이는 개념도다</li>
+      </ul>
+    </div>
+  </section></div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
