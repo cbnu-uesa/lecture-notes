@@ -1598,6 +1598,112 @@
 </section>
 
 
+<!-- ══ X₂ → X₁ 세 단계 (2026-10-14 교수 요청으로 추가) ═══════════════
+     앞 장(이성원 p.163)의 콥−더글러스 U = √(h·g) 와 소득 I = W − tx (W 2000 · t 50)를 쓴다.
+     앞 장의 x 2·10 으로는 ② 의 효용 차이가 4.6% 라 b 와 무차별곡선이 붙어 보여
+     (2026-10-14 교수 지적) 이 장만 x₁ = 0 · x₂ = 14 로 넓혔다. 축에 숫자는 없다.
+       x₂: I₂ = 1300 · 가격 6 → Ex₂ (h 108.3, g 650) · x₁: I₁ = 2000 (통근비 절감 700)
+       ① 가격 6 그대로: 절편 2000 · 기울기 −6 → 무차별곡선 바깥
+       ② 가격 p′ = (2000 − 650)/108.3 ≈ 12.46: 예산선이 Ex₂ 를 지남 (6.46 × 108.3 = 700)
+          그러나 기울기 > 한계대체율 6 → 최적점 b(h 80.3, g 1000)의 효용이 약 14% 높다
+       ③ 원래 효용을 되돌리는 가격 ≈ 14.2 → Ex₁(h 70.4, g 1000). 주택소비 108 → 70 -->
+<section>
+  <h2>X₂에서 X₁으로: 주택가격이 오르는 세 단계</h2>
+  <div class="body tight" style="padding-top:0">
+    <p class="lead t-define" style="margin-bottom:6px">주택가격은 <span class="mark">통근비용 절감분보다 더</span> 오르고, 주택소비(면적)는 줄어듦</p>
+    <svg class="fig" id="f-3step" viewBox="0 0 848 318" style="width:848px;display:block;margin:0" role="img">
+      <title>첫째 칸은 가격이 그대로일 때 예산선이 무차별곡선 바깥에 놓이는 그림, 둘째 칸은 통근비 절감만큼 가격이 올라 예산선이 Ex2 를 지나지만 기울기가 한계대체율보다 커 주택을 줄이면 효용이 높아지는 그림, 셋째 칸은 가격이 더 올라 Ex1 에서 무차별곡선에 접하고 주택소비가 Hx2 에서 Hx1 으로 줄어드는 그림</title></svg>
+  </div>
+  <script>
+    (function () {
+      const C = window.CHOICE;
+      const I1 = C.I(0), I2 = C.I(14), p2 = 6, h2 = I2 / (2 * p2), g2 = I2 / 2, U2 = h2 * g2;
+      const pm = (I1 - g2) / h2;                            // ② Ex₂ 를 지나는 가격 ≈ 12.46
+      const hb = I1 / (2 * pm), gb = I1 / 2;                // ② 그 가격에서의 최적점
+      const g1 = I1 / 2, h1 = U2 / g1, p1 = I1 / (2 * h1);  // ③ 원래 효용을 되돌리는 가격
+      const RED = 'var(--brand-crimson)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const parts = [];
+      const W = 274, X = [0, 287, 574];
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const txt = (x, y, s, size, fill, w) =>
+        Fig.raw(`<text x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}${w ? ';font-weight:700' : ''}">${esc(s)}</text>`);
+
+      const panel = (i, head, lines, xmax = 345) => {
+        const x = X[i];
+        parts.push(Fig.raw(`<rect x="${x}" y="0" width="${W}" height="314" rx="6" fill="#FFF" stroke="${GUIDE}"/>`));
+        parts.push(Fig.raw(`<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>`));
+        parts.push(Fig.raw(`<text class="on-dark" x="${x + 18}" y="24.5" style="font-size:13px;fill:#FFF;font-weight:700;text-anchor:middle">${i + 1}</text>`));
+        parts.push(txt(x + 35, 25, head, 13, RED, true));
+        lines.forEach((l, j) => parts.push(txt(x + 12, 250 + j * 16, l, 10.5, INK2)));
+        const P = Fig.withBox({ x0: x + 58, y0: 214, x1: x + W - 14, y1: 46 });
+        const S = P.scale({ x: [0, xmax], y: [0, 2100] });
+        parts.push(Fig.raw(`<path class="axis" d="M${P.BOX.x0},${P.BOX.y1 - 6} L${P.BOX.x0},${P.BOX.y0} L${P.BOX.x1 + 6},${P.BOX.y0}"/>`));
+        parts.push(P.annot(P.BOX.x0 + 4, P.BOX.y1 - 2, 'G', { size: 10 }));
+        parts.push(P.annot(P.BOX.x1 + 4, P.BOX.y0 - 5, 'H', { size: 10, anchor: 'end' }));
+        // 공통: 무차별곡선과 X₂ 의 예산선
+        const ic = []; for (let h = 36; h <= xmax; h += 2) ic.push([h, U2 / h]);
+        parts.push(P.curve(S.curve(ic)));
+        parts.push(P.annot(S.x(xmax - 4), S.y(U2 / (xmax - 4)) - 6, 'IC', { size: 10, anchor: 'end' }));
+        parts.push(P.line(S.x(0), S.y(I2), S.x(I2 / p2), S.y(0), { variant: 'demand' }));
+        parts.push(P.annot(P.BOX.x0 - 5, S.y(I2) + 4, 'W−tx₂', { size: 9.5, anchor: 'end' }));
+        parts.push(P.annot(P.BOX.x0 - 5, S.y(I1) + 4, 'W−tx₁', { size: 9.5, anchor: 'end' }));
+        parts.push(P.dot(...S.p([h2, g2]), { label: 'Ex₂', lx: 8, ly: -8 }));
+        return { P, S };
+      };
+
+      // ① 가격이 그대로면
+      {
+        const { P, S } = panel(0, '가격이 그대로라면', [
+          '기울기 −Pₕ(x₂), 절편 W−tx₁ 인 예산선',
+          '무차별곡선보다 원점에서 멀어 효용이 높음',
+          '→ x₁ 으로 이동이 시작되고 가격이 오름',
+        ]);
+        parts.push(P.line(S.x(0), S.y(I1), S.x(I1 / p2), S.y(0), { variant: 'supply', dash: '5 4' }));
+        parts.push(P.annot(S.x(I1 / p2) - 2, S.y(0) - 7, '−Pₕ(x₂)', { size: 10, tone: 'red', anchor: 'end' }));
+        parts.push(P.arrow(S.x(40), S.y(I2 - 6 * 40) - 2, S.x(40), S.y(I1 - 6 * 40) + 3, { tone: 'red' }));
+      }
+      // ② 통근비 절감분만큼 오르면
+      {
+        const { P, S } = panel(1, '통근비 절감분만큼 오르면', [
+          '예산선 −Pₕ′ 이 Ex₂ 를 지남: 같은 묶음을 살 수 있음',
+          '그러나 기울기 > Ex₂ 의 한계대체율',
+          '→ 주택을 줄이고 다른 재화를 늘리면 효용↑',
+        ], 230);
+        // 예산선이 무차별곡선 위로 올라가는 구간(렌즈) — pm·h² − I₁·h + U₂ = 0 의 두 근 사이
+        const hL = (I1 - Math.sqrt(I1 * I1 - 4 * pm * U2)) / (2 * pm), lens = [];
+        for (let i = 0; i <= 30; i++) { const h = hL + ((h2 - hL) * i) / 30; lens.push(S.p([h, I1 - pm * h])); }
+        for (let i = 30; i >= 0; i--) { const h = hL + ((h2 - hL) * i) / 30; lens.push(S.p([h, U2 / h])); }
+        parts.push(Fig.raw(`<path d="M${lens.map((q) => q.join(',')).join(' L')} Z" fill="${RED}" fill-opacity="0.35"/>`));
+        parts.push(P.line(S.x(0), S.y(I1), S.x(I1 / pm), S.y(0), { variant: 'supply' }));
+        parts.push(P.annot(S.x(I1 / pm) + 3, S.y(0) - 7, '−Pₕ′', { size: 10, tone: 'red' }));
+        // b 를 지나는 더 높은 무차별곡선 — 원래 곡선과의 간격이 효용의 증가다 (U 가 약 14% 높다)
+        const Ub = hb * gb, icb = []; for (let h = 40; h <= 230; h += 2) icb.push([h, Ub / h]);
+        parts.push(P.curve(S.curve(icb), { variant: 'cap', dash: '5 4' }));
+        parts.push(P.annot(S.x(175), S.y(Ub / 175) - 8, 'IC′', { size: 10, tone: 'muted' }));
+        parts.push(Fig.raw(`<circle cx="${S.x(hb)}" cy="${S.y(gb)}" r="4" fill="#FFF" stroke="${RED}" stroke-width="1.6"/>`));
+        parts.push(P.arrow(S.x(h2) - 3, S.y(g2) - 3, S.x(hb) + 4, S.y(gb) + 4, { tone: 'red' }));
+        parts.push(P.annot(S.x(hb) - 8, S.y(gb) - 8, '효용↑', { size: 10, tone: 'red', anchor: 'end' }));
+      }
+      // ③ 효용이 같아질 때까지
+      {
+        const { P, S } = panel(2, '효용이 같아질 때까지', [
+          '−Pₕ(x₁) 이 무차별곡선에 Ex₁ 에서 접함',
+          '가격 상승 > 통근비 절감분',
+          '→ 대체효과로 주택소비 Hx₁ < Hx₂',
+        ], 230);
+        parts.push(P.line(S.x(0), S.y(I1), S.x(I1 / p1), S.y(0), { variant: 'supply' }));
+        parts.push(P.annot(S.x(I1 / p1) + 3, S.y(0) - 7, '−Pₕ(x₁)', { size: 10, tone: 'red' }));
+        parts.push(P.dot(...S.p([h1, g1]), { label: 'Ex₁', lx: -30, ly: -6 }));
+        parts.push(Fig.raw(`<path class="guide" d="M${S.x(h1)},${S.y(g1)} L${S.x(h1)},${S.y(0)}"/>`));
+        parts.push(Fig.raw(`<path class="guide" d="M${S.x(h2)},${S.y(g2)} L${S.x(h2)},${S.y(0)}"/>`));
+        parts.push(P.annot(S.x(h1), S.y(0) + 13, 'Hx₁', { size: 9.5, anchor: 'end' }));
+        parts.push(P.annot(S.x(h2), S.y(0) + 13, 'Hx₂', { size: 9.5 }));
+      }
+      Fig.draw('#f-3step', { parts, check: false });
+    })();
+  </script>
+</section>
+
 <!-- ══ 45. 그림 12-4 · 12-5 볼록한 주택-가격곡선 (p.247~248) ═ -->
 <section>
   <h2>주택-가격곡선은 직선이 아니라 볼록하다</h2>
@@ -1620,8 +1726,6 @@
           parts.push(F.raw(`<path class="axis" d="M${B.BOX.x0},${B.BOX.y1 - 6} L${B.BOX.x0},${B.BOX.y0} L${B.BOX.x1 + 10},${B.BOX.y0}"/>`));
           parts.push(F.annot(B.BOX.x0, B.BOX.y1 - 11, '$', { anchor: 'middle', size: 11 }));
           parts.push(F.curve(samp((x) => H.p(x), xs[0], xs[1])));
-          parts.push(F.annot(S.x(labelX), S.y(H.p(labelX)) - 11, '주택가격',
-                             { anchor: 'middle', size: 11 }));
           parts.push(F.line(S.x(xs[0]), S.y(H.line(xs[0])), S.x(xs[1]), S.y(H.line(xs[1])),
                             { variant: 'cap' }));
           // 한 세로선 위에 점이 둘 놓이므로 이름표 자리를 점마다 지정한다.
@@ -1655,6 +1759,12 @@
         parts.push(F.annot(SB.x(14) + 30, SB.y(5) - 7, '소비자 대체', { size: 10, tone: 'red' }));
         parts.push(F.arrow(SB.x(14) + 16, SB.y(6), SB.x(14) + 16, SB.y(4)));
         parts.push(F.annot(SB.x(14) + 12, SB.y(4) + 15, '△통근비용', { size: 10 }));
+        // 범례 — 2026-10-14 교수 요청: 곡선은 「요소대체가 존재할 때」, 회색 직선은 「요소대체가 없을 때」.
+        // 곡선 옆에 붙이면 점 a·e 의 이름과 겹쳐 그림 위에 한 줄로 둔다.
+        parts.push(F.line(170, 12, 196, 12, {}));
+        parts.push(F.annot(202, 16, '요소대체가 존재할 때 주택가격', { size: 11 }));
+        parts.push(F.line(390, 12, 416, 12, { variant: 'cap' }));
+        parts.push(F.annot(422, 16, '요소대체가 없을 때 주택가격', { size: 11 }));
         F.draw('#f-hp', { parts });
       })();
     </script>

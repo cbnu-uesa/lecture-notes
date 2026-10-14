@@ -1,7 +1,8 @@
 <!doctype html>
 <!--
   7주차. 고용과 주거의 공간적 분포
-  교재: 오설리반의 도시경제학 제9판 — 13장 (p.273~287) · 14장 (p.288~302) · 15장 (p.309~328).
+  교재: 오설리반의 도시경제학 제9판 — 14장 (p.288~302) · 13장 (p.273~287).
+  15장 (p.309~328) 은 2026-10-13 교수 요청으로 9주차로 옮겼다.
   PART 03 도시토지이용과 주택.
 -->
 <html lang="ko">
@@ -29,21 +30,28 @@
       { home: '교외지역', work: '중심 도시', y1960: 0.16, y2000: 0.15 },
       { home: '교외지역', work: '교외지역', y1960: 0.34, y2000: 0.62 },
     ],
+    // 표 13-1 가장 큰 25개 대도시지역 중 다섯 (km) [p.275]
+    median: [
+      { city: '뉴욕', work: 20, home: 25 },
+      { city: '시카고', work: 30, home: 36 },
+      { city: '샌프란시스코', work: 19, home: 25 },
+      { city: '볼티모어', work: 21, home: 23 },
+      { city: '포틀랜드', work: 12, home: 15 },
+    ],
+    // 표 13-3 헥타르당 25개 이상 지역의 일자리 비중 [p.277]
+    center: [
+      { city: '보스턴', v: 0.614 },
+      { city: '로스앤젤레스', v: 0.551 },
+      { city: '시카고', v: 0.344 },
+      { city: '포틀랜드', v: 0.339 },
+      { city: '애틀란타', v: 0.239 },
+    ],
     transit: [
       { label: '평균 밀도\n(헥타르당 사람수)', atl: 6, bcn: 171 },
       { label: '최대 거리\n(킬로미터)', atl: 138, bcn: 37 },
     ],
   };
 
-  // ── 14장 중앙집권화된 제조업 [p.294, 그림 14-2] ─────────────
-  // 교재가 인쇄한 25·60·75·15 가 세 직선에서 모두 나온다.
-  //   운송비용 6/km · 노동비용 −1/km · 노동자는 중심에서 10km 에 거주
-  window.MONO = {
-    wDist: 10, ship: 6, wage0: 25, wageSlope: 1,
-    transport(x) { return this.ship * x; },
-    labor(x)     { return this.wage0 - this.wageSlope * x; },
-    total(x)     { return this.transport(x) + this.labor(x); },
-  };
 
   // ── 14장 일반균형 [p.296~299, 그림 14-3·14-4·14-5] ──────────
   // 교재가 인쇄한 교차점에서 역산한 직선 지불용의지대곡선이다.
@@ -55,46 +63,41 @@
     r0(x) { return 70 - 10 * x; },     // 초기 주거 (2 에서 50 · 6 에서 10)
     r1(x) { return 66 - 4 * x; },      // 전차 주거 (14 에서 10)
     r2(x) { return 58 - 4 * x; },      // 균형 주거 (12 에서 10)
+    // 28쪽 왼쪽 그림의 곡선판 (2026-10-13). 직선과 같은 교차점을 지나는 지수곡선이다.
+    //   주거 rr: (2, 50) · (6, 10) 을 지남 → b = ln5 / 4
+    //   상업 cc: (2, 50) 을 지나고 x = 0 에서 150 → b = ln3 / 2. 2km 에서 기울기 −27.5 로 주거(−20.1)보다 가파르다
+    rr(x) { return 50 * Math.sqrt(5) * Math.exp(-(Math.log(5) / 4) * x); },
+    cc(x) { return 150 * Math.exp(-(Math.log(3) / 2) * x); },
+    // 15·16쪽 (2026-10-13). 전차 주거 r1c 는 a(2km) 까지 rr 과 같고, 거기서 꺾여 (14, 10) 을 지난다.
+    // 임금 하락은 단위 토지당 같은 금액이라 두 곡선이 평행 이동한다:
+    //   주거 rr2c = r1c − δ (e = 12km 에서 농업 10) · 상업 cc2c = cc + δc (d = 4km 에서 주거와 만남)
+    r1c(x)  { return x <= 2 ? window.CITY.rr(x) : 50 * Math.exp(-(Math.log(5) / 12) * (x - 2)); },
+    rr2c(x) { const C = window.CITY; return C.r1c(x) - (C.r1c(12) - C.agri); },
+    cc2c(x) { const C = window.CITY; return C.cc(x) + (C.rr2c(4) - C.cc(4)); },
     c2(x) { return 122 - 20 * x; },    // 균형 상업 (4 에서 42)
     labor(km) { return (km * this.width * this.densB) / 1000; },   // 천명
     house(km) { return (km * this.width * this.densR) / 1000; },
   };
 
-  // ── 15장 차별 지수 [p.313~314, 그림 15-1·15-2] ──────────────
-  window.SEG = {
-    mix: [
-      { k: '아시아인', v: [49, 9, 19, 22] },
-      { k: '히스패닉', v: [35, 11, 46, 7] },
-      { k: '흑인',     v: [35, 45, 15, 4] },
-      { k: '백인',     v: [75, 8, 11, 5] },
-    ],
-    dis: [
-      { k: '모든\n대도시지역', a: 73, b: 59 },
-      { k: '5% 미만의\n흑인',  a: 67, b: 40 },
-      { k: '5−10%의\n흑인',    a: 72, b: 54 },
-      { k: '10−20%의\n흑인',   a: 77, b: 63 },
-      { k: '20% 초과의\n흑인', a: 70, b: 59 },
-    ],
+  // ── 14장 그림 14-6 전차와 토지임대료 [p.299~300] — 숫자 없는 모식도 ────
+  // 원래(o)·새(n) 곡선. 교재 서술의 순서 x₁ < x₂ < x₃ 와 세 구간의 증감이 지켜지게 골랐다.
+  //   x₁ = 새 상업 × 새 주거 ≈ 2.8 · x₂ = 새 주거 × 원래 주거 ≈ 4.1 · x₃ = 새 주거 × 농업 ≈ 9
+  //   x₁ 앞: 새 상업 > 원래 (오름) · x₁~x₂: 새 주거·새 상업 < 원래 주거 (내림) · x₂~x₃: 오름
+  window.RENT14 = {
+    agri: 8,
+    oc(x) { return 80 * Math.exp(-0.6 * x); },
+    or(x) { return 40 * Math.exp(-0.25 * x); },
+    nr(x) { return 23.6 * Math.exp(-0.12 * x); },
+    nc(x) { return window.RENT14.oc(x) + 2.0; },   // 함수만 떼어 넘기므로 this 를 쓰지 않는다
+    cross(f, g, lo = 0.01, hi = 12) { for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; (f(m) - g(m)) * (f(lo) - g(lo)) > 0 ? (lo = m) : (hi = m); } return (lo + hi) / 2; },
   };
 
-  // ── 15장 과세물품 [p.318~319, 그림 15-4] ────────────────────
-  // 직사각형의 넓이(세율 × 무게)가 곧 세액이다. 여섯 값이 전부 120·60·180 으로 나온다.
-  window.HEAD = {
-    group: [
-      { k: '동일한 머리무게',       box: [{ rate: 60, kg: 2 }, { rate: 60, kg: 2 }] },
-      { k: '동일하지 않은 머리무게', box: [{ rate: 60, kg: 1 }, { rate: 60, kg: 3 }] },
-      { k: '두 개의 학군',          box: [{ rate: 120, kg: 1 }, { rate: 40, kg: 3 }] },
-    ],
+  // ── 13장 교외화와 확산 [p.280·283] — 합친 장의 막대 높이 ─────
+  window.SPRAWL = {
+    within3: [0.88, 0.24],   // 중심지 3마일 안 거주 비중, 1880 · 1963
+    land: [739, 1167],       // 가구당 토지(평방미터), 중심 도시 · 교외
   };
 
-  // ── 15장 입찰가격 할증금 [p.322~327, 그림 15-6·15-7·15-9] ───
-  // 교재가 인쇄한 것은 두 값뿐이다 — 서부의 파란색이 7명일 때 30달러와 21달러.
-  // 곡선은 점 i(6명, 0달러)에서 출발해 체감적으로 오르므로 √ 꼴로 맞춘다.
-  //   prem(7,b)=30 · prem(7,g)=21 · 부지가 2단위면 단위당 15달러(점 h)
-  window.NBHD = {
-    K: { b: 30, g: 21 },
-    prem(x, t) { return this.K[t] * Math.sqrt(Math.max(0, x - 6)); },
-  };
 
   // ── 단일도심 도시의 입찰지대곡선 [이성원 강의노트 p.165·167·168] — 2026-10-07 6강에서 옮겨 왔다.
   // 7강 교재 그림의 window.MONO 와 이름이 겹쳐 MONO_LEE 로 바꿨다 ────────────
@@ -108,12 +111,14 @@
     ra: 5, YMAX: 45, XMAX: 5.5,
     rc(x)  { return 43 * Math.exp(-0.983 * x); },
     rc2(x) { return 38 * Math.exp(-0.983 * x); },
+    // 제조업 Rm = 32.7e^(−0.594x) — 상업과 0.7 에서, 주거와 1.6 에서 만나도록 둔 모식도 (2026-10-13)
+    rm(x)  { return 32.7 * Math.exp(-0.594 * x); },
     r1(x)  { return 24 * Math.exp(-0.40 * x); },
     r2(x)  { return 18 * Math.exp(-0.28 * x); },
     cross(f, g, lo = 0.01, hi = 8) { for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; (f(m) - g(m)) * (f(lo) - g(lo)) > 0 ? (lo = m) : (hi = m); } return (lo + hi) / 2; },
     // p.167·168 그림 — second 가 참이면 상업 지대 하락(점선)과 X1** 를 더한다
     drawClosed(sel, second) {
-      const M = this, F = Fig.withBox({ x0: 46, y0: 236, x1: 410, y1: 24 });
+      const M = this, F = Fig.withBox({ x0: 46, y0: 316, x1: 410, y1: 24 });   // 2026-10-13 위아래로 늘림
       const S = F.scale({ x: [0, M.XMAX], y: [0, M.YMAX] });
       const from = (f) => { let x = 0; while (f(x) > M.YMAX) x += 0.01; return x; };
       const samp = (f, a, b) => { const o = []; for (let i = 0; i <= 80; i++) { const x = a + ((b - a) * i) / 80; o.push([x, f(x)]); } return S.curve(o); };
@@ -153,6 +158,8 @@
   .pending { border: 1.4px dashed var(--rule); border-radius: 12px;
     padding: 18px 22px; color: var(--muted); }
   .tbl-dist, .tbl-dens { width: 100%; table-layout: fixed; }
+  .foot-src { position: absolute; left: 0; right: 0; bottom: 0; margin: 0; }
+  .reveal .big, .reveal ul.big > li { font-size: var(--fs-lead); line-height: 1.5; }
   .tbl-dist th, .tbl-dist td, .tbl-dens th, .tbl-dens td { text-align: right; }
   .tbl-dist th:first-child, .tbl-dist td:first-child,
   .tbl-dens th:first-child, .tbl-dens td:first-child { text-align: left; }
@@ -165,363 +172,122 @@
 <section class="s-cover">
   <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
   <p class="cover-label" data-course-label>&nbsp;</p>
-  <h1>7주차. 고용과 주거의<br>공간적 분포</h1>
+  <h1>7주차. 고용과 주거의 공간적 분포</h1>
   <p class="cover-date" data-course-date>&nbsp;</p>
 </section>
 
-<!-- ══ 지난 시간 — 6주차 요약 ════════════════════════════════ -->
+<!-- ══ 지난 시간 — 6강을 토지이용별 인포그래픽으로 (2026-10-13 교수 요청) ═══
+     네 칸 모두 6강 덱의 식을 그대로 옮겼다 (design.md §6.5).
+       농업   RICARDO: 지대 = (가격 11 − 평균비용) × 수량 → 500 · 270 · 0
+       제조업 PLANT:   마차 42 − 6x · 트럭 42 + 3x (x = 0~5km)
+       사무업 OFFICE:  지불용의 = 100 − (20 + 2.2x²)
+       주거   HOUSE:   p(x) = 4.5 + 23.38e^(−0.2747x)
+     글의 판은 보관/07-삭제슬라이드.html 에 있다. -->
 <section>
-  <h2>지난 시간 — 도시토지이용과 입찰지대</h2>
-  <div class="body tight">
-    <div class="cols" style="align-items:flex-start">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">잉여의 원칙</p>
-        <p>토지 임대료는 <strong>총 수입에서 비토지 비용을 뺀 것</strong>. 경쟁이 그 잉여를 지주에게 넘김</p>
-        <p style="margin-bottom:8px">농업용 토지는 <strong>비옥도</strong>가, 제조업용 토지는 <strong>접근성</strong>이 값을 정함</p>
-        <p class="sub t-red" style="margin-bottom:2px">사무공간과 건물높이 (11장)</p>
-        <p>정보교환 통행비용이 지불용의를 정하고, 한계편익 = 한계비용에서 <strong>건물높이</strong>가 정해짐</p>
-        <p class="caption">가장 높은 건물이 되려는 경쟁은 균형높이를 효율적 높이 위로 밀어 올림</p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">주택가격과 주거용 토지 (12장)</p>
-        <p>주택은 <strong>특성들의 묶음</strong>. 일자리 접근성·범죄·대기의 질·학교가 가격에 들어감</p>
-        <p style="margin-bottom:8px">소비자 대체 때문에 주택-가격곡선은 <strong>볼록</strong>함.
-          가격이 높은 곳에서 밀도가 높아짐</p>
-        <p class="sub t-red" style="margin-bottom:2px">한 줄로</p>
-        <p>10~12장은 모두 <strong>같은 틀</strong>이었음 — 지불용의를 그리고, 가장 높이 부르는 쪽이 땅을 가져가고,
-          남은 잉여가 지주에게 감</p>
-      </div>
-    </div>
-    <p class="derive t-red" style="margin-top:18px">→ 지난 시간까지는 <strong>땅값이 어떻게 정해지는가</strong>였음.
-      오늘은 그 결과로 일자리와 사람이 <strong>실제로 어디에 있는지</strong>(13장),
-      그것을 낳는 <strong>도시 전체의 모형</strong>(14장), 그리고 <strong>이웃 하나 안의 갈라짐</strong>(15장)을 봄</p>
+  <h2>지난 시간: 토지가격은 어떻게 정해지는가</h2>
+  <div class="body tight" style="padding-top:0">
+    <p class="lead t-define" style="margin-bottom:2px">요소대체가 없을 때: 총수입 − 총비용 = 이윤 = 지불가능지대</p>
+    <p class="derive t-red" style="margin-bottom:0">→ 입지에 따른 비용 차이에 따라 지대지불차이가 발생</p>
+    <p class="derive t-red" style="margin-bottom:8px">* 요소(소비자)대체가 존재할 경우 토지가격이 비싸면 토지 대신 자본을 늘려 밀도가 상승</p>
+    <svg class="fig" id="f-recap6" viewBox="0 0 848 228" style="width:848px;display:block;margin:0" role="img">
+      <title>6강 요약 인포그래픽. 농업은 비옥도, 제조업은 운송 접근성, 사무업은 대면접촉 접근성, 주거는 통근 접근성이 토지가격을 정한다</title></svg>
+    <p class="derive t-red" style="margin-top:8px">→ 지난 시간까지는 <strong>토지가격이 어떻게 정해지는지</strong>를 봤음.
+      오늘은 그 결과로 <strong>일자리와 사람이 어디에 입지하는지</strong>를 봄</p>
   </div>
-</section>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--chart-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)',
+            MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const path = (pts, c, w = 2.4, dash) =>
+        (s += `<path d="M${pts.map((p) => p.join(',')).join(' L')}" fill="none" stroke="${c}" stroke-width="${w}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`);
+      const samp = (f, a, b, n = 40) => Array.from({ length: n + 1 }, (_, i) => a + ((b - a) * i) / n).map((x) => [x, f(x)]);
 
-<!-- ══ 섹션 — CHAPTER 13 ═════════════════════════════════════ -->
-<section class="s-section">
-  <div class="section-rule"></div>
-  <p class="section-label">CHAPTER 13 고용과 주거의 공간적 분포</p>
-  <p class="section-sub">12장까지가 가격이 어떻게 정해지는가였다면 이 장은 그래서 어디에 있는가다 · 교재 p.273~287</p>
-</section>
+      const W = 206, X = [0, 214, 428, 642];
+      // 칸 머리: 번호 · 토지이용 · 무엇이 값을 정하나
+      const panel = (i, q, key) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="224" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += `<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>` + t(x + 18, 24.5, String(i + 1), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+        s += t(x + 35, 25, q, 14, RED, { w: 700 });
+        s += t(x + W - 12, 25, key, 12, INK, { w: 700, a: 'end' });
+      };
+      // 작은 좌표평면: 가로 거리, 세로 값
+      const B = (x) => ({ x0: x + 30, y0: 128, x1: x + 190, y1: 50 });
+      const axes = (b, ylab, xlab) => {
+        s += `<path class="axis" d="M${b.x0},${b.y1 - 4} L${b.x0},${b.y0} L${b.x1 + 4},${b.y0}"/>`;
+        s += t(b.x0 - 4, b.y1 - 8, ylab, 10, MUTED) + t(b.x1 + 4, b.y0 + 13, xlab, 10, MUTED, { a: 'end' });
+      };
+      const foot = (x, a, b) => { s += t(x + 12, 164, a, 11, INK2) + t(x + 12, 179, b, 11, INK2); };
+      const rule = (x, str) => {
+        s += `<rect x="${x + 8}" y="190" width="${W - 16}" height="24" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, 207, str, 11, RED, { w: 700, a: 'middle' });
+      };
 
-<!-- ══ 발문 (p.273) ══════════════════════════════════════════ -->
-<section class="s-question">
-  <div class="body stack">
-    <p class="epigraph emph" style="margin-bottom:34px">
-      “그 저주 받을 자동차는 잊고 사랑하는 사람들과 친구들을 위해 도시들을 지어라.”
-      <span class="who">— 루이스 멈포드</span></p>
-    <p class="lead t-define">이제까지는 <span class="mark">가격이 어떻게 정해지는지</span>를 봤음</p>
-      <p class="lead t-define" style="margin-bottom:16px">이 장에서는 그 결과로
-        <span class="mark">일자리와 사람이 실제로 어디에 있는지</span>를 봄</p>
-    <p class="emph"><strong>중심 도시</strong>는 대도시지역의 주된 자치시임 —
-      예를 들어 시카고나 샌프란시스코의 정치적 도시</p>
-      <p class="emph">나머지 자치시들이 그 대도시지역의 <strong>교외</strong>를 이룸</p>
-  </div>
-</section>
-
-<!-- ══ 섹션 — 01 ═════════════════════════════════════════════ -->
-<section class="s-section">
-  <div class="section-rule"></div>
-  <p class="section-label">01 고용과 주거의 공간적 분포</p>
-  <p class="section-sub">일자리와 사람이 어디에 있는지 재는 세 가지 방법 · 교재 p.273~279</p>
-</section>
-
-<!-- ══ 그림 13-1 통근 유형 (p.273~274) ═══════════════════════ -->
-<section>
-  <h2>40년 동안 통근은 교외 안에서 일어나게 됐다</h2>
-  <div class="body tight">
-    <p class="emph">1960년에 10만명 이상이던 <strong>152개 대도시지역</strong>의 통근 자료.
-      1960년의 중심 도시 경계를 기준으로 나눴음</p>
-    <svg class="fig" id="f-commute" viewBox="0 0 660 288" style="width:598px;margin:4px 0 0 124px" role="img">
-      <title>중심 도시 안 통근이 0.45에서 0.15로 줄고 교외 안 통근이 0.34에서 0.62로 늘어난 것을 보여주는 막대그래프</title></svg>
-    <script>
-      (function () {
-        const D = window.DIST13.commute, F = Fig;
-        const X0 = 74, X1 = 632, Y0 = 208, HMAX = 168;
-        const sy = (v) => Y0 - (v / 0.7) * HMAX;
-        const gw = (X1 - X0) / D.length, bw = 30;
-        const parts = [];
-        [0, 0.175, 0.35, 0.525, 0.7].forEach((v) => {
-          parts.push(F.raw(`<path class="guide" d="M${X0},${sy(v)} L${X1},${sy(v)}"/>`));
-          parts.push(F.annot(X0 - 8, sy(v) + 4, v.toFixed(3).replace(/0+$/, '').replace(/\.$/, ''),
-                             { anchor: 'end', size: 11 }));
+      // ── ① 농업: 비옥도 — 6강 RICARDO ──────────────────────
+      panel(0, '농업', '비옥도');
+      {
+        const x = X[0], b = B(x), P = 11;
+        const land = [['기름진', 100, 6], ['중간', 90, 8], ['황폐한', 80, 12]];
+        const sy = (v) => b.y0 - (v / 500) * (b.y0 - b.y1 - 12);
+        axes(b, '지대', '');
+        land.forEach(([k, q, ac], i) => {
+          const r = Math.max(0, (P - ac) * q), cx = b.x0 + 30 + i * 52;
+          if (r > 0) s += `<rect x="${cx - 16}" y="${sy(r)}" width="32" height="${b.y0 - sy(r)}" fill="${RED}" fill-opacity="${1 - i * 0.3}"/>`;
+          s += t(cx, sy(r) - 5, r > 0 ? String(r) : '0', 11, INK, { w: 700, a: 'middle' });
+          s += t(cx, b.y0 + 14, k, 10.5, INK2, { a: 'middle' });
         });
-        D.forEach((g, i) => {
-          const cx = X0 + gw * (i + 0.5);
-          [['y1960', -bw, 'var(--accent-blue)'], ['y2000', 2, 'var(--chart-sky)']].forEach(([k, dx, fill]) => {
-            const v = g[k], x = cx + dx;
-            parts.push(F.raw(`<rect x="${x}" y="${sy(v)}" width="${bw - 2}" height="${Y0 - sy(v)}" fill="${fill}"/>`));
-            parts.push(F.annot(x + (bw - 2) / 2, sy(v) - 5, v.toFixed(2), { anchor: 'middle', size: 11 }));
-          });
-          parts.push(F.annot(cx, Y0 + 16, g.home, { anchor: 'middle', size: 11 }));
-          parts.push(F.annot(cx, Y0 + 31, g.work, { anchor: 'middle', size: 11 }));
-        });
-        parts.push(F.raw(`<path class="axis" d="M${X0},${sy(0.7) - 8} L${X0},${Y0} L${X1 + 8},${Y0}"/>`));
-        parts.push(F.annot(X0, sy(0.7) - 14, '대도시지역 노동력의 비중', { size: 11 }));
-        parts.push(F.annot(X0 - 8, Y0 + 16, '거주지', { anchor: 'end', size: 11 }));
-        parts.push(F.annot(X0 - 8, Y0 + 31, '근무지', { anchor: 'end', size: 11 }));
-        // 범례
-        [['1960', 'var(--accent-blue)', 0], ['2000', 'var(--chart-sky)', 78]].forEach(([t, c, dx]) => {
-          parts.push(F.raw(`<rect x="${X1 - 150 + dx}" y="${sy(0.7) - 22}" width="12" height="12" fill="${c}"/>`));
-          parts.push(F.annot(X1 - 134 + dx, sy(0.7) - 12, t, { size: 11 }));
-        });
-        F.draw('#f-commute', { parts, check: false });
-      })();
-    </script>
-    <p class="caption" style="margin-top:2px">출처: Baum-Snow, Nathaniel, “Changes in Transportation Infrastructure
-      and Commuting Patterns in US Metropolitan Areas, 1960−2000,” <em>American Economic Review</em> 100, 2010
-      (교재 그림 13−1, p.274)</p>
-    <p class="derive t-red" style="margin-top:4px">→ 중심 도시의 일자리 비중은 <strong>0.61 → 0.30</strong>,
-      교외의 일자리 비중은 <strong>0.40 → 0.69</strong></p>
-  </div>
-</section>
+        foot(x, '지대 = 총수입 − 비토지비용', '비옥할수록 남는 것이 큼');
+        rule(x, '잉여의 원칙');
+      }
 
-<!-- ══ 표 13-1 · 13-2 큰 도시와 중간 도시 (p.274~276) ═════════ -->
-<section>
-  <h2>중위 근무지는 중위 거주지보다 중심에 가깝다</h2>
-  <div class="body tight">
-    <p class="emph" style="margin-bottom:4px"><strong>중위 근무지</strong>는 일자리를 중심에 가까운 절반과 먼 절반으로
-      나누는 거리. <strong>중위 거주지</strong>는 노동자의 거주지를 같은 방식으로 나눈 거리</p>
-    <div class="cols">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">가장 큰 25개 대도시지역 (일부)</p>
-        <table class="tbl-dist">
-          <thead><tr><th>도시</th><th>중위<br>근무지</th><th>중위<br>거주지</th><th>5km 내<br>일자리</th><th>5km 내<br>거주</th></tr></thead>
-          <tbody>
-            <tr><td>뉴욕</td><td>20</td><td>25</td><td>17</td><td>5</td></tr>
-            <tr><td>시카고</td><td>30</td><td>36</td><td>18</td><td>4</td></tr>
-            <tr><td>샌프란시스코</td><td>19</td><td>25</td><td>27</td><td>13</td></tr>
-            <tr><td>볼티모어</td><td>21</td><td>23</td><td>4</td><td>3</td></tr>
-            <tr><td>포틀랜드</td><td>12</td><td>15</td><td>24</td><td>8</td></tr>
-          </tbody>
-        </table>
-        <p class="caption" style="margin-top:2px">25개 전체 평균 — 중위 근무지 <strong>22km</strong>,
-          중위 거주지 <strong>27km</strong>, 5km 내 고용 <strong>14%</strong></p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">중간-규모 대도시지역 (일부)</p>
-        <table class="tbl-dist">
-          <thead><tr><th>도시</th><th>중위<br>근무지</th><th>중위<br>거주지</th><th>5km 내<br>일자리</th><th>5km 내<br>거주</th></tr></thead>
-          <tbody>
-            <tr><td>콜럼버스</td><td>13</td><td>16</td><td>15</td><td>7</td></tr>
-            <tr><td>오스틴</td><td>10</td><td>19</td><td>29</td><td>8</td></tr>
-            <tr><td>해리스버그</td><td>12</td><td>15</td><td>7</td><td>7</td></tr>
-            <tr><td>톨레도</td><td>10</td><td>10</td><td>20</td><td>18</td></tr>
-            <tr><td>스포캐인</td><td>8</td><td>11</td><td>38</td><td>19</td></tr>
-          </tbody>
-        </table>
-        <p class="caption" style="margin-top:2px">단위는 킬로미터와 %.
-          출처: LEHD 자료 (교재 표 13−1·13−2, p.275~276)</p>
-      </div>
-    </div>
-    <p class="derive t-red" style="margin-top:8px">→ 어느 규모에서든 <strong>중위 근무지 &lt; 중위 거주지</strong> —
-      일자리가 사람보다 중심에 가깝게 남아 있음</p>
-      <p class="derive t-red" style="margin-top:2px">→ 작은 도시일수록 두 값이 모두 작고
-      <strong>5km 안에 든 비중이 큼</strong> (스포캐인 38%)</p>
-  </div>
-</section>
+      // ── ② 제조업: 운송 접근성 — 6강 PLANT ─────────────────
+      panel(1, '제조업', '운송비');
+      {
+        const x = X[1], b = B(x);
+        const sx = (d) => b.x0 + (d / 5) * (b.x1 - b.x0 - 8), sy = (v) => b.y0 - ((v - 0) / 60) * (b.y0 - b.y1);
+        axes(b, '입찰지대', '거리');
+        path(samp((d) => 42 - 6 * d, 0, 5, 1).map(([d, v]) => [sx(d), sy(v)]), RED);
+        path(samp((d) => 42 + 3 * d, 0, 5, 1).map(([d, v]) => [sx(d), sy(v)]), BLUE, 2.4, '6 4');
+        s += t(sx(3.4), sy(42 - 6 * 3.4) + 16, '마차 −6', 10.5, RED, { w: 700, a: 'middle' });
+        s += t(sx(5), sy(57) + 15, '트럭 +3', 10.5, BLUE, { w: 700, a: 'end' });
+        foot(x, '기울기 = (−운송비 + 노동비)/면적', '트럭이 오면 공장이 중심을 떠남');
+        rule(x, '중심 터미널 접근성');
+      }
 
-<!-- ══ 표 13-3 고용밀도 (p.277) ═══════════════════════════════ -->
-<section>
-  <h2>일자리가 모여 있는 도시와 흩어진 도시</h2>
-  <div class="body">
-    <p class="emph" style="margin-bottom:6px">경제학자들은 <strong>고용중심지</strong>를 헥타르당 25명 이상이고
-      인접한 인구조사표준지역이 일자리 1만 개 이상인 지역으로 정의함</p>
-    <table class="tbl-dens">
-      <thead><tr><th>대도시지역</th><th>헥타르당 10개 이상</th><th>헥타르당 25개 이상</th>
-        <th>헥타르당 75개 이상</th><th>최대 밀도</th></tr></thead>
-      <tbody>
-        <tr><td>보스턴</td><td>0.852</td><td>0.614</td><td><strong>0.410</strong></td><td>1,073</td></tr>
-        <tr><td>로스앤젤레스</td><td>0.811</td><td>0.551</td><td>0.199</td><td>1,572</td></tr>
-        <tr><td>포틀랜드</td><td>0.638</td><td>0.339</td><td>0.138</td><td>501</td></tr>
-        <tr><td>시카고</td><td>0.608</td><td>0.344</td><td>0.201</td><td><strong>2,622</strong></td></tr>
-        <tr><td>애틀란타</td><td>0.438</td><td>0.239</td><td><strong>0.102</strong></td><td>345</td></tr>
-      </tbody>
-    </table>
-    <p class="caption" style="margin-top:4px">마지막 열은 헥타르당 일자리 수 (교재 표 13−3, p.277)</p>
-    <p class="derive t-red" style="margin-top:10px">→ 애틀란타는 약 <strong>24%</strong>만 고용중심지에 있어
-      <strong>3/4이 산재</strong>함. 보스턴은 약 <strong>62%</strong>가 고용중심지에 있음</p>
-  </div>
-</section>
+      // ── ③ 사무업: 대면접촉 접근성 — 6강 OFFICE ───────────
+      panel(2, '사무업', '정보교환');
+      {
+        const x = X[2], b = B(x);
+        const wtp = (d) => 100 - (20 + 2.2 * d * d);
+        const sx = (d) => b.x0 + (d / 5) * (b.x1 - b.x0 - 8), sy = (v) => b.y0 - (v / 90) * (b.y0 - b.y1);
+        axes(b, '지불용의', '거리');
+        path(samp(wtp, 0, 5).map(([d, v]) => [sx(d), sy(v)]), RED);
+        s += t(sx(0) + 6, sy(80) - 6, '80', 10.5, INK, { w: 700 }) + t(sx(5) - 2, sy(wtp(5)) - 8, '25', 10.5, INK, { w: 700, a: 'end' });
+        foot(x, '다른 사무기업과 가까울수록', '통행비용이 작아 지불용의가 큼');
+        rule(x, '땅값 높은 곳에 높은 건물');
+      }
 
-<!-- ══ 고용부도심들 (p.278~279) ═══════════════════════════════ -->
-<section>
-  <h2>고용부도심 <span class="en">(employment subcenters)</span></h2>
-  <div class="body tight">
-    <p class="emph" style="margin-bottom:6px"><strong>3강에서 본 집적의 경제</strong>가 기업들을 모이게 함 —
-      숙련매칭·중간재·노동풀·정보의 공유</p>
-    <p style="margin-bottom:8px">로스앤젤레스 <strong>46개</strong>, 뉴욕 38개, 시애틀 14개, 시카고·댈러스·샌프란시스코 12개.
-      샬롯·호놀룰루·마이애미·피츠버그는 <strong>하나뿐</strong>이고 오스틴·버펄로·내쉬빌·솔트레이크시티는 <strong>없음</strong></p>
-    <p class="sub t-red" style="margin-bottom:2px">부도심의 수를 정하는 두 요인</p>
-    <p style="margin-bottom:10px"><strong>대도시지역의 인구</strong>와 <strong>교통혼잡의 수준</strong> —
-      혼잡이 심한 도시는 인구가 적어도 첫 부도심이 일찍 생김</p>
-    <ol class="dense" style="margin:0;padding-left:1.4em;text-indent:-1.4em;list-style-position:inside">
-      <li>부도심은 새 대도시지역에도 오랜 대도시지역에도 무수히 존재함</li>
-      <li>대부분의 일자리는 중심상업지구와 부도심에 모이기보다 <strong>분산되어</strong> 있음</li>
-      <li>많은 부도심이 매우 특화되어 있어 <strong>지역화 경제</strong>가 큼을 나타냄</li>
-      <li>도시의 중심지는 여전히 가장 크고 밀집된 고용 집적지임</li>
-      <li>고용밀도는 중심지로부터 거리가 늘수록 감소함</li>
-      <li>부도심 기업은 중심지 기업과 상호작용하며, 그 접근의 가치가 <strong>중심지 부근의 높은 토지가격</strong>에 반영됨</li>
-      <li>서로 다른 부도심의 기업들도 상호작용함 — 기능이 다르고 <strong>상호보완적</strong>임</li>
-    </ol>
-  </div>
-</section>
+      // ── ④ 주거: 통근 접근성 — 6강 HOUSE ──────────────────
+      panel(3, '주거', '통근비');
+      {
+        const x = X[3], b = B(x);
+        const p = (d) => 4.5 + 23.3823 * Math.exp(-0.274653 * d);
+        const sx = (d) => b.x0 + (d / 14) * (b.x1 - b.x0 - 8), sy = (v) => b.y0 - (v / 28) * (b.y0 - b.y1);
+        axes(b, '주택가격', '거리');
+        path(samp(p, 0, 14).map(([d, v]) => [sx(d), sy(v)]), RED);
+        s += t(sx(6), sy(p(6)) - 10, '볼록', 10.5, RED, { w: 700 });
+        foot(x, '가까울수록 통근비가 줄어 비싸고', '비싼 곳에서 밀도가 높음');
+        rule(x, '범죄·대기·학교도 가격에');
+      }
 
-<!-- ══ 섹션 — 02 ═════════════════════════════════════════════ -->
-<section class="s-section">
-  <div class="section-rule"></div>
-  <p class="section-label">02 교외화와 도시확산</p>
-  <p class="section-sub">왜 밖으로 퍼지는가, 그것이 문제인가 · 교재 p.280~285</p>
-</section>
-
-<!-- ══ 인구의 분산 (p.280~281) ════════════════════════════════ -->
-<section>
-  <h2>인구의 분산은 오래된 전 세계적 현상이다</h2>
-  <div class="body">
-    <p class="emph" style="margin-bottom:8px">밀스(1972)는 <strong>1880년까지 거슬러</strong> 교외화를 기록함.
-      볼티모어·밀워키·필라델피아·로체스터에서 중심지 3마일 내 거주 비중이
-      1880년 <strong>0.88</strong>에서 1963년 <strong>0.24</strong>로 떨어짐. 런던도 1801~1961년에 같은 값으로 변함</p>
-    <div class="cols">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">주된 두 요인</p>
-        <p><strong>상승하는 임금</strong> — 주택수요가 소득과 함께 늘고 교외의 주택가격이 낮음.
-          다만 소득 증가는 통근의 기회비용도 높여 방향이 이론적으로 분명하지는 않음</p>
-        <p class="caption" style="margin-bottom:8px">소득증가가 교외화를 촉진한다는 증거가 있음 (Anas·Arnott·Small, 1998)</p>
-        <p><strong>낮아진 통근비용</strong> — 1827년 승합마차부터 오늘의 자동차까지 180년의 교통혁신</p>
-        <p class="caption">일자리와 사람의 교외화는 서로를 강화했음 — 일자리가 노동자를 따라가고
-          노동자가 일자리를 따라갔음</p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">그 밖의 네 요인</p>
-        <p><strong>헌 주택</strong> — 중심-도시 주택의 노후화</p>
-        <p><strong>중심-도시의 재정문제</strong> — 높은 세금. 인과관계가 <strong>양방향</strong>으로 작용함</p>
-        <p><strong>범죄</strong> — 큘렌과 레빗(1999)은 중심-도시 범죄 하나가 늘 때마다 한 명이 교외로 옮겼다고 추정함</p>
-        <p class="caption" style="margin-bottom:8px">인구 백만이 넘는 대도시지역에서는 오늘날
-          <strong>중심도시의 범죄율이 교외보다 낮음</strong> — 역사적 흐름의 극적인 역전</p>
-        <p><strong>교육</strong> — 교외 학교가 낫다고 여겨짐</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 도시확산의 원인 (p.281~283) ════════════════════════════ -->
-<section>
-  <h2>무엇이 도시의 확산을 만드는가</h2>
-  <div class="body stack">
-    <p class="lead t-define" style="margin-bottom:18px">도시는 <span class="mark">위로</span> 성장할 수도
-      <span class="mark">밖으로</span> 성장할 수도 있음. 확산을 걱정하는 사람들은
-      위로가 너무 적고 밖으로가 너무 많다고 봄</p>
-    <div class="cols">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">시장의 힘</p>
-        <p>토지는 <strong>정상재</strong>라 소득이 높을수록 많이 소비하고 밀도는 낮아짐</p>
-        <p style="margin-bottom:8px">통행비용이 낮아 멀리 살 수 있고, 먼 토지는 싸서 부지가 커짐</p>
-        <p class="caption">버타우드와 말페찌(2003)는 <strong>문화</strong>도 설명한다고 봄 —
-          아시아의 밀도는 소득으로 설명되는 것보다 훨씬 높다</p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">낮은 밀도를 부추긴 정부 정책 넷</p>
-        <p><strong>혼잡의 외부효과</strong> — 첨두시간 도로 이용의 과소가격책정</p>
-        <p><strong>주택담보대출 지원</strong> — 이자 소득공제. 토지와 주택이 보완재라 부지가 커짐</p>
-        <p><strong>변두리 기반시설의 과소가격책정</strong> — 개발부담금으로 대응하는 주가 많음</p>
-        <p><strong>용도지역제</strong> — 최소부지규모. 저소득 가구를 배제하려는 동기</p>
-      </div>
-    </div>
-    <p class="derive t-red" style="margin-top:14px">→ 글래이져와 칸(2004)은 다르게 봄 —
-      확산은 소득·빈곤·정부분할을 가리지 않고 <strong>어디서나</strong> 일어났으므로
-      진짜 원인은 <strong>내연기관</strong>이고 보조금은 규모가 너무 작아 큰 효과가 없었다는 것</p>
-  </div>
-</section>
-
-<!-- ══ 낮은 밀도의 결과 (p.283~284) ═══════════════════════════ -->
-<section>
-  <h2>낮은 밀도는 무엇을 낳는가</h2>
-  <div class="body stack">
-    <p class="sub t-red" style="margin-bottom:2px">칸(2000)이 잰 것 — 중심-도시 가구 대비 교외 가구</p>
-    <p style="margin-bottom:6px">토지를 <strong>58% 더</strong> 씀 (1,167평방미터 대 739)</p>
-    <p style="margin-bottom:6px">에너지는 <strong>거의 같게</strong> 씀 — 집이 크지만 새것이고 효율적이기 때문</p>
-    <p style="margin-bottom:16px">운전은 <strong>약 30% 더</strong> 함. 자동차 운행거리의 밀도탄력성은
-      <strong>−0.36</strong>이라 밀도가 10% 낮아지면 운행거리가 3.6% 늘어남</p>
-    <p class="emph" style="margin-bottom:16px">그래서 확산은 자동차가 내는 <strong>대기오염과 온실가스</strong>를 늘림</p>
-    <p class="sub t-red" style="margin-bottom:2px">농지는 어떤가</p>
-    <p style="margin-bottom:16px">농지규모의 도시인구 탄력성은 <strong>−0.02</strong>로 작음. 인구가 10% 늘면 농지가 0.2% 줄어듦</p>
-    <p class="derive t-red">→ 도시확산이 농지나 농작물의 부족을 낳았다는 증거는 없음.
-      그랬다면 <strong>농작물 가격이 올라</strong> 농부가 개발업자보다 높은 값을 불렀을 것임</p>
-  </div>
-</section>
-
-<!-- ══ 그림 13-2 대중교통 (p.284~285) ═════════════════════════ -->
-<section class="s-split">
-  <h2>낮은 밀도에서는 대중교통이 서지 않는다</h2>
-  <div class="body">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">역까지 걸어갈 수 있는 최대 시간은 약 <strong>10분</strong>이라
-        역 하나가 맡을 수 있는 범위는 <strong>반경 800미터</strong>임</p>
-      <p style="margin-bottom:8px">시간당 버스 2대에 정거장 간격 1/2마일인 중간수준 서비스를 유지하려면
-        서비스지역 밀도가 <strong>헥타르당 31명</strong> 이상이어야 함</p>
-      <p style="margin-bottom:10px">미국에서 그 조건을 넘는 대도시지역은
-        <strong>뉴욕(40)과 호놀룰루(31)</strong> 둘뿐임. 뉴욕시만 따로 보면 헥타르당 80명임</p>
-      <p class="derive t-red">→ 바르셀로나는 애틀란타보다 <strong>28배</strong> 밀집해 있음</p>
-      <p class="derive t-red">→ 바르셀로나는 인구의 60%가 역에서 600m 안에 살지만
-        애틀란타는 <strong>4%</strong>만 800m 안에 삶</p>
-      <p class="derive t-red">→ 바르셀로나 수준의 접근성을 따라가려면 애틀란타는
-        지하철 <strong>3,400km와 역 2,800개</strong>를 더 지어야 함. 바르셀로나는 99km에 136개뿐임</p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-transit" viewBox="0 0 430 260" style="width:392px" role="img">
-        <title>애틀란타와 바르셀로나의 평균 밀도와 최대 거리를 비교한 가로 막대그래프</title></svg>
-      <script>
-        (function () {
-          const D = window.DIST13.transit, F = Fig;
-          const X0 = 150, X1 = 402, Y0 = 56, GAP = 74, BH = 22;
-          const sx = (v) => X0 + (v / 200) * (X1 - X0);
-          const parts = [];
-          D.forEach((g, i) => {
-            const y = Y0 + i * GAP;
-            [['atl', 0, 'var(--accent-blue)'], ['bcn', BH + 4, 'var(--chart-sky)']].forEach(([k, dy, fill]) => {
-              const v = g[k];
-              parts.push(F.raw(`<rect x="${X0}" y="${y + dy}" width="${sx(v) - X0}" height="${BH}" fill="${fill}"/>`));
-              parts.push(F.annot(sx(v) + 6, y + dy + 16, String(v), { size: 11 }));
-            });
-            g.label.split('\n').forEach((t, j) =>
-              parts.push(F.annot(X0 - 10, y + 18 + j * 14, t, { anchor: 'end', size: 11 })));
-          });
-          const yAx = Y0 + D.length * GAP - 22;
-          parts.push(F.raw(`<path class="axis" d="M${X0},${Y0 - 8} L${X0},${yAx} L${X1 + 8},${yAx}"/>`));
-          [0, 50, 100, 150, 200].forEach((v) =>
-            parts.push(F.annot(sx(v), yAx + 16, String(v), { anchor: 'middle', size: 11 })));
-          [['애틀란타', 'var(--accent-blue)', 0], ['바르셀로나', 'var(--chart-sky)', 96]].forEach(([t, c, dx]) => {
-            parts.push(F.raw(`<rect x="${X0 + dx}" y="${Y0 - 30}" width="12" height="12" fill="${c}"/>`));
-            parts.push(F.annot(X0 + 16 + dx, Y0 - 20, t, { size: 11 }));
-          });
-          F.draw('#f-transit', { parts, check: false });
-        })();
-      </script>
-      <p class="caption" style="margin-top:2px;text-align:center">출처: Bertaud, Alain,
-        “Clearing the Air in Atlanta,” <em>Journal of Urban Economics</em> 54, 2003
-        (교재 그림 13−2, p.285)</p>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 확산에 대한 정책반응 (p.285) ═══════════════════════════ -->
-<section>
-  <h2>확산에 어떻게 대응할 것인가</h2>
-  <div class="body stack">
-    <p class="emph" style="margin-bottom:18px">확산은 부분적으로 <strong>소비자선택</strong>임 —
-      다른 소비재를 포기하고 큰 부지를 고른 합리적 선택</p>
-    <p class="lead t-define" style="margin-bottom:18px">많은 공공정책이 확산에 기여하므로
-      적절한 반응은 <span class="mark">그 왜곡을 없애는 것</span>임</p>
-    <p class="emph" style="margin-bottom:6px">왜곡을 없애면 토지이용이 얼마나 바뀔 것인가</p>
-    <p style="margin-bottom:6px">낮은 밀도가 대부분 <strong>높은 소득·낮은 교통비용·공간에 대한 선호</strong> 때문이라면
-      크게 바뀌지 않음</p>
-    <p style="margin-bottom:18px">혼잡의 외부효과·주택담보대출 지원·변두리 기반시설의 과소가격책정·큰-부지 용도지역제의
-      왜곡이 크다면 <strong>더 크게 바뀜</strong></p>
-    <p class="derive t-red">→ 대안은 <strong>도시성장경계</strong>나 <strong>개발세</strong> 같은 비확산정책임</p>
-      <p class="derive t-red">→ 밀도를 올리는 데는 성공할 수 있음.
-      문제는 <strong>그 편익이 비용을 넘는가</strong>임 (11주차에서 다시 다룸)</p>
-  </div>
+      Fig.draw('#f-recap6', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
 </section>
 
 <!-- ══ 섹션 — CHAPTER 14 ═════════════════════════════════════ -->
@@ -553,201 +319,19 @@
   <p class="section-sub">왜 모든 일자리가 가운데 모였는가 · 교재 p.288~295</p>
 </section>
 
-<!-- ══ 네 가정 · 산업혁명 (p.288~291) ═════════════════════════ -->
-<section>
-  <h2>모형의 네 가정과 그것을 가능하게 한 기술</h2>
-  <div class="body tight">
-    <div class="cols">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">네 개의 핵심 가정 <span class="en">(20세기 초의 기술)</span></p>
-        <p><strong>중심의 수출지점</strong> — 제조업체는 철로 종점이나 항구를 통해 수출함</p>
-        <p><strong>말이 끄는 마차</strong> — 공장에서 수출지점까지 생산물을 나름</p>
-        <p><strong>터미널 집중방식 전차체계</strong> — 노동자는 거주지역에서 중심상업지구로 통근함</p>
-        <p style="margin-bottom:10px"><strong>중심에서의 정보교환</strong> — 사무 종사자는 기업 사이를 오가며 정보를 교환함</p>
-        <p class="derive t-red">→ 제조업체는 <strong>수출지점</strong>을, 사무업체는 <strong>서로</strong>를,
-          가구는 <strong>일자리</strong>를 향함</p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">도시 내 교통의 혁신</p>
-        <p style="margin-bottom:8px">승합마차(1827, 시속 6마일) · 케이블카(1873) ·
-          전기 무궤도 전차 · 지하철(1890 런던, 보스턴이 미국 최초)</p>
-        <p class="caption" style="margin-bottom:10px">도시의 활동가능 반경은 한 시간에 갈 수 있는 거리다.
-          19세기 초 「도보에 의한 도시」에서 그 반경은 <strong>약 2마일</strong>이었다</p>
-        <p class="sub t-red" style="margin-bottom:2px">건축기술의 혁신</p>
-        <p style="margin-bottom:8px">풍선 구조(1832, 값싼 못) · 주물-철 기둥(1848) ·
-          강철 구조(1885, 11층 홈 인슈어런스 빌딩)</p>
-        <p class="caption">1854년 오티스의 <strong>안전걸쇠</strong>가 승강기를 쓸 수 있게 했다 —
-          밧줄이 끊어져도 추락하지 않는 장치다</p>
-      </div>
-    </div>
-    <p class="derive t-red" style="margin-top:10px">→ 생산의 규모의 경제와 집적의 경제가 공장을 큰 산업도시에 모으고,
-      도시 간 교통혁신이 교역도시를 키웠음. 남은 질문은
-      <strong>왜 그 큰 도시들이 하필 단일도심이었는가</strong>임</p>
-  </div>
-</section>
-
-<!-- ══ 그림 14-1 토지이용 (p.292~293) ═════════════════════════ -->
-<section class="s-split">
-  <h2>가장 가파른 곡선이 가운데를 가져간다</h2>
-  <div class="body">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:10px">단순한 단일도심모형에서 지불용의곡선의 기울기는
-        <strong>운송비용</strong>이 정함</p>
-      <p style="margin-bottom:8px"><strong>사무업</strong>이 가장 가파름 — 생산물이
-        <strong>사무노동자의 머릿속과 서류가방</strong>으로 운송되고 그 통행의 기회비용이 높기 때문</p>
-      <p style="margin-bottom:12px"><strong>제조업</strong>은 완만함 — 말과 마차의 기회비용이 낮음</p>
-      <p class="derive t-red">→ 사무지구는 반경 x₁, 제조업지구는 폭 x₂ − x₁ 의 고리,
-        주거지구는 폭 x₃ − x₂ 의 고리이고 도시 반경은 x₃ 임</p>
-      <p class="derive t-red">→ 이 할당은 <strong>효율적</strong>임. 사무기업과 제조업체가 자리를 맞바꾸면
-        단위 운송비용이 높은 쪽이 더 멀어져 <strong>총 운송비용이 늘어남</strong></p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-mono1" viewBox="0 0 430 300" style="width:392px" role="img">
-        <title>사무업·제조업·거주민·농업의 지불용의곡선이 차례로 교차해 도시를 세 개의 고리로 나누는 그림</title></svg>
-      <script>
-        (function () {
-          const F = Fig.withBox({ x0: 62, y0: 216, x1: 392, y1: 32 });
-          const S = F.scale({ x: [0, 10], y: [0, 110] });
-          // 네 곡선은 기울기만 다른 지불용의곡선이다. 교차점은 Fig.cross 로 구한다.
-          const mk = (k, s) => { const o = []; for (let i = 0; i <= 40; i++) { const x = (10 * i) / 40; o.push([x, k * Math.exp(-s * x)]); } return S.curve(o); };
-          const off = mk(100, 0.62), mfg = mk(58, 0.30), res = mk(38, 0.155);
-          const agr = S.curve([[0, 12], [10, 12]]);
-          const A = Fig.cross(off, mfg), B = Fig.cross(mfg, res), C = Fig.cross(res, agr);
-          const parts = [
-            F.curve(off), F.annot(S.x(0.5), S.y(78), '사무업', { size: 11 }),
-            F.curve(mfg, { variant: 'demand' }),
-            F.annot(S.x(3.2), S.y(23), '제조업', { size: 11, tone: 'blue' }),
-            F.curve(res, { variant: 'supply' }),
-            F.annot(S.x(4.5), S.y(23), '거주민들', { size: 11, tone: 'red' }),
-            F.curve(agr, { variant: 'cap' }), F.annot(S.x(8.6), S.y(12) - 9, '농업', { size: 11 }),
-          ];
-          [[A, 'a', 'x₁'], [B, 'b', 'x₂'], [C, 'c', 'x₃']].forEach(([P, nm, tick]) => {
-            parts.push(F.guide(P[0], P[1], { xtick: tick, only: 'x' }));
-            parts.push(F.dot(P[0], P[1], { label: nm, lx: 8, ly: -8 }));
-          });
-          // 가로축 아래 구역 띠 O | M | R
-          const bt = F.BOX.y0 + 34, bh = 22;
-          [['O', F.BOX.x0, A[0], 0.10], ['M', A[0], B[0], 0.20], ['R', B[0], C[0], 0.34]]
-            .forEach(([t, xa, xb, op]) => {
-              parts.push(F.raw(`<rect x="${xa}" y="${bt}" width="${xb - xa}" height="${bh}" ` +
-                               `fill="var(--brand-crimson)" opacity="${op}"/>`));
-              parts.push(F.annot((xa + xb) / 2, bt + 15, t, { anchor: 'middle', size: 12 }));
-            });
-          F.draw('#f-mono1', { axes: { x: '중심으로부터 거리', y: '$' }, parts });
-        })();
-      </script>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 그림 14-2 중앙집권화된 제조업 (p.293~295) ══════════════ -->
-<section class="s-split">
-  <h2>기업은 노동자에게서 멀어지고 수출지점에 붙는다</h2>
-  <div class="body">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:10px"><strong>3강에서 본 기업입지 모형</strong>을 도시 안으로 옮김.
-        기업은 운송비용과 노동비용의 합을 최소화함</p>
-      <p style="margin-bottom:6px"><strong>마차</strong> — 수출지점에서 1km 멀어지면 주당 운송비용이
-        <strong>6달러</strong> 늘어남</p>
-      <p style="margin-bottom:12px"><strong>시내 전차</strong> — 노동자 쪽으로 1km 가까워지면 주당 노동비용이
-        <strong>1달러</strong> 줄어듦. 통근이 빠르고 효율적이라 절약이 작음</p>
-      <p class="derive t-red">→ 총 비용은 도시중심지에서 <strong>25달러</strong>로 최소가 되고
-        x=10 에서 <strong>75달러</strong>가 됨</p>
-      <p class="derive t-red">→ 합리적 선택은 <strong>노동자에게서 멀리, 수출지점에 가까이</strong>임</p>
-      <p class="derive t-red">→ 사무기업도 같음. 교외로 가면 임금은 아끼지만 노동자가
-        중심지 왕래에 시간을 더 써 <strong>같은 산출에 더 많은 노동시간</strong>이 듦</p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-mono2" viewBox="0 0 430 296" style="width:392px" role="img">
-        <title>운송비용이 1킬로미터당 6달러 오르고 노동비용이 1달러 내려 총비용이 도시중심지에서 최소가 되는 그림</title></svg>
-      <script>
-        (function () {
-          const M = window.MONO, F = Fig.withBox({ x0: 66, y0: 212, x1: 386, y1: 32 });
-          const S = F.scale({ x: [0, 11.5], y: [0, 88] });
-          const ln = (f, o) => F.line(S.x(0), S.y(f(0)), S.x(10), S.y(f(10)), o);
-          const parts = [
-            ln((x) => M.total(x), { variant: 'demand' }),
-            F.annot(S.x(9.8), S.y(M.total(9.8)) - 12, '총 비용 = 운송비용 + 노동비용',
-                    { anchor: 'end', size: 11, tone: 'blue' }),
-            ln((x) => M.transport(x), {}),
-            F.annot(S.x(7.6), S.y(M.transport(7.6)) + 16, '운송비용', { anchor: 'end', size: 11 }),
-            ln((x) => M.labor(x), { variant: 'cap' }),
-            F.annot(S.x(2.2), S.y(M.labor(2.2)) - 10, '노동비용', { size: 11 }),
-          ];
-          [[0, M.total(0), 'c', -16, -6], [10, M.total(10), 's', 9, -8],
-           [10, M.transport(10), 'b', 9, -8], [10, M.labor(10), 'a', 9, 15]]
-            .forEach(([x, v, nm, lx, ly]) => parts.push(F.dot(...S.p([x, v]), { label: nm, lx, ly })));
-          [75, 60, 25, 15].forEach((v) => {
-            parts.push(F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(v)} L${S.x(10)},${S.y(v)}"/>`));
-            parts.push(F.annot(F.BOX.x0 - 8, S.y(v) + 4, String(v), { anchor: 'end', size: 11 }));
-          });
-          parts.push(F.raw(`<path class="guide" d="M${S.x(10)},${S.y(0)} L${S.x(10)},${S.y(75)}"/>`));
-          [[0, '0', '10'], [10, '10', '0']].forEach(([x, top, bot]) => {
-            parts.push(F.annot(S.x(x), F.BOX.y0 + 16, top, { anchor: 'middle', size: 11 }));
-            parts.push(F.annot(S.x(x), F.BOX.y0 + 32, bot, { anchor: 'middle', size: 11 }));
-          });
-          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 16, 'x =', { anchor: 'end', size: 10 }));
-          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 32, '10−x =', { anchor: 'end', size: 10 }));
-          parts.push(F.annot(S.x(5), F.BOX.y0 + 48, '위: 중심지로부터 거리 · 아래: 노동자들로부터 거리',
-                             { anchor: 'middle', size: 10 }));
-          F.draw('#f-mono2', { axes: { y: '$' }, parts });
-        })();
-      </script>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 이성원 강의노트의 단일도심 모형 (p.159~168) — 2026-10-07 6강 「05 단일도심 도시 모형」에서 옮겨 왔다 ══ -->
-
-
-<!-- ══ 단일 도심 모형 (이성원 p.159) ══════════════════════════════════
-     원본의 「1920년대 시카고」 지도는 다시 그릴 수 없어 옮기지 않았다. 동심원 모형만 다시 그렸다. -->
-<section class="s-split">
-  <h2>단일 도심 모형</h2>
-  <div class="body">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:12px;white-space:nowrap"><strong>20C 초, 세계 대다수의 모든 도시는 도시 중심지역 인근에 집중됨</strong></p>
-      <ul style="margin:0">
-        <li><strong>제조업</strong> 관련 기업은 도시 중심부에 입지<br>→ 물품의 수입과 수출 시 통행 비용 절감 목표를 위해</li>
-        <li><strong>오피스</strong> 중심의 기업도 중심부에 입지<br>→ 빠른 의사결정과 빠른 정보교환 목적</li>
-      </ul>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-burgess" viewBox="0 0 430 300" style="width:400px" role="img">
-        <title>도심을 중심으로 공장 지대, 전이 지대, 노동자 주거 지대, 주거 지대, 통근자 지대가 차례로 둘러싼 동심원 모형</title></svg>
-      <script>
-        (function () {
-          // 동심원 모형 — 반지름은 안쪽부터 같은 간격
-          const ZONE = [
-            ['I', '도심 (루프)', '#9B3A1E'], ['II', '공장 지대', '#E07A1F'], ['III', '전이 지대', '#F2C14E'],
-            ['IV', '노동자 주거 지대', '#7FAE3E'], ['V', '주거 지대', '#C7E3A6'], ['VI', '통근자 지대', '#FFFFFF'],
-          ];
-          const CX = 130, CY = 150, DR = 20;
-          let s = '';
-          for (let i = ZONE.length - 1; i >= 0; i--)
-            s += `<circle cx="${CX}" cy="${CY}" r="${DR * (i + 1)}" fill="${ZONE[i][2]}" stroke="var(--guide)" stroke-width="1"/>`;
-          ZONE.forEach(([n, name, col], i) => {
-            const y = 70 + i * 30;
-            s += `<rect x="272" y="${y - 11}" width="14" height="14" fill="${col}" stroke="var(--guide)"/>` +
-                 `<text x="294" y="${y}" style="font-size:12px;fill:var(--ink-2)">${n} · ${name}</text>`;
-          });
-          Fig.draw('#f-burgess', { parts: [Fig.raw(s)], check: false });
-        })();
-      </script>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 단일 도심 모형: 단순한 가정 (이성원 p.160) ═══════════════════════ -->
+<!-- ══ 단일 도심 모형: 단순한 가정 (이성원 p.160) ═══════════════════════
+     2026-10-13 교재 p.288~291 의 네 가정(뺀 장 「모형의 네 가정」)을 합쳐 제조업·사무업·노동자로 나눴다. -->
 <section>
   <h2>단일 도심 모형: 단순한 가정</h2>
   <div class="body stack">
     <ul style="margin:0">
-      <li><strong>기업</strong>은 그들의 생산품을 <strong>도시 중심지에 있는 항구 또는 기차 역으로 수송</strong>하기 위한 비용 지불</li>
-      <li>각 <strong>고용자(노동자)</strong>는 <strong>도시 중심지까지 통근·통행에 대한 비용을 지불</strong>해야 함</li>
-      <li>19C의 세계 모든 도시는 대부분 <strong>단일 도심의 도시공간구조 형태</strong>를 띔</li>
+      <li><strong>제조업</strong> — 생산품을 <strong>도시 중심지의 항구 또는 기차역(수출지점)</strong>으로
+        말이 끄는 마차로 수송하는 비용 지불</li>
+      <li><strong>사무업</strong> — 사무 종사자는 <strong>중심에서 기업 사이를 오가며</strong> 정보를 교환함</li>
+      <li><strong>노동자</strong> — 터미널 집중방식 전차로 <strong>도시 중심지까지 통근</strong>하는 비용을 지불해야 함</li>
     </ul>
-    <ul style="margin:18px 0 0">
+    <ul style="margin:28px 0 0">
+      <li>19C의 세계 모든 도시는 대부분 <strong>단일 도심의 도시공간구조 형태</strong>를 띔</li>
       <li>현재 시점 기준으로 <strong>현실성이 크지 않을 수</strong>도 있음</li>
       <li>하지만 도시의 <strong>토지시장이 어떤 방식으로 작동되는지 이해</strong>하는데 도움이 됨</li>
     </ul>
@@ -795,36 +379,157 @@
   </div>
 </section>
 
-<!-- ══ 단일도심도시에서의 토지이용 (이성원 p.165) ════════════════════ -->
-<section>
+<!-- ══ 입찰지대곡선: 요소 대체가 있을 때 (이성원 강의노트 p.162) — 2026-10-14 교수 요청으로 추가 ═══
+     앞 장(p.161)과 짝이다. 영어 병기와 출처는 앞 장처럼 옮기지 않았다.
+     곡선은 모식도 R(d) = 1.5 + 9e^(−0.5d), 점 A 는 d = 4. tQ0 은 A 에서의 접선 기울기라
+     R0 ± tQ0 은 토지 소비를 고정했을 때의 지대이고, 곡선 위의 값과의 차이가 대체의 효과다.
+       R0 = 2.72 · R0 + tQ1 = 3.51 (tQ1 = 0.79) · R0 + tQ0 = 3.33 · R0 − tQ2 = 2.24 · R0 − tQ0 = 2.11 -->
+<section class="s-split">
+  <h2>입찰지대곡선: 요소 대체가 있을 때</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:6px"><strong>점 A:</strong> 중심지로부터 거리 x 일 때 지불하는 지대 R₀</p>
+      <p class="sub t-red" style="margin-bottom:2px">중심지 쪽으로 1마일 움직이면</p>
+      <ul class="dense" style="margin:0 0 8px">
+        <li>토지 소비가 고정되어 있다고 가정할 때 지대: <strong>R₀ + tQ₀</strong></li>
+        <li>지대가 상승하면 토지의 자본 대체가 진행됨 (ex 생산성↑용도 전환)</li>
+        <li>토지가격 상승에 따른 에이커당 생산량이 Q₁까지 높아짐</li>
+        <li>경쟁시장에서 지대는 <strong class="t-red">R₀ + tQ₁</strong>까지 상승</li>
+      </ul>
+      <p class="sub t-red" style="margin-bottom:2px">중심지 반대쪽으로 1마일 움직이면</p>
+      <ul class="dense" style="margin:0">
+        <li>토지 소비가 고정되어 있다고 가정할 때 지대: <strong>R₀ − tQ₀</strong></li>
+        <li>토지의 자본대체 (ex. 가치에 맞는 용도로 전환)</li>
+        <li>토지가격 하락에 따른 에이커당 생산량이 Q₂까지 떨어짐</li>
+        <li>자본 대체에 따른 지대: <strong class="t-red">R₀ − tQ₂</strong></li>
+      </ul>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-bidrent2" viewBox="0 0 430 300" style="width:400px" role="img">
+        <title>점 A 에서 중심지 쪽으로 1마일 가면 지대가 R0 + tQ0 이 아니라 R0 + tQ1 까지, 반대쪽으로 가면 R0 − tQ0 이 아니라 R0 − tQ2 까지만 변해 볼록한 입찰지대곡선이 되는 그림</title></svg>
+      <script>
+        (function () {
+          const F = Fig.withBox({ x0: 96, y0: 246, x1: 410, y1: 30 });
+          const S = F.scale({ x: [2, 7.6], y: [1.8, 4.0] });
+          const R = (d) => 1.5 + 9 * Math.exp(-0.5 * d);
+          const xA = 4, R0 = R(xA), tQ0 = 0.5 * 9 * Math.exp(-0.5 * xA);   // A 에서의 접선 기울기
+          const pts = []; for (let i = 0; i <= 60; i++) { const d = 2.6 + (4.9 * i) / 60; pts.push([d, R(d)]); }
+          const lv = (d, v, label) => [
+            Fig.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(v)} L${S.x(d)},${S.y(v)} L${S.x(d)},${F.BOX.y0}"/>`),
+            F.annot(F.BOX.x0 - 8, S.y(v) + 4, label, { anchor: 'end', size: 11 }),
+          ];
+          F.draw('#f-bidrent2', {
+            axes: { x: '항구까지의 거리', y: '입찰지대' },
+            parts: [
+              ...lv(xA - 1, R(xA - 1), 'R₀ + tQ₁'), ...lv(xA - 1, R0 + tQ0, 'R₀ + tQ₀'),
+              ...lv(xA, R0, 'R₀'),
+              ...lv(xA + 1, R(xA + 1), 'R₀ − tQ₂'), ...lv(xA + 1, R0 - tQ0, 'R₀ − tQ₀'),
+              // A 에서의 접선 — 토지 소비를 고정했을 때의 지대 R₀ ∓ tQ₀ 가 이 직선 위에 놓인다 (2026-10-14 교수 요청)
+              F.line(...S.p([xA - 1.6, R0 + 1.6 * tQ0]), ...S.p([xA + 1.9, R0 - 1.9 * tQ0]), { variant: 'cap' }),
+              F.annot(S.x(xA + 1.9), S.y(R0 - 1.9 * tQ0) + 15, '토지 소비 고정', { anchor: 'end', size: 10, tone: 'muted' }),
+              F.curve(S.curve(pts), { variant: 'supply' }),
+              F.annot(S.x(2.75), S.y(R(2.75)), 'R', { size: 12, tone: 'red' }),
+              F.dot(S.x(xA), S.y(R0), { label: 'A', lx: 8, ly: -8 }),
+              F.annot(S.x(xA - 1), F.BOX.y0 + 15, 'x − 1', { anchor: 'middle', size: 11 }),
+              F.annot(S.x(xA), F.BOX.y0 + 15, 'x', { anchor: 'middle', size: 11 }),
+              F.annot(S.x(xA + 1), F.BOX.y0 + 15, 'x + 1', { anchor: 'middle', size: 11 }),
+            ],
+            check: false,
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 단일도심도시에서의 토지이용 (이성원 p.165 · 교재 그림 14-1, p.292~293) ═══
+     2026-10-13 교수 요청으로 제조업 곡선과 「가장 가파른 곡선」 장(뺌)의 설명을 합쳤다.
+     제조업 곡선 window.MONO_LEE.rm 은 상업·주거 곡선 사이에 오도록 둔 모식도다. -->
+<section class="s-split">
   <h2>단일도심도시에서의 토지이용</h2>
   <div class="body">
-    <p class="lead t-define" style="margin-bottom:4px">토지는 각 위치별 <span class="mark">더 높은 비용을 지불할 수 있는 자</span>에게 할당 됨</p>
-    <svg class="fig" id="f-mono-use" viewBox="0 0 720 270" style="width:620px;margin:0 0 0 110px" role="img">
-      <title>도심에서 가장 가파른 상업 입찰지대, 그 다음 주거, 평평한 농업 입찰지대가 차례로 가장 높아 CBD 경계와 도시지역 경계가 정해지는 그림</title></svg>
-    <script>
-      (function () {
-        const M = window.MONO_LEE;
-        const F = Fig.withBox({ x0: 70, y0: 220, x1: 660, y1: 20 });
-        const S = F.scale({ x: [0, M.XMAX], y: [0, M.YMAX] });
-        const samp = (f, a, b) => { const o = []; for (let i = 0; i <= 80; i++) { const x = a + ((b - a) * i) / 80; o.push([x, f(x)]); } return S.curve(o); };
-        const x1 = M.cross(M.rc, M.r1), x2 = M.cross(M.r1, () => M.ra);
-        F.draw('#f-mono-use', {
-          axes: { x: '도시 중심으로부터의 거리 (x)', y: '지대' },
-          parts: [
-            F.curve(samp(M.rc, 0, 2.6), { variant: 'supply' }),
-            F.curve(samp(M.r1, 0, M.XMAX), { variant: 'demand' }),
-            F.line(...S.p([0, M.ra]), ...S.p([M.XMAX, M.ra]), { variant: 'i1' }),
-            F.annot(S.x(0.35), S.y(M.rc(0.35)) - 6, 'R 상업', { size: 12, tone: 'red' }),
-            F.annot(S.x(2.6), S.y(M.r1(2.6)) - 8, 'R 주거', { size: 12, tone: 'blue' }),
-            F.annot(S.x(M.XMAX) - 4, S.y(M.ra) - 8, 'R 농업', { size: 12, anchor: 'end' }),
-            F.guide(S.x(x1), S.y(M.r1(x1)), { xtick: 'X1 = CBD 경계', only: 'x' }),
-            F.guide(S.x(x2), S.y(M.ra), { xtick: 'X2 = 도시지역 경계', only: 'x' }),
-          ],
-          check: false,
-        });
-      })();
-    </script>
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:14px">토지는 각 위치별 <span class="mark">더 높은 비용을 지불할 수 있는 자</span>에게 할당 됨</p>
+      <p class="emph" style="margin-bottom:8px">지불용의곡선의 기울기는 <strong>운송비용</strong>이 정함</p>
+      <ul style="margin:0">
+        <li><strong>사무업:</strong> 정보교환과 암묵지로 인해 통행의 기회비용이 높아 <strong>제일 가파름</strong></li>
+        <li><strong>제조업:</strong> 말과 마차의 기회비용이 낮아 <strong>상대적으로 완만함</strong></li>
+      </ul>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-mono-use" viewBox="0 0 430 330" style="width:400px" role="img">
+        <title>도심에서 가장 가파른 상업(사무업) 입찰지대, 그 다음 제조업, 주거, 평평한 농업 입찰지대가 차례로 가장 높아 CBD·제조업지구·도시지역 경계가 정해지는 그림</title></svg>
+      <script>
+        (function () {
+          const M = window.MONO_LEE;
+          const F = Fig.withBox({ x0: 52, y0: 262, x1: 410, y1: 24 });
+          const S = F.scale({ x: [0, M.XMAX], y: [0, M.YMAX] });
+          const samp = (f, a, b) => { const o = []; for (let i = 0; i <= 80; i++) { const x = a + ((b - a) * i) / 80; o.push([x, f(x)]); } return S.curve(o); };
+          const x1 = M.cross(M.rc, M.rm), xm = M.cross(M.rm, M.r1), x2 = M.cross(M.r1, () => M.ra);
+          const tick = (x, label, row) => [
+            Fig.raw(`<path class="guide" d="M${S.x(x)},${S.y(0)} L${S.x(x)},${S.y(M.YMAX * 0.92)}"/>`),
+            F.annot(S.x(x), S.y(0) + 15 + row * 14, label, { size: 10.5, anchor: 'middle' }),
+          ];
+          F.draw('#f-mono-use', {
+            axes: { y: '지대' },
+            parts: [
+              F.curve(samp(M.rc, 0, 2.2), { variant: 'supply' }),
+              F.curve(samp(M.rm, 0, 3.4), { variant: 'i2' }),
+              F.curve(samp(M.r1, 0, M.XMAX), { variant: 'demand' }),
+              F.line(...S.p([0, M.ra]), ...S.p([M.XMAX, M.ra]), { variant: 'i1' }),
+              F.annot(S.x(0.12), S.y(M.rc(0.12)) - 4, 'R 상업(사무업)', { size: 11, tone: 'red' }),
+              F.annot(S.x(1.5), S.y(M.rm(1.5)) - 6, 'R 제조업', { size: 11, tone: 'orange' }),
+              F.annot(S.x(2.7), S.y(M.r1(2.7)) - 8, 'R 주거', { size: 11, tone: 'blue' }),
+              F.annot(S.x(M.XMAX) - 4, S.y(M.ra) - 8, 'R 농업', { size: 11, anchor: 'end' }),
+              ...tick(x1, 'X1 CBD', 0), ...tick(xm, 'Xm', 1), ...tick(x2, 'X2 도시 경계', 0),
+              F.annot(S.x(M.XMAX / 2), S.y(0) + 50, '도시 중심으로부터의 거리 (x)', { size: 11, anchor: 'middle' }),
+            ],
+            check: false,
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 이성원 강의노트의 단일도심 모형 (p.159~168) — 2026-10-07 6강 「05 단일도심 도시 모형」에서 옮겨 왔다 ══ -->
+
+
+<!-- ══ 단일 도심 모형 (이성원 p.159) ══════════════════════════════════
+     원본의 「1920년대 시카고」 지도는 다시 그릴 수 없어 옮기지 않았다. 동심원 모형만 다시 그렸다. -->
+<section class="s-split">
+  <h2>단일 도심 모형</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px;white-space:nowrap"><strong>20C 초, 세계 대다수의 모든 도시는 도시 중심지역 인근에 집중됨</strong></p>
+      <ul style="margin:0">
+        <li><strong>제조업</strong> 관련 기업은 도시 중심부에 입지<br>→ 물품의 수입과 수출 시 통행 비용 절감 목표를 위해</li>
+        <li><strong>오피스</strong> 중심의 기업도 중심부에 입지<br>→ 빠른 의사결정과 빠른 정보교환 목적</li>
+      </ul>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-burgess" viewBox="0 0 430 300" style="width:400px" role="img">
+        <title>도심을 중심으로 공장 지대, 전이 지대, 노동자 주거 지대, 주거 지대, 통근자 지대가 차례로 둘러싼 동심원 모형</title></svg>
+      <script>
+        (function () {
+          // 동심원 모형 — 반지름은 안쪽부터 같은 간격
+          const ZONE = [
+            ['I', '도심 (루프)', '#9B3A1E'], ['II', '공장 지대', '#E07A1F'], ['III', '전이 지대', '#F2C14E'],
+            ['IV', '노동자 주거 지대', '#7FAE3E'], ['V', '주거 지대', '#C7E3A6'], ['VI', '통근자 지대', '#FFFFFF'],
+          ];
+          const CX = 130, CY = 150, DR = 20;
+          let s = '';
+          for (let i = ZONE.length - 1; i >= 0; i--)
+            s += `<circle cx="${CX}" cy="${CY}" r="${DR * (i + 1)}" fill="${ZONE[i][2]}" stroke="var(--guide)" stroke-width="1"/>`;
+          ZONE.forEach(([n, name, col], i) => {
+            const y = 70 + i * 30;
+            s += `<rect x="272" y="${y - 11}" width="14" height="14" fill="${col}" stroke="var(--guide)"/>` +
+                 `<text x="294" y="${y}" style="font-size:12px;fill:var(--ink-2)">${n} · ${name}</text>`;
+          });
+          Fig.draw('#f-burgess', { parts: [Fig.raw(s)], check: false });
+        })();
+      </script>
+    </div>
   </div>
 </section>
 
@@ -832,10 +537,7 @@
 <section>
   <h2>단일도심 도시의 예측</h2>
   <div class="body stack">
-    <p class="sub t-red" style="margin-bottom:8px">단일 도심 도시 모형을 통한 예측</p>
-    <ul style="margin:0">
-      <li>지대(임대료), 건물 높이(현금 자본이 토지 자산으로 전환되는 정도), 단위 주택 가격,
-        중심지로부터 거리가 증가할수록 인구밀도 감소 정도 등을 추정할 수 있음</li>
+    <ul class="big" style="margin:0">
       <li><strong>인구가 성장한다면?</strong> 임대료와 밀도 곡선을 상승시키고 도시 경계를 확장시킴</li>
       <li><strong>농업의 지대가 상승한다면?</strong> 도시 경계는 축소하면서 임대료와 밀도 곡선은 상승시킴</li>
       <li>만약 <strong>통행 비용이 감소</strong>한다면 어떤 변화가 생길까?</li>
@@ -848,7 +550,7 @@
   <h2>단일도심 도시 모형: 통행비용 감소와 닫힌도시</h2>
   <div class="body tight">
     <div class="col-l">
-      <svg class="fig" id="f-closed1" viewBox="0 0 430 300" style="width:400px" role="img">
+      <svg class="fig" id="f-closed1" viewBox="0 0 430 380" style="width:380px" role="img">
         <title>통근비용이 줄면 주거 입찰지대곡선의 기울기가 줄어 CBD 경계가 X1 에서 X1* 로, 도시 경계가 X2 에서 X2* 로 넓어지는 그림</title></svg>
       <script>window.MONO_LEE.drawClosed('#f-closed1', false);</script>
     </div>
@@ -859,7 +561,7 @@
         <li>주택 수요는 중심부에 가까울수록 떨어지고 외곽에 위치할수록 증가</li>
         <li>통근비용 감소 시 주택가격에 대한 입찰지대곡선의 <strong>기울기는 감소</strong></li>
       </ul>
-      <p class="derive t-red hang">→ 주택의 지대가 하락하나, 도시 외곽의 넓은 면적 주거에 대한 선호가 더 큼</p>
+      <p class="derive t-red hang">→ 주택의 지대가 하락하나,<br> 도시 외곽의 넓은 면적 주거에 대한 선호가 더 큼</p>
       <p class="caption" style="margin-top:12px"><strong>※ 참고</strong><br>
         열린도시: 도시 외부에 대해 열려 있어 주민의 이주가 자유로운 도시<br>
         닫힌도시: 도시 내외부로의 인구이동이 불가능한 도시</p>
@@ -872,17 +574,17 @@
   <h2>단일도심 도시 모형: 통행비용 감소와 닫힌도시</h2>
   <div class="body tight">
     <div class="col-l">
-      <svg class="fig" id="f-closed2" viewBox="0 0 430 300" style="width:400px" role="img">
+      <svg class="fig" id="f-closed2" viewBox="0 0 430 380" style="width:380px" role="img">
         <title>주거 수요가 도심 근처에서 줄어 상업 입찰지대가 점선으로 내려가고, CBD 와 도시지역이 함께 넓어지는 그림</title></svg>
       <script>window.MONO_LEE.drawClosed('#f-closed2', true);</script>
     </div>
     <div class="col-r">
-      <ul style="margin:0">
+      <ul class="big" style="margin:0 0 6px">
         <li>주택수요 감소에 따라 도심부 인근 상업 가용지 증가 (밀도 감소)</li>
-        <li>상업용지의 지대 하락 (점선)</li>
-        <li>도시지역과 CBD지역 확대 예상 가능</li>
-        <li>도시지역은 <strong>중심성 감소</strong></li>
       </ul>
+      <p class="derive t-red big">→ 상업용지의 지대 하락 (점선)</p>
+      <p class="derive t-red big">→ 도시지역과 CBD지역 확대 예상 가능</p>
+      <p class="derive t-red big">→ 도시지역은 <strong>중심성 감소</strong></p>
     </div>
   </div>
 </section>
@@ -896,12 +598,13 @@
   <p class="section-sub">토지시장 하나를 건드리면 노동시장이 따라 움직인다 · 교재 p.295~302</p>
 </section>
 
-<!-- ══ 그림 14-3 토지시장과 노동시장 (p.295~297) ══════════════ -->
+<!-- ══ 그림 14-3 토지시장과 노동시장 (p.295~297) ══════════════
+     2026-10-13 교수 요청으로 왼쪽 두 지대곡선을 곡선(window.CITY.cc·rr)으로 바꿨다. 교차점 2·6km 는 그대로다. -->
 <section>
-  <h2>토지시장과 노동시장은 같은 숫자로 묶여 있다</h2>
+  <h2>토지시장과 노동시장간의 상호작용</h2>
   <div class="body tight">
-    <p class="emph">작고 개방된 도시를 봄 — 거주민의 효용수준은 <strong>전국에서 정해져 고정</strong>이고
-      도시의 인구가 변함. 당분간 <strong>밀도는 고정</strong>이고 도시는 폭 10km 의 직사각형임</p>
+    <p class="emph" style="margin-bottom:2px">가정: 1) 거주민의 효용은 전국적으로 동일, 2) 도시 인구는 변화가능,</p>
+    <p class="emph" style="margin-bottom:4px;padding-left:2.6em">3) 소비자대체와 요소대체 X → 인구밀도 및 고용밀도 일정, 4) 10km의 고정폭을 갖는 직사각형의 도시</p>
     <svg class="fig" id="f-ge" viewBox="0 0 700 264" style="width:560px;margin:2px 0 0 142px" role="img">
       <title>왼쪽 토지시장의 상업지구 2킬로미터와 주거지구 4킬로미터가 오른쪽 노동시장의 12만명으로 이어지는 그림</title></svg>
     <script>
@@ -910,18 +613,18 @@
         const parts = [];
         // 왼쪽 — 토지시장
         const A = Fig.withBox({ x0: 58, y0: 176, x1: 318, y1: 36 });
-        const SA = A.scale({ x: [0, 8], y: [0, 100] });
+        const SA = A.scale({ x: [0, 8], y: [0, 160] });
         const mk = (f, x1, n = 40) => { const o = []; for (let i = 0; i <= n; i++) { const x = (x1 * i) / n; o.push([x, f(x)]); } return SA.curve(o); };
         // 각 곡선은 농업용 수평선과 만나는 곳까지만 그린다. 더 그리면 축을 뚫고 내려간다
-        const com = mk((x) => C.c0(x), 4.0), res = mk((x) => C.r0(x), 6.4),
+        const com = mk((x) => C.cc(x), 4.9), res = mk((x) => C.rr(x), 6.4),
               agr = SA.curve([[0, C.agri], [8, C.agri]]);
         const a = Fig.cross(com, res), b = Fig.cross(res, agr);
         parts.push(F.raw(`<path class="axis" d="M${A.BOX.x0},${A.BOX.y1 - 8} L${A.BOX.x0},${A.BOX.y0} L${A.BOX.x1 + 10},${A.BOX.y0}"/>`));
-        parts.push(F.annot(A.BOX.x0, A.BOX.y1 - 14, '달러', { anchor: 'middle', size: 11 }));
+        parts.push(F.annot(A.BOX.x0 - 6, A.BOX.y1 - 14, '달러 (지대지불용의)', { size: 11 }));
         parts.push(F.curve(com));
-        parts.push(F.annot(SA.x(0.4), SA.y(74), '상업용지', { size: 10 }));
+        parts.push(F.annot(SA.x(0.25), SA.y(C.cc(0.25)) + 4, '상업용지', { size: 10 }));
         parts.push(F.curve(res, { variant: 'demand' }));
-        parts.push(F.annot(SA.x(3.4), SA.y(C.r0(3.4)) + 15, '주거용지', { size: 10, tone: 'blue' }));
+        parts.push(F.annot(SA.x(3.4), SA.y(C.rr(3.4)) + 15, '주거용지', { size: 10, tone: 'blue' }));
         parts.push(F.curve(agr, { variant: 'cap' }));
         parts.push(F.annot(SA.x(7.0), SA.y(C.agri) - 8, '농업용지', { size: 10 }));
         [[a, 'a', '2'], [b, 'b', '6']].forEach(([P, nm, tick]) => {
@@ -954,44 +657,43 @@
         F.draw('#f-ge', { parts });
       })();
     </script>
-    <p class="derive t-red" style="margin-top:2px">→ 상업지구 20km²와 주거지구 40km²에 밀도를 곱하면
-      노동수요와 노동공급이 <strong>둘 다 120,000명</strong>이 됨</p>
-      <p class="derive t-red" style="margin-top:2px">→ 두 곡선의 기울기는 <strong>잉여의 원칙</strong>에서 나옴 —
-      임금이 오르면 상업용지 지불용의가 줄어 구역이 좁아지고, 주거용지 쪽은 반대로 넓어짐</p>
+    <p class="derive t-red" style="margin:2px 0 0">→ 상업지구의 면적(10km × 2km) × 고용밀도(6,000명/km²) = <strong>120,000명</strong></p>
+    <p class="derive t-red" style="margin:0">→ 주거지구의 면적(10km × 4km) × 주거밀도(3,000명/km²) = <strong>120,000명</strong></p>
+    <p class="derive t-red" style="margin:0">→ 수요와 공급이 일치</p>
   </div>
 </section>
 
-<!-- ══ 그림 14-4 전차의 단기효과 (p.297) ══════════════════════ -->
+<!-- ══ 그림 14-4 전차의 일반균형효과 (p.297) — 2026-10-13 교수 요청으로 다시 짬 ═══
+     14쪽 왼쪽 그림의 곡선(window.CITY.cc·rr)을 그대로 잇는다. 전차 주거곡선 r1c 는
+     a(2km) 까지 초기 곡선과 같고, a 에서 꺾여 완만해져 14km 에서 농업용과 만난다. -->
 <section class="s-split">
-  <h2>전차의 단기효과 — 주거지구가 6km 에서 14km 로</h2>
+  <h2>전차의 일반균형효과</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:10px">전차가 도보를 대체해 <strong>단위통근비용</strong>이 줄어듦</p>
-      <p style="margin-bottom:10px">주택-가격곡선과 주거용 토지 지불용의지대곡선의
-        <strong>기울기가 완만해짐</strong></p>
-      <p style="margin-bottom:12px">주거용 곡선과 농업용 곡선의 교차가 점 b 에서 <strong>점 c</strong> 로 옮겨가
-        주거지역이 음영(△R)만큼 늘어남</p>
-      <p class="derive t-red">→ 주거지역의 확장이 <strong>노동공급을 늘려</strong> 노동의 초과공급이 생김</p>
-      <p class="derive t-red">→ 아직 임금은 움직이지 않았으므로 이것은 <strong>단기</strong>다</p>
+      <p class="lead t-define" style="margin-bottom:14px">전차도입에 따라 <span class="mark">단위통근비용이 감소</span></p>
+      <p class="derive t-red big">→ 주거용 지대지불곡선의 기울기가 완만</p>
+      <p class="derive t-red big">→ 주거지역의 크기 확장(ΔR)</p>
+      <p class="derive t-red big">→ 노동공급확대로 <strong>노동초과공급</strong></p>
     </div>
     <div class="col-r">
-      <svg class="fig" id="f-tram1" viewBox="0 0 430 300" style="width:392px" role="img">
-        <title>전차가 주거용 지불용의지대곡선을 완만하게 만들어 주거지구가 6킬로미터에서 14킬로미터로 늘어나는 그림</title></svg>
+      <svg class="fig" id="f-tram1" viewBox="0 0 430 384" style="width:392px" role="img">
+        <title>전차 주거곡선이 a 점까지 초기 곡선과 같고 a 에서 완만해져 주거지구가 6킬로미터에서 14킬로미터로 늘어나는 그림</title></svg>
       <script>
         (function () {
-          const C = window.CITY, F = Fig.withBox({ x0: 62, y0: 214, x1: 392, y1: 34 });
-          const S = F.scale({ x: [0, 16], y: [0, 100] });
-          const mk = (f, x1 = 16) => { const o = []; for (let i = 0; i <= 40; i++) { const x = (x1 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
-          const com = mk((x) => C.c0(x), 4.2), r0 = mk((x) => C.r0(x), 6.6),
-                r1 = mk((x) => C.r1(x)), agr = S.curve([[0, C.agri], [16, C.agri]]);
+          const C = window.CITY, F = Fig.withBox({ x0: 62, y0: 296, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 160] });
+          const mk = (f, x0, x1, n = 60) => { const o = []; for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n; o.push([x, f(x)]); } return S.curve(o); };
+          const com = mk(C.cc, 0, 4.9), r0 = mk(C.rr, 0, 6.4), r1 = mk(C.r1c, 0, 16),
+                agr = S.curve([[0, C.agri], [16, C.agri]]);
           const a = Fig.cross(com, r0), b = Fig.cross(r0, agr), c = Fig.cross(r1, agr);
           const parts = [
             F.raw(`<rect x="${b[0]}" y="${S.y(C.agri)}" width="${c[0] - b[0]}" ` +
                   `height="${F.BOX.y0 - S.y(C.agri)}" fill="var(--brand-crimson)" opacity="0.12"/>`),
-            F.curve(com), F.annot(S.x(0.4), S.y(74), '상업: 초기', { size: 10 }),
-            F.curve(r0, { variant: 'cap' }), F.annot(S.x(4.4), S.y(C.r0(4.4)) - 9, '주거: 초기', { size: 10 }),
+            F.curve(com), F.annot(S.x(0.3), S.y(C.cc(0.3)) + 4, '상업: 초기', { size: 10 }),
             F.curve(r1, { variant: 'demand' }),
-            F.annot(S.x(12.6), S.y(C.r1(12.6)) - 10, '주거: 전차', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.curve(mk(C.rr, 2, 6.4), { variant: 'cap' }),
+            F.annot(S.x(4.2), S.y(C.rr(4.2)) - 8, '주거: 초기', { size: 10 }),
+            F.annot(S.x(9.5), S.y(C.r1c(9.5)) - 10, '주거: 전차', { size: 10, tone: 'blue' }),
             F.curve(agr, { variant: 'cap' }),
           ];
           [[a, 'a', '2'], [b, 'b', '6'], [c, 'c', '14']].forEach(([P, nm, tick]) => {
@@ -1005,546 +707,436 @@
               parts.push(F.raw(`<rect x="${xa}" y="${bt}" width="${xb - xa}" height="${bh}" fill="var(--brand-crimson)" opacity="${op}"/>`));
               parts.push(F.annot((xa + xb) / 2, bt + 14, t, { anchor: 'middle', size: 11 }));
             });
-          parts.push(F.annot(S.x(8), F.BOX.y0 + 68, '중심지로부터의 거리(킬로미터)',
-                             { anchor: 'middle', size: 11 }));
-          F.draw('#f-tram1', { axes: { y: '$' }, parts });
+          parts.push(F.annot(S.x(8), F.BOX.y0 + 68, '중심지로부터의 거리(킬로미터)', { anchor: 'middle', size: 11 }));
+          F.draw('#f-tram1', { axes: { y: '$ (지대지불용의)' }, parts });
         })();
       </script>
     </div>
   </div>
 </section>
 
-<!-- ══ 그림 14-5 전차의 균형효과 (p.298) ══════════════════════ -->
+<!-- ══ 그림 14-5 전차의 균형효과 (p.298) — 2026-10-13 15쪽 곡선에서 이동을 그림 ═══
+     임금 하락분은 단위 토지당 같은 금액이므로(밀도 고정) 두 곡선은 위아래로 평행하게 움직인다.
+     교재 직선판의 90−20x → 122−20x · 66−4x → 58−4x 와 같은 방식이다. 균형점 d·e 는 4·12km. -->
 <section class="s-split">
   <h2>전차의 균형효과 — 두 구역이 모두 커진다</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:10px">노동의 초과공급이 <strong>도시임금을 낮춤</strong>.
-        그러면 두 곡선이 동시에 움직임</p>
-      <p style="margin-bottom:8px">임금이 내리면 생산비용이 줄고 기업 간 경쟁이 상업용지 가격을 올림 —
-        <strong>상업용 곡선이 위로</strong></p>
-      <p style="margin-bottom:12px">임금이 내리면 주택가격과 주거용 지불용의가 내림 —
-        <strong>주거용 곡선이 아래로</strong></p>
+      <p class="lead t-define" style="margin-bottom:14px">노동초과공급 → <span class="mark">도시임금의 하락</span></p>
+      <p class="derive t-red big" style="margin-bottom:14px">→ 상업곡선의 우측 이동(상승)<br>+ 주거곡선의 좌측 이동(하락)</p>
       <p class="derive t-red">→ 일반균형은 점 <strong>d(4km)</strong> 와 <strong>e(12km)</strong> 에서 회복됨.
         상업지구도 주거지구도 커졌음</p>
-      <p class="derive t-red">→ 전차의 <strong>직접효과</strong>는 토지시장에,
-        <strong>간접효과</strong>는 노동시장에 나타남. 그 간접효과가 다시 토지시장을 움직임</p>
+      <p class="derive t-red">→ 전차의 <strong>직접효과</strong>는 토지시장에,<br>
+        <strong>간접효과</strong>는 노동시장에 나타나 토지시장을 움직임</p>
     </div>
     <div class="col-r">
-      <svg class="fig" id="f-tram2" viewBox="0 0 430 300" style="width:392px" role="img">
-        <title>임금이 내려 상업용 곡선이 올라가고 주거용 곡선이 내려와 상업지구 4킬로미터 주거지구 12킬로미터에서 균형이 회복되는 그림</title></svg>
+      <svg class="fig" id="f-tram2" viewBox="0 0 430 384" style="width:392px" role="img">
+        <title>임금이 내려 상업용 곡선이 위로, 전차 주거곡선이 아래로 이동해 상업지구 4킬로미터 주거지구 12킬로미터에서 균형이 회복되는 그림</title></svg>
       <script>
         (function () {
-          const C = window.CITY, F = Fig.withBox({ x0: 62, y0: 214, x1: 392, y1: 34 });
-          const S = F.scale({ x: [0, 16], y: [0, 135] });
-          const mk = (f, x1 = 16) => { const o = []; for (let i = 0; i <= 40; i++) { const x = (x1 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
-          const com = mk((x) => C.c2(x), 5.4), res = mk((x) => C.r2(x)),
+          const C = window.CITY, F = Fig.withBox({ x0: 62, y0: 296, x1: 392, y1: 30 });
+          const S = F.scale({ x: [0, 16], y: [0, 180] });
+          const mk = (f, x0, x1, n = 60) => { const o = []; for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n; o.push([x, f(x)]); } return S.curve(o); };
+          const com0 = mk(C.cc, 0, 4.9), res0 = mk(C.r1c, 0, 16),
+                com = mk(C.cc2c, 0, 6), res = mk(C.rr2c, 0, 16),
                 agr = S.curve([[0, C.agri], [16, C.agri]]);
           const d = Fig.cross(com, res), e = Fig.cross(res, agr);
+          const ar = (x, f0, f1) => F.arrow(S.x(x), S.y(f0(x)), S.x(x), S.y(f1(x)), {});
           const parts = [
-            F.curve(com),
-            F.annot(S.x(0.4), S.y(112), '보다 낮은 임금하의 상업용지', { size: 10 }),
-            F.curve(res, { variant: 'demand' }),
-            F.annot(S.x(3.0), S.y(C.r2(3.0)) - 10, '보다 낮은 임금하의 주거용지', { size: 10, tone: 'blue' }),
-            F.curve(agr, { variant: 'cap' }),
+            F.curve(com0, { variant: 'cap', dash: '4 3' }), F.curve(res0, { variant: 'cap', dash: '4 3' }),
+            F.curve(com), F.curve(res, { variant: 'demand' }), F.curve(agr, { variant: 'cap' }),
+            ar(0.9, C.cc, C.cc2c),
+            F.annot(S.x(1.1), S.y(C.cc2c(1.1)) - 4, '상업: 상승', { size: 10 }),
+            F.annot(S.x(8.6), S.y(C.r1c(8.6)) - 10, '주거: 하락', { size: 10, tone: 'blue' }),
+            F.annot(S.x(15.8), S.y(C.r1c(15.8)) - 22, '점선: 15쪽 곡선', { size: 9.5, anchor: 'end' }),
           ];
+          // 경계의 이동 — a(2) → d(4) 우측, c(14) → e(12) 좌측. 가로축 바로 위에 화살표로
+          const ya = F.BOX.y0 + 30;
+          [[2, 4, '우측 이동', 'start', 6], [14, 12, '좌측 이동', 'end', -6]].forEach(([x0, x1, t, an, dx]) => {
+            parts.push(F.raw(`<circle cx="${S.x(x0)}" cy="${ya}" r="3" fill="#FFF" stroke="var(--muted)" stroke-width="1.4"/>`));
+            parts.push(F.arrow(S.x(x0), ya, S.x(x1), ya, { tone: 'red' }));
+            parts.push(F.annot(S.x(x1) + dx, ya + 4, t, { size: 9.5, anchor: an, tone: 'red' }));
+          });
           [[d, 'd', '4'], [e, 'e', '12']].forEach(([P, nm, tick]) => {
             parts.push(F.raw(`<path class="guide" d="M${P[0]},${P[1]} L${P[0]},${F.BOX.y0}"/>`));
             parts.push(F.annot(P[0], F.BOX.y0 + 15, tick, { anchor: 'middle', size: 11 }));
             parts.push(F.dot(P[0], P[1], { label: nm, lx: 8, ly: -8 }));
           });
-          const bt = F.BOX.y0 + 26, bh = 20;
+          const bt = F.BOX.y0 + 44, bh = 18;
           [['B', F.BOX.x0, d[0], 0.12], ['R', d[0], e[0], 0.3]].forEach(([t, xa, xb, op]) => {
             parts.push(F.raw(`<rect x="${xa}" y="${bt}" width="${xb - xa}" height="${bh}" fill="var(--brand-crimson)" opacity="${op}"/>`));
-            parts.push(F.annot((xa + xb) / 2, bt + 14, t, { anchor: 'middle', size: 11 }));
+            parts.push(F.annot((xa + xb) / 2, bt + 13, t, { anchor: 'middle', size: 11 }));
           });
-          F.draw('#f-tram2', { axes: { x: '중심지로부터의 거리(킬로미터)', y: '$' }, parts });
+          parts.push(F.annot(S.x(8), F.BOX.y0 + 82, '중심지로부터의 거리(킬로미터)', { anchor: 'middle', size: 11 }));
+          F.draw('#f-tram2', { axes: { y: '$ (지대지불용의)' }, parts });
         })();
       </script>
     </div>
   </div>
 </section>
 
-<!-- ══ 그림 14-6 토지임대료 · 밀도 (p.299~300) ════════════════ -->
-<section>
-  <h2>전차가 땅값을 올린 곳과 내린 곳</h2>
-  <div class="body tight">
-    <p class="emph">도시가 커지면 토지임대료는 대체로 오름. 그런데 전차는
-      <strong>일부 지역의 임대료를 떨어뜨림</strong></p>
-    <div class="cols" style="margin-top:6px">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">중심지 ~ x₁ — 오름</p>
-        <p style="margin-bottom:10px">전차가 임금을 낮추고, 생산에서 아낀 비용이 <strong>지주에게</strong> 돌아감</p>
-        <p class="sub t-red" style="margin-bottom:2px">x₂ ~ 변두리 x₃ — 오름</p>
-        <p style="margin-bottom:10px">먼 입지의 접근성이 크게 좋아져
-          <strong>통근비용 절약이 임금 하락을 압도</strong>함</p>
-        <p class="sub t-red" style="margin-bottom:2px">x₁ ~ x₂ 중간 — 내림</p>
-        <p>통근거리가 짧아 접근성 개선이 작음.
-          거주민에게는 <strong>임금 하락이 통근비용 절약을 압도</strong>함</p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">밀도 가정을 풀면</p>
-        <p style="margin-bottom:8px">이제까지 고용밀도와 주거밀도를 <strong>고정</strong>으로 뒀음.
-          수치 예를 단순하게 하지만 현실적이지 않음</p>
-        <p><strong>상업구역</strong> — 전차가 토지임대료를 올리므로 생산요소 대체가 일어나
-          <strong>고용밀도가 높아짐</strong>. 기업이 작은 부지에 높은 건물로 올라감</p>
-        <p style="margin-bottom:8px"><strong>주거구역</strong> — 주택가격과 토지임대료가 내린 곳에서는
-          더 많은 주택·토지를 써 <strong>밀도가 낮아지고</strong>, 오른 곳에서는 아껴 써 높아짐</p>
-        <p class="derive t-red">→ 집적의 경제를 넣으면 상업용 곡선이 위로,
-          노동수요가 오른쪽으로 이동해 <strong>임금이 올라가고 두 구역이 다 커짐</strong></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 그림 14-7 해수면 상승 (p.300~302) ══════════════════════ -->
+<!-- ══ 그림 14-6 전차의 토지임대료에 대한 효과 (p.299~300) — 2026-10-13 그림을 넣음 ═══
+     교재 그림은 숫자 없는 모식도다. window.RENT14 에서 원래(가늘고 연함)·새(굵고 진함) 곡선을 그린다. -->
 <section class="s-split">
-  <h2>해수면이 오르면 무슨 일이 생기는가</h2>
+  <h2>전차의 균형효과</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:10px">기후변화로 <strong>도시 생산지역의 일부가 범람</strong>함.
-        음영 직사각형이 잠긴 구역임</p>
-      <p style="margin-bottom:10px">직접효과는 원래 임금에서 <strong>노동수요가 줄어</strong>
-        노동의 초과공급이 생기는 것임</p>
-      <p style="margin-bottom:12px">초과공급이 임금을 낮추고, 잉여의 원칙에 따라
-        상업용 곡선은 <strong>위로</strong> 주거용 곡선은 <strong>아래로</strong> 이동함</p>
-      <p class="derive t-red">→ 새 균형은 점 c 와 d. 두 구역의 변화가 합해져
-        <strong>균형노동력은 순감소</strong>함</p>
-      <p class="derive t-red">→ 상업지역 임대료는 단순 수급분석대로 <strong>오름</strong>.
-        주거지역은 단순 수급으로 풀리지 않음 — 노동시장을 넣어야
-        <strong>임금 하락이 주거용 토지가격을 낮춘다</strong>는 것이 보임</p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-flood" viewBox="0 0 430 298" style="width:392px" role="img">
-        <title>범람 전후의 지불용의지대곡선을 위아래로 비교해 상업지구와 주거지구가 모두 줄어드는 그림</title></svg>
+      <svg class="fig" id="f-rent14" viewBox="0 0 430 320" style="width:400px" role="img">
+        <title>원래의 지불용의지대곡선은 가늘고 연하게, 전차 뒤의 곡선은 굵게 겹쳐 그려 중심지에서 x1 까지와 x2 에서 x3 까지는 임대료가 오르고 x1 과 x2 사이는 내리는 그림</title></svg>
       <script>
         (function () {
-          const C = window.CITY, F = Fig;
-          const parts = [];
-          // 범람 뒤 상업용은 위로, 주거용은 아래로 간다. 이동폭이 크면
-          // 상업×주거 교차(x₂)가 주거×농업 교차(x₃)를 넘어 주거지구 폭이 음수가 된다.
-          // 교재는 x̲ < x₂ < x₃ 이므로 그 순서가 지켜지는 폭을 쓴다.
-          //   상업 +8 · 주거 −3 → x₂ = 3.1 · x₃ = 5.7  (범람 전 x₁ = 2 · x₄ = 6)
-          const panel = (box, up, dn, names, ticks) => {
-            const P = Fig.withBox(box);
-            const S = P.scale({ x: [0, 8.6], y: [0, 120] });
-            const mk = (f, x1) => { const o = []; for (let i = 0; i <= 36; i++) { const x = (x1 * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
-            const com = mk((x) => C.c0(x) + up, (90 + up - C.agri) / 20),
-                  res = mk((x) => C.r0(x) - dn, (70 - dn - C.agri) / 10 + 0.4),
-                  agr = S.curve([[0, C.agri], [8.6, C.agri]]);
-            const p1 = Fig.cross(com, res), p2 = Fig.cross(res, agr);
-            parts.push(F.raw(`<path class="axis" d="M${P.BOX.x0},${P.BOX.y1 - 7} L${P.BOX.x0},${P.BOX.y0} L${P.BOX.x1 + 8},${P.BOX.y0}"/>`));
-            parts.push(F.annot(P.BOX.x0, P.BOX.y1 - 12, '$', { anchor: 'middle', size: 10 }));
-            // 범람 구역 x̲
-            parts.push(F.raw(`<rect x="${P.BOX.x0}" y="${P.BOX.y1}" width="${S.x(0.8) - P.BOX.x0}" ` +
-                             `height="${P.BOX.y0 - P.BOX.y1}" fill="var(--accent-blue)" opacity="0.18"/>`));
-            parts.push(F.annot(S.x(0.8), P.BOX.y0 + 14, 'x̲', { anchor: 'middle', size: 10 }));
-            parts.push(F.curve(com));
-            parts.push(F.curve(res, { variant: 'demand' }));
-            parts.push(F.curve(agr, { variant: 'cap' }));
-            [[p1, names[0], ticks[0]], [p2, names[1], ticks[1]]].forEach(([Q, nm, tk]) => {
-              parts.push(F.raw(`<path class="guide" d="M${Q[0]},${Q[1]} L${Q[0]},${P.BOX.y0}"/>`));
-              parts.push(F.annot(Q[0], P.BOX.y0 + 14, tk, { anchor: 'middle', size: 10 }));
-              parts.push(F.dot(Q[0], Q[1], { label: nm, lx: 7, ly: -7 }));
-            });
-            return S;
-          };
-          panel({ x0: 62, y0: 128, x1: 392, y1: 34 }, 0, 0, ['a', 'b'], ['x₁', 'x₄']);
-          parts.push(F.annot(66, 26, '범람 이전', { size: 10 }));
-          panel({ x0: 62, y0: 272, x1: 392, y1: 178 }, 8, 3, ['c', 'd'], ['x₂', 'x₃']);
-          parts.push(F.annot(66, 170, '범람 이후 — 상업용은 위로, 주거용은 아래로', { size: 10 }));
-          F.draw('#f-flood', { parts });
+          const R = window.RENT14, F = Fig.withBox({ x0: 50, y0: 232, x1: 410, y1: 26 });
+          const S = F.scale({ x: [0, 10], y: [0, 84] });
+          const mk = (f, x0, x1, n = 60) => { const o = []; for (let i = 0; i <= n; i++) { const x = x0 + ((x1 - x0) * i) / n; o.push([x, f(x)]); } return S.curve(o); };
+                    const x1 = R.cross(R.nc, R.nr), x2 = R.cross(R.nr, R.or), x3 = R.cross(R.nr, () => R.agri);
+          // 교재처럼 원래 곡선은 가늘고 연하게, 새 곡선은 굵게 — curve() 에 굵기 옵션이 없어 style 을 붙인다
+          const sw = (svg, w, op = 1) => svg.replace('<path ', `<path style="stroke-width:${w};opacity:${op}" `);
+          const parts = [
+            sw(F.curve(mk(R.oc, 0, 3.4)), 1.2, 0.45), sw(F.curve(mk(R.or, 0, 7.2), { variant: 'demand' }), 1.2, 0.45),
+            sw(F.curve(mk(R.nc, 0, 3.6)), 3.2), sw(F.curve(mk(R.nr, 0, 10), { variant: 'demand' }), 3.2),
+            F.line(...S.p([0, R.agri]), ...S.p([10, R.agri]), { variant: 'i1' }),
+            F.annot(S.x(0.5), S.y(R.nc(0.5)) + 2, '상업용', { size: 10.5 }),
+            F.annot(S.x(6.6), S.y(R.nr(6.6)) - 8, '주거용', { size: 10.5, tone: 'blue' }),
+            F.annot(S.x(10) - 2, S.y(R.agri) - 7, '농업용', { size: 10.5, anchor: 'end' }),
+            F.dot(S.x(x1), S.y(R.nr(x1)), {}), F.dot(S.x(x2), S.y(R.nr(x2)), {}),
+          ];
+          [[x1, 'x₁'], [x2, 'x₂'], [x3, 'x₃']].forEach(([x, t]) => {
+            parts.push(Fig.raw(`<path class="guide" d="M${S.x(x)},${S.y(0)} L${S.x(x)},${S.y(Math.max(R.nr(x), R.agri))}"/>`));
+            parts.push(F.annot(S.x(x), S.y(0) + 15, t, { size: 11, anchor: 'middle' }));
+          });
+          // 구간별 증감 띠
+          const bt = S.y(0) + 24;
+          [[0, x1, '오름', 0.30], [x1, x2, '내림', 0.08], [x2, x3, '오름', 0.30]].forEach(([a, b, t, op]) => {
+            parts.push(Fig.raw(`<rect x="${S.x(a)}" y="${bt}" width="${S.x(b) - S.x(a)}" height="20" fill="var(--brand-crimson)" opacity="${op}"/>`));
+            parts.push(F.annot((S.x(a) + S.x(b)) / 2, bt + 14, t, { size: 10.5, anchor: 'middle' }));
+          });
+          parts.push(F.annot(S.x(5), bt + 44, '중심지로부터의 거리 · 가는 선: 원래 · 굵은 선: 전차 뒤', { size: 10.5, anchor: 'middle' }));
+          F.draw('#f-rent14', { axes: { y: '$' }, parts, check: false });
         })();
       </script>
+    </div>
+    <div class="col-r">
+      <p class="sub t-red" style="margin-bottom:8px">구간별 토지임대료의 변화</p>
+      <p class="sub t-red" style="margin-bottom:2px">중심지 ~ x₁ — 오름</p>
+      <p style="margin-bottom:10px">전차가 임금을 낮추고, 생산에서 아낀 비용이 <strong>지주에게</strong> 돌아감</p>
+      <p class="sub t-red" style="margin-bottom:2px">x₂ ~ 변두리 x₃ — 오름</p>
+      <p style="margin-bottom:10px">먼 입지의 접근성이 크게 좋아져
+        <strong>통근비용 절약이 임금 하락을 압도</strong>함</p>
+      <p class="sub t-red" style="margin-bottom:2px">x₁ ~ x₂ 중간 — 내림</p>
+      <p>통근거리가 짧아 접근성 개선이 작음.
+        거주민에게는 <strong>임금 하락이 통근비용 절약을 압도</strong>함</p>
     </div>
   </div>
 </section>
 
-<!-- ══ 섹션 — CHAPTER 15 ═════════════════════════════════════ -->
-<section class="s-section">
-  <div class="section-rule"></div>
-  <p class="section-label">CHAPTER 15 이웃</p>
-  <p class="section-sub">14장이 도시 전체를 봤다면 이 장은 이웃 하나를 들여다본다 · 교재 p.309~328</p>
+<!-- ══ 가정의 완화 (p.298~300) — 2026-10-13 「전차가 땅값을 올린 곳과 내린 곳」 오른쪽을 따로 뺌 ═══ -->
+<section>
+  <h2>가정의 완화</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:8px">1) 요소 및 소비자대체가 존재할 때</p>
+    <p class="big" style="margin-bottom:4px"><strong>상업구역</strong> — 전차가 토지임대료를 올리므로 생산요소 대체가 일어나
+      <strong>고용밀도가 높아짐</strong>. 기업이 작은 부지에 높은 건물로 올라감</p>
+    <p class="big" style="margin-bottom:28px"><strong>주거구역</strong> — 주택가격과 토지임대료가 내린 곳에서는
+      더 많은 주택·토지를 써 <strong>밀도가 낮아지고</strong>, 오른 곳에서는 아껴 써 높아짐</p>
+    <p class="lead t-define" style="margin-bottom:8px">2) 집적경제가 존재할 때</p>
+    <p class="derive t-red big">→ 상업용 곡선이 위로, 노동수요가 오른쪽으로 이동해
+      <strong>임금이 올라가고 두 구역이 다 커짐</strong></p>
+  </div>
 </section>
 
-<!-- ══ 발문 (p.309) ══════════════════════════════════════════ -->
+<!-- ══ 섹션 — CHAPTER 13 ═════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 13 고용과 주거의 공간적 분포</p>
+  <p class="section-sub">12장까지가 가격이 어떻게 정해지는가였다면 이 장은 그래서 어디에 있는가다 · 교재 p.273~287</p>
+</section>
+
+<!-- ══ 발문 (p.273) ══════════════════════════════════════════ -->
 <section class="s-question">
   <div class="body stack">
     <p class="epigraph emph" style="margin-bottom:34px">
-      “너 자신과 같이 이웃을 사랑하라, 그러나 너의 이웃을 선택하라.”
-      <span class="who">— 루이스 빌</span></p>
-    <p class="emph" style="margin-bottom:16px">이웃을 고를 때 가구는 <strong>사회적 상호교류의 상대</strong>를 고르는 동시에,
-      지역공공재와 지방세의 수준을 함께 정할 <strong>시민의 조합</strong>을 고름</p>
-    <p class="lead t-define" style="margin-bottom:16px">핵심 질문은 이웃이 소득·교육·인종에서
-      <span class="mark">동질적일 것인가 이질적일 것인가</span>임</p>
-    <p class="derive t-red">→ <strong>동류의 이웃에 대한 뚜렷한 선호가 없어도</strong>
-      상대적으로 동질적인 이웃을 만드는 강력한 힘이 존재함</p>
+      “그 저주 받을 자동차는 잊고 사랑하는 사람들과 친구들을 위해 도시들을 지어라.”
+      <span class="who">— 루이스 멈포드</span></p>
+    <p class="lead t-define">이제까지는 <span class="mark">가격이 어떻게 정해지는지</span>를 봤음</p>
+      <p class="lead t-define" style="margin-bottom:16px">이 장에서는 그 결과로
+        <span class="mark">일자리와 사람이 실제로 어디에 있는지</span>를 봄</p>
+    <p class="emph"><strong>중심 도시</strong>는 대도시지역의 주된 자치시임 —
+      예를 들어 시카고나 샌프란시스코의 정치적 도시</p>
+      <p class="emph">나머지 자치시들이 그 대도시지역의 <strong>교외</strong>를 이룸</p>
   </div>
 </section>
 
 <!-- ══ 섹션 — 01 ═════════════════════════════════════════════ -->
 <section class="s-section">
   <div class="section-rule"></div>
-  <p class="section-label">01 차별: 소득, 교육, 인종</p>
-  <p class="section-sub">먼저 사실부터 — 미국 도시는 얼마나 갈라져 있는가 · 교재 p.309~315</p>
+  <p class="section-label">01 고용과 주거의 공간적 분포</p>
+  <p class="section-sub">일자리와 사람이 어디에 있는지 재는 세 가지 방법 · 교재 p.273~279</p>
 </section>
 
-<!-- ══ 비유사성 지수 (p.309~312) ══════════════════════════════ -->
+<!-- ══ 그림 13-1 · 표 13-1 · 표 13-3 을 한 장으로 (2026-10-13 교수 요청) ═══
+     한 문장으로 변화를 말하고 그림 셋으로 받친다. 값은 모두 window.DIST13 에 있다.
+     원래의 세 장은 보관/07-삭제슬라이드.html 에 있다. -->
 <section>
-  <h2>비유사성 지수 <span class="en">(dissimilarity index)</span></h2>
+  <h2>미국 도시의 일자리와 사람은 교외로 옮겨 갔다</h2>
   <div class="body tight">
-    <p class="lead t-define" style="margin-bottom:6px">이웃들이 <span class="mark">같으면 0</span>,
-      <span class="mark">완전히 갈라지면 100</span>. 개별 이웃이 도시 전체와 같은 혼합을 가지면 0 임</p>
-    <p class="formula-key" style="margin-bottom:4px">
-      $D = 100 \cdot \tfrac{1}{2} \sum_{i=1}^{N} \left| \dfrac{a_i}{A} - \dfrac{b_i}{B} \right|$</p>
-    <p class="caption" style="margin-bottom:10px">$a_i$·$b_i$ 는 이웃 i 의 두 유형 인구, A·B 는 도시 전체 인구.
-      이 값은 <strong>모든 이웃이 같은 혼합을 갖게 하려면 몇 %가 이주해야 하는가</strong>를 뜻한다</p>
-    <div class="cols">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">소득 — 낮은-소득 가구 (2010)</p>
-        <table class="tbl-dens">
-          <thead><tr><th></th><th>거대 대도시<br>(100만 초과)</th><th>모든 대도시</th></tr></thead>
-          <tbody><tr><td>최소</td><td>27</td><td>17</td></tr>
-                 <tr><td>최대</td><td>47</td><td>49</td></tr></tbody>
-        </table>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">교육성취 (2010)</p>
-        <table class="tbl-dens">
-          <thead><tr><th></th><th>거대 대도시</th><th>모든 대도시</th></tr></thead>
-          <tbody>
-            <tr><td>고교 중퇴자 최소~최대</td><td>24 ~ 45</td><td>10 ~ 50</td></tr>
-            <tr><td>대학 졸업자 최소~최대</td><td>28 ~ 43</td><td>14 ~ 44</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <p class="caption" style="margin-top:4px">낮은-소득 가구 = 소득이 국가 빈곤수준(4인 가구 연 약 23,000달러) 아래.
-      이웃 = 인구조사구역. 출처: Florida and Mellander, <em>Segregated City</em>, 2015 (교재 표 15−1·15−3)</p>
-    <p class="derive t-red" style="margin-top:8px">→ 소득 사다리의 <strong>양 끝이 모두</strong> 뭉쳐 있음.
-      낮은-소득 가구가 다수인 이웃에 사는 낮은-소득 가구는 1980년 <strong>23%</strong>에서
-      2010년 <strong>28%</strong>로, 높은-소득 쪽은 <strong>9% → 18%</strong>로 두 배가 됐음</p>
+    <p class="lead t-define" style="margin-bottom:10px">일자리와 주거가 <span class="mark">교외로</span> 옮겨 갔지만,
+      일자리는 사람보다 중심에 가깝게 남았음</p>
+    <svg class="fig" id="f-shift13" viewBox="0 0 848 292" style="width:848px;display:block;margin:0" role="img">
+      <title>왼쪽은 교외 안 통근이 0.34에서 0.62로 늘어난 막대그래프, 가운데는 다섯 도시 모두 중위 근무지가 중위 거주지보다 중심에 가까운 그림, 오른쪽은 고용중심지에 있는 일자리 비중이 보스턴 61%에서 애틀란타 24%까지 다른 그림</title></svg>
+    <p class="caption" style="margin-top:2px">출처: Baum-Snow (2010), <em>American Economic Review</em> 100 (교재 그림 13−1, p.274) ·
+      LEHD 자료 (교재 표 13−1, p.275) · 교재 표 13−3 (p.277)</p>
   </div>
+  <script>
+    (function () {
+      const D = window.DIST13;
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', SKY = 'var(--chart-sky)', INK = 'var(--ink)',
+            INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const W = 274, X = [0, 287, 574];
+      const panel = (i, q, sub) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="288" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += t(x + 12, 22, q, 13.5, RED, { w: 700 });
+        s += t(x + 12, 39, sub, 10.5, MUTED);
+      };
+
+      // ── ① 통근 유형 1960 → 2000 (그림 13-1) ──────────────
+      panel(0, '통근은 교외 안에서 일어나게 됨', '대도시지역 노동력의 비중, 152개 대도시지역');
+      {
+        const x = X[0], x0 = x + 18, x1 = x + W - 10, y0 = 222, hmax = 150;
+        const sy = (v) => y0 - (v / 0.7) * hmax, gw = (x1 - x0) / D.commute.length, bw = 22;
+        s += `<path class="axis" d="M${x0},${y0} L${x1},${y0}"/>`;
+        D.commute.forEach((g, i) => {
+          const cx = x0 + gw * (i + 0.5);
+          [['y1960', -bw, BLUE], ['y2000', 1, SKY]].forEach(([k, dx, c]) => {
+            const v = g[k], bx = cx + dx;
+            s += `<rect x="${bx}" y="${sy(v)}" width="${bw - 1}" height="${y0 - sy(v)}" fill="${c}"/>`;
+            s += t(bx + (bw - 1) / 2, sy(v) - 4, v.toFixed(2), 9.5, INK2, { a: 'middle' });
+          });
+          s += t(cx, y0 + 14, g.home.replace(' ', ''), 9.5, INK2, { a: 'middle' });
+          s += t(cx, y0 + 27, '→ ' + g.work.replace(' ', ''), 9.5, INK2, { a: 'middle' });
+        });
+        [['1960', BLUE, 0], ['2000', SKY, 56]].forEach(([k, c, dx]) => {
+          s += `<rect x="${x + 150 + dx}" y="52" width="10" height="10" fill="${c}"/>` + t(x + 164 + dx, 61, k, 10, INK2);
+        });
+        s += t(x + 12, 276, '중심 도시의 일자리 비중 0.61 → 0.30', 11, RED, { w: 700 });
+      }
+
+      // ── ② 중위 근무지 · 중위 거주지 (표 13-1) ─────────────
+      panel(1, '일자리가 사람보다 중심에 가까움', '도심에서의 거리(km), 가장 큰 25개 대도시 중 다섯');
+      {
+        const x = X[1], lx = x + 74, rx = x + W - 18, sx = (km) => lx + (km / 40) * (rx - lx);
+        [0, 10, 20, 30, 40].forEach((km) => {
+          s += `<path class="guide" d="M${sx(km)},60 L${sx(km)},236"/>` + t(sx(km), 250, String(km), 9.5, MUTED, { a: 'middle' });
+        });
+        D.median.forEach((c, i) => {
+          const y = 76 + i * 34;
+          s += t(lx - 8, y + 4, c.city, 11, INK, { a: 'end' });
+          s += `<line x1="${sx(c.work)}" y1="${y}" x2="${sx(c.home)}" y2="${y}" stroke="${GUIDE}" stroke-width="3"/>`;
+          s += `<circle cx="${sx(c.work)}" cy="${y}" r="5" fill="${RED}"/><circle cx="${sx(c.home)}" cy="${y}" r="5" fill="${BLUE}"/>`;
+        });
+        s += `<circle cx="${x + 18}" cy="272" r="5" fill="${RED}"/>` + t(x + 27, 276, '중위 근무지', 10.5, INK2);
+        s += `<circle cx="${x + 110}" cy="272" r="5" fill="${BLUE}"/>` + t(x + 119, 276, '중위 거주지', 10.5, INK2);
+      }
+
+      // ── ③ 고용중심지에 있는 일자리 비중 (표 13-3) ─────────
+      panel(2, '모인 정도는 도시마다 다름', '헥타르당 25개 이상 지역의 일자리 비중');
+      {
+        const x = X[2], lx = x + 84, rx = x + W - 34, sx = (v) => lx + v * (rx - lx);
+        D.center.forEach((c, i) => {
+          const y = 66 + i * 34;
+          s += t(lx - 8, y + 15, c.city, 11, INK, { a: 'end' });
+          s += `<rect x="${lx}" y="${y + 4}" width="${sx(c.v) - lx}" height="16" fill="${i === 0 ? RED : i === D.center.length - 1 ? BLUE : MUTED}" fill-opacity="${i === 0 || i === D.center.length - 1 ? 1 : 0.45}"/>`;
+          s += t(sx(c.v) + 4, y + 16, Math.round(c.v * 100) + '%', 10.5, INK2);
+        });
+        s += `<path class="axis" d="M${lx},62 L${lx},236"/>`;
+        s += t(x + 12, 276, '애틀란타는 일자리의 3/4이 흩어져 있음', 11, RED, { w: 700 });
+      }
+
+      Fig.draw('#f-shift13', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
 </section>
 
-<!-- ══ 그림 15-1 · 15-2 인종 (p.312~314) ═════════════════════ -->
+<!-- ══ 고용부도심 (p.278 · Lee 2007) — 2026-10-13 교수 요청으로 인포그래픽으로 다시 짬 ═══
+     왼쪽 형성 원리는 Lee, B. (2007) "Edge" or "edgeless" cities?, J. Reg. Sci. 47(3), p.480·482.
+     오른쪽 밀도 프로파일은 2026-10-13 교수 요청으로 부도심 수의 두 요인을 대신한 모식도다 (수치 없음).
+     글로 된 판은 보관/07-삭제슬라이드.html 에 있다. -->
 <section>
-  <h2>인종 혼합과 흑인-백인 비유사성</h2>
+  <h2>고용부도심 <span class="en">(employment subcenters)</span></h2>
   <div class="body tight">
-    <p class="emph">2010년 미국 대도시지역의 인종 구성은 백인 58% · 흑인 14% · 히스패닉 19% · 아시아인 7% 임.
-      아래는 <strong>전형적인 거주민의 이웃</strong>이 어떻게 구성되는지임</p>
-    <svg class="fig" id="f-race" viewBox="0 0 700 246" style="width:560px;margin:2px 0 0 142px" role="img">
-      <title>인종별 전형적인 거주민의 이웃 구성을 누적 막대로 보이고 흑인-백인 비유사성 지수가 1980년에서 2010년으로 줄어든 것을 보이는 그림</title></svg>
-    <script>
-      (function () {
-        const R = window.SEG, F = Fig;
-        const parts = [];
-        // 왼쪽 — 누적 100% 가로 막대 (그림 15-1)
-        const X0 = 106, X1 = 330, Y0 = 44, GAP = 38, BH = 24;
-        const sw = (v) => (v / 100) * (X1 - X0);
-        const tone = ['0.16', '0.36', '0.58', '0.82'];
-        R.mix.forEach((g, i) => {
-          const y = Y0 + i * GAP;
-          let x = X0;
-          g.v.forEach((v, j) => {
-            parts.push(F.raw(`<rect x="${x}" y="${y}" width="${sw(v)}" height="${BH}" ` +
-                             `fill="var(--accent-blue)" opacity="${tone[j]}"/>`));
-            parts.push(F.annot(x + sw(v) / 2, y + 16, String(v),
-                               { anchor: 'middle', size: v >= 7 ? 10 : 8, tone: j >= 2 ? 'on-dark' : null }));
-            x += sw(v);
-          });
-          parts.push(F.annot(X0 - 8, y + 16, g.k, { anchor: 'end', size: 11 }));
-        });
-        parts.push(F.annot(X0, Y0 - 16, '전형적인 거주민의 이웃 구성 (%)', { size: 11 }));
-        parts.push(F.annot(X0, Y0 + R.mix.length * GAP + 4,
-                           '왼쪽부터 백인 · 흑인 · 히스패닉 · 아시아인', { size: 10 }));
-        // 오른쪽 — 1980 대 2010 (그림 15-2)
-        const Z0 = 430, Z1 = 676, B0 = 196, HMAX = 130;
-        const sy = (v) => B0 - (v / 80) * HMAX;
-        const gw = (Z1 - Z0) / R.dis.length, bw = 15;
-        R.dis.forEach((g, i) => {
-          const cx = Z0 + gw * (i + 0.5);
-          [['a', -bw - 1, 'var(--accent-blue)'], ['b', 1, 'var(--chart-sky)']].forEach(([k, dx, fill]) => {
-            const v = g[k];
-            parts.push(F.raw(`<rect x="${cx + dx}" y="${sy(v)}" width="${bw}" height="${B0 - sy(v)}" fill="${fill}"/>`));
-            parts.push(F.annot(cx + dx + bw / 2, sy(v) - 4, String(v), { anchor: 'middle', size: 10 }));
-          });
-          g.k.split('\n').forEach((t, j) =>
-            parts.push(F.annot(cx, B0 + 15 + j * 12, t, { anchor: 'middle', size: 9 })));
-        });
-        [0, 20, 40, 60, 80].forEach((v) => {
-          parts.push(F.raw(`<path class="guide" d="M${Z0},${sy(v)} L${Z1},${sy(v)}"/>`));
-          parts.push(F.annot(Z0 - 7, sy(v) + 4, String(v), { anchor: 'end', size: 9 }));
-        });
-        parts.push(F.raw(`<path class="axis" d="M${Z0},${sy(80) - 8} L${Z0},${B0} L${Z1 + 8},${B0}"/>`));
-        parts.push(F.annot(Z0, sy(80) - 14, '흑인−백인 비유사성 지수', { size: 11 }));
-        [['1980', 'var(--accent-blue)', 0], ['2010', 'var(--chart-sky)', 60]].forEach(([t, c, dx]) => {
-          parts.push(F.raw(`<rect x="${Z1 - 120 + dx}" y="${sy(80) - 22}" width="11" height="11" fill="${c}"/>`));
-          parts.push(F.annot(Z1 - 106 + dx, sy(80) - 13, t, { size: 10 }));
-        });
-        F.draw('#f-race', { parts, check: false });
-      })();
-    </script>
-    <p class="caption" style="margin-top:2px">출처: Logan and Stults, “The Persistence of Segregation in the
-      Metropolis,” Project US2010, 2011 (교재 그림 15−1·15−2, p.313~314)</p>
-    <p class="derive t-red" style="margin-top:4px">→ 어느 인종이든 <strong>자기 인종의 비중이 전국 비중보다 높은</strong> 이웃에 삶
-      (백인 75% &gt; 58%)</p>
-      <p class="derive t-red" style="margin-top:2px">→ 흑인-백인 지수는 73 → 59 로 낮아졌고,
-      감소가 가장 큰 곳은 <strong>흑인 인구가 적은 대도시지역</strong>(67 → 40)임</p>
+    <p class="lead t-define" style="margin-bottom:10px">도심의 <span class="mark">집적불경제</span>와 교외에서 새로 생긴
+      <span class="mark">집적경제</span>가 기업을 부도심에 모이게 함</p>
+    <svg class="fig" id="f-subc" viewBox="0 0 848 290" style="width:848px;display:block;margin:0" role="img">
+      <title>왼쪽은 혼잡과 높은 땅값을 겪는 도심에서 집적경제를 얻는 교외 부도심으로 기업이 옮기는 도식, 오른쪽은 도심에서 멀어질수록 낮아지다가 순환고속도로 인터체인지 근처에서 다시 솟는 고용밀도 곡선</title></svg>
+    <p class="caption foot-src">출처: Lee, B. (2007). “Edge” or “edgeless” cities? Urban spatial structure in US metropolitan areas, 1980 to 2000.
+      Journal of Regional Science 47(3)</p>
   </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--chart-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)',
+            MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const box = (x, w, head) => {
+        s += `<rect x="${x}" y="0" width="${w}" height="286" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += t(x + 14, 24, head, 14, RED, { w: 700 });
+      };
+      const band = (x, w, y, str) => {
+        s += `<rect x="${x + 8}" y="${y}" width="${w - 16}" height="26" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + w / 2, y + 17.5, str, 11.5, RED, { w: 700, a: 'middle' });
+      };
+
+      // ── 왼쪽: 부도심은 어떻게 생기는가 ─────────────────────
+      const LW = 452;
+      box(0, LW, '부도심은 어떻게 생기는가');
+      {
+        // 도심
+        const cx = 92, cy = 112;
+        s += `<circle cx="${cx}" cy="${cy}" r="48" fill="${RED}" fill-opacity="0.14" stroke="${RED}" stroke-width="1.5"/>`;
+        s += t(cx, cy - 4, '도심(CBD)', 13, RED, { w: 700, a: 'middle' });
+        s += t(cx, cy + 14, '혼잡 · 높은 땅값', 10.5, INK2, { a: 'middle' });
+        s += t(cx, cy + 72, '집적불경제', 12, RED, { w: 700, a: 'middle' });
+        // 부도심 둘
+        [[318, 74], [318, 156]].forEach(([x, y]) => {
+          s += `<path d="M${cx + 52},${cy + (y - cy) * 0.35} L${x - 34},${y}" stroke="${INK2}" stroke-width="1.5" fill="none" marker-end="url(#ah-ink)"/>`;
+          s += `<circle cx="${x}" cy="${y}" r="27" fill="${BLUE}" fill-opacity="0.14" stroke="${BLUE}" stroke-width="1.5"/>`;
+          s += t(x, y + 4.5, '부도심', 12, BLUE, { w: 700, a: 'middle' });
+        });
+        s += t(368, 104, '집적경제를', 11, INK2) + t(368, 119, '얻으면서', 11, INK2) + t(368, 134, '불경제를 피함', 11, INK2);
+        s += t(318, 205, '집적경제', 12, BLUE, { w: 700, a: 'middle' });
+        band(0, LW, 218, '다핵화: 커지며 늘어나는 불경제를 넘어 성장을 받아들이는 방식');
+        // 반대 관점
+        s += t(14, 268, '반대 관점(edgeless city)', 10.5, MUTED, { w: 700 });
+        s += t(150, 268, '자동차로 집적경제를 어디서나 누리면 일자리는 흩어짐', 10.5, MUTED);
+        s += t(150, 281, 'LA 중심지의 고용 비중 20% → 12% (1970~1990)', 10.5, MUTED);
+      }
+
+      // ── 오른쪽: 밀도 프로파일 (모식도) ───────────────────
+      // 도심에서 멀어질수록 지수적으로 낮아지다가 순환고속도로 인터체인지(x = 7) 근처에서 다시 솟는다.
+      //   밀도(x) = 100e^(−0.38x) + 34e^(−(x−7)²/0.72)
+      const RX = 464, RW = 384;
+      box(RX, RW, '밀도 프로파일');
+      {
+        const x0 = RX + 40, x1 = RX + RW - 22, y0 = 214, y1 = 54;
+        const dens = (d) => 100 * Math.exp(-0.38 * d) + 34 * Math.exp(-((d - 7) ** 2) / 0.72);
+        const sx = (d) => x0 + (d / 10) * (x1 - x0), sy = (v) => y0 - (v / 100) * (y0 - y1);
+        s += `<path class="axis" d="M${x0},${y1 - 6} L${x0},${y0} L${x1 + 4},${y0}"/>`;
+        s += t(x0 - 6, y1 - 12, '고용밀도', 10.5, MUTED) + t(x1 + 4, y0 + 31, '도심으로부터 거리', 10.5, MUTED, { a: 'end' });
+        const pts = Array.from({ length: 121 }, (_, i) => { const d = (10 * i) / 120; return [sx(d), sy(dens(d))]; });
+        s += `<path d="M${pts.map((p) => p.join(',')).join(' L')}" fill="none" stroke="${RED}" stroke-width="2.6"/>`;
+        s += `<path class="guide" d="M${sx(7)},${y0} L${sx(7)},${y1 + 10}"/>`;
+        s += t(sx(0) + 8, sy(dens(0)) + 4, '도심(CBD)', 11, RED, { w: 700 });
+        s += t(sx(7), sy(dens(7)) - 10, '부도심', 11, BLUE, { w: 700, a: 'middle' });
+        s += t(sx(7), y0 + 15, '순환고속도로 인터체인지', 10.5, INK2, { a: 'middle' });
+        band(RX, RW, 252, '멀어질수록 낮아지다 인터체인지 근처에서 다시 모임');
+      }
+
+      Fig.draw('#f-subc', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
 </section>
 
 <!-- ══ 섹션 — 02 ═════════════════════════════════════════════ -->
 <section class="s-section">
   <div class="section-rule"></div>
-  <p class="section-label">02 지방공공재를 위한 패지어 살기</p>
-  <p class="section-sub">왜 비슷한 사람끼리 모이는가 — 첫 번째 이유 · 교재 p.315~320</p>
+  <p class="section-label">02 교외화와 도시확산</p>
+  <p class="section-sub">왜 밖으로 퍼지는가, 그것이 문제인가 · 교재 p.280~285</p>
 </section>
 
-<!-- ══ 그림 15-3 수요의 다양성 (p.316~318) ════════════════════ -->
-<section class="s-split">
-  <h2>발로 하는 투표</h2>
-  <div class="body">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">학군 하나에 시민 300명. 낮은·중간·높은 소득이 각 100명씩.
-        지방공공재는 <strong>교사의 수</strong>로 잼</p>
-      <p style="margin-bottom:8px">당분간 <strong>인두세</strong>로 재원을 마련한다고 가정함 —
-        소득과 무관하게 같은 세금이라 모두가 같은 교환조건을 만남. 그래서 예산선이 <strong>평행</strong>함</p>
-      <p style="margin-bottom:10px">교사는 <strong>정상재</strong>라 소득이 높을수록 더 많은 교사를 원함.
-        점 l · m · h 가 각 유형의 선호임</p>
-      <p class="derive t-red">→ 투표용지로 정하면 <strong>중위투표자</strong>인 중간-소득이 이겨 t* 가 됨.
-        낮은 쪽은 t′ 를, 높은 쪽은 t″ 를 원해 둘 다 불만임</p>
-      <p class="derive t-red">→ 대안은 <strong>발로 투표하는 것</strong>. 각자 학군을 새로 만들면
-        낮은 쪽은 점 l 을, 높은 쪽은 점 h 를 얻음</p>
-      <p class="derive t-red">→ 지방공공재 수요의 차이가 가구를 <strong>소득에 따라 패지어 살게</strong> 함</p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-tiebout" viewBox="0 0 430 292" style="width:390px" role="img">
-        <title>평행한 예산선 셋에 무차별곡선이 각각 접해 소득이 높을수록 더 많은 교사를 선호하는 것을 보이는 그림</title></svg>
-      <script>
-        (function () {
-          const F = Fig.withBox({ x0: 68, y0: 226, x1: 392, y1: 34 });
-          const S = F.scale({ x: [0, 100], y: [0, 1100] });
-          const p = 8;                       // 공통 기울기 (인두세라 모두 같다)
-          const inc = [{ I: 520, n: 'l' }, { I: 700, n: 'm' }, { I: 880, n: 'h' }];
-          const parts = [];
-          inc.forEach(({ I, n }, i) => {
-            // 콥−더글러스 U = t^0.5 g^0.5 → t* = I/(2p), g* = I/2
-            const t = I / (2 * p), g = I / 2, U = Math.sqrt(t * g);
-            // 무차별곡선은 세로 범위(1,060) 안에 드는 구간만 그린다
-            const xMin = Math.max(16, (U * U) / 1060);
-            const ic = []; for (let k = 0; k <= 40; k++) { const x = xMin + ((98 - xMin) * k) / 40; ic.push([x, (U * U) / x]); }
-            const xe = Math.min(I / p, 98);
-            parts.push(F.line(S.x(0), S.y(I), S.x(xe), S.y(I - p * xe), { variant: 'cap' }));
-            parts.push(F.curve(S.curve(ic), { variant: i === 1 ? 'demand' : null }));
-            parts.push(F.guide(...S.p([t, g]), { xtick: '', ytick: '' }));
-            parts.push(F.dot(...S.p([t, g]), { label: n, lx: 8, ly: 17 }));
-          });
-          [['a″', 440], ['a*', 350], ['a′', 260]].forEach(([t, v]) =>
-            parts.push(F.annot(F.BOX.x0 - 8, S.y(v) + 4, t, { anchor: 'end', size: 11 })));
-          [['t′', 32.5], ['t*', 43.75], ['t″', 55]].forEach(([t, v]) =>
-            parts.push(F.annot(S.x(v), F.BOX.y0 + 16, t, { anchor: 'middle', size: 11 })));
-          F.draw('#f-tiebout', { axes: { x: '교사', y: '여타의 재화 (달러)' }, parts });
-        })();
-      </script>
-    </div>
-  </div>
-</section>
-
-<!-- ══ 그림 15-4 과세물품 (p.318~320) ════════════════════════ -->
+<!-- ══ 교외화와 도시확산 — p.280~285 다섯 장을 한 장으로 (2026-10-13 교수 요청) ═══
+     원인 → 문제 → 대응. 저자(연도) 표기는 빼라는 지시를 따랐다. 수치는 모두 교재 값이며
+     막대 높이는 window.SPRAWL 에서 나온다. 원래의 다섯 장은 보관/07-삭제슬라이드.html 에 있다. -->
 <section>
-  <h2>세금이 붙는 물건을 많이 가진 쪽이 떠난다</h2>
+  <h2>교외화와 도시확산: 원인, 문제, 대응</h2>
   <div class="body tight">
-    <p class="emph">중간-소득 학군의 프로그램 비용이 1인당 <strong>120달러</strong>임.
-      머리무게에 세금을 매긴다고 하자. 평균 무게가 2kg 이면 <strong>kg당 60달러</strong>면 맞음</p>
-    <svg class="fig" id="f-headtax" viewBox="0 0 680 236" style="width:600px;margin:6px 0 0 122px" role="img">
-      <title>직사각형의 넓이가 세액이 되어 동일한 머리무게에서는 120달러씩이지만 무거운 머리가 따로 학군을 만들면 세율이 40달러로 내려가는 그림</title></svg>
-    <script>
-      (function () {
-        const H = window.HEAD, F = Fig;
-        const Y0 = 176, XU = 30, YU = 1.05;   // 1kg = 30px, 1달러 = 1.05px
-        const parts = [];
-        let x = 84;
-        H.group.forEach((g, gi) => {
-          const x0 = x;
-          g.box.forEach((b) => {
-            const w = b.kg * XU, h = b.rate * YU;
-            parts.push(F.raw(`<rect x="${x}" y="${Y0 - h}" width="${w}" height="${h}" ` +
-                             `fill="var(--accent-blue)" opacity="${gi === 2 ? 0.34 : 0.16}" ` +
-                             `stroke="var(--ink)" stroke-width="0.8"/>`));
-            parts.push(F.annot(x + w / 2, Y0 - h / 2 + 4, String(b.rate * b.kg),
-                               { anchor: 'middle', size: 11 }));
-            parts.push(F.annot(x + w / 2, Y0 + 15, String(b.kg), { anchor: 'middle', size: 10 }));
-            x += w + 10;
-          });
-          parts.push(F.annot((x0 + x - 10) / 2, Y0 + 32, g.k, { anchor: 'middle', size: 11 }));
-          x += 34;
+    <p class="lead t-define" style="margin-bottom:10px">소득이 오르고 통근비용이 내려 도시는 <span class="mark">밖으로</span> 퍼졌고,
+      대응은 확산을 부추긴 왜곡을 없애는 것임</p>
+    <svg class="fig" id="f-sprawl" viewBox="0 0 848 300" style="width:848px;display:block;margin:0" role="img">
+      <title>왼쪽은 중심지 3마일 안 거주 비중이 0.88에서 0.24로 떨어진 교외화와 그 원인, 가운데는 교외 가구가 토지를 58% 더 쓰고 운전을 30% 더 하며 대중교통이 서지 않는 문제, 오른쪽은 정책 왜곡 제거와 비확산정책이라는 대응</title></svg>
+    <p class="caption foot-src">교재 p.280~285</p>
+  </div>
+  <script>
+    (function () {
+      const D = window.SPRAWL;
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', SKY = 'var(--chart-sky)', INK = 'var(--ink)',
+            INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const W = 274, X = [0, 287, 574];
+      const panel = (i, q, sub) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="296" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += `<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>` + t(x + 18, 24.5, String(i + 1), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+        s += t(x + 35, 25, q, 14, RED, { w: 700 });
+        s += t(x + 12, 44, sub, 10.5, MUTED);
+      };
+      const band = (x, y, str) => {
+        s += `<rect x="${x + 8}" y="${y}" width="${W - 16}" height="24" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, y + 16.5, str, 11, RED, { w: 700, a: 'middle' });
+      };
+      // 막대 두 개 — [이름, 값, 색] 을 같은 눈금으로
+      const bars2 = (x, yTop, yBase, rows, max, fmt) => {
+        rows.forEach(([k, v, c], i) => {
+          const bx = x + 40 + i * 70, h = (v / max) * (yBase - yTop);
+          s += `<rect x="${bx}" y="${yBase - h}" width="40" height="${h}" fill="${c}"/>`;
+          s += t(bx + 20, yBase - h - 5, fmt(v), 11, INK, { w: 700, a: 'middle' });
+          s += t(bx + 20, yBase + 14, k, 10.5, INK2, { a: 'middle' });
         });
-        // 파선을 첫 직사각형 앞까지만 긋는다. 안쪽까지 그으면 면적 숫자를 관통한다
-        [120, 60, 40].forEach((v) => {
-          parts.push(F.raw(`<path class="guide" d="M64,${Y0 - v * YU} L80,${Y0 - v * YU}"/>`));
-          parts.push(F.annot(60, Y0 - v * YU + 4, String(v), { anchor: 'end', size: 11 }));
-        });
-        parts.push(F.raw(`<path class="axis" d="M64,${Y0 - 140} L64,${Y0} L${x - 14},${Y0}"/>`));
-        parts.push(F.annot(64, Y0 - 148, '인두세율(킬로그램당 달러)', { size: 11 }));
-        F.draw('#f-headtax', { parts, check: false });
-      })();
-    </script>
-    <p class="derive t-red" style="margin-top:6px">→ 무게가 다르면 <strong>무거운 머리가 180달러</strong>를 내고
-      가벼운 머리는 60달러만 냄. 평균은 여전히 120달러임</p>
-      <p class="derive t-red" style="margin-top:2px">→ 무거운 머리들이 따로 학군을 세우면 세율을
-      <strong>kg당 40달러</strong>로 낮출 수 있음. 남은 가벼운 머리들은 <strong>120달러</strong>로 올려야 함</p>
-      <p class="derive t-red" style="margin-top:2px">→ 현실에서는 머리가 아니라 <strong>주택</strong>에 세금이 붙음.
-      30만달러 주택 관할구역은 세율 2%로 족하지만 10만달러 관할구역은 6%가 필요함.
-      이 차이는 <strong>싼 주택을 배제하는 수단</strong>이 있어야 유지됨</p>
-  </div>
-</section>
+        s += `<path class="axis" d="M${x + 28},${yBase} L${x + 190},${yBase}"/>`;
+      };
 
-<!-- ══ 섹션 — 03 ═════════════════════════════════════════════ -->
-<section class="s-section">
-  <div class="section-rule"></div>
-  <p class="section-label">03 선호하는 이웃에 대한 입찰가격</p>
-  <p class="section-sub">모두가 같은 이웃을 원하면 누가 갖는가 · 교재 p.320~328</p>
-</section>
+      // ── ① 왜 교외화가 진행되는가 ─────────────────────────
+      panel(0, '왜 교외로 가는가', '중심지 3마일 안에 사는 비중 (미국 네 도시)');
+      {
+        const x = X[0];
+        bars2(x, 70, 150, [['1880', D.within3[0], RED], ['1963', D.within3[1], BLUE]], 1, (v) => v.toFixed(2));
+        s += t(x + 12, 190, '임금 상승', 12, INK, { w: 700 }) + t(x + 80, 190, '토지는 정상재, 큰 부지를 원함', 11, INK2);
+        s += t(x + 12, 210, '통근비 하락', 12, INK, { w: 700 }) + t(x + 80, 210, '승합마차에서 자동차까지', 11, INK2);
+        s += t(x + 12, 230, '그 밖에', 12, INK, { w: 700 }) + t(x + 80, 230, '헌 주택 · 재정 · 범죄 · 교육', 11, INK2);
+        band(x, 260, '일자리와 사람이 서로를 따라 나감');
+      }
 
-<!-- ══ 그림 15-5 · 15-6 · 15-7 (p.320~324) ═══════════════════ -->
-<section class="s-split">
-  <h2>완전한 통합은 균형이지만 불안정하다</h2>
-  <div class="body tighter">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">이웃 외부효과가 있음 — 아이는 어른을 모방하고,
-        어른은 이웃에게서 <strong>일자리 정보</strong>를 얻음. 약물 남용은 반대로 작용함</p>
-      <p style="margin-bottom:8px">모두가 <strong>파란색 이웃</strong>을 원한다고 하자. 도시에 이웃이 둘(서부·동부),
-        거주민이 24명(유형마다 12명)임</p>
-      <p class="formula-key" style="margin-bottom:8px">$r = \text{입찰가격(서부)} - \text{입찰가격(동부)}$</p>
-      <p style="margin-bottom:10px">서부가 파래질수록 <strong>두 유형 모두</strong> 서부에 더 내려 함.
-        그래서 할증금 곡선이 둘 다 우상향함</p>
-      <p class="derive t-red">→ 점 i(6 대 6)는 균형임. 이탈 유인이 없고, 임대료가 같으며, 모두 수용됨</p>
-      <p class="derive t-red">→ 그런데 <strong>불안정</strong>함. 한 쌍이 자리를 바꿔 7 대 5 가 되면
-        파란색은 30달러(점 b), 녹색은 21달러(점 g)를 내려 해 파란색이 이김</p>
-      <p class="derive t-red">→ 파란색 곡선이 <strong>어디서나 위</strong>에 있어
-        이 과정은 <strong>완전한 차별</strong>(점 s)에서 끝남</p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-bid" viewBox="0 0 430 296" style="width:364px" role="img">
-        <title>파란색 가구의 할증금 곡선이 녹색 가구의 곡선보다 전 구간에서 위에 있어 완전한 차별로 끝나는 그림</title></svg>
-      <script>
-        (function () {
-          const N = window.NBHD, F = Fig.withBox({ x0: 70, y0: 214, x1: 392, y1: 36 });
-          const S = F.scale({ x: [6, 12.6], y: [0, 96] });
-          const mk = (f) => { const o = []; for (let i = 0; i <= 40; i++) { const x = 6 + (6 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
-          const blue = mk((x) => N.prem(x, 'b')), green = mk((x) => N.prem(x, 'g'));
-          const parts = [
-            F.curve(blue, { variant: 'demand' }),
-            F.annot(S.x(12.4), S.y(N.prem(12.4, 'b')) - 12, '할증금: 파란색 가구',
-                    { anchor: 'end', size: 10, tone: 'blue' }),
-            F.curve(green),
-            F.annot(S.x(11.0), S.y(N.prem(11.0, 'g')) + 17, '할증금: 녹색 가구', { anchor: 'end', size: 10 }),
-            F.dot(...S.p([6, 0]), { label: 'i', lx: 8, ly: -8 }),
-          ];
-          [[7, 'b', 'blue', 30], [7, 'g', null, 21], [12, 'b', 'blue', null], [12, 'g', null, null]]
-            .forEach(([x, t, tone, tick]) => {
-              const v = N.prem(x, t), P = S.p([x, v]);
-              parts.push(F.raw(`<path class="guide" d="M${F.BOX.x0},${P[1]} L${P[0]},${P[1]}"/>`));
-              parts.push(F.annot(F.BOX.x0 - 8, P[1] + 4,
-                                 tick !== null ? String(tick) : (t === 'b' ? 'r″' : 'r′'),
-                                 { anchor: 'end', size: 11 }));
-              if (x === 7) parts.push(F.dot(...P, { label: t === 'b' ? 'b' : 'g', lx: 8, ly: t === 'b' ? -8 : 15 }));
-              else parts.push(F.dot(...P, { label: t === 'b' ? 's' : 't', lx: -14, ly: -8 }));
-            });
-          [[6, '6', '6'], [7, '7', '5'], [12, '12', '0']].forEach(([x, top, bot]) => {
-            parts.push(F.raw(`<path class="guide" d="M${S.x(x)},${F.BOX.y0} L${S.x(x)},${S.y(N.prem(x, 'b'))}"/>`));
-            parts.push(F.annot(S.x(x), F.BOX.y0 + 16, top, { anchor: 'middle', size: 11 }));
-            parts.push(F.annot(S.x(x), F.BOX.y0 + 31, bot, { anchor: 'middle', size: 11 }));
+      // ── ② 스프롤은 무엇을 낳는가 ─────────────────────────
+      panel(1, '스프롤의 문제', '가구당 토지 사용 (평방미터)');
+      {
+        const x = X[1];
+        bars2(x, 70, 150, [['중심 도시', D.land[0], BLUE], ['교외', D.land[1], RED]], 1300, (v) => v.toLocaleString());
+        s += t(x + 12, 190, '운전', 12, INK, { w: 700 }) + t(x + 64, 190, '교외 가구가 약 30% 더 함', 11, INK2);
+        s += t(x + 64, 205, '→ 대기오염 · 온실가스 증가', 11, INK2);
+        s += t(x + 12, 228, '대중교통', 12, INK, { w: 700 }) + t(x + 64, 228, '헥타르당 31명이 넘어야 섬', 11, INK2);
+        s += t(x + 64, 243, '미국에서는 뉴욕 · 호놀룰루뿐', 11, INK2);
+        band(x, 260, '토지 58% 더, 대중교통은 서지 않음');
+      }
+
+      // ── ③ 어떻게 대응하는가 ──────────────────────────────
+      panel(2, '어떻게 대응하는가', '확산은 부분적으로 소비자의 선택');
+      {
+        const x = X[2];
+        s += t(x + 12, 72, '먼저: 확산을 부추긴 왜곡을 없앰', 12, INK, { w: 700 });
+        ['혼잡의 과소가격책정', '주택담보대출 이자 공제', '변두리 기반시설의 과소가격책정', '최소부지규모 용도지역제']
+          .forEach((k, i) => {
+            s += `<circle cx="${x + 18}" cy="${92 + i * 20}" r="2.5" fill="${INK2}"/>` + t(x + 28, 96 + i * 20, k, 11, INK2);
           });
-          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 16, '파란색', { anchor: 'end', size: 10 }));
-          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 31, '녹색', { anchor: 'end', size: 10 }));
-          parts.push(F.annot(S.x(9.3), F.BOX.y0 + 47, '서부에서의 가구 수', { anchor: 'middle', size: 10 }));
-          F.draw('#f-bid', { axes: { y: '지불용의 할증금(달러)' }, parts });
-        })();
-      </script>
-    </div>
-  </div>
-</section>
+        s += t(x + 12, 194, '대안: 비확산정책', 12, INK, { w: 700 });
+        s += t(x + 12, 213, '도시성장경계 · 개발세', 11, INK2);
+        s += t(x + 12, 231, '밀도를 올리는 데는 성공할 수 있음', 11, INK2);
+        band(x, 260, '편익이 비용을 넘는가가 문제');
+      }
 
-<!-- ══ 그림 15-8 — 재촬영 대기 (p.325) ═══════════════════════ -->
-<section>
-  <h2>곡선의 자리가 다르면 혼합이 안정적 균형이 된다</h2>
-  <div class="body stack">
-    <p class="emph" style="margin-bottom:18px">앞의 결과는 <strong>곡선의 위치</strong> 때문임.
-      두 곡선이 중간에서 엇갈리면 결과가 달라짐</p>
-    <div class="pending">
-      <p class="emph" style="margin-bottom:6px">교재 <strong>그림 15-8</strong>이 들어갈 자리
-        <span class="en">(p.325)</span></p>
-      <p>이 쪽이 촬영되지 않아 곡선의 모양을 확인하지 못했음. 다른 쪽 본문이 가리키는 것은 이것뿐임</p>
-      <p style="margin-top:8px">· 점 <strong>m</strong> — 파란색 거주민 9명, 녹색 거주민 3명</p>
-      <p>· 임의의 이탈이 시장을 <strong>다시 점 m 으로 되돌림</strong> (자기−교정적)</p>
-      <p>· 서부의 개별 거주민은 선호하는 이웃에 대해 <strong>r*</strong> 의 할증금을 지불함</p>
-    </div>
-    <p class="emph" style="margin-top:18px">서부의 파란색 9명은 동부의 파란색 3명만큼 행복함 —
-      서부 거주민은 <strong>할증금을 내고</strong> 동부 거주민은 <strong>할인을 받기</strong> 때문임</p>
-    <p class="derive t-red" style="margin-top:14px">→ 완전한 차별에서 균형 할증금은 점 s 와 점 t 사이 어딘가임.
-      거주민은 적어도 r′ 을 내야 함을 알고, 지주는 파란색이 최대 r″ 까지 낼 수 있음을 앎</p>
-  </div>
-</section>
-
-<!-- ══ 그림 15-9 부지규모 (p.326~328) ════════════════════════ -->
-<section class="s-split">
-  <h2>부지가 커지면 통합이 살아난다</h2>
-  <div class="body tighter">
-    <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">이제까지 <strong>가구마다 토지 한 단위</strong>를 쓴다고 가정했음.
-        토지는 정상재라 소득과 함께 소비가 늘어남</p>
-      <p style="margin-bottom:8px">파란색이 <strong>두 단위</strong>를 쓰면 30달러의 할증금은
-        <strong>단위당 15달러</strong>(점 h)가 됨. 녹색의 21달러보다 낮음</p>
-      <p style="margin-bottom:10px">그러면 녹색이 입찰에서 이기므로 이탈이
-        <strong>자기−교정적</strong>이 되고 6 대 6 의 대칭적 균형으로 돌아옴</p>
-      <p class="derive t-red">→ 지주 관점에서도 같음. 두 단위를 파란색 하나에게 30달러로 빌려주느니
-        녹색 둘에게 <strong>42달러</strong>로 빌려주는 것이 나음</p>
-      <p class="derive t-red">→ 토지소비의 차이가 할증금의 차이보다 <strong>크면 통합</strong>,
-        작으면 차별임. 1.25단위만 쓰면 단위당 24달러라 여전히 차별임 (24 &gt; 21)</p>
-      <p class="derive t-red">→ <strong>최소부지규모 용도지역제</strong>가 이것을 뒤집음.
-        녹색에게도 두 단위를 강제하면 단위당 할증금이 <strong>10.50달러</strong>가 되어
-        시장의 결과였던 통합이 <strong>차별로 바뀜</strong></p>
-    </div>
-    <div class="col-r">
-      <svg class="fig" id="f-lot" viewBox="0 0 430 288" style="width:370px" role="img">
-        <title>파란색 가구가 토지 두 단위를 쓰면 단위당 할증금이 15달러로 떨어져 녹색 가구의 21달러보다 낮아지는 그림</title></svg>
-      <script>
-        (function () {
-          const N = window.NBHD, F = Fig.withBox({ x0: 70, y0: 212, x1: 392, y1: 36 });
-          const S = F.scale({ x: [6, 12.6], y: [0, 96] });
-          const mk = (f) => { const o = []; for (let i = 0; i <= 40; i++) { const x = 6 + (6 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
-          const parts = [
-            F.curve(mk((x) => N.prem(x, 'b')), { variant: 'demand' }),
-            F.annot(S.x(12.4), S.y(N.prem(12.4, 'b')) - 12, '파란색 (부지 = 1)',
-                    { anchor: 'end', size: 10, tone: 'blue' }),
-            F.curve(mk((x) => N.prem(x, 'g'))),
-            F.annot(S.x(10.2), S.y(N.prem(10.2, 'g')) + 17, '녹색 (부지 = 1)', { anchor: 'end', size: 10 }),
-            // 같은 「파란색 가구」의 곡선이라 색을 바꾸지 않고 파선으로 구분한다
-            F.curve(mk((x) => N.prem(x, 'b') / 2), { variant: 'demand', dash: '6 4' }),
-            F.annot(S.x(12.4), S.y(N.prem(12.4, 'b') / 2) + 17, '파란색 (부지 = 2)',
-                    { anchor: 'end', size: 10 }),
-          ];
-          [['b', N.prem(7, 'b'), 30, -8], ['g', N.prem(7, 'g'), 21, 16], ['h', N.prem(7, 'b') / 2, 15, 16]]
-            .forEach(([nm, v, tick, ly]) => {
-              const P = S.p([7, v]);
-              parts.push(F.raw(`<path class="guide" d="M${F.BOX.x0},${P[1]} L${P[0]},${P[1]}"/>`));
-              parts.push(F.annot(F.BOX.x0 - 8, P[1] + 4, String(tick), { anchor: 'end', size: 11 }));
-              parts.push(F.dot(...P, { label: nm, lx: 9, ly }));
-            });
-          parts.push(F.raw(`<path class="guide" d="M${S.x(7)},${F.BOX.y0} L${S.x(7)},${S.y(N.prem(7, 'b'))}"/>`));
-          [[6, '6', '6'], [7, '7', '5'], [12, '12', '0']].forEach(([x, top, bot]) => {
-            parts.push(F.annot(S.x(x), F.BOX.y0 + 16, top, { anchor: 'middle', size: 11 }));
-            parts.push(F.annot(S.x(x), F.BOX.y0 + 31, bot, { anchor: 'middle', size: 11 }));
-          });
-          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 16, '파란색', { anchor: 'end', size: 10 }));
-          parts.push(F.annot(F.BOX.x0 - 8, F.BOX.y0 + 31, '녹색', { anchor: 'end', size: 10 }));
-          F.draw('#f-lot', { axes: { y: '입찰가격 할증금(달러)' }, parts });
-        })();
-      </script>
-    </div>
-  </div>
+      Fig.draw('#f-sprawl', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
 </section>
 
 <!-- ══ Q & A ════════════════════════════════════════════════ -->
