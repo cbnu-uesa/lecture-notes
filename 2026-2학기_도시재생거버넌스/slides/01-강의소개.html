@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>1강. 강의 소개 — 도시재생 거버넌스</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 강의 일정 표 — 날짜·연사·소속·주제 네 칸 */
+  .sched { width: 100%; table-layout: fixed; margin-top: 4px; }
+  .sched th, .sched td { font-variant-numeric: tabular-nums; }
+  .sched td.wk { color: var(--muted); font-size: 12.5px; }
+  .sched td.who { font-weight: 700; }
+  .sched td.org { font-size: 12.5px; color: var(--ink-2); }
+  .sched tr.tbd td { color: var(--muted); }
+
+  /* 번호 매긴 절차 — 다른 과목 노트와 같은 관례 */
+  .steps { counter-reset: st; margin: 10px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 32px;
+                margin-bottom: 9px; font-size: var(--fs-body); line-height: 1.56; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 21px; height: 21px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 11.5px; font-weight: 700; text-align: center; line-height: 21px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>1강. 강의 소개</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 강의 목표와 주제 ══════════════════════════════ -->
+  <section>
+    <h2>강의 목표와 주제</h2>
+    <div class="body">
+      <p class="sub">목표</p>
+      <p class="emph">도시재생에서 <span class="hl">로컬크리에이터의 역할</span>과
+        <span class="hl">거점시설 운영</span>을 이해하고,<br>
+        현장 사례를 통해 지역활성화 방안을 파악함</p>
+      <p class="sub" style="margin-top:22px">다루는 주제</p>
+      <ul>
+        <li>로컬크리에이터의 지역활성화, 공간재생과 콘텐츠 기획</li>
+        <li>지역별 공간 특성 진단과 활성화 방안</li>
+        <li>마을스테이 · 마을경영 등 주민이 참여하는 운영 사례</li>
+        <li>문화기반시설과 도시재생 거점시설의 지속가능한 운영</li>
+        <li>도시브랜딩 · 상권활성화 · 문화관광지역 관리</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 공동 운영의 구조 ══════════════════════════════ -->
+  <section class="s-definition">
+    <h2>공동 운영</h2>
+    <div class="body">
+      <p class="define">도시재생 거점대학 <span class="t-red">6개교</span> 공동 운영<br>
+        충북대학교 · 고려대학교 · 경북대학교 등</p>
+      <p class="conclusion">→ 여섯 대학 수강생이 같은 시간에 같은 강의를 수강함</p>
+    </div>
+  </section>
+
+  <!-- ══ 4. 한 학기의 모양 ════════════════════════════════ -->
+  <section>
+    <h2>주차별 구성</h2>
+    <div class="body stack">
+      <svg class="fig" id="f-term" viewBox="0 0 840 250" style="width:810px" role="img"
+           aria-label="1주차 오리엔테이션과 8주차 중간고사, 15주차 기말고사는 학교별로, 나머지 열두 주는 여섯 대학이 함께 운영한다는 도식">
+        <title>학교별로 하는 세 주와 함께 듣는 열두 주</title>
+
+        <text x="20" y="34" font-size="11.5" font-weight="700" fill="#8A867E"
+              letter-spacing="0.06em">15주 · 매주 화요일</text>
+
+        <rect x="20" y="48" width="86" height="56" fill="#6E6A63"/>
+        <text class="on-dark" x="63" y="72" text-anchor="middle" font-size="13"
+              font-weight="700" fill="#FFF">1주차</text>
+        <text class="on-dark" x="63" y="92" text-anchor="middle" font-size="11.5" fill="#FFF">오리엔테이션</text>
+
+        <rect x="116" y="48" width="404" height="56" fill="#A02948"/>
+        <text class="on-dark" x="318" y="72" text-anchor="middle" font-size="13"
+              font-weight="700" fill="#FFF">2 ~ 7주차 · 특강 여섯 번</text>
+        <text class="on-dark" x="318" y="92" text-anchor="middle" font-size="11.5" fill="#FFF">9/8 ~ 10/13</text>
+
+        <rect x="530" y="48" width="86" height="56" fill="#6E6A63"/>
+        <text class="on-dark" x="573" y="72" text-anchor="middle" font-size="13"
+              font-weight="700" fill="#FFF">8주차</text>
+        <text class="on-dark" x="573" y="92" text-anchor="middle" font-size="11.5" fill="#FFF">중간고사</text>
+
+        <rect x="626" y="48" width="108" height="56" fill="#A02948"/>
+        <text class="on-dark" x="680" y="72" text-anchor="middle" font-size="13"
+              font-weight="700" fill="#FFF">9 ~ 14주차</text>
+        <text class="on-dark" x="680" y="92" text-anchor="middle" font-size="11.5" fill="#FFF">특강 여섯 번</text>
+
+        <rect x="744" y="48" width="76" height="56" fill="#6E6A63"/>
+        <text class="on-dark" x="782" y="72" text-anchor="middle" font-size="13"
+              font-weight="700" fill="#FFF">15주차</text>
+        <text class="on-dark" x="782" y="92" text-anchor="middle" font-size="11.5" fill="#FFF">기말고사</text>
+
+        <path class="guide" d="M20,124 L106,124"/>
+        <path class="guide" d="M530,124 L616,124"/>
+        <path class="guide" d="M744,124 L820,124"/>
+        <text x="63" y="146" text-anchor="middle" font-size="12.5" fill="#4A4741">학교별</text>
+        <text x="573" y="146" text-anchor="middle" font-size="12.5" fill="#4A4741">학교별</text>
+        <text x="782" y="146" text-anchor="middle" font-size="12.5" fill="#4A4741">학교별</text>
+
+        <path class="guide" d="M116,124 L520,124"/>
+        <path class="guide" d="M626,124 L734,124"/>
+        <text x="318" y="146" text-anchor="middle" font-size="12.5" font-weight="700"
+              fill="#A02948">여섯 대학이 함께 — 줌</text>
+        <text x="680" y="146" text-anchor="middle" font-size="12.5" font-weight="700"
+              fill="#A02948">여섯 대학이 함께 — 줌</text>
+
+        <text x="420" y="200" text-anchor="middle" font-size="14" fill="#4A4741">
+          함께 듣는 <tspan font-weight="700" fill="#A02948">12주</tspan>가 강의의 중심이고,
+          1·8·15주차는 <tspan font-weight="700">학교별로 운영</tspan>한다</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ══ 5. 일정 ① ═══════════════════════════════════════ -->
+  <section>
+    <h2>강의 일정 (9~10월)</h2>
+    <div class="body tight">
+      <table class="sched">
+        <thead><tr><th style="width:8%">주차</th><th style="width:10%">날짜</th>
+          <th style="width:11%">연사</th><th style="width:24%">소속</th><th>주제</th></tr></thead>
+        <tbody>
+          <tr><td class="wk">1주</td><td>9/1</td><td class="who">—</td>
+            <td class="org">충북대학교</td><td>학교별 오리엔테이션</td></tr>
+          <tr><td class="wk">2주</td><td>9/8</td><td class="who">박창용</td>
+            <td class="org">한양대 사회혁신융합전공 겸임교수</td><td>지역활성화 로컬크리에이터</td></tr>
+          <tr><td class="wk">3주</td><td>9/15</td><td class="who">김선영</td>
+            <td class="org">PLQ Partners 대표</td><td>지역별 공간 특성 진단을 통한 활성화 방안</td></tr>
+          <tr><td class="wk">4주</td><td>9/22</td><td class="who">권오상</td>
+            <td class="org">㈜퍼즐랩 대표</td><td>마을스테이를 통한 지역활성화 사례</td></tr>
+          <tr><td class="wk">5주</td><td>9/29</td><td class="who">조지영</td>
+            <td class="org">㈜문화공간연구소 대표</td><td>일본의 세대 통합형 마을만들기와 정책적 대응</td></tr>
+          <tr><td class="wk">6주</td><td>10/6</td><td class="who">김영재</td>
+            <td class="org">㈜아키반건축도시연구원 대표</td><td>문화기반시설을 이용한 지역활성화</td></tr>
+          <tr><td class="wk">7주</td><td>10/13</td><td class="who">양수진</td>
+            <td class="org">고려대학교 연구교수</td><td>지역활성화를 위한 도시브랜딩 사례</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ 6. 일정 ② ═══════════════════════════════════════ -->
+  <section>
+    <h2>강의 일정 (10~12월)</h2>
+    <div class="body tight">
+      <table class="sched">
+        <thead><tr><th style="width:8%">주차</th><th style="width:10%">날짜</th>
+          <th style="width:11%">연사</th><th style="width:24%">소속</th><th>주제</th></tr></thead>
+        <tbody>
+          <tr><td class="wk">9주</td><td>10/27</td><td class="who">이건원</td>
+            <td class="org">고려대학교 교수</td><td>문화관광지역 관리를 위한 도전</td></tr>
+          <tr><td class="wk">10주</td><td>11/3</td><td class="who">이상훈</td>
+            <td class="org">㈜디자인그룹 이상도시 대표</td><td>주민과 함께하는 마을경영</td></tr>
+          <tr><td class="wk">11주</td><td>11/10</td><td class="who">정인아</td>
+            <td class="org">건축공간연구원 부연구위원</td><td>로컬리즘과 상권활성화</td></tr>
+          <tr><td class="wk">12주</td><td>11/17</td><td class="who">김영하</td>
+            <td class="org">건축공간연구원 마을재생센터장</td><td>도시재생 거점시설의 지속가능한 운영방안</td></tr>
+          <tr><td class="wk">13주</td><td>11/24</td><td class="who">선한빛</td>
+            <td class="org">선한빛라이프팩토리 대표</td><td>로컬크리에이터의 공간재생과 콘텐츠 기획</td></tr>
+          <tr class="tbd"><td class="wk">14주</td><td>12/1</td><td class="who">미정</td>
+            <td class="org">—</td><td>미정</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ 7. 수업 방식 ════════════════════════════════════ -->
+  <section class="s-split">
+    <h2>수업 진행 방식</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub">수업 구성</p>
+        <ol class="steps">
+          <li>연사 특강</li>
+          <li>질의응답</li>
+          <li>토론</li>
+        </ol>
+        <p class="emph" style="margin-top:14px">
+          모든 강의는 <span class="hl">줌(Zoom)</span>으로 진행한다</p>
+      </div>
+      <div class="col-r">
+        <p class="sub">준비 사항</p>
+        <ul>
+          <li>접속 주소는 매주 공지로 안내한다</li>
+          <li>줌 표시 이름은 <span class="code">학교–이름</span> 으로 설정한다</li>
+          <li>질문을 준비해 참여한다</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 8. 과제 ═════════════════════════════════════════ -->
+  <section>
+    <h2>과제 및 제출방법</h2>
+    <div class="body tight">
+      <table style="width:100%;table-layout:fixed;margin-top:4px">
+        <thead><tr><th style="width:18%">언제</th><th style="width:30%">무엇을</th><th>어떻게 쓰나</th></tr></thead>
+        <tbody>
+          <tr><td>8주차 (10/20)</td><td>중간 과제</td>
+            <td>2~7주차 특강 중 <span class="hl">가장 좋았던 강의</span> 하나를 골라
+              그 내용과 도시재생 차원의 시사점을 작성</td></tr>
+          <tr><td>15주차 (12/8)</td><td>기말 과제</td>
+            <td>9~14주차 특강 중 하나를 같은 방식으로 작성</td></tr>
+        </tbody>
+      </table>
+      <p class="sub" style="margin-top:16px">포함할 내용</p>
+      <ul>
+        <li>그 강의를 선택한 이유</li>
+        <li>강의 내용 정리</li>
+        <li><span class="hl">도시재생 차원의 시사점</span> — 다른 지역에도 적용할 수 있는지, 그러려면 무엇이 필요한지</li>
+      </ul>
+      <p class="emph" style="margin-top:14px">분량은 각각 <span class="hl">A4 2쪽</span> 수준</p>
+    </div>
+  </section>
+
+  <!-- ══ 9. 출석 ═════════════════════════════════════════ -->
+  <section class="s-definition">
+    <h2>출석</h2>
+    <div class="body">
+      <p class="define">모든 강의에 <span class="t-red">반드시 출석</span>해야 한다.<br>
+        결석 <span class="t-red">3회마다</span> 학점을 한 등급씩 내린다</p>
+      <p class="conclusion">→ 매주 정해진 시간에 줌으로 접속한다</p>
+    </div>
+  </section>
+
+  <!-- ══ 10. 마무리 ══════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
