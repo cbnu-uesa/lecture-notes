@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """7강(탐색적 공간분석)의 공간자기상관·핫스팟·밀도군집 사례를 만든다.
 
+  1 단계구분도        분류 기준값    등간 · 분위 · 자연분류(Jenks) 다섯 계급
+  2 커널밀도추정      KDE            충전소 점의 밀도 (가우스 커널, 대역폭 1km)
   3 전역 공간자기상관  Moran's I      비슷한 값이 뭉쳐 있나를 한 숫자로
   4 국지 공간자기상관  LISA           어느 구역이 뭉침에 기여하나
   5 핫스팟 분석        Getis-Ord Gi*  높은 값이 몰린 곳
@@ -24,6 +26,9 @@ DATA = HERE.parent / 'data'
 GRID = DATA / '08.광양시_격자별인구현황(100X100).geojson'
 EVSE = DATA / '01.광양시_충전기설치현황.csv'
 EPS_M   = 700     # DBSCAN 반경(m). 도보권 10분 남짓
+KDE_BW  = 1000    # KDE 대역폭(m). 차로 몇 분 — 충전소 하나가 미치는 범위로 잡았다 (2026-10-12 추가)
+KDE_CELL = 500    # KDE 를 계산할 격자 한 칸(m)
+K_CLASS = 5       # 단계구분도 계급 수
 MIN_PTS = 3       # 군집으로 인정할 최소 점 수
 
 # ── 좌표 도우미 ────────────────────────────────────────────────
@@ -149,6 +154,47 @@ def dbscan(pts, eps, minpts):
         cid += 1
     return lab, cid
 
+# ── 1. 단계구분도 분류 기준 (2026-10-12 추가) ─────────────────
+def breaks_equal(v, k):
+    lo, hi = min(v), max(v)
+    return [lo + (hi - lo) * i / k for i in range(1, k)]
+
+def breaks_quantile(v, k):
+    s = sorted(v); n = len(s)
+    return [s[int(n * i / k)] for i in range(1, k)]
+
+def breaks_jenks(v, k):
+    """자연분류(Jenks). 같은 값이 많으므로 서로 다른 값과 그 개수로 푼다 — 결과는 같다."""
+    from collections import Counter
+    cnt = sorted(Counter(v).items())
+    xs = [a for a, _ in cnt]; ws = [b for _, b in cnt]; m = len(xs)
+    # 누적합으로 구간 [i, j] 의 제곱오차를 바로 구한다
+    W = [0]; S = [0]; Q = [0]
+    for x, w in cnt:
+        W.append(W[-1] + w); S.append(S[-1] + w * x); Q.append(Q[-1] + w * x * x)
+    def sse(i, j):            # xs[i..j] 포함
+        w = W[j + 1] - W[i]; s = S[j + 1] - S[i]; q = Q[j + 1] - Q[i]
+        return q - s * s / w
+    INF = float('inf')
+    D = [[INF] * m for _ in range(k)]; P = [[0] * m for _ in range(k)]
+    for j in range(m): D[0][j] = sse(0, j)
+    for c in range(1, k):
+        for j in range(c, m):
+            for i in range(c, j + 1):
+                val = D[c - 1][i - 1] + sse(i, j)
+                if val < D[c][j]: D[c][j] = val; P[c][j] = i
+    cuts = []; j = m - 1
+    for c in range(k - 1, 0, -1):
+        i = P[c][j]; cuts.append(xs[i - 1]); j = i - 1
+    return sorted(cuts)
+
+# ── 2. KDE (2026-10-12 추가) ─────────────────────────────────
+def kde(pts, xs, ys, bw):
+    """가우스 커널. 값은 km² 당 충전소 수로 맞춘다 (합하면 점의 개수)."""
+    c = 1 / (2 * math.pi * bw * bw) * 1e6
+    return [[sum(c * math.exp(-((x - px) ** 2 + (y - py) ** 2) / (2 * bw * bw)) for px, py in pts)
+             for x in xs] for y in ys]
+
 def save(name, header, rows):
     p = HERE / name
     with open(p, 'w', encoding='utf-8-sig', newline='') as f:
@@ -163,6 +209,11 @@ def main():
     v = [c['v'] for c in cells]
     print(f'격자 {len(cells):,}칸 (인구값이 있는 칸) · 인구 합 {sum(v):,.0f}명')
     print(f'칸당 인구  평균 {st.mean(v):.1f} · 중앙값 {st.median(v):.1f} · 최대 {max(v):.0f}\n')
+
+    print(f'빈 칸(인구 0) {sum(1 for x in v if x == 0):,}칸 · {sum(1 for x in v if x == 0)/len(v)*100:.1f}%')
+    for nm, f in (('등간', breaks_equal), ('분위', breaks_quantile), ('자연분류', breaks_jenks)):
+        b = f(v, K_CLASS)
+        print(f'  단계구분도 {nm:<4} 경계 {[round(x, 1) for x in b]}')
 
     W = neighbors(cells, 150)                 # 상하좌우 이웃
     deg = [len(w) for w in W]
@@ -211,6 +262,18 @@ def main():
     save('07-광양공간분석-충전소군집.csv', ['충전소명', 'lon', 'lat', '군집'],
          [[rows[i][0], rows[i][1], rows[i][2], lab[i] + 1 if lab[i] >= 0 else '잡음']
           for i in range(len(rows))])
+
+    # ── 충전소 KDE — 인구 격자를 덮는 범위에서 500m 칸마다 ──
+    x0 = min(c['x'] for c in cells); x1 = max(c['x'] for c in cells)
+    y0 = min(c['y'] for c in cells); y1 = max(c['y'] for c in cells)
+    gx = [x0 + KDE_CELL * i for i in range(int((x1 - x0) // KDE_CELL) + 1)]
+    gy = [y0 + KDE_CELL * j for j in range(int((y1 - y0) // KDE_CELL) + 1)]
+    D = kde(pts, gx, gy, KDE_BW)
+    flat = [d for row in D for d in row]
+    print(f'\nKDE  대역폭 {KDE_BW}m · 칸 {KDE_CELL}m · {len(gx)}×{len(gy)} · 최대 {max(flat):.2f}개/km²')
+    save('07-광양공간분석-KDE.csv', ['lon', 'lat', '밀도_개per㎢'],
+         [[round(gx[i] / MPD_LON, 6), round(gy[j] / MPD_LAT, 6), round(D[j][i], 4)]
+          for j in range(len(gy)) for i in range(len(gx)) if D[j][i] >= 0.005])
 
 if __name__ == '__main__':
     main()
