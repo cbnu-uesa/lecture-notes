@@ -110,6 +110,12 @@ def main():
            round(st.median([x['per'] for x in by[y]]))] for y in sorted(by)])
     save('07-세종주택시장-동별.csv', ['동', '거래건수', '㎡당중앙값(만원)'],
          [[d, len(v), round(st.median(v))] for d, v in ok])
+    # 연도별 다섯 숫자 — 6강 「실습: 연도별 박스플롯」 의 확인값 (2026-10-19)
+    box = []
+    for y in sorted(by):
+        a = sorted(x['amt'] for x in by[y]); qq = st.quantiles(a, n=4)
+        box.append([y, len(a), min(a), round(qq[0]), round(qq[1]), round(qq[2]), max(a)])
+    save('07-세종주택시장-연도별박스.csv', ['연도', '거래건수', '최소', 'Q1', '중앙값', 'Q3', '최대'], box)
 
 if __name__ == '__main__':
     main()
