@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10강에서 뺀 슬라이드</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 13px 17px;
+                font-size: 13.5px; line-height: 1.66; color: var(--ink-2); margin-top: 10px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 8px; }
+  .steps { counter-reset: st; margin: 12px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 34px;
+                margin-bottom: 10px; font-size: var(--fs-body); line-height: 1.58; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 22px; height: 22px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 22px; }
+  .steps .t { font-size: 12px; color: var(--muted); margin-left: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <!-- ══ 표지 — 이 파일의 성격 ═══════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>10강에서 뺀 슬라이드</h1>
+    <p class="cover-date">2026-10-19 보관</p>
+  </section>
+
+  <!-- ══ 무엇을 왜 뺐나 ═══════════════════════════════════════ -->
+  <section>
+    <h2>이 파일은 무엇인가</h2>
+    <div class="body tight">
+      <p class="lead t-define">10강 「진단적 분석 Ⅱ」에서 뺀 슬라이드를 버리지 않고 모아 둔 것</p>
+      <ul>
+        <li><strong>실습 구분 장:</strong> 수업 중 실습이 없어져 함께 뺌</li>
+        <li><strong>실습 ① · 실습 ② · 실습 ③:</strong> 2026-10-19 교수 요청으로 과제로 옮김 (6강과 같은 방식).<br>
+          통제 변수 정하기 · 단계적 회귀 · 네 문장은 본편 「과제」 장에 그대로 남김</li>
+        <li><strong>실습 ③ 의 제출 안내와 가정 과제:</strong> 본편 「과제」 · 「제출물」 장으로 합침</li>
+      </ul>
+      <p class="conclusion">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 13. 실습 구분 ═══════════════════════════════════ -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">실습</p>
+    <p class="section-sub">아산 의료 취약지역 ② 원인 분석 — 약 1시간 30분</p>
+  </section>
+
+  <!-- ══ 14. 실습 ① ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ① — 무엇을 통제할지 정한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <p class="sub">지난주에 "10만명당 병원이 적다" 고 찾은 지역들. 왜 그럴까</p>
+      <ol class="steps">
+        <li>원인 후보를 <span class="hl">먼저 종이에 적는다</span> — 인구밀도, 도시화 정도,
+          노령인구 비율, 온양 시가지와의 거리</li>
+        <li>후보마다 <span class="mark">"이것이 병원 수와 지역 특성 둘 다에 영향을 주는가"</span> 를 따진다.
+          둘 다면 혼란변수다</li>
+        <li>데이터로 만들 수 있는 것과 없는 것을 나눈다</li>
+      </ol>
+      <p class="emph" style="margin-top:14px">
+        <span class="hl">이 순서를 지킨다.</span> 데이터를 먼저 보고 변수를 고르면
+        눈에 띄는 것만 넣게 된다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 15. 실습 ② ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ② — 통제 전후를 비교한다 <span class="en" style="font-size:16px;color:var(--muted)">40분</span></h2>
+    <div class="body tight">
+      <div class="prompt-box">
+        <p class="who">프롬프트</p>
+        <p>"아산 12개 지역 자료로 회귀를 해 줘.
+          종속변수는 <b>인구 10만명당 병원 수</b>야.</p>
+        <p>모형을 <span class="mark">단계적으로</span> 보여 줘 —
+          ① 도시화 여부만 ② + 인구밀도 ③ + 노령인구 비율.
+          <span class="mark">각 단계에서 계수가 어떻게 변하는지 표로</span> 정리해 줘.</p>
+        <p>표본이 12개뿐인데 <span class="mark">이 회귀를 믿어도 되는지도 같이 말해 줘.</span>"</p>
+      </div>
+      <p class="emph" style="margin-top:14px">
+        마지막 문장이 중요하다. <span class="hl">n = 12 는 회귀를 돌리기에 매우 작다</span> —
+        변수를 셋만 넣어도 자유도가 거의 남지 않는다.</p>
+      <p class="caption" style="margin-top:8px">
+        읍면동보다 잘게 나눈 격자 자료를 쓰면 표본이 늘어난다. 그 방법도 물어본다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 16. 실습 ③ ══════════════════════════════════════ -->
+  <section>
+    <h2>실습 ③ — 단서와 함께 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <div class="body tight">
+      <p class="sub">네 문장으로 쓴다</p>
+      <ol class="steps">
+        <li><span class="hl">통제 전</span> — 무엇이 얼마나 차이 났나</li>
+        <li><span class="hl">통제 후</span> — 그 차이가 얼마나 줄었나. <span class="mark">숫자로</span></li>
+        <li><span class="hl">남은 것의 해석</span> — 줄지 않은 부분은 무엇으로 볼 수 있나</li>
+        <li><span class="hl">단서</span> — 무엇을 통제하지 못했나. 표본은 충분했나</li>
+      </ol>
+      <p class="emph" style="margin-top:16px">
+        제출: <span class="t-red">모형 비교표 + 네 문장</span> + 로직 문서</p>
+      <p class="caption" style="margin-top:8px">
+        <span class="hl">가정 과제 (10주차)</span> — 도로교통공단 TAAS 공개 데이터로
+        어린이 교통사고 위험지역을 집에서 분석해 제출한다. 절차는 별도로 배부한다.</p>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

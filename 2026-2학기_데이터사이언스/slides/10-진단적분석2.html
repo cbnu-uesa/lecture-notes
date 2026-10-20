@@ -1,4 +1,13 @@
 <!doctype html>
+<!--
+  10주차. 진단적 분석 Ⅱ — 회귀와 혼란변수
+  2026-10-19 교수 요청으로 6강과 같은 정리를 했다. 방법마다 「목적과 정의」 장에 개념별 정의를,
+  방법 목록 뒤에 실습자료 장을 더하고, 실습 셋을 과제로 바꿨다.
+  뺀 장은 보관/10-삭제슬라이드.html
+  배포 묶음은 analysis/data/학생배포/10강-세종아파트회귀.zip (깃에 없다).
+
+  회귀 숫자는 analysis/10-진단적분석2/10-세종회귀.py 가 만든 것이다 (10-세종회귀-모형별.csv).
+-->
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -34,6 +43,19 @@
          font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
   .num { font-variant-numeric: tabular-nums; }
   .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
+  /* 정의 목록 — 「개념: 정의」 한 줄씩 (2026-10-19, 6강과 같음) */
+  .reveal ul.defs { margin: 6px 0 8px; }
+  .reveal ul.defs > li { margin-bottom: 5px; font-size: var(--fs-body); line-height: 1.5; }
+  /* 「필요한 자료」 한 줄 딱지 */
+  .need { display: inline-block; background: #F2EFEA; color: var(--ink-2);
+          font-size: 12.5px; padding: 3px 10px; margin-top: 2px; }
+  /* 제출 주소 상자 — 6강 「제출물」 장과 같은 모양 */
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+              letter-spacing: .04em; color: #4A4741; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 11px; line-height: 1.7; color: #4A4741; white-space: pre-wrap; }
+  .doc .h { color: var(--brand-crimson); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -52,7 +74,7 @@
     <h2>비싼 것은 위치 때문인가, 새것이기 때문인가?</h2>
     <div class="body">
       <ul>
-        <li>7주차에 세종 동별 ㎡당 가격이 <span class="num">5.33배</span> 차이 난다고 했다</li>
+        <li>6주차에 세종 동별 ㎡당 가격이 <span class="num">5.33배</span> 차이 난다고 했다</li>
         <li>비싼 동은 <span class="mark">새 아파트가 많은 동이기도 하다</span></li>
         <li>둘이 섞여 있는데 어떻게 떼어 내는가</li>
       </ul>
@@ -74,6 +96,64 @@
       <p class="caption" style="margin-top:16px">
         ②까지 가면 상관보다 훨씬 나아진다. 그래도 <span class="hl">인과는 증명되지 않는다</span> —
         ③이 그 이유를 다룬다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 오늘의 실습자료와 자료 정리 (2026-10-19 추가) ═══════════════
+     배포 묶음은 analysis/data/학생배포/10강-세종아파트회귀.zip (깃에 없다).
+     프롬프트는 그 안의 「분석 프롬프트.md」 0번과 같다. 확인할 값은 10-세종회귀.py 의 출력 -->
+  <section class="s-split">
+    <h2>오늘의 실습자료와 자료 정리</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="sub t-red" style="margin-bottom:4px">세종시 아파트 매매 실거래가</p>
+        <ul class="defs">
+          <li><strong>파일:</strong> <span class="code">10강-세종아파트회귀.zip</span></li>
+          <li><strong>기간:</strong> 2017년 1월 ~ 2020년 12월 계약분</li>
+          <li><strong>규모:</strong> <span class="num">23,597</span>건</li>
+          <li><strong>열:</strong> 계약년월 · 시군구 · 단지명 · 전용면적(㎡) ·
+            거래금액(만원) · 건축년도 · 해제사유발생일 등 11개</li>
+          <li><strong>함께 든 것:</strong> 열 설명(README) · 방법별 프롬프트 · 로직 문서 본보기</li>
+        </ul>
+        <p class="conclusion" style="margin-top:8px">→ 6강과 같은 자료.
+          오늘은 <strong>건물 나이와 신도시 여부</strong>를 더함</p>
+        <p class="src">자료: COMPAS 「주택 시장 특성분석」(세종, SBJ_2102_001)</p>
+      </div>
+      <div class="col-r">
+        <div class="prompt-box">
+          <p class="who">자료 정리 프롬프트</p>
+          <p>세종시_아파트매매_실거래가_2017-2020.csv 를 읽고 행 수, 열 이름, 열마다 빈 값의 개수를 보여 줘.</p>
+          <p>거래금액(만원)은 "8,600" 같은 문자열이야. 숫자로 바꿔 줘.</p>
+          <p>해제사유발생일이 있는 거래(취소)와 전용면적 60㎡ 이하는 빼 줘.
+            기준마다 몇 건이 빠졌는지 따로 알려 줘.</p>
+          <p>㎡당 가격, 건물 나이(계약연도 − 건축년도), 신도시 여부(시군구가 「동」으로 끝나면 1,
+            「리」로 끝나면 0) 열을 만들어 줘.</p>
+          <p>무엇을 왜 뺐는지 로직 문서로 정리해 줘.</p>
+        </div>
+        <p class="caption" style="margin-top:8px"><strong>확인할 값:</strong>
+          23,597건 → 취소 537건 제외 23,060건 → 60㎡ 이하 7,574건 제외 <strong>15,486건</strong>
+          (신도시 12,779 · 편입 2,707)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 방법 ① — 목적과 정의 (2026-10-19 추가) ═════════════════════ -->
+  <section class="s-definition">
+    <p class="mth">방법 ①  단순회귀</p>
+    <h2>단순회귀: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">한 변수가 변할 때 다른 변수가 <span class="t-red">평균적으로 얼마나 변하는지</span>를
+        직선 하나로 나타낸 것</p>
+      <ul class="defs">
+        <li><strong>종속변수(y):</strong> 설명하려는 변수. 오늘은 ㎡당 가격</li>
+        <li><strong>독립변수(x):</strong> y 를 설명하는 데 쓰는 변수</li>
+        <li><strong>회귀계수(기울기, b₁):</strong> x 가 1 늘 때 y 의 평균 변화량</li>
+        <li><strong>절편(b₀):</strong> x 가 0 일 때 직선이 예측하는 y 값</li>
+        <li><strong>잔차:</strong> 실제 y 값에서 직선이 예측한 값을 뺀 것</li>
+        <li><strong>최소제곱법:</strong> 잔차를 제곱해 더한 값이 가장 작아지게 계수를 정하는 방법</li>
+        <li><strong>결정계수(R²):</strong> y 의 변동 가운데 직선이 설명하는 비율. 0 에서 1 사이</li>
+      </ul>
+      <p class="need">필요한 자료: 종속변수 1개 + 독립변수 1개</p>
     </div>
   </section>
 
@@ -133,13 +213,31 @@
         <tbody>
           <tr><td>말해 주는 것</td><td>함께 움직이는 <span class="hl">정도</span></td><td>얼마나 <span class="hl">변하는지</span></td></tr>
           <tr><td>단위</td><td>없다 (−1~+1)</td><td>있다 (㎡당 만원 등)</td></tr>
-          <tr><td>방향</td><td>대칭이다 — x와 y를 바꿔도 같다</td><td class="hl">비대칭이다 — 무엇을 설명할지 정한다</td></tr>
+          <tr><td>방향</td><td>대칭이다: x와 y를 바꿔도 같다</td><td class="hl">비대칭이다: 무엇을 설명할지 정한다</td></tr>
           <tr><td>변수 개수</td><td>둘</td><td class="hl">여럿을 한꺼번에</td></tr>
         </tbody>
       </table>
       <p class="emph" style="margin-top:16px">
         마지막 줄이 오늘의 핵심이다. <span class="hl">변수를 여럿 넣을 수 있다는 것</span>이
         "다른 조건을 같게 맞추는" 길을 연다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 방법 ② — 목적과 정의 (2026-10-19 추가) ═════════════════════ -->
+  <section class="s-definition">
+    <p class="mth">방법 ②  다중회귀와 통제</p>
+    <h2>다중회귀와 통제: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">독립변수 여럿을 한 식에 넣어 <span class="t-red">다른 변수를 같게 맞춘 채</span>
+        한 변수의 효과를 구하는 것</p>
+      <ul class="defs">
+        <li><strong>다중회귀:</strong> 독립변수가 둘 이상인 회귀</li>
+        <li><strong>통제변수:</strong> 관심 변수의 효과를 보려고 식에 함께 넣는 변수</li>
+        <li><strong>편회귀계수:</strong> 다른 독립변수를 고정했을 때 그 변수가 1 늘면 y 가 평균적으로 변하는 양</li>
+        <li><strong>더미변수:</strong> 범주를 0 과 1 로 바꾼 변수. 오늘은 신도시 = 1, 편입 = 0</li>
+        <li><strong>더미변수의 계수:</strong> 다른 변수가 같을 때 1 인 집단과 0 인 집단의 평균 차이</li>
+      </ul>
+      <p class="need">필요한 자료: 종속변수 1개 + 독립변수 여럿 (범주는 더미로 바꿈)</p>
     </div>
   </section>
 
@@ -197,7 +295,7 @@
   <!-- ══ 8. ② 예시 ═══════════════════════════════════════ -->
   <section>
     <p class="mth">방법 ②  다중회귀와 통제</p>
-    <h2>7주차의 질문에 답한다</h2>
+    <h2>6주차의 질문에 답한다</h2>
     <div class="body tight">
       <p class="sub">세종 아파트 ㎡당 가격 (만원) · 15,486건 · 신도시(동) 12,779 · 편입(리) 2,707</p>
       <table style="width:100%;table-layout:fixed;margin-top:6px">
@@ -258,10 +356,27 @@
     </script>
   </section>
 
+  <!-- ══ 방법 ③ — 목적과 정의 (2026-10-19 추가) ═════════════════════ -->
+  <section class="s-definition">
+    <p class="mth">방법 ③  혼란변수·역인과</p>
+    <h2>혼란변수·역인과: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">회귀 계수를 <span class="t-red">원인의 효과로 읽지 못하게 하는 것</span>을 찾아
+        결론이 어디까지인지 정하는 일</p>
+      <ul class="defs">
+        <li><strong>혼란변수:</strong> 원인 후보와 결과 양쪽에 영향을 주는 변수</li>
+        <li><strong>누락변수 편의:</strong> 혼란변수를 식에 넣지 않아 그 효과가 남은 계수에 섞이는 것</li>
+        <li><strong>역인과:</strong> 결과로 본 변수가 실제로는 원인 쪽에 영향을 주는 경우</li>
+        <li><strong>심슨의 역설:</strong> 전체에서 본 관계의 방향이 집단별로 나누면 뒤집히는 현상</li>
+      </ul>
+      <p class="need">필요한 자료: 회귀 결과 + 넣지 않은 변수와 시간 순서에 대한 지식</p>
+    </div>
+  </section>
+
   <!-- ══ 10. ③ 주의 — 남은 혼란변수 ══════════════════════ -->
   <section>
     <p class="mth">방법 ③  혼란변수·역인과</p>
-    <h2>주의 — 통제했다고 끝난 것이 아니다</h2>
+    <h2>주의: 통제했다고 끝난 것이 아니다</h2>
     <div class="body tight">
       <table style="width:100%;table-layout:fixed;margin-top:4px">
         <thead><tr><th style="width:30%">아직 남은 것</th><th>왜 문제인가</th></tr></thead>
@@ -337,68 +452,50 @@
     </div>
   </section>
 
-  <!-- ══ 13. 실습 구분 ═══════════════════════════════════ -->
-  <section class="s-section">
-    <div class="section-rule"></div>
-    <p class="section-label">실습</p>
-    <p class="section-sub">아산 의료 취약지역 ② 원인 분석 — 약 1시간 30분</p>
-  </section>
-
-  <!-- ══ 14. 실습 ① ══════════════════════════════════════ -->
-  <section>
-    <h2>실습 ① — 무엇을 통제할지 정한다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+  <!-- ══ 과제 (2026-10-19 실습 ①·②·③ 과 가정 과제를 과제로 합침) ═══════
+     뺀 실습 장은 보관/10-삭제슬라이드.html. TAAS 과제의 절차는 별도로 배부한다 -->
+  <section class="s-split">
+    <h2>과제: 아산 원인 분석과 어린이 교통사고 위험지역</h2>
     <div class="body tight">
-      <p class="sub">지난주에 "10만명당 병원이 적다" 고 찾은 지역들. 왜 그럴까</p>
-      <ol class="steps">
-        <li>원인 후보를 <span class="hl">먼저 종이에 적는다</span> — 인구밀도, 도시화 정도,
-          노령인구 비율, 온양 시가지와의 거리</li>
-        <li>후보마다 <span class="mark">"이것이 병원 수와 지역 특성 둘 다에 영향을 주는가"</span> 를 따진다.
-          둘 다면 혼란변수다</li>
-        <li>데이터로 만들 수 있는 것과 없는 것을 나눈다</li>
-      </ol>
-      <p class="emph" style="margin-top:14px">
-        <span class="hl">이 순서를 지킨다.</span> 데이터를 먼저 보고 변수를 고르면
-        눈에 띄는 것만 넣게 된다.</p>
-    </div>
-  </section>
-
-  <!-- ══ 15. 실습 ② ══════════════════════════════════════ -->
-  <section>
-    <h2>실습 ② — 통제 전후를 비교한다 <span class="en" style="font-size:16px;color:var(--muted)">40분</span></h2>
-    <div class="body tight">
-      <div class="prompt-box">
-        <p class="who">프롬프트</p>
-        <p>"아산 12개 지역 자료로 회귀를 해 줘.
-          종속변수는 <b>인구 10만명당 병원 수</b>야.</p>
-        <p>모형을 <span class="mark">단계적으로</span> 보여 줘 —
-          ① 도시화 여부만 ② + 인구밀도 ③ + 노령인구 비율.
-          <span class="mark">각 단계에서 계수가 어떻게 변하는지 표로</span> 정리해 줘.</p>
-        <p>표본이 12개뿐인데 <span class="mark">이 회귀를 믿어도 되는지도 같이 말해 줘.</span>"</p>
+      <div class="col-l" style="flex:0 0 61%">
+        <p class="sub t-red" style="margin-bottom:4px">1. 아산 의료 취약지역 ② 원인 분석</p>
+        <p style="margin-bottom:4px">9주차에 「10만명당 병원이 적다」고 찾은 지역. 왜 그런가</p>
+        <ol class="steps" style="margin-top:4px">
+          <li><b>원인 후보를 먼저 적음:</b> 인구밀도, 도시화 정도, 노령인구 비율, 온양 시가지와의 거리</li>
+          <li><b>혼란변수를 가림:</b> 병원 수와 지역 특성 둘 다에 영향을 주는가</li>
+          <li><b>단계적으로 회귀함:</b> ① 도시화 여부 ② + 인구밀도 ③ + 노령인구 비율<br>단계마다 계수가 어떻게 변하는지 표로 정리</li>
+          <li><b>네 문장으로 씀:</b> 통제 전 · 통제 후 · 남은 것의 해석 · 단서</li>
+        </ol>
+        <p class="caption" style="margin-top:2px">n = 12 는 회귀를 돌리기에 매우 작음.
+          이 회귀를 믿어도 되는지도 AI 에게 묻고 판단을 적음</p>
       </div>
-      <p class="emph" style="margin-top:14px">
-        마지막 문장이 중요하다. <span class="hl">n = 12 는 회귀를 돌리기에 매우 작다</span> —
-        변수를 셋만 넣어도 자유도가 거의 남지 않는다.</p>
-      <p class="caption" style="margin-top:8px">
-        읍면동보다 잘게 나눈 격자 자료를 쓰면 표본이 늘어난다. 그 방법도 물어본다.</p>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">2. 어린이 교통사고 위험지역</p>
+        <p>도로교통공단 TAAS 공개 데이터로<br>어린이 교통사고 위험지역을 분석함</p>
+        <p style="margin-top:6px">절차는 별도로 배부함</p>
+        <p class="caption" style="margin-top:14px">본보기: 배포 자료의 「분석 프롬프트.md」와 「로직 문서 본보기.md」</p>
+      </div>
     </div>
   </section>
 
-  <!-- ══ 16. 실습 ③ ══════════════════════════════════════ -->
+  <!-- ══ 제출 (2026-10-19 · 6강 「제출물」 장과 같은 방식) ═══════════ -->
   <section>
-    <h2>실습 ③ — 단서와 함께 쓴다 <span class="en" style="font-size:16px;color:var(--muted)">25분</span></h2>
+    <h2>제출물</h2>
     <div class="body tight">
-      <p class="sub">네 문장으로 쓴다</p>
-      <ol class="steps">
-        <li><span class="hl">통제 전</span> — 무엇이 얼마나 차이 났나</li>
-        <li><span class="hl">통제 후</span> — 그 차이가 얼마나 줄었나. <span class="mark">숫자로</span></li>
-        <li><span class="hl">남은 것의 해석</span> — 줄지 않은 부분은 무엇으로 볼 수 있나</li>
-        <li><span class="hl">단서</span> — 무엇을 통제하지 못했나. 표본은 충분했나</li>
-      </ol>
-      <p class="emph" style="margin-top:16px">
-        제출: <span class="t-red">모형 비교표 + 네 문장</span> + 로직 문서</p>
+      <p class="sub">두 과제를 <span class="hl">각각 별도 파일로</span> 낸다</p>
+      <ul>
+        <li><span class="code">원인분석.md</span>: 1번의 모형 비교표 + 네 문장 + 로직 문서</li>
+        <li><span class="code">교통사고분석.md</span>: 2번의 어린이 교통사고 위험지역 분석 결과</li>
+      </ul>
+      <p class="emph" style="margin-top:14px">제출기한:
+        <span class="t-red">11월 14일(토) 23시 59분 59초</span></p>
+      <div class="doc" style="margin-top:10px">
+        <div class="bar">데이터사이언스 과제 제출 — 한 학기 내내 같은 주소</div>
+        <pre style="font-size:13px;line-height:1.9"><span class="h">docs.google.com/forms/d/e/1FAIpQLSc7AWYdgrGn1gKGoo7VkC6vsDZNXANo-CWokVjY2dm2pucIew/viewform</span></pre>
+      </div>
       <p class="caption" style="margin-top:8px">
-        <span class="hl">가정 과제 (10주차)</span> — 도로교통공단 TAAS 공개 데이터로
-        어린이 교통사고 위험지역을 집에서 분석해 제출한다. 절차는 별도로 배부한다.</p>
+        2주차와 같은 주소다. 주차 선택에서 <span class="hl">10주차</span>를 고르고,
+        학번 열 자리와 이름을 띄어쓰기 없이 적는다.</p>
     </div>
   </section>
 
@@ -407,13 +504,13 @@
     <h2>자료 출처</h2>
     <div class="body tight">
       <ul class="src" style="font-size:13px;color:var(--ink-2)">
-        <li>8·9쪽 회귀 결과 — COMPAS 「주택 시장 특성분석」(세종시, SBJ_2102_001) 공개 데이터<br>
+        <li><strong>11·12쪽 회귀 결과:</strong> COMPAS 「주택 시장 특성분석」(세종시, SBJ_2102_001) 공개 데이터<br>
           2017~2020 계약분 · 전용 60㎡ 초과 · 취소 제외 15,486건<br>
           신도시/편입 구분은 지역명이 <span class="code">동</span> 으로 끝나는지
           <span class="code">리</span> 로 끝나는지로 나눴다</li>
-        <li>산출 방법 — <span class="code">analysis/10-진단적분석2/10-세종회귀.py</span> (외부 라이브러리 없이
+        <li><strong>산출 방법:</strong> <span class="code">analysis/10-진단적분석2/10-세종회귀.py</span> (외부 라이브러리 없이
           정규방정식을 직접 푼다), 판단 근거는 <span class="code">analysis/10-진단적분석2/10-세종회귀-로직.md</span></li>
-        <li>4·6·11쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
+        <li>6·9·15쪽 그림은 원리를 보이는 개념도다. 실제 자료가 아니다</li>
       </ul>
     </div>
   </section>

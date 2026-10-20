@@ -7,6 +7,8 @@
   head 의 window.GY_RAW 한 곳에만 적고, 지도·표·본문 숫자가 모두 거기서 나온다 (design.md §6.5).
   단계구분도 사례는 방법론 목록의 아산 대신 광양 격자를 썼다 — 아산은 행정경계 자료가 없어
   지도를 그릴 수 없다 (2026-10-12 교수 확인).
+  2026-10-19 6강과 같은 규칙으로 고쳤다: 정의 장에 개념별 정의, 실습자료 장, 실습을 과제로.
+  뺀 장은 보관/07-삭제슬라이드.html
 -->
 <html lang="ko">
 <head>
@@ -57,6 +59,24 @@
   .tbl-sm { width: 100%; table-layout: fixed; font-size: 13px; }
   .tbl-sm th, .tbl-sm td { padding: 2px 8px; }
   .sw { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+  /* 정의 목록 — 「개념: 정의」 한 줄씩 (2026-10-19, 6강과 같다) */
+  .reveal ul.defs { margin: 6px 0 8px; }
+  .reveal ul.defs > li { margin-bottom: 5px; font-size: var(--fs-body); line-height: 1.5; }
+  /* 프롬프트 상자 · 코드 · 제출 주소 — 6강과 같은 모양 */
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 11px 15px;
+                font-size: 13px; line-height: 1.6; color: var(--ink-2); margin-top: 8px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+              letter-spacing: .04em; color: #4A4741; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 11px; line-height: 1.7; color: #4A4741; white-space: pre-wrap; }
+  .doc .h { color: var(--brand-crimson); font-weight: 700; }
 </style>
 <script>
   /* ── 광양 격자 인구 · 충전소 — analysis/07-공간분석/07-광양공간분석.py 가 만든 CSV ──────────
@@ -178,8 +198,47 @@
           <tr><td>6</td><td><b>밀도기반 공간군집</b> — DBSCAN</td><td>위치만으로 덩어리와 잡음을 가름</td><td>점 좌표</td></tr>
         </tbody>
       </table>
-      <p class="conclusion" style="margin-top:10px">→ 1·2 는 <strong>보는</strong> 방법, 3~5 는 뭉침을 <strong>재는</strong> 방법,
+      <p class="conclusion" style="margin-top:10px">→ 1·2 는 <strong>보는</strong> 방법, 3~5 는 뭉침을 <strong>측정하는</strong> 방법,
         6 은 점을 <strong>묶는</strong> 방법</p>
+    </div>
+  </section>
+
+  <!-- ══ 오늘의 실습자료와 자료 정리 (2026-10-19 추가) ═══════════════
+     배포 묶음은 analysis/data/학생배포/07강-광양격자인구-충전소.zip (깃에 없다).
+     프롬프트는 그 안의 「분석 프롬프트.md」 0번과 같다. 확인할 값은 07-광양공간분석.py 의 출력 -->
+  <section class="s-split">
+    <h2>오늘의 실습자료와 자료 정리</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 42%">
+        <p class="sub t-red" style="margin-bottom:4px">광양시 100m 격자 인구와 전기차 충전소</p>
+        <ul class="defs">
+          <li><strong>파일:</strong> <span class="code">07강-광양격자인구-충전소.zip</span></li>
+          <li><strong>격자:</strong> 100m 격자 <span class="num">47,032</span>칸 (GeoJSON)<br>
+            속성은 격자번호 gid 와 인구 val 둘</li>
+          <li><strong>충전소:</strong> <span class="num">44</span>행 (CSV)<br>
+            충전소명 · 주소 · 급속/완속 · lon · lat 등 10개 열</li>
+          <li><strong>시점:</strong> 파일에 기준 시점이 적혀 있지 않음</li>
+          <li><strong>함께 든 것:</strong> README · 방법별 프롬프트 · 로직 문서 본보기</li>
+        </ul>
+        <p class="conclusion" style="margin-top:8px">→ 인구가 빈 칸은 <strong>0 명과 다름</strong>.
+          조사 대상이 아닌 칸이라 뺌</p>
+        <p class="src">자료: COMPAS 「전기차 충전소 최적입지 선정」(광양시, SBJ_2009_001)</p>
+      </div>
+      <div class="col-r">
+        <div class="prompt-box">
+          <p class="who">자료 정리 프롬프트</p>
+          <p>광양시_100m격자인구.geojson 과 광양시_전기차충전소.csv 를 읽고
+            행 수, 열 이름, 열마다 빈 값의 개수를 보여 줘.</p>
+          <p>격자에서 인구(val)가 빈 칸은 빼 줘. 0 명이 아니라 조사 대상이 아닌 칸이야.</p>
+          <p>남은 칸 가운데 인구 0 인 칸도 세어 줘.</p>
+          <p>격자마다 꼭짓점의 평균으로 중심점을 구하고, 경위도를 미터 좌표로 바꿔 줘.</p>
+          <p>충전소에서 lon · lat 이 같은 행이 몇 쌍인지 알려 줘.</p>
+          <p>무엇을 왜 뺐는지 로직 문서로 정리해 줘.</p>
+        </div>
+        <p class="caption" style="margin-top:8px"><strong>확인할 값:</strong>
+          격자 47,032칸 → 인구 빈 칸 42,809 제외 <strong>4,223칸</strong> · 인구 합 145,683명<br>
+          인구 0 인 칸 2,188 (51.8%) · 충전소 44행 중 같은 자리 6쌍</p>
+      </div>
     </div>
   </section>
 
@@ -187,10 +246,17 @@
   <section class="s-definition">
     <p class="mth">방법 1 / 6</p>
     <h2>단계구분도: 목적과 정의</h2>
-    <div class="body">
+    <div class="body tight">
       <p class="define">구역마다 값을 <span class="t-red">몇 개의 계급으로 나누고</span> 계급마다 색을 칠한 지도</p>
-      <p>영어로 choropleth map. 행정동 · 격자처럼 <strong>면</strong>이 단위다</p>
-      <p class="need">필요한 자료 — 구역(경계) + 구역마다 값 하나</p>
+      <p style="margin-bottom:6px">영어로 choropleth map. 행정동 · 격자처럼 <strong>면</strong>이 단위다</p>
+      <ul class="defs">
+        <li><strong>구역:</strong> 경계로 둘러싸여 값 하나를 갖는 면. 행정동 · 격자 등</li>
+        <li><strong>계급:</strong> 값의 범위를 나눈 구간. 계급마다 색 하나를 칠함</li>
+        <li><strong>등간 분류:</strong> 최솟값에서 최댓값까지를 같은 폭으로 나눔</li>
+        <li><strong>분위 분류:</strong> 계급마다 들어가는 구역 수가 같도록 나눔</li>
+        <li><strong>자연분류(Jenks):</strong> 계급 안 값들의 편차 제곱합이 가장 작도록 나눔</li>
+      </ul>
+      <p class="need">필요한 자료: 구역(경계) + 구역마다 값 하나</p>
       <p class="conclusion">→ 값의 <strong>지역 차이</strong>가 한눈에 보임. 다만 계급을 어떻게 나누느냐로 지도가 달라짐</p>
     </div>
   </section>
@@ -212,7 +278,7 @@
     <script>
       (function () {
         const v = GY.cells.map((c) => c.p);
-        [['eq', '등간 — 폭을 똑같이'], ['q', '분위 — 칸 수를 똑같이'], ['jk', '자연분류 — 계급 안이 비슷하게']].forEach(([k, t]) => {
+        [['eq', '등간: 폭을 똑같이'], ['q', '분위: 칸 수를 똑같이'], ['jk', '자연분류: 계급 안이 비슷하게']].forEach(([k, t]) => {
           const b = GY.breaks[k];
           GY.map(`#f-ch-${k}`, { h: 215, title: t, fill: (c) => GY.RAMP[GY.cls(c.p, b)] });
           const n = [0, 0, 0, 0, 0]; v.forEach((x) => n[GY.cls(x, b)]++);
@@ -257,10 +323,16 @@
   <section class="s-definition">
     <p class="mth">방법 2 / 6</p>
     <h2>커널밀도추정: 목적과 정의</h2>
-    <div class="body">
+    <div class="body tight">
       <p class="define">점마다 <span class="t-red">둥근 언덕을 하나씩 얹고 모두 더해</span> 만든 매끈한 밀도면</p>
-      <p>영어로 Kernel Density Estimation. 경계가 없는 <strong>점</strong> 자료를 면으로 바꿈</p>
-      <p class="need">필요한 자료 — 점 좌표 + 언덕의 폭(대역폭)</p>
+      <p style="margin-bottom:6px">영어로 Kernel Density Estimation. 경계가 없는 <strong>점</strong> 자료를 면으로 바꿈</p>
+      <ul class="defs">
+        <li><strong>밀도:</strong> 단위 면적에 든 점의 개수. 광양은 km² 당 충전소 수</li>
+        <li><strong>커널:</strong> 점 하나에 얹는 언덕의 모양을 정한 함수. 가우스 커널은 종 모양</li>
+        <li><strong>대역폭(bandwidth):</strong> 언덕이 퍼지는 폭. 넓을수록 밀도면이 매끈해짐</li>
+        <li><strong>밀도면:</strong> 지도 위 위치마다 계산한 밀도를 이어 붙인 면</li>
+      </ul>
+      <p class="need">필요한 자료: 점 좌표 + 언덕의 폭(대역폭)</p>
       <p class="conclusion">→ 점이 <strong>얼마나 촘촘한가</strong>를 행정경계에 묶이지 않고 봄</p>
     </div>
   </section>
@@ -302,8 +374,8 @@
           return parts;
         };
         Fig.draw('#f-kde-how', { check: false, parts: [
-          ...panel({ x0: 20, y0: 110, x1: 400, y1: 20 }, 0.25, 0.75, '좁은 대역폭 — 봉우리가 점마다'),
-          ...panel({ x0: 20, y0: 240, x1: 400, y1: 150 }, 0.9, 0.24, '넓은 대역폭 — 두 덩어리로'),
+          ...panel({ x0: 20, y0: 110, x1: 400, y1: 20 }, 0.25, 0.75, '좁은 대역폭: 봉우리가 점마다'),
+          ...panel({ x0: 20, y0: 240, x1: 400, y1: 150 }, 0.9, 0.24, '넓은 대역폭: 두 덩어리로'),
         ] });
       })();
     </script>
@@ -341,10 +413,16 @@
   <section class="s-definition">
     <p class="mth">방법 3 / 6</p>
     <h2>전역 공간자기상관 — Moran's I: 목적과 정의</h2>
-    <div class="body">
-      <p class="define">이웃한 구역끼리 값이 <span class="t-red">얼마나 비슷한가</span>를 숫자 하나로 잰 것</p>
-      <p><strong>양수</strong> 비슷한 값끼리 뭉침 · <strong>0 근처</strong> 아무렇게나 흩어짐 · <strong>음수</strong> 높고 낮은 값이 엇갈림</p>
-      <p class="need">필요한 자료 — 구역 + 값 + 누가 누구의 이웃인지 (공간가중행렬)</p>
+    <div class="body tight">
+      <p class="define">이웃한 구역끼리 값이 <span class="t-red">얼마나 비슷한가</span>를 숫자 하나로 측정한 것</p>
+      <ul class="defs">
+        <li><strong>공간자기상관:</strong> 가까운 구역끼리 값이 서로 닮은 정도</li>
+        <li><strong>이웃:</strong> 경계가 맞닿거나 정한 거리 안에 있는 구역</li>
+        <li><strong>공간가중행렬:</strong> 구역 쌍마다 이웃인지를 적은 표. 이웃이면 1, 아니면 0</li>
+        <li><strong>I 의 부호:</strong> 양수는 비슷한 값끼리 뭉침 · 0 근처는 아무렇게나 흩어짐 · 음수는 높고 낮은 값이 엇갈림</li>
+        <li><strong>z 점수:</strong> I 가 아무렇게나 흩어졌을 때의 기대값에서 표준편차 몇 개만큼 떨어졌나</li>
+      </ul>
+      <p class="need">필요한 자료: 구역 + 값 + 누가 누구의 이웃인지 (공간가중행렬)</p>
       <p class="conclusion">→ 지도를 보고 「뭉쳐 보인다」 고 느낀 것을 <strong>검정할 수 있는 숫자</strong>로 바꿈</p>
     </div>
   </section>
@@ -411,7 +489,7 @@
       <div class="big">
         <div><p class="v" id="k-mi-i"></p><p class="k">Moran's I</p></div>
         <div><p class="v" id="k-mi-e"></p><p class="k">아무렇게나 흩어졌을 때의 기대값</p></div>
-        <div><p class="v" id="k-mi-z"></p><p class="k">z — 2.58 을 넘으면 99% 에서 유의</p></div>
+        <div><p class="v" id="k-mi-z"></p><p class="k">z: 2.58 을 넘으면 99% 에서 유의</p></div>
       </div>
       <p class="conclusion">→ 인구는 <strong>강하게 뭉쳐 있음</strong>. 우연으로는 나올 수 없는 크기</p>
       <p class="conclusion">→ 다만 숫자 하나는 <strong>어디가</strong> 뭉쳤는지 말하지 않음 — 다음 방법이 짚음</p>
@@ -430,10 +508,16 @@
   <section class="s-definition">
     <p class="mth">방법 4 / 6</p>
     <h2>국지 공간자기상관 — LISA: 목적과 정의</h2>
-    <div class="body">
+    <div class="body tight">
       <p class="define">칸마다 <span class="t-red">내 값과 이웃의 값</span>을 견줘 뭉침이 어디서 생기는지 짚는 것</p>
-      <p>영어로 Local Indicators of Spatial Association. Moran's I 를 <strong>칸 하나씩</strong> 나눠 본 것</p>
-      <p class="need">필요한 자료 — Moran's I 와 같음</p>
+      <p style="margin-bottom:6px">영어로 Local Indicators of Spatial Association. Moran's I 를 <strong>칸 하나씩</strong> 나눠 본 것</p>
+      <ul class="defs">
+        <li><strong>공간시차(spatial lag):</strong> 한 칸의 이웃들이 가진 값의 평균</li>
+        <li><strong>국지 I:</strong> 내 표준화 값 × 이웃의 표준화 값 평균. 양수면 이웃과 닮음</li>
+        <li><strong>HH · LL:</strong> 높은(낮은) 칸이 높은(낮은) 이웃에 둘러싸인 덩어리</li>
+        <li><strong>HL · LH:</strong> 이웃과 반대로 높거나 낮은 칸. 공간 이상치라고도 함</li>
+      </ul>
+      <p class="need">필요한 자료: Moran's I 와 같음</p>
       <p class="conclusion">→ 「뭉쳐 있다」 를 넘어 <strong>어디가 높은 덩어리, 어디가 낮은 덩어리, 어디가 튀는 곳</strong>인지</p>
     </div>
   </section>
@@ -444,9 +528,9 @@
     <div class="body">
       <div class="col-l" style="flex:0 0 46%">
         <ol class="steps">
-          <li><b>내 값을 표준화</b> — 평균보다 높나 낮나</li>
-          <li><b>이웃 평균을 표준화</b> — 이웃은 높나 낮나</li>
-          <li><b>둘을 곱함</b> — 그 칸의 국지 I</li>
+          <li><b>내 값을 표준화:</b> 평균보다 높나 낮나</li>
+          <li><b>이웃 평균을 표준화:</b> 이웃은 높나 낮나</li>
+          <li><b>둘을 곱함:</b> 그 칸의 국지 I</li>
           <li><b>네 사분면으로 나눔</b></li>
         </ol>
         <p class="conclusion" style="margin-top:10px">→ HH · LL 은 덩어리, HL · LH 는 <strong>주변과 다른 튀는 칸</strong></p>
@@ -508,10 +592,15 @@
   <section class="s-definition">
     <p class="mth">방법 5 / 6</p>
     <h2>핫스팟 분석 — Getis-Ord Gi*: 목적과 정의</h2>
-    <div class="body">
-      <p class="define">한 칸과 그 이웃의 합이 <span class="t-red">전체에서 기대한 것보다 유의하게 큰지</span>를 z 로 잰 것</p>
-      <p>크면 <strong>핫스팟</strong>, 작으면 <strong>콜드스팟</strong>. 높은 값이 <strong>몰려 있는 곳</strong>만 짚음</p>
-      <p class="need">필요한 자료 — Moran's I 와 같음</p>
+    <div class="body tight">
+      <p class="define">한 칸과 그 이웃의 합이 <span class="t-red">전체에서 기대한 것보다 유의하게 큰지</span>를 z 로 측정한 것</p>
+      <ul class="defs">
+        <li><strong>핫스팟:</strong> Gi* 가 유의하게 큰 칸. 높은 값이 몰려 있는 곳</li>
+        <li><strong>콜드스팟:</strong> Gi* 가 유의하게 작은 칸. 낮은 값이 몰려 있는 곳</li>
+        <li><strong>Gi 와 Gi*:</strong> Gi* 는 자기 칸을 합에 넣고, Gi 는 이웃만 더함</li>
+        <li><strong>유의 기준:</strong> |z| 가 1.96 을 넘으면 95%, 2.58 을 넘으면 99% 에서 유의</li>
+      </ul>
+      <p class="need">필요한 자료: Moran's I 와 같음</p>
       <p class="conclusion">→ LISA 가 네 유형을 나눈다면 Gi* 는 <strong>뜨거운 곳 하나</strong>에 집중함</p>
     </div>
   </section>
@@ -522,10 +611,10 @@
     <div class="body">
       <div class="col-l" style="flex:0 0 52%">
         <ol class="steps">
-          <li><b>나와 이웃을 한 묶음으로</b> — Gi* 는 자기 자신을 포함함</li>
+          <li><b>나와 이웃을 한 묶음으로:</b> Gi* 는 자기 자신을 포함함</li>
           <li><b>묶음의 합</b>을 구함</li>
           <li><b>전체 평균으로 기대한 합</b>과의 차이를 구함</li>
-          <li><b>표준화해 z 로</b> — |z| &gt; 2.58 이면 99% 에서 유의</li>
+          <li><b>표준화해 z 로:</b> |z| &gt; 2.58 이면 99% 에서 유의</li>
         </ol>
         <p class="fx">Gᵢ* = (Σⱼ xⱼ − x̄·w) / ( s · √((n·w − w²)/(n−1)) )</p>
         <p class="caption" style="margin:0">합은 나와 이웃 w 칸에 대해 · x̄ 전체 평균 · s 전체 표준편차</p>
@@ -533,7 +622,7 @@
       <div class="col-r">
         <svg class="fig" id="f-gi-how" viewBox="0 0 300 250" role="img">
           <title>5×5 격자에서 가운데 칸과 상하좌우 네 칸을 한 묶음으로 표시한 그림</title></svg>
-        <p class="caption" style="text-align:center;margin-top:2px">가운데 칸의 묶음 — 자기 자신 + 상하좌우 넷</p>
+        <p class="caption" style="text-align:center;margin-top:2px">가운데 칸의 묶음: 자기 자신 + 상하좌우 넷</p>
       </div>
     </div>
     <script>
@@ -559,9 +648,9 @@
           <div><p class="v" id="k-gi-cold"></p><p class="k">콜드스팟 (z &lt; −2.58)</p></div>
         </div>
         <p class="emph" style="margin-bottom:4px">결과를 읽기 전에 볼 한계 둘</p>
-        <p><strong>콜드스팟 0 은 자료의 성질</strong> — 인구는 0 아래로 못 가고 0 이 절반이라
+        <p><strong>콜드스팟 0 은 자료의 성질:</strong> 인구는 0 아래로 못 가고 0 이 절반이라
           낮은 쪽으로는 더 낮아질 수 없음</p>
-        <p><strong>4,223번 검정함</strong> — 99% 기준이어도 우연만으로 수십 칸이 걸릴 수 있음.
+        <p><strong>4,223번 검정함:</strong> 99% 기준이어도 우연만으로 수십 칸이 걸릴 수 있음.
           다중검정 보정은 하지 않았음</p>
         <p class="src">계산: analysis/07-공간분석/07-광양공간분석.py · 한계는 07-광양공간분석-로직.md</p>
       </div>
@@ -585,11 +674,18 @@
   <section class="s-definition">
     <p class="mth">방법 6 / 6</p>
     <h2>밀도기반 공간군집 — DBSCAN: 목적과 정의</h2>
-    <div class="body">
+    <div class="body tight">
       <p class="define">반경 안에 점이 <span class="t-red">충분히 모인 곳을 덩어리로 잇고</span>,
         어디에도 끼지 못한 점은 <span class="t-red">잡음</span>으로 남기는 것</p>
-      <p>6강 K-means 와 달리 <strong>덩어리 개수를 미리 정하지 않음</strong>. 모양도 둥글 필요가 없음</p>
-      <p class="need">필요한 자료 — 점 좌표 + 반경 eps + 최소 점 수 minPts</p>
+      <p style="margin-bottom:6px">6강 K-means 와 달리 <strong>덩어리 개수를 미리 정하지 않음</strong>. 모양도 둥글 필요가 없음</p>
+      <ul class="defs">
+        <li><strong>eps:</strong> 이웃으로 볼 반경</li>
+        <li><strong>minPts:</strong> 핵심점이 되려면 반경 안에 있어야 하는 최소 점 수 (자기 포함)</li>
+        <li><strong>핵심점:</strong> 반경 eps 안에 minPts 개 이상의 점이 있는 점</li>
+        <li><strong>경계점:</strong> 스스로는 모자라지만 어떤 핵심점의 반경 안에 드는 점</li>
+        <li><strong>잡음:</strong> 핵심점도 경계점도 아닌 점</li>
+      </ul>
+      <p class="need">필요한 자료: 점 좌표 + 반경 eps + 최소 점 수 minPts</p>
       <p class="conclusion">→ 위치만으로 <strong>덩어리와 외톨이</strong>를 가름</p>
     </div>
   </section>
@@ -600,10 +696,10 @@
     <div class="body">
       <div class="col-l" style="flex:0 0 46%">
         <ol class="steps">
-          <li><b>반경 eps 를 정함</b> — 광양은 700m</li>
-          <li><b>핵심점</b> — 반경 안에 자기 포함 minPts(3) 이상</li>
-          <li><b>경계점</b> — 핵심점의 반경 안에 들지만 스스로는 모자람</li>
-          <li><b>잡음</b> — 어느 쪽도 아님</li>
+          <li><b>반경 eps 를 정함:</b> 광양은 700m</li>
+          <li><b>핵심점:</b> 반경 안에 자기 포함 minPts(3) 이상</li>
+          <li><b>경계점:</b> 핵심점의 반경 안에 들지만 스스로는 모자람</li>
+          <li><b>잡음:</b> 어느 쪽도 아님</li>
           <li>이어진 핵심점과 경계점이 <b>한 덩어리</b></li>
         </ol>
       </div>
@@ -682,8 +778,8 @@
       <svg class="fig" id="f-choose" viewBox="0 0 900 300" style="width:830px" role="img"
            aria-label="자료가 점인가 구역인가로 갈라져 여섯 방법 중 하나에 이르는 선택 순서도">
         <title>자료가 점인가 구역인가로 시작해 여섯 방법 중 하나를 고르는 순서도</title></svg>
-      <p class="conclusion" style="margin-top:6px">→ 첫 갈림은 <strong>자료의 모양</strong> — 점인가 면인가</p>
-      <p class="conclusion">→ 면이면 「보고 싶은가, 재고 싶은가, 어디인지 알고 싶은가」 로 다시 갈림</p>
+      <p class="conclusion" style="margin-top:6px">→ 첫 갈림은 <strong>자료의 모양:</strong> 점인가 면인가</p>
+      <p class="conclusion">→ 면이면 「보고 싶은가, 측정하고 싶은가, 어디인지 알고 싶은가」 로 다시 갈림</p>
     </div>
     <script>
       (function () {
@@ -707,17 +803,17 @@
         ask(16, 131, 150, '자료가 점인가 면인가');
         // 점 — 위
         ask(250, 30, 150, '무엇을 알고 싶나');
-        leaf(470, 8, 200, '2 커널밀도 — 촘촘함');
-        leaf(470, 52, 200, '6 DBSCAN — 덩어리와 잡음');
+        leaf(470, 8, 200, '2 커널밀도: 촘촘함');
+        leaf(470, 52, 200, '6 DBSCAN: 덩어리와 잡음');
         arrow(166, 140, 246, 52, '점', 196, 86);
         arrow(400, 44, 466, 26);
         arrow(400, 56, 466, 70);
         // 면 — 아래
         ask(250, 190, 150, '무엇을 알고 싶나');
-        leaf(470, 118, 200, '1 단계구분도 — 보기');
-        leaf(470, 162, 200, "3 Moran's I — 한 숫자");
-        leaf(470, 206, 200, '4 LISA — 어디가 어떻게');
-        leaf(470, 250, 200, '5 Gi* — 높은 곳만');
+        leaf(470, 118, 200, '1 단계구분도: 보기');
+        leaf(470, 162, 200, "3 Moran's I: 한 숫자");
+        leaf(470, 206, 200, '4 LISA: 어디가 어떻게');
+        leaf(470, 250, 200, '5 Gi*: 높은 곳만');
         arrow(166, 160, 246, 208, '면', 196, 196);
         arrow(400, 200, 466, 136);
         arrow(400, 205, 466, 180);
@@ -728,69 +824,53 @@
     </script>
   </section>
 
-  <!-- ══ 실습 ① ══════════════════════════════════════════════ -->
-  <section>
-    <p class="mth">실습 1 / 3</p>
-    <h2>실습 ① — 방법을 조사해 위키에 적는다 <span class="en">25분</span></h2>
+  <!-- ══ 과제 (2026-10-19 실습 ①·② 를 과제로 옮김. 실습 ③ 은 뺐다) ══════ -->
+  <section class="s-split">
+    <h2>과제: 여섯 방법을 조사하고 자기 데이터에 적용한다</h2>
     <div class="body tight">
-      <p class="emph">오늘 여섯 중 <strong>자기가 쓸 두세 개</strong>를 고름</p>
-      <div class="lab">
-        <div>
-          <p class="hd">AI 에게 물을 것</p>
-          <p>이 방법은 언제 쓰고 언제 쓰면 안 되나</p>
-          <p>이웃을 어떻게 정하느냐에 따라 결과가 어떻게 바뀌나</p>
-          <p>흔히 저지르는 잘못은 무엇인가</p>
-        </div>
-        <div>
-          <p class="hd">위키에 적을 것</p>
-          <p>한 문장 정의와 필요한 자료</p>
-          <p>고를 조건 · 피할 조건</p>
-          <p>확인하지 못한 것은 <span class="mark">「확인 필요」</span> 로 표시</p>
-        </div>
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:4px">1. 여섯 방법을 모두 조사한다</p>
+        <p style="margin-bottom:4px">방법마다 AI 에게 묻고 확인해 세 가지를 정리함</p>
+        <ul class="defs">
+          <li><strong>쓰는 경우:</strong> 어떤 목적과 자료에서 쓰나</li>
+          <li><strong>다른 방법과의 차이:</strong> 같은 목적의 다른 방법과 무엇이 다른가.<br>
+            이웃을 어떻게 정하느냐에 따라 결과가 어떻게 바뀌나</li>
+          <li><strong>장점과 단점:</strong> 무엇을 잘 보여 주고 무엇을 놓치나.<br>
+            흔히 저지르는 잘못은 무엇인가</li>
+        </ul>
       </div>
-      <p class="conclusion" style="margin-top:10px">→ 산출물은 <span class="code">wiki/topics/</span> 페이지.
-        2주차에 만든 위키에 이어 붙임</p>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">2. 자기 데이터에 적용해 보고서로 정리한다</p>
+        <ol class="steps" style="margin-top:4px">
+          <li><b>목적을 한 문장으로 적음:</b> 「어디에 무엇이 몰려 있는가」</li>
+          <li><b>방법을 고르고 이유를 적음:</b> 순서도의 어느 갈림을 탔나</li>
+          <li><b>정한 값을 적음:</b> 분류법 · 대역폭 · 이웃 반경 · eps 처럼 결과를 바꾸는 것</li>
+          <li><b>적용하고 결과를 봄:</b> AI 에게 로직을 요구하고 사람이 검증함</li>
+        </ol>
+        <p class="caption" style="margin-top:4px">본보기: 배포 자료의 「분석 프롬프트.md」와 「로직 문서 본보기.md」<br>
+          같은 자료로 다른 사람이 같은 지도를 얻을 수 있게 판단을 적음</p>
+      </div>
     </div>
   </section>
 
-  <!-- ══ 실습 ② ══════════════════════════════════════════════ -->
+  <!-- ══ 제출 (2026-10-19 · 6강 「제출물」 장과 같은 방식) ═══════════ -->
   <section>
-    <p class="mth">실습 2 / 3</p>
-    <h2>실습 ② — 자기 데이터에 적용한다 <span class="en">40분</span></h2>
+    <h2>제출물</h2>
     <div class="body tight">
-      <ol class="steps">
-        <li><b>목적을 한 문장으로</b> — 「어디에 무엇이 몰려 있는가」 를 먼저 적음</li>
-        <li><b>방법을 고르고 이유를 적음</b> — 순서도의 갈림 중 어디를 탔는지</li>
-        <li><b>정한 값을 적음</b> — 분류법 · 대역폭 · 이웃 반경 · eps 처럼 결과를 바꾸는 것</li>
-        <li><b>적용하고 결과를 봄</b> — AI 에게 로직을 요구하고 사람이 검증함</li>
-      </ol>
-      <p class="emph" style="margin-top:10px">본보기는
-        <span class="code">analysis/07-공간분석/07-광양공간분석-로직.md</span></p>
-      <p class="conclusion">→ 코드가 아니라 <strong>판단</strong>을 적음. 같은 자료로 다른 사람이 같은 지도를 얻을 수 있어야 함</p>
-    </div>
-  </section>
-
-  <!-- ══ 실습 ③ ══════════════════════════════════════════════ -->
-  <section>
-    <p class="mth">실습 3 / 3</p>
-    <h2>실습 ③ — 아쉬운 점을 공개 논의한다 <span class="en">25분</span></h2>
-    <div class="body tight">
-      <div class="lab">
-        <div>
-          <p class="hd">내는 것</p>
-          <p>고른 방법과 그 이유</p>
-          <p>결과 지도 한 장</p>
-          <p><span class="mark">스스로 아쉬운 점</span> 한 가지</p>
-        </div>
-        <div>
-          <p class="hd">서로 볼 것</p>
-          <p>이 목적에 이 방법이 맞나</p>
-          <p>분류법 · 반경을 바꾸면 결론이 뒤집히지 않나</p>
-          <p>지도가 결론을 과장하지 않나</p>
-        </div>
+      <p class="sub">두 과제를 <span class="hl">각각 별도 파일로</span> 낸다</p>
+      <ul>
+        <li><span class="code">공간분석-방법조사.md</span>: 1번의 조사내용: 쓰는 경우, 다른 방법과의 차이, 장점과 단점</li>
+        <li><span class="code">공간분석-보고서.md</span>: 2번의 자기 데이터에 적용한 결과</li>
+      </ul>
+      <p class="emph" style="margin-top:14px">제출기한:
+        <span class="t-red">10월 24일(토) 23시 59분 59초</span></p>
+      <div class="doc" style="margin-top:10px">
+        <div class="bar">데이터사이언스 과제 제출 — 한 학기 내내 같은 주소</div>
+        <pre style="font-size:13px;line-height:1.9"><span class="h">docs.google.com/forms/d/e/1FAIpQLSc7AWYdgrGn1gKGoo7VkC6vsDZNXANo-CWokVjY2dm2pucIew/viewform</span></pre>
       </div>
-      <p class="conclusion" style="margin-top:10px">→ 받은 지적과 고친 내용을 위키에 남김.
-        <strong>고치지 않기로 한 것도 이유와 함께</strong> 적음</p>
+      <p class="caption" style="margin-top:8px">
+        2주차와 같은 주소다. 주차 선택에서 <span class="hl">7주차</span>를 고르고,
+        학번 열 자리와 이름을 띄어쓰기 없이 적는다.</p>
     </div>
   </section>
 
