@@ -29,6 +29,21 @@
   .fig-note p { font-size: 11px; line-height: 1.42; margin: 0 0 2px; }
   .fig-note .ind { margin-left: 12px; }
   .panel-head { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0 0 2px; text-align: center; }
+
+  /* 중간고사 풀이 (2026-10-20) — 6강 퀴즈 풀이와 같은 모양 */
+  .qz { font-size: 14px; line-height: 1.5; margin: 0 0 8px; color: var(--ink); }
+  .qz-item { font-size: 14px; line-height: 1.5; margin: 0 0 14px; color: var(--ink); }
+  .qz-item .in { display: block; padding-left: 20px; margin-top: 2px; }
+  .qz-item .ok, .blank .ok { color: var(--brand-crimson); font-weight: 700; }
+  .blank { display: inline-block; min-width: 110px; text-align: center; }
+  .quiz2 { display: flex; gap: 18px; align-items: flex-start; margin-top: 4px; }
+  .quiz2 .fig-col { flex: 0 0 auto; }
+  .quiz2 .sol { flex: 1 1 auto; font-size: 13px; line-height: 1.55; color: var(--ink); }
+  .quiz2 .sol p { margin: 0 0 5px; }
+  .reveal .ans { font-size: 19px; font-weight: 700; color: var(--brand-crimson); margin-top: 6px; }
+  .sol-line { font-size: 13px; line-height: 1.55; color: var(--ink); margin: 0 0 4px; }
+  .mid-tbl { font-size: 13px; margin: 2px 0 4px; }
+  .mid-tbl th, .mid-tbl td { padding: 3px 12px; text-align: center; }
 </style>
 
 <script>
@@ -280,6 +295,18 @@ window.L8 = (function () {
            pmfPlot, pdfPlot, A, B, boxPair, tree };
 })();
 </script>
+<script>
+  /* 중간고사 (2026-2학기) 문제지에 인쇄된 값 — 풀이의 계산값은 모두 여기서 유도한다 (design.md §6.5) */
+  window.r1 = (v) => Math.round(v * 10) / 10;
+  window.r2 = (v) => Math.round(v * 100) / 100;
+  window.neg = (v) => String(v).replace('-', '−');   // 음수는 하이픈이 아니라 마이너스 기호로
+  window.MID = {
+    bus: [[0, 10, 30], [10, 20, 60], [20, 30, 60], [30, 50, 40], [50, 90, 10]],   // [하한, 상한, 빈도]
+    commute: { mu: 40, sd: 8, lo: 28, hi: 52, phi15: 0.9332, phi128: 0.8997, phi129: 0.9015, z90: 1.28 },
+    apt: { mx: 800, sdx: 200, my: 500, sdy: 80, r: -0.6, x0: 600 },
+    models: { n: 12, sst: 500, list: [{ name: 'A', k: 1, sse: 200 }, { name: 'B', k: 3, sse: 180 }] },
+  };
+</script>
 </head>
 <body>
 <div class="reveal"><div class="slides">
@@ -290,6 +317,267 @@ window.L8 = (function () {
     <p class="cover-label" data-course-label>&nbsp;</p>
     <h1>8강. 확률이론 (1)</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+    <!-- ══ 중간고사 풀이 (2026-10-20 추가) ═══════════════════════════
+       문항·정답·풀이는 private/중간고사/2026-2학기 도시교통통계학 중간고사.hwpx 에서 옮겼다.
+       6강 퀴즈 1 풀이와 같은 형식이다. 계산값은 head 의 window.MID 에서 유도한다. -->
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">중간고사 풀이</p>
+  </section>
+
+  <section>
+    <h2>중간고사 풀이: 1. 참과 거짓 (1)~(3)</h2>
+    <div class="body">
+      <p class="qz" style="margin-bottom:16px">1. 다음 명제의 참과 거짓을 판별하시오. (6점, 각 1점)</p>
+      <p class="qz-item">(1) 같은 모집단에서 표본을 다시 뽑더라도 표본의 평균(통계량)은 언제나 같은 값이 나온다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment in ok" data-fragment-index="0">→ 거짓: 모수는 하나로 정해져 있으나, 통계량은 표본을 다시 뽑으면 값이 달라진다 (2강)</span></p>
+      <p class="qz-item">(2) 계급구간의 길이가 서로 다른 히스토그램에서 각 막대의 넓이(구간길이×높이)는 그 계급의 상대빈도와 같다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment in ok" data-fragment-index="0">→ 참: 밀도 = 상대빈도 / 구간길이 이므로 밀도 × 구간길이 = 상대빈도 (2강)</span></p>
+      <p class="qz-item">(3) 표본의 표준편차를 구할 때 n 이 아니라 n−1 로 나누는 것은 평균을 먼저 계산하면서 자유도가 하나 줄기 때문이다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment in ok" data-fragment-index="0">→ 참: 평균을 쓰는 순간 값 하나가 묶이므로 마음대로 정할 수 있는 값은 n−1 개다 (2강)</span></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>중간고사 풀이: 1. 참과 거짓 (4)~(6)</h2>
+    <div class="body">
+      <p class="qz-item">(4) 왼쪽으로 늘어진(left-skewed) 분포에서는 일반적으로 평균이 중앙값보다 크다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment in ok" data-fragment-index="0">→ 거짓: 왼쪽으로 늘어지면 평균 &lt; 중앙값 &lt; 최빈값 이다. 평균이 긴 꼬리 쪽으로 끌려간다 (2강)</span></p>
+      <p class="qz-item">(5) 상관계수는 이상치(outlier) 하나에 의해서도 값이 크게 달라질 수 있다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment in ok" data-fragment-index="0">→ 참: 상관계수는 이상치에 민감하다 (4강 상관계수의 한계)</span></p>
+      <p class="qz-item">(6) 회귀모형에 설명변수를 추가하면 결정계수(R²)는 줄어들지 않지만, 조정된 결정계수는 줄어들 수 있다. (참, &nbsp;&nbsp;&nbsp;&nbsp;거짓)
+        <span class="fragment in ok" data-fragment-index="0">→ 참: 설명변수가 추가되면 SSE 는 줄거나 같아 R² 는 줄지 않는다.
+          조정된 결정계수는 자유도 감소를 반영하므로 줄 수 있다 (6강)</span></p>
+    </div>
+  </section>
+
+  <section>
+    <h2>중간고사 풀이: 2. 빈칸 채우기</h2>
+    <div class="body tight">
+      <p class="qz" style="margin-bottom:12px">2. 다음 문장의 빈칸에 알맞은 용어를 쓰시오. (6점, 각 1점)</p>
+      <p class="qz-item" style="margin-bottom:9px">(1) 관심 대상이 되는 전체 집단의 특성을 나타내는 값으로, 하나로 정해져 있으나 대개 알 수 없는 값을
+        (<span class="blank"><span class="fragment ok" data-fragment-index="0">모수</span></span>)라 한다.</p>
+      <p class="qz-item" style="margin-bottom:9px">(2) 히스토그램에서 각 계급의 상대빈도를 구간의 길이로 나눈 값을
+        (<span class="blank"><span class="fragment ok" data-fragment-index="0">밀도</span></span>)라 하며, 이 값이 막대의 높이가 된다.</p>
+      <p class="qz-item" style="margin-bottom:9px">(3) 제3사분위수에서 제1사분위수를 뺀 값을
+        (<span class="blank"><span class="fragment ok" data-fragment-index="0">사분위수 범위 (IQR)</span></span>)라 한다.</p>
+      <p class="qz-item" style="margin-bottom:9px">(4) 두 변수의 편차를 곱해 평균한 값으로, 두 변수의 측정단위를 그대로 지니는 통계량을
+        (<span class="blank"><span class="fragment ok" data-fragment-index="0">공분산</span></span>)이라 한다.</p>
+      <p class="qz-item" style="margin-bottom:9px">(5) 처음 측정한 값이 극단적이었던 대상이 다음 측정에서는 평균에 더 가까운 값을 보이는 현상을
+        (<span class="blank"><span class="fragment ok" data-fragment-index="0">회귀효과 (평균으로의 회귀)</span></span>)라 한다.</p>
+      <p class="qz-item" style="margin-bottom:9px">(6) 두 변수의 결합분포를 나타내기 위해 한 변수를 x축에, 다른 변수를 y축에 두고 점으로 찍은 그림을
+        (<span class="blank"><span class="fragment ok" data-fragment-index="0">산포도</span></span>)라 한다.</p>
+    </div>
+  </section>
+
+  <!-- 3번 — 밀도 히스토그램. 막대 높이는 MID.bus 의 빈도에서 계산한다 -->
+  <section>
+    <h2>중간고사 풀이: 3. 도수분포표와 히스토그램</h2>
+    <div class="body tight">
+      <p class="qz">3. 청주시 시내버스 승객 200명의 통행시간(분)을 조사하여 아래의 도수분포표를 얻었다. (4점)<br>
+        (단, 계급구간은 좌측경계는 포함하되 우측경계는 포함하지 않음)</p>
+      <table class="mid-tbl" id="t-bus"><tbody></tbody></table>
+      <div class="quiz2">
+        <div class="fig-col">
+          <svg class="fig" id="f-mid-hist" viewBox="0 0 330 230" style="width:310px" role="img">
+            <title>계급 폭이 다른 다섯 계급의 밀도 히스토그램. 30-50분 막대의 높이는 1.0, 중앙값은 20-30분 계급에 있다</title>
+          </svg>
+        </div>
+        <div class="sol">
+          <p>(1) 30-50분 계급의 밀도 (%/분)</p>
+          <p class="fragment" data-fragment-index="0" id="sol-dens"></p>
+          <p style="margin-top:8px">(2) 중앙값이 속한 계급</p>
+          <p class="fragment" data-fragment-index="1" id="sol-med"></p>
+          <p style="margin-top:8px">(3) 평균과 중앙값 중 더 큰 쪽과 그 이유</p>
+          <p class="fragment" data-fragment-index="2"><b class="t-red">평균</b>: 50-90분 계급까지 오른쪽으로 길게 늘어진(right-skewed) 분포이다.
+            평균은 극단적인 값의 영향을 받아 긴 꼬리 쪽으로 끌려가므로 중앙값보다 크다</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const B = window.MID.bus, N = B.reduce((s, b) => s + b[2], 0);
+        document.querySelector('#t-bus tbody').innerHTML =
+          '<tr><th>계급(분)</th>' + B.map(([a, b]) => `<td>${a}-${b}</td>`).join('') + '</tr>' +
+          '<tr><th>빈도(명)</th>' + B.map((b) => `<td>${b[2]}</td>`).join('') + '</tr>';
+        const dens = B.map(([a, b, f]) => (f / N * 100) / (b - a));      // %/분
+        const k = B.findIndex((b) => b[0] === 30);
+        document.getElementById('sol-dens').innerHTML =
+          `상대빈도 = ${B[k][2]} / ${N} = ${B[k][2] / N * 100}%, 구간길이 = ${B[k][1] - B[k][0]}분 → 밀도 = <b class="t-red">${window.r2(dens[k]).toFixed(1)}</b>`;
+        let cum = 0; const cums = B.map((b) => (cum += b[2]));
+        const mi = cums.findIndex((c) => c >= N / 2 + 1);
+        document.getElementById('sol-med').innerHTML =
+          `누적빈도 ${cums.slice(0, mi + 1).join(' → ')}. 중앙값은 ${N / 2}번째와 ${N / 2 + 1}번째 값의 평균이므로 <b class="t-red">${B[mi][0]}-${B[mi][1]}분</b> 계급`;
+        const F = Fig.withBox({ x0: 40, y0: 196, x1: 318, y1: 18 });
+        const S = F.scale({ x: [0, 90], y: [0, 3.4] });
+        let s = '';
+        B.forEach(([a, b], i) => {
+          const hot = i === k ? 'var(--brand-crimson)' : (i === mi ? 'var(--accent-blue)' : 'var(--muted)');
+          s += `<rect x="${S.x(a)}" y="${S.y(dens[i])}" width="${S.x(b) - S.x(a)}" height="${S.y(0) - S.y(dens[i])}"
+                  fill="${hot}" fill-opacity="${i === k || i === mi ? 0.55 : 0.25}" stroke="var(--ink-2)" stroke-width="0.8"/>`;
+          s += `<text class="tick" x="${(S.x(a) + S.x(b)) / 2}" y="${S.y(dens[i]) - 5}" text-anchor="middle" style="font-size:11px">${Math.round(dens[i] * 1000) / 1000}</text>`;
+        });
+        [0, 10, 20, 30, 50, 90].forEach((t) =>
+          s += `<text class="tick" x="${S.x(t)}" y="${S.y(0) + 15}" text-anchor="middle" style="font-size:11px">${t}</text>`);
+        F.draw('#f-mid-hist', { axes: { x: '통행시간(분)', y: '밀도(%/분)' }, parts: [Fig.raw(s)], check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- 4번 — 위는 28~52분 넓이, 아래는 상위 10% 경계. MID.commute 에서 Z 와 경계를 계산한다 -->
+  <section>
+    <h2>중간고사 풀이: 4. 정규분포</h2>
+    <div class="body tight">
+      <p class="qz">4. 어느 도시 직장인의 출근 통행시간은 평균 40분, 표준편차 8분인 정규분포를 따른다고 한다. (5점)<br>
+        (1) 출근 통행시간이 28분 이상 52분 이하인 직장인은 대략 몇 %인지 답과 풀이과정을 쓰시오. (2점)<br>
+        (2) 통행시간이 가장 긴 상위 10%에 속하려면 출근 통행시간이 최소 몇 분이어야 하는지 답과 풀이과정을 쓰시오.
+        (답은 소수점 둘째 자리에서 반올림) (3점)</p>
+      <div class="quiz2">
+        <div class="fig-col">
+          <svg class="fig" id="f-mid-norm" viewBox="0 0 300 282" style="width:262px" role="img">
+            <title>위는 평균 40분·표준편차 8분인 정규분포에서 28분과 52분 사이를 칠한 그림, 아래는 오른쪽 끝 10% 를 칠해 그 경계가 약 50.2분임을 보인 그림</title>
+          </svg>
+        </div>
+        <div class="sol">
+          <div class="fragment" data-fragment-index="0">
+            <p id="sol-n1a"></p>
+            <p id="sol-n1b"></p>
+            <p class="ans" id="sol-n1ans"></p>
+          </div>
+          <div class="fragment" data-fragment-index="1">
+            <p style="margin-top:8px">(2) 상위 10% 의 경계는 Φ(z) = P(Z ≤ z) = 0.90 이 되는 z</p>
+            <p id="sol-n2a"></p>
+            <p id="sol-n2b"></p>
+            <p class="ans" id="sol-n2ans"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const C = window.MID.commute, z = (x) => (x - C.mu) / C.sd;
+        const p = 2 * C.phi15 - 1, cut = C.mu + C.z90 * C.sd;
+        document.getElementById('sol-n1a').textContent =
+          `(1) Z(${C.lo}) = (${C.lo} − ${C.mu}) / ${C.sd} = ${neg(z(C.lo))},  Z(${C.hi}) = ${z(C.hi)}`;
+        document.getElementById('sol-n1b').textContent =
+          `P(−1.5 ≤ Z ≤ 1.5) = 2 × Φ(1.5) − 1 = 2 × ${C.phi15} − 1 = ${p.toFixed(4)}`;
+        document.getElementById('sol-n1ans').textContent = `답: 약 ${window.r2(p * 100)}%`;
+        document.getElementById('sol-n2a').textContent =
+          `Φ(1.28) = ${C.phi128}, Φ(1.29) = ${C.phi129} → z ≈ ${C.z90}`;
+        document.getElementById('sol-n2b').textContent =
+          `X = μ + zσ = ${C.mu} + ${C.z90} × ${C.sd} = ${window.r2(cut)}`;
+        document.getElementById('sol-n2ans').textContent =
+          `답: 약 ${window.r1(cut)}분 (z = 1.29 로 보아 ${window.r1(C.mu + 1.29 * C.sd)}분도 정답)`;
+        function panel(top, bot, from, to, ticks) {
+          const F = Fig.withBox({ x0: 16, y0: bot, x1: 284, y1: top });
+          const m = C.mu, s = C.sd, lo = m - 3.6 * s, hi = m + 3.6 * s;
+          const SC = F.scale({ x: [lo, hi], y: [0, 0.42 / s] });
+          const full = F.normal(m, s, lo, hi, { through: [from, to] });
+          const cutp = full.filter((q) => q[0] >= from && q[0] <= to);
+          let g = `<path class="axis" d="M${SC.x(lo)},${SC.y(0)} L${SC.x(hi)},${SC.y(0)}"/>`;
+          g += F.under(SC.curve(cutp), { cls: 'area-loss', baseY: SC.y(0) });
+          g += F.curve(SC.curve(full), { variant: 'demand' });
+          ticks.forEach(([v, lab]) => {
+            g += `<text class="tick" x="${SC.x(v)}" y="${SC.y(0) + 18}" text-anchor="middle" style="font-size:12px">${lab}</text>`;
+          });
+          return g;
+        }
+        const up = panel(18, 112, C.lo, C.hi, [[C.lo, C.lo], [C.mu, C.mu], [C.hi, C.hi]]);
+        const dn = panel(156, 250, cut, C.mu + 3.6 * C.sd, [[C.mu, C.mu], [cut, window.r1(cut)]]);
+        Fig.draw('#f-mid-norm', { parts: [Fig.raw(up, { fragment: 0 }), Fig.raw(dn, { fragment: 1 })], check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- 5번 — 회귀직선은 MID.apt 의 요약통계량에서 계산한다 -->
+  <section>
+    <h2>중간고사 풀이: 5. 회귀방정식</h2>
+    <div class="body tight">
+      <p class="qz">5. 어느 도시 아파트의 ㎡당 가격(Y, 만원)과 가장 가까운 지하철역까지의 거리(X, m)에 대한 요약 통계량은 다음과 같다. (5점)<br>
+        X 의 평균 800m, 표준편차 200m · Y 의 평균 500만원, 표준편차 80만원 · X 와 Y 의 상관계수 −0.6<br>
+        (1) 거리(X)로 ㎡당 가격(Y)을 추정하는 회귀방정식을 구하시오. (3점)<br>
+        (2) 역에서 600m 떨어진 아파트의 ㎡당 가격을 추정하시오. (2점)</p>
+      <div class="quiz2">
+        <div class="fig-col">
+          <svg class="fig" id="f-mid-reg" viewBox="0 0 360 240" style="width:340px" role="img">
+            <title>평균점 (800, 500)을 지나는 기울기 −0.24 의 회귀직선. 600m 에서 추정치는 548만원이다</title>
+          </svg>
+        </div>
+        <div class="sol">
+          <div class="fragment" data-fragment-index="0">
+            <p id="sol-r1"></p>
+            <p id="sol-r2"></p>
+            <p class="ans" id="sol-r3"></p>
+          </div>
+          <div class="fragment" data-fragment-index="1">
+            <p id="sol-r4" style="margin-top:8px"></p>
+            <p class="ans" id="sol-r5"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const A = window.MID.apt;
+        const b1 = window.r2(A.r * A.sdy / A.sdx), b0 = window.r2(A.my - b1 * A.mx), y = (x) => window.r2(b0 + b1 * x);
+        document.getElementById('sol-r1').textContent = `(1) 기울기 b₁ = r × SDy / SDx = ${neg(A.r)} × ${A.sdy} / ${A.sdx} = ${neg(b1)} (만원/m)`;
+        document.getElementById('sol-r2').textContent = `절편 b₀ = Ȳ − b₁X̄ = ${A.my} − (${neg(b1)} × ${A.mx}) = ${b0}`;
+        document.getElementById('sol-r3').textContent = `답: Y = ${b0} − ${Math.abs(b1)}X`;
+        document.getElementById('sol-r4').textContent = `(2) Y = ${b0} − ${Math.abs(b1)} × ${A.x0} = ${y(A.x0)}`;
+        document.getElementById('sol-r5').textContent = `답: ${y(A.x0)}만원`;
+        const F = Fig.withBox({ x0: 56, y0: 196, x1: 344, y1: 22 });
+        const S = F.scale({ x: [300, 1300], y: [350, 650] });
+        F.draw('#f-mid-reg', {
+          axes: { x: '역까지 거리 X(m)', y: '㎡당 가격 Y(만원)' },
+          parts: [
+            F.line(S.x(320), S.y(y(320)), S.x(1280), S.y(y(1280)), { variant: 'demand' }),
+            F.guide(...S.p([A.mx, A.my]), { xtick: String(A.mx), ytick: String(A.my) }),
+            F.dot(...S.p([A.mx, A.my]), { label: '평균점', lx: 8, ly: -8 }),
+            Fig.raw(F.guide(...S.p([A.x0, y(A.x0)]), { xtick: String(A.x0), ytick: String(y(A.x0)) }) +
+                    F.dot(...S.p([A.x0, y(A.x0)]), { label: '추정치', lx: 8, ly: -8 }), { fragment: 1 }),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- 6번 — 두 모형의 R² 와 조정된 R² 를 MID.models 에서 계산한다 -->
+  <section>
+    <h2>중간고사 풀이: 6. 결정계수와 조정된 결정계수</h2>
+    <div class="body tight">
+      <p class="qz">6. 표본 12개 동(n = 12)의 대중교통 이용률(Y)을 설명하는 두 회귀모형을 추정하였다. 총제곱합(SST)은 두 모형 모두 500 이다. (4점)<br>
+        모형 A: 설명변수 1개 (역까지 거리), SSE = 200 · 모형 B: 설명변수 3개 (역까지 거리, 인구밀도, 가구소득), SSE = 180<br>
+        (1) 두 모형의 R² 와 조정된 R² 를 각각 구하시오. (소수점 셋째 자리에서 반올림) (2점)<br>
+        (2) 어느 모형을 고르는 것이 적절한지 쓰고, 그 이유를 설명하시오. (2점)</p>
+      <div class="fragment" data-fragment-index="0">
+        <p class="sol-line">R² = 1 − SSE / SST &nbsp;·&nbsp; 조정된 R² = 1 − [SSE / (n − k − 1)] / [SST / (n − 1)]</p>
+        <table class="mid-tbl" id="t-r2" style="margin-top:4px"><tbody></tbody></table>
+      </div>
+      <div class="fragment" data-fragment-index="1">
+        <p class="ans" style="margin:10px 0 2px">답: 모형 A</p>
+        <p class="sol-line" id="sol-pick"></p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const M = window.MID.models, n = M.n, sst = M.sst;
+        const rows = M.list.map((m) => {
+          const r2 = 1 - m.sse / sst, adj = 1 - (m.sse / (n - m.k - 1)) / (sst / (n - 1));
+          return { ...m, r2, adj, df: n - m.k - 1 };
+        });
+        document.querySelector('#t-r2 tbody').innerHTML =
+          '<tr><th>모형</th><th>설명변수 k</th><th>SSE</th><th>자유도 n−k−1</th><th>R²</th><th>조정된 R²</th></tr>' +
+          rows.map((m) => `<tr><td>${m.name}</td><td>${m.k}</td><td>${m.sse}</td><td>${m.df}</td>` +
+                         `<td>${window.r2(m.r2).toFixed(2)}</td><td><b class="t-red">${window.r2(m.adj + 1e-9).toFixed(2)}</b></td></tr>`).join('');
+        const [a, b] = rows;
+        document.getElementById('sol-pick').textContent =
+          `B 는 설명변수를 둘 더했지만 SSE 가 ${a.sse - b.sse} 만 줄어 R² 가 ${window.r2(b.r2 - a.r2)} 오르는 데 그쳤다. ` +
+          `그 대가로 자유도가 ${a.df} 에서 ${b.df} 로 줄어 조정된 R² 는 ${window.r2(a.adj).toFixed(2)} 에서 ${window.r2(b.adj + 1e-9).toFixed(2)} 로 낮아졌다. ` +
+          `설명력을 공정하게 비교하는 조정된 R² 가 더 큰 A 가 적절하다`;
+      })();
+    </script>
   </section>
 
   <!-- 원본 p.11 -->
