@@ -8,7 +8,7 @@
 | `tb-` | 교재에서 잘라 온 것 | **대외 배포 전 저작권 판단 대상** |
 | (접두사 없음) | 직접 만든 것 | 자유 |
 
-이 과목은 현재 `tb-` 열한 개뿐이고 `cc-` 는 없다.
+이 과목은 현재 `tb-` 열세 개와 `cc-` 하나가 있다.
 개념도는 전부 인라인 SVG 로 다시 그렸다 (design.md §6.1) — 그래서 파일이 적다.
 
 ## 파일 목록
@@ -109,3 +109,26 @@
   `06-시장실패정부실패.html` 의 같은 그림을 SVG·스크립트째 옮겼다.
   출처 표기(김동건, 2012, 비용−편익분석, 박영사)도 함께 옮겼다.
   **원본을 고치면 이쪽도 함께 고쳐야 한다** — 두 곳에 같은 코드가 있다.
+
+### cc-portland-ugb-bullmountain.jpg
+- 포틀랜드 대도시권 Bull Mountain 의 도시성장경계 가장자리 (언덕 위 주택단지와 그 앞 농지)
+- 출처: M.O. Stevens, "Urban growth boundary at Bull Mountain in Oregon" (2009-12-31 촬영), Wikimedia Commons
+- 라이선스: **CC BY-SA 3.0** — 슬라이드에 저작자·라이선스를 적어 두었다
+- 쓰는 곳: **9강 「포틀랜드의 도시성장경계」**
+- 크기: 원본 2769×1828 을 긴 변 1100px 로 줄임. 받은 날: 2026-10-27
+- 같은 장의 지도는 Oregon Metro RLIS 「Urban Growth Boundary (UGB)」 도형(RLIS Open Database License)을 단순화해 인라인 SVG 로 그렸다
+  (2026-10-27 교수 요청으로 본편에서는 아래 두 파일로 바꿨다. 이 사진은 `보관/09-삭제슬라이드.html` 에만 남는다)
+
+### tb-portland-ugb-map-metro.jpg
+- 포틀랜드 대도시권 도시성장경계와 둘레의 도시·농촌 유보지 지도
+- 출처: Metro, 「Urban growth boundary address lookup」 페이지의 지도 이미지 `ugb_1.jpg`
+  (gis.oregonmetro.gov/boundary-lookup-tools/ugb-address-lookup). 지도 오른쪽 아래 표기: Data Resource Center/Metro
+- 쓰는 곳: **9강 「포틀랜드의 도시성장경계」** · 크기 1280×1024 · 받은 날 2026-10-27
+- 라이선스 표기가 없어 **대외 배포 전 저작권 판단 대상**
+
+### tb-portland-ugb-aerial-modernfarmer.jpg
+- 성장경계 부근 항공사진 (주택단지와 과수원·농지가 맞닿음)
+- 출처: Scott Latta, "Portland's Urban Growth Boundary Plots City Versus Country", *Modern Farmer*, 2016-09-26
+  (modernfarmer.com/2016/09/portland-urban-growth-boundary/) 의 대표 사진. 기사에 사진가 표기는 없다
+- 쓰는 곳: **9강 「포틀랜드의 도시성장경계」** · 원본 1200×900 을 긴 변 1100px 로 줄임 · 받은 날 2026-10-27
+- **대외 배포 전 저작권 판단 대상**
