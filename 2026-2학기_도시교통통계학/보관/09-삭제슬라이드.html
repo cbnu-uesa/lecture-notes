@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>9강에서 뺀 슬라이드 · 9강. 확률이론 (2)</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols.top { align-items: flex-start; }
+  /* 이 강의에서 쓰는 좌우 비율들 */
+  .body > .cols.w38 > .col-l { flex: 0 0 38%; }
+  .body > .cols.w56 > .col-l { flex: 0 0 56%; }
+  .body > .cols.w64 > .col-l { flex: 0 0 64%; }
+  .body > .cols.w70 > .col-l { flex: 0 0 70%; }
+  ul.slim > li { margin-bottom: 3px; }
+  ol.dense { margin: 0 0 0 2px; padding-left: 20px; }
+  ol.dense > li { margin-bottom: 6px; }
+  /* 원본이 수식 옆에 붙여 둔 작은 회색 각주 */
+  .side-note { font-size: 11px; line-height: 1.45; color: var(--muted); margin: 0; }
+  /* 두 갈래 예시의 머리말 (상호배반 / 상호배반이 아님) */
+  .case-title { font-size: var(--fs-emph); font-weight: 700; color: var(--brand-crimson);
+                text-align: center; margin: 0 0 4px; }
+  .vsub { font-size: 14px; color: var(--ink-2); text-align: center; margin: 0 0 6px; }
+  /* 몬티홀 계산 슬라이드는 원본이 가장 빽빽하다 — 이 장에서만 더 조인다 */
+  #s-monty ol.dense { font-size: 12px; }
+  #s-monty ol.dense > li { margin-bottom: 3px; }
+  #s-monty .side-note { font-size: 10.5px; line-height: 1.4; }
+</style>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   이 강의의 그림은 전부 집합·확률에서 유도한다 (design.md §6.4~6.5).
+   주사위 예시의 원 안 숫자·원 밖 숫자·아래 확률식이 모두 아래 집합
+   하나에서 나오므로 그림과 식이 어긋날 수 없다.
+   ───────────────────────────────────────────────────────────── */
+(function () {
+  const S = [1, 2, 3, 4, 5, 6];
+  const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+  const red = (n, d) => { const g = gcd(n, d) || 1; return [n / g, d / g]; };
+  const slash = (n, d) => { if (n === 0) return '0'; const [p, q] = red(n, d); return q === 1 ? String(p) : `${p}/${q}`; };
+  const frac  = (n, d) => { if (n === 0) return '0'; const [p, q] = red(n, d); return q === 1 ? String(p) : `\\frac{${p}}{${q}}`; };
+
+  function mk(A, B) {
+    const inter  = A.filter((x) => B.includes(x));
+    const aOnly  = A.filter((x) => !B.includes(x));
+    const bOnly  = B.filter((x) => !A.includes(x));
+    const out    = S.filter((x) => !A.includes(x) && !B.includes(x));
+    const n = S.length;
+    const union = A.length + B.length - inter.length;
+    return {
+      aOnly: aOnly.join(','), bOnly: bOnly.join(','),
+      inter: inter.join(','), out: out.join(','),
+      overlap: inter.length > 0,
+      tex: [
+        `P(A) = ${slash(A.length, n)}`,
+        `P(B) = ${slash(B.length, n)}`,
+        `P(A \\cap B) = ${slash(inter.length, n)}`,
+        `P(A \\cup B) = ${frac(A.length, n)} + ${frac(B.length, n)} - ${frac(inter.length, n)}` +
+          (inter.length ? ` = ${frac(union, n)}` : ''),
+      ],
+    };
+  }
+
+  /* 벤 다이어그램 한 판. viewBox 는 언제나 0 0 300 168 이다. */
+  const BOXV = { x: 6, y: 26, w: 288, h: 132 };
+  const CY = 96, R = 45;
+
+  function frame() {
+    return `<rect x="${BOXV.x}" y="${BOXV.y}" width="${BOXV.w}" height="${BOXV.h}" ` +
+           `fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+  }
+  function circ(cx, tone) {
+    const c = tone === 'b' ? 'var(--chart-orange)' : 'var(--accent-blue)';
+    const op = tone === 'b' ? 0.20 : 0.18;
+    return `<circle cx="${cx}" cy="${CY}" r="${R}" fill="${c}" fill-opacity="${op}" ` +
+           `stroke="${c}" stroke-width="1.6"/>`;
+  }
+  function lab(x, y, t, o) {
+    o = o || {};
+    return `<text x="${x}" y="${y}" text-anchor="${o.anchor || 'middle'}" ` +
+           `style="font-size:${o.size || 13}px;font-style:${o.italic ? 'italic' : 'normal'};` +
+           `font-weight:${o.bold ? 700 : 500}" fill="${o.fill || 'var(--ink)'}">${t}</text>`;
+  }
+
+  /* 두 사건의 벤 다이어그램 */
+  function vennTwo(d) {
+    const ax = d.overlap ? 112 : 86;
+    const bx = d.overlap ? 188 : 214;
+    let s = frame() + circ(ax, 'a') + circ(bx, 'b');
+    s += lab(ax, BOXV.y + 21, 'A', { italic: true });
+    s += lab(bx, BOXV.y + 21, 'B', { italic: true });
+    if (d.overlap) {
+      s += lab(ax - 16, CY + 5, d.aOnly);
+      s += lab(150, CY + 5, d.inter);
+      s += lab(bx + 16, CY + 5, d.bOnly);
+    } else {
+      s += lab(ax, CY + 5, d.aOnly);
+      s += lab(bx, CY + 5, d.bOnly);
+    }
+    if (d.out) s += lab(150, BOXV.y + 21, d.out, { fill: 'var(--ink-2)' });
+    return s;
+  }
+
+  /* 한 사건과 그 여사건 */
+  function vennOne(inside, outside) {
+    const ax = 92;
+    let s = frame() + circ(ax, 'a');
+    s += lab(ax, BOXV.y + 21, 'A', { italic: true });
+    s += `<text x="216" y="${BOXV.y + 21}" text-anchor="middle" ` +
+         `style="font-size:13px;font-style:italic;font-weight:500" fill="var(--ink)">` +
+         `A<tspan dy="-5" style="font-size:9px">c</tspan></text>`;
+    if (inside)  s += lab(ax, CY + 5, inside);
+    if (outside) s += lab(216, CY + 5, outside, { fill: 'var(--ink-2)' });
+    return s;
+  }
+
+  function fill(sel, svg) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const t = el.querySelector('title');
+    el.innerHTML = (t ? t.outerHTML : '') + svg;
+  }
+
+  function texRows(sel, tex, gap) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    el.innerHTML = tex.map((t) => `<p style="margin:0 0 ${gap || 2}px">$${t}$</p>`).join('');
+  }
+
+  /* 채우기는 문서 아래쪽 스크립트가 파싱 도중에 부른다.
+     MathJax 는 Reveal 초기화 때 한 번 훑으므로 그 전에 DOM 에 들어가 있어야 한다. */
+  window.VENN = { mk: mk, vennOne: vennOne, vennTwo: vennTwo, fill: fill, texRows: texRows };
+
+  /* 몬티홀 — 사회자가 C를 열 조건부확률에서 P(A|D)를 유도한다.
+     원본 p.30 이 나열한 P(D|A)=1/2, P(D|B)=1, P(D|C)=0 이 그대로 들어간다. */
+  window.MONTY = (function () {
+    const P = { A: 1 / 3, B: 1 / 3, C: 1 / 3 };
+    const D = { A: 1 / 2, B: 1, C: 0 };
+    const den = P.A * D.A + P.B * D.B + P.C * D.C;
+    const post = (P.A * D.A) / den;
+    return { P, D, post, postTex: slash(Math.round(post * 12), 12) };
+  })();
+})();
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>9강에서 뺀 슬라이드</h1>
+  <p class="cover-date">2026-10-27 보관</p>
+</section>
+
+<section>
+  <h2>이 파일은 무엇인가</h2>
+  <div class="body">
+    <p class="lead t-define">9강 「확률이론 (2)」에서 뺀 슬라이드를 버리지 않고 모아 둔 것</p>
+    <ul class="dense">
+      <li><strong>[부록] 베이즈 정리:</strong> 2026-10-27 교수 요청으로 뺌 (본편 33쪽)</li>
+    </ul>
+    <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+  </div>
+</section>
+
+<section>
+    <h2>[부록] 베이즈 정리 (Bayes’ theorem)</h2>
+    <div class="body tight">
+      <p class="sub">사전에 설정한 (주관적 견해의) 확률을 새롭게 주어진 정보를 활용해서
+        업데이트 시켜 미지의 세계를 추론하는 것</p>
+      <p class="formula-key" style="text-align:center;margin:0">
+        $$P(A|B) = \frac{P(A)P(B|A)}{P(A)P(B|A) + P(A^c)P(B|A^c)}$$</p>
+      <p class="emph" style="margin:8px 0 4px">Q) 비행기가 세계무역센터에 충돌했을 때
+        그 일이 테러리스트에 의해 벌어질 확률은?</p>
+      <ul class="slim">
+        <li>테러리스트가 뉴욕을 공격할 사건: A</li>
+        <li>비행기가 세계무역센터에 충돌한 사건: B</li>
+        <li>$P(A) = 0.005\%$</li>
+        <li>$P(B|A)$ : 테러리스트가 뉴욕을 공격했다는 조건 하에서
+          비행기가 세계무역센터에 충돌했을 확률: 100%</li>
+        <li>$P(B|A^c)$ : 테러리스트가 뉴욕을 공격하지 않았다는 조건 하에서
+          비행기가 세계무역센터에 충돌했을 확률: 0.008%</li>
+      </ul>
+      <p class="derive" style="margin-top:6px">→ 비행기가 세계무역센터에 충돌한 사건(B)가 발생했을 때
+        테러리스트가 뉴욕을 공격했다고 판단할 확률은?</p>
+      <p style="text-align:center;margin:0;font-size:14px">
+        $0.005 * 100 \,/\, \{(0.005 * 100) + (100 - 0.005) * 0.008\} = 38\%$</p>
+    </div>
+  </section>
+
+</div></div>
+
+<script>
+/* ── 조건부확률 도해 · 몬티홀 표본공간 ─────────────────────────
+   두 원의 반지름과 중심거리를 한 곳에서만 정하고, 세 판의 칠한 자리와
+   아래의 볼록렌즈·초승달을 전부 그 값에서 잘라 낸다 (design.md §6.5). */
+(function () {
+  const R = 27, D = 34;          /* 원 반지름 · 두 원의 중심거리 */
+  let uid = 0;
+
+  /* 한 판: 직사각형 + 두 원. what: 'B' | 'AB' | 'AcB' */
+  function panel(x, y, w, h, what, head) {
+    const cx = x + w / 2, cy = y + h / 2 + 4;
+    const ax = cx - D / 2, bx = cx + D / 2;
+    const k = 'p' + (uid++);
+    let s = `<defs>
+        <clipPath id="cA-${k}"><circle cx="${ax}" cy="${cy}" r="${R}"/></clipPath>
+        <mask id="mA-${k}">
+          <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff"/>
+          <circle cx="${ax}" cy="${cy}" r="${R}" fill="#000"/>
+        </mask>
+      </defs>`;
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    const F = `fill="var(--accent-blue)" fill-opacity="0.30" stroke="none"`;
+    if (what === 'B')   s += `<circle cx="${bx}" cy="${cy}" r="${R}" ${F}/>`;
+    if (what === 'AB')  s += `<circle cx="${bx}" cy="${cy}" r="${R}" ${F} clip-path="url(#cA-${k})"/>`;
+    if (what === 'AcB') s += `<circle cx="${bx}" cy="${cy}" r="${R}" ${F} mask="url(#mA-${k})"/>`;
+    s += `<circle cx="${ax}" cy="${cy}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    s += `<circle cx="${bx}" cy="${cy}" r="${R}" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    s += `<text x="${ax - 6}" y="${cy - R + 12}" text-anchor="middle" style="font-size:11px;font-style:italic" fill="var(--ink)">A</text>`;
+    s += `<text x="${bx + 6}" y="${cy - R + 12}" text-anchor="middle" style="font-size:11px;font-style:italic" fill="var(--ink)">B</text>`;
+    if (head) s += `<text x="${cx}" y="${y - 5}" text-anchor="middle" style="font-size:11px" fill="var(--ink-2)">${head}</text>`;
+    return s;
+  }
+
+  function splitSvg() {
+    const W = 112, H = 84, Y = 26;
+    let s = panel(6, Y, W, H, 'B', '');
+    s += `<text x="140" y="${Y + H / 2 + 6}" text-anchor="middle" style="font-size:16px" fill="var(--ink-2)">=</text>`;
+    s += panel(166, Y, W, H, 'AB', 'A 그리고 B');
+    s += `<text x="298" y="${Y + H / 2 + 6}" text-anchor="middle" style="font-size:16px" fill="var(--ink-2)">+</text>`;
+    s += panel(322, Y, W, H, 'AcB', 'Aᶜ 그리고 B');
+    return s;
+  }
+
+  /* 볼록렌즈(교집합) · 원 · 초승달을 같은 R·D 에서 잘라 낸다.
+     셋 다 보이는 부분의 가운데가 cx 에 오도록 맞춰 두어야 분수의 위아래가 맞는다. */
+  const LR = 25, LD = 32;
+  function shape(cx, cy, kind) {
+    const k = 's' + (uid++);
+    const F = `fill="var(--accent-blue)" fill-opacity="0.30" stroke="var(--ink)" stroke-width="1"`;
+    if (kind === 'circle') return `<circle cx="${cx}" cy="${cy}" r="${LR}" ${F}/>`;
+    if (kind === 'lens') {
+      const ax = cx - LD / 2, bx = cx + LD / 2;
+      return `<defs><clipPath id="cl-${k}"><circle cx="${ax}" cy="${cy}" r="${LR}"/></clipPath></defs>` +
+             `<g clip-path="url(#cl-${k})"><circle cx="${bx}" cy="${cy}" r="${LR}" ${F}/></g>` +
+             `<g clip-path="url(#cl-${k})"><circle cx="${bx}" cy="${cy}" r="${LR}" fill="none" stroke="var(--ink)" stroke-width="1"/></g>`;
+    }
+    /* 초승달: B 에서 A 를 뺀 부분. 보이는 부분은 bx-7 … bx+LR 이므로 그 가운데를 cx 에 둔다 */
+    const bx = cx - (LR - 7) / 2, ax = bx - LD;
+    return `<defs><mask id="mk-${k}">` +
+           `<rect x="${bx - LR - 4}" y="${cy - LR - 4}" width="${2 * LR + 8}" height="${2 * LR + 8}" fill="#fff"/>` +
+           `<circle cx="${ax}" cy="${cy}" r="${LR}" fill="#000"/></mask></defs>` +
+           `<g mask="url(#mk-${k})"><circle cx="${bx}" cy="${cy}" r="${LR}" ${F}/></g>`;
+  }
+
+  /* 원본 p.12·p.20 의 "P(A|B) = 볼록렌즈/오른쪽의 원 = 렌즈/원 = 렌즈/(렌즈+초승달)" */
+  function lensSvg() {
+    const TOP = 38, BOT = 102, BAR = 70;
+    const eq = (x) => `<text x="${x}" y="${BAR + 5}" text-anchor="middle" style="font-size:15px" fill="var(--ink-2)">=</text>`;
+    const bar = (x1, x2) => `<line x1="${x1}" y1="${BAR}" x2="${x2}" y2="${BAR}" stroke="var(--ink)" stroke-width="1.2"/>`;
+    let s = `<text x="2" y="${BAR + 5}" style="font-size:14px;font-style:italic" fill="var(--ink)">P(A|B)</text>`;
+    s += eq(58);
+    /* 낱말 분수 */
+    s += `<text x="108" y="${BAR - 8}" text-anchor="middle" style="font-size:12px" fill="var(--ink-2)">볼록렌즈</text>`;
+    s += bar(70, 146);
+    s += `<text x="108" y="${BAR + 19}" text-anchor="middle" style="font-size:12px" fill="var(--ink-2)">오른쪽의 원</text>`;
+    s += eq(158);
+    /* 렌즈 / 원 */
+    s += shape(196, TOP, 'lens');
+    s += bar(170, 222);
+    s += shape(196, BOT, 'circle');
+    s += eq(234);
+    /* 렌즈 / (렌즈 + 초승달) */
+    s += shape(330, TOP, 'lens');
+    s += bar(248, 412);
+    s += shape(292, BOT, 'lens');
+    s += `<text x="320" y="${BOT + 5}" text-anchor="middle" style="font-size:15px" fill="var(--ink-2)">+</text>`;
+    s += shape(356, BOT, 'crescent');
+    return s;
+  }
+
+  /* 몬티홀 표본공간 — A|B|C 세 칸과 그 위를 가로지르는 사건 D */
+  function montySvg() {
+    let s = `<text x="4" y="16" style="font-size:13px;font-style:italic" fill="var(--ink)">S</text>`;
+    s += `<rect x="8" y="22" width="304" height="146" fill="none" stroke="var(--ink)" stroke-width="1.2"/>`;
+    s += `<line x1="109" y1="22" x2="109" y2="168" stroke="var(--accent-blue)" stroke-width="1"/>`;
+    s += `<line x1="211" y1="22" x2="211" y2="168" stroke="var(--accent-blue)" stroke-width="1"/>`;
+    s += `<text x="58"  y="54" text-anchor="middle" style="font-size:14px;font-style:italic" fill="var(--ink)">A</text>`;
+    s += `<text x="160" y="54" text-anchor="middle" style="font-size:14px;font-style:italic" fill="var(--ink)">B</text>`;
+    s += `<text x="261" y="54" text-anchor="middle" style="font-size:14px;font-style:italic" fill="var(--ink)">C</text>`;
+    s += `<ellipse cx="160" cy="120" rx="124" ry="32" fill="var(--accent-blue)" fill-opacity="0.85" stroke="none"/>`;
+    s += `<text x="160" y="126" text-anchor="middle" style="font-size:14px;font-style:italic;stroke:none" fill="#FFFFFF">D</text>`;
+    return s;
+  }
+
+  function fill(sel, svg) {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    const t = el.querySelector('title');
+    el.innerHTML = (t ? t.outerHTML : '') + svg;
+  }
+
+  (function () {
+    const V = window.VENN;
+    const ME  = V.mk([1, 3, 5], [6]);      /* 홀수 · 6         → 상호배반      */
+    const NME = V.mk([1, 3, 5], [3, 6]);   /* 홀수 · 3의 배수  → 상호배반 아님 */
+    V.fill('#f-venn-c',    V.vennOne('', ''));
+    V.fill('#f-venn-coin', V.vennOne('앞면', '뒷면'));
+    V.fill('#f-venn-dice', V.vennTwo(ME));
+    V.fill('#f-me',        V.vennTwo(ME));
+    V.fill('#f-nme',       V.vennTwo(NME));
+    V.texRows('#eq-me',  ME.tex, 3);
+    V.texRows('#eq-nme', NME.tex, 3);
+
+    fill('#f-cp-split',  splitSvg());
+    fill('#f-cp-split2', splitSvg());
+    fill('#f-cp-lens',   lensSvg());
+    fill('#f-cp-lens2',  lensSvg());
+    fill('#f-monty',     montySvg());
+    fill('#f-monty2',    montySvg());
+
+    /* 사후확률은 위에서 선언한 P·P(D|·) 에서 계산한다 */
+    const M = window.MONTY;
+    const eq = document.getElementById('eq-monty');
+    if (eq && M) {
+      eq.innerHTML =
+        '$P(\\mathrm{A|D}) = \\dfrac{P(\\mathrm{A})P(\\mathrm{D|A})}' +
+        '{P(\\mathrm{A})P(\\mathrm{D|A}) + P(\\mathrm{B})P(\\mathrm{D|B}) + P(\\mathrm{C})P(\\mathrm{D|C})}' +
+        ' = ' + M.postTex + '$';
+    }
+  })();
+})();
+</script>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
