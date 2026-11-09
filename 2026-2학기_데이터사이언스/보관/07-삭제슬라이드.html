@@ -174,6 +174,11 @@
         <li><strong>실습 ① · 실습 ②:</strong> 2026-10-19 교수 요청으로 과제로 옮김 (6강과 같은 규칙).
           방법 조사는 두세 개가 아니라 여섯 개 모두로 바꾸고 「위키에 적을 것」은 뺌</li>
         <li><strong>실습 ③ 공개 논의:</strong> 2026-10-19 교수 요청으로 뺌</li>
+        <li><strong>광양 사례 아홉 장:</strong> 2026-10-30 교수 요청으로 사례를 서울 행정동 생활인구 · 따릉이로 바꾸며 뺌.
+          광양은 시가지가 작아 지도에 잘 드러나지 않았음. 분석은 analysis/07-공간분석/07-광양공간분석.py</li>
+        <li><strong>옛 과제 · 제출물 두 장:</strong> 2026-11-01 교수 요청으로 과제를 방법조사 · 문제풀이 · 적용계획서 셋으로
+          바꾸며 뺌. 옛 과제의 「자기 데이터에 적용한 보고서」가 계획서로 바뀌었고, 과제마다 AI 대화록을 내게 함</li>
+        <li><strong>뺀 문구 한 장 (맨 뒤):</strong> 2026-11-02 교수 수정으로 본편에서 지운 문구를 옮겨 둠</li>
       </ul>
       <p class="conclusion">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
     </div>
@@ -242,6 +247,320 @@
       </div>
       <p class="conclusion" style="margin-top:10px">→ 받은 지적과 고친 내용을 위키에 남김.
         <strong>고치지 않기로 한 것도 이유와 함께</strong> 적음</p>
+    </div>
+  </section>
+
+  <!-- ══ [2026-10-30 광양 사례 · 본편에서 뺌] 2. 발문 — 이음말은 방법론-목록.md 7주차 첫 문단 ═══════════════ -->
+  <section class="s-question">
+    <h2>사람은 어디에 몰려 사는가</h2>
+    <div class="body">
+      <ul>
+        <li>광양 100m 격자 <span class="num" id="q-n"></span>칸 · 인구 <span class="num" id="q-sum"></span>명 · 충전소 44곳</li>
+        <li>6강은 <strong>속성</strong>으로 유형을 찾았음. 오늘은 <span class="mark">위치로 덩어리를 찾음</span></li>
+        <li>여섯 가지를 목록으로 펼치고 언제 무엇을 고르는지까지</li>
+      </ul>
+    </div>
+    <script>
+      document.getElementById('q-n').textContent = GY.n.toLocaleString();
+      document.getElementById('q-sum').textContent = GY.sum.toLocaleString();
+    </script>
+  </section>
+  <!-- ══ 오늘의 실습자료와 자료 정리 (2026-10-19 추가) ═══════════════
+     배포 묶음은 analysis/data/학생배포/07강-광양격자인구-충전소.zip (깃에 없다).
+     프롬프트는 그 안의 「분석 프롬프트.md」 0번과 같다. 확인할 값은 07-광양공간분석.py 의 출력 -->
+  <section class="s-split">
+    <h2>오늘의 실습자료와 자료 정리</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 42%">
+        <p class="sub t-red" style="margin-bottom:4px">광양시 100m 격자 인구와 전기차 충전소</p>
+        <ul class="defs">
+          <li><strong>파일:</strong> <span class="code">07강-광양격자인구-충전소.zip</span></li>
+          <li><strong>격자:</strong> 100m 격자 <span class="num">47,032</span>칸 (GeoJSON)<br>
+            속성은 격자번호 gid 와 인구 val 둘</li>
+          <li><strong>충전소:</strong> <span class="num">44</span>행 (CSV)<br>
+            충전소명 · 주소 · 급속/완속 · lon · lat 등 10개 열</li>
+          <li><strong>시점:</strong> 파일에 기준 시점이 적혀 있지 않음</li>
+          <li><strong>함께 든 것:</strong> README · 방법별 프롬프트 · 로직 문서 본보기</li>
+        </ul>
+        <p class="conclusion" style="margin-top:8px">→ 인구가 빈 칸은 <strong>0 명과 다름</strong>.
+          조사 대상이 아닌 칸이라 뺌</p>
+        <p class="src">자료: COMPAS 「전기차 충전소 최적입지 선정」(광양시, SBJ_2009_001)</p>
+      </div>
+      <div class="col-r">
+        <div class="prompt-box">
+          <p class="who">자료 정리 프롬프트</p>
+          <p>광양시_100m격자인구.geojson 과 광양시_전기차충전소.csv 를 읽고
+            행 수, 열 이름, 열마다 빈 값의 개수를 보여 줘.</p>
+          <p>격자에서 인구(val)가 빈 칸은 빼 줘. 0 명이 아니라 조사 대상이 아닌 칸이야.</p>
+          <p>남은 칸 가운데 인구 0 인 칸도 세어 줘.</p>
+          <p>격자마다 꼭짓점의 평균으로 중심점을 구하고, 경위도를 미터 좌표로 바꿔 줘.</p>
+          <p>충전소에서 lon · lat 이 같은 행이 몇 쌍인지 알려 줘.</p>
+          <p>무엇을 왜 뺐는지 로직 문서로 정리해 줘.</p>
+        </div>
+        <p class="caption" style="margin-top:8px"><strong>확인할 값:</strong>
+          격자 47,032칸 → 인구 빈 칸 42,809 제외 <strong>4,223칸</strong> · 인구 합 145,683명<br>
+          인구 0 인 칸 2,188 (51.8%) · 충전소 44행 중 같은 자리 6쌍</p>
+      </div>
+    </div>
+  </section>
+  <section>
+    <p class="mth">방법 1 / 6</p>
+    <h2>단계구분도: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <p class="emph" style="margin-bottom:4px">같은 자료를 다섯 계급으로 — <strong>나누는 법만</strong> 다르게</p>
+      <div style="display:flex;gap:10px;justify-content:space-between">
+        <div style="flex:1 1 0"><svg class="fig" id="f-ch-eq" style="height:262px;width:auto;display:block;margin:0 auto" role="img"><title>등간 분류로 칠한 광양 격자 인구. 거의 모든 칸이 첫 계급이다</title></svg>
+          <p class="caption" id="c-ch-eq" style="margin:0"></p></div>
+        <div style="flex:1 1 0"><svg class="fig" id="f-ch-q" style="height:262px;width:auto;display:block;margin:0 auto" role="img"><title>분위 분류로 칠한 광양 격자 인구. 인구가 조금만 있어도 진하게 칠해진다</title></svg>
+          <p class="caption" id="c-ch-q" style="margin:0"></p></div>
+        <div style="flex:1 1 0"><svg class="fig" id="f-ch-jk" style="height:262px;width:auto;display:block;margin:0 auto" role="img"><title>자연분류로 칠한 광양 격자 인구. 시가지 안의 차이가 드러난다</title></svg>
+          <p class="caption" id="c-ch-jk" style="margin:0"></p></div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const v = GY.cells.map((c) => c.p);
+        [['eq', '등간: 폭을 똑같이'], ['q', '분위: 칸 수를 똑같이'], ['jk', '자연분류: 계급 안이 비슷하게']].forEach(([k, t]) => {
+          const b = GY.breaks[k];
+          GY.map(`#f-ch-${k}`, { h: 215, title: t, fill: (c) => GY.RAMP[GY.cls(c.p, b)] });
+          const n = [0, 0, 0, 0, 0]; v.forEach((x) => n[GY.cls(x, b)]++);
+          document.getElementById(`c-ch-${k}`).innerHTML =
+            `경계 ${b.map((x) => x.toLocaleString()).join(' · ')}<br>계급별 칸 수 ${n.map((x) => x.toLocaleString()).join(' · ')}`;
+        });
+      })();
+    </script>
+  </section>
+  <section class="s-split">
+    <p class="mth">방법 1 / 6</p>
+    <h2>단계구분도: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="emph" id="k-ch-lead"></p>
+        <p><strong>등간</strong>은 맨 위 몇 칸 때문에 폭이 넓어져 거의 전부가 첫 계급에 들어감</p>
+        <p><strong>분위</strong>는 0 이 절반이라 경계가 0 · 0 으로 겹쳐 <strong>한 계급이 비고</strong>, 몇 명만 살아도 진하게 칠해짐</p>
+        <p><strong>자연분류</strong>는 계급 안의 값이 가장 비슷하게 끊어 시가지 안의 차이가 드러남</p>
+        <p class="conclusion" style="margin-top:10px">→ 한쪽으로 쏠린 자료는 분류법부터 의심함</p>
+        <p class="src">자료: COMPAS 「전기차 충전소 최적입지 선정」(광양시, SBJ_2009_001) 100m 격자 인구<br>
+          계산: analysis/07-공간분석/07-광양공간분석.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-ch" style="width:390px;display:block;margin:0 auto" role="img">
+          <title>자연분류 다섯 계급으로 칠한 광양 100m 격자 인구 단계구분도</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        document.getElementById('k-ch-lead').innerHTML =
+          `격자 <span class="num">${GY.n.toLocaleString()}</span>칸 중 <span class="hl">인구 0 이
+          <span class="num">${GY.zero.toLocaleString()}</span>칸 (${(GY.zero / GY.n * 100).toFixed(1)}%)</span> · 중앙값 0`;
+        const b = GY.breaks.jk, lab = ['0 ~ 90', '91 ~ 301', '302 ~ 636', '637 ~ 1,164', '1,165 ~'];
+        GY.map('#f-ch', { h: 330, legendW: 120, legendY: 4, fill: (c) => GY.RAMP[GY.cls(c.p, b)],
+                          legend: lab.map((t, i) => [GY.RAMP[i], t + '명']) });
+      })();
+    </script>
+  </section>
+  <section class="s-split">
+    <p class="mth">방법 2 / 6</p>
+    <h2>커널밀도추정: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="emph">충전소 <span class="num">44</span>곳에 대역폭 <span class="num">1km</span> 의 언덕을 얹음</p>
+        <p>가장 촘촘한 곳이 km² 당 <strong><span class="num" id="k-kde-max"></span>곳</strong>.
+          충전소 이름으로 보면 <strong>중마동 일대</strong>(중마버스터미널 · 중마상설시장)</p>
+        <p>회색은 사람이 사는 격자. 진한 파랑이 사람 많은 곳과 겹치는지 봄</p>
+        <p class="conclusion" style="margin-top:10px">→ 충전소가 몰린 곳과 사람이 몰린 곳이 같은지가 13강의 질문으로 이어짐</p>
+        <p class="src">대역폭 1km 는 충전소 하나가 미치는 범위로 잡음 (로직 문서)<br>
+          계산: analysis/07-공간분석/07-광양공간분석.py · 07-광양공간분석-KDE.csv</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-kde" style="width:390px;display:block;margin:0 auto" role="img">
+          <title>광양 충전소 44곳의 커널밀도. 사람이 사는 격자를 회색으로 깔고 밀도를 파랑으로 칠했다</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        document.getElementById('k-kde-max').textContent = GY.kdeMax.toFixed(2);
+        GY.map('#f-kde', { h: 330, legendW: 120, legendY: 4, kde: true, st: 'dot', r: 2.4,
+                           fill: (c) => (c.p > 0 ? '#CFC9BF' : '#EDE9E3'),
+                           legend: [['#1F5C8B', '밀도 높음'], ['#B9CBDD', '밀도 낮음'], ['#CFC9BF', '사람 사는 칸'], ['#16181C', '충전소', true]] });
+      })();
+    </script>
+  </section>
+  <section>
+    <p class="mth">방법 3 / 6</p>
+    <h2>Moran's I: 적용 사례</h2>
+    <div class="body tight">
+      <p class="emph">광양 100m 격자 <span class="num" id="k-mi-n"></span>칸의 인구 · 이웃은 150m 이내</p>
+      <div class="big">
+        <div><p class="v" id="k-mi-i"></p><p class="k">Moran's I</p></div>
+        <div><p class="v" id="k-mi-e"></p><p class="k">아무렇게나 흩어졌을 때의 기대값</p></div>
+        <div><p class="v" id="k-mi-z"></p><p class="k">z: 2.58 을 넘으면 99% 에서 유의</p></div>
+      </div>
+      <p class="conclusion">→ 인구는 <strong>강하게 뭉쳐 있음</strong>. 우연으로는 나올 수 없는 크기</p>
+      <p class="conclusion">→ 다만 숫자 하나는 <strong>어디가</strong> 뭉쳤는지 말하지 않음 — 다음 방법이 짚음</p>
+      <p class="caption" style="margin-top:10px">주: 이웃이 없는 칸 342칸(8.1%)도 분모에는 들어가고 이웃 항은 비어 I 를 끌어내림</p>
+      <p class="src">자료: COMPAS 「전기차 충전소 최적입지 선정」(광양시, SBJ_2009_001) · 계산: analysis/07-공간분석/07-광양공간분석.py</p>
+    </div>
+    <script>
+      document.getElementById('k-mi-n').textContent = GY.n.toLocaleString();
+      document.getElementById('k-mi-i').textContent = GY.I.toFixed(4);
+      document.getElementById('k-mi-e').textContent = GY.EI.toFixed(5);
+      document.getElementById('k-mi-z').textContent = GY.zI.toFixed(1);
+    </script>
+  </section>
+  <section class="s-split">
+    <p class="mth">방법 4 / 6</p>
+    <h2>LISA: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 44%">
+        <table class="tbl-sm" id="t-lisa"><thead><tr><th>유형</th><th style="text-align:right">칸</th><th style="text-align:right">비율</th></tr></thead><tbody></tbody></table>
+        <p style="margin-top:10px">HH 는 남쪽 시가지 몇 곳에 덩어리로 모임. 가까운 충전소 이름으로 보면 광양읍 · 중마동 · 광영동 쪽</p>
+        <p>LH 는 시가지 가장자리 — <strong>사람 많은 동네 바로 옆의 빈 칸</strong></p>
+        <p class="caption" style="margin-top:6px">주: 칸마다 유의성 검정은 하지 않고 사분면으로만 나눴음</p>
+        <p class="src">계산: analysis/07-공간분석/07-광양공간분석.py · 07-광양공간분석-격자.csv</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-lisa" style="width:390px;display:block;margin:0 auto" role="img">
+          <title>광양 격자를 LISA 네 유형과 이웃없음으로 칠한 지도</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        document.querySelector('#t-lisa tbody').innerHTML = GY.LISA_N.map((t, i) =>
+          `<tr><td><span class="sw" style="background:${GY.LISA_C[i]}"></span>${t}</td>` +
+          `<td style="text-align:right" class="num">${GY.lisa[i].toLocaleString()}</td>` +
+          `<td style="text-align:right" class="num">${(GY.lisa[i] / GY.n * 100).toFixed(1)}%</td></tr>`).join('');
+        GY.map('#f-lisa', { h: 330, legendW: 90, legendY: 4, fill: (c) => GY.LISA_C[c.t],
+                            legend: GY.LISA_N.map((t, i) => [GY.LISA_C[i], t]) });
+      })();
+    </script>
+  </section>
+  <section class="s-split">
+    <p class="mth">방법 5 / 6</p>
+    <h2>Gi*: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 46%">
+        <div class="big" style="margin-top:0">
+          <div><p class="v" id="k-gi-hot"></p><p class="k">핫스팟 (z &gt; 2.58)</p></div>
+          <div><p class="v" id="k-gi-cold"></p><p class="k">콜드스팟 (z &lt; −2.58)</p></div>
+        </div>
+        <p class="emph" style="margin-bottom:4px">결과를 읽기 전에 볼 한계 둘</p>
+        <p><strong>콜드스팟 0 은 자료의 성질:</strong> 인구는 0 아래로 못 가고 0 이 절반이라
+          낮은 쪽으로는 더 낮아질 수 없음</p>
+        <p><strong>4,223번 검정함:</strong> 99% 기준이어도 우연만으로 수십 칸이 걸릴 수 있음.
+          다중검정 보정은 하지 않았음</p>
+        <p class="src">계산: analysis/07-공간분석/07-광양공간분석.py · 한계는 07-광양공간분석-로직.md</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-gi" style="width:380px;display:block;margin:0 auto" role="img">
+          <title>광양 격자에서 Gi* 가 2.58 을 넘는 핫스팟 칸을 진하게 칠한 지도</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        document.getElementById('k-gi-hot').textContent = GY.hot.toLocaleString() + '칸';
+        document.getElementById('k-gi-cold').textContent = GY.cold.toLocaleString() + '칸';
+        GY.map('#f-gi', { h: 330, legendW: 112, legendY: 4,
+                          fill: (c) => (c.g > 2.58 ? '#A02948' : c.g > 1.96 ? '#E3A3B0' : '#E6E1D9'),
+                          legend: [['#A02948', 'z > 2.58'], ['#E3A3B0', '1.96 ~ 2.58'], ['#E6E1D9', '그 밖']] });
+      })();
+    </script>
+  </section>
+  <section class="s-split">
+    <p class="mth">방법 6 / 6</p>
+    <h2>DBSCAN: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="emph">충전소 <span class="num">44</span>곳 · eps <span class="num">700m</span> · minPts <span class="num">3</span></p>
+        <table class="tbl-sm" id="t-db" style="font-size:12.5px"><thead><tr><th>군집</th><th style="text-align:right">곳</th><th>대표 충전소</th></tr></thead><tbody></tbody></table>
+        <p class="caption" style="margin-top:6px">주: 군집 5 는 <strong>고속도로 휴게소</strong>라 사는 곳이 아님.
+          같은 자리 충전기 두 대가 각각 한 행이라 넷이 됨. 군집 6 도 같은 사정</p>
+        <p class="src" style="margin-top:4px">계산: analysis/07-공간분석/07-광양공간분석.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-db" style="width:380px;display:block;margin:0 auto" role="img">
+          <title>광양 충전소 44곳을 DBSCAN 군집별 색으로 칠한 지도. 잡음은 흰 점</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const rep = { 1: '송보파인빌 5·6차', 2: '광영동주민센터', 3: '광양읍사무소',
+                      4: '중마버스터미널', 5: '섬진강휴게소', 6: '송보파인빌 7차' };
+        const n = {}; GY.st.forEach((p) => { n[p.c] = (n[p.c] || 0) + 1; });
+        const rows = [1, 2, 3, 4, 5, 6].map((c) =>
+          `<tr><td><span class="sw" style="background:${GY.CL_C[c]};border-radius:50%"></span>${c}</td><td style="text-align:right" class="num">${n[c]}</td><td>${rep[c]}</td></tr>`);
+        rows.push(`<tr><td><span class="sw" style="background:#FFF;border:1px solid #6E6A63;border-radius:50%"></span>잡음</td><td style="text-align:right" class="num">${n[0]}</td><td>${(n[0] / GY.st.length * 100).toFixed(0)}%</td></tr>`);
+        document.querySelector('#t-db tbody').innerHTML = rows.join('');
+        GY.map('#f-db', { h: 330, legendW: 90, legendY: 4, st: 'cluster', r: 3.6,
+                          fill: (c) => (c.p > 0 ? '#E3DED6' : null),
+                          legend: [1, 2, 3, 4, 5, 6].map((c) => [GY.CL_C[c], '군집 ' + c, true]).concat([['#FFFFFF', '잡음', true]]) });
+      })();
+    </script>
+  </section>
+  <!-- ══ [2026-11-01 본편에서 뺌] 과제 (2026-10-19 실습 ①·② 를 과제로 옮김. 실습 ③ 은 뺐다) ══════ -->
+  <section class="s-split">
+    <h2>과제: 여섯 방법을 조사하고 자기 데이터에 적용한다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:4px">1. 여섯 방법을 모두 조사한다</p>
+        <p style="margin-bottom:4px">방법마다 AI 에게 묻고 확인해 세 가지를 정리함</p>
+        <ul class="defs">
+          <li><strong>쓰는 경우:</strong> 어떤 목적과 자료에서 쓰나</li>
+          <li><strong>다른 방법과의 차이:</strong> 같은 목적의 다른 방법과 무엇이 다른가.<br>
+            이웃을 어떻게 정하느냐에 따라 결과가 어떻게 바뀌나</li>
+          <li><strong>장점과 단점:</strong> 무엇을 잘 보여 주고 무엇을 놓치나.<br>
+            흔히 저지르는 잘못은 무엇인가</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">2. 자기 데이터에 적용해 보고서로 정리한다</p>
+        <ol class="steps" style="margin-top:4px">
+          <li><b>목적을 한 문장으로 적음:</b> 「어디에 무엇이 몰려 있는가」</li>
+          <li><b>방법을 고르고 이유를 적음:</b> 순서도의 어느 갈림을 탔나</li>
+          <li><b>정한 값을 적음:</b> 분류법 · 대역폭 · 이웃 반경 · eps 처럼 결과를 바꾸는 것</li>
+          <li><b>적용하고 결과를 봄:</b> AI 에게 로직을 요구하고 사람이 검증함</li>
+        </ol>
+        <p class="caption" style="margin-top:4px">본보기: 배포 자료의 「분석 프롬프트.md」와 「로직 문서 본보기.md」<br>
+          같은 자료로 다른 사람이 같은 지도를 얻을 수 있게 판단을 적음</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 제출 (2026-10-19 · 6강 「제출물」 장과 같은 방식) ═══════════ -->
+  <section>
+    <h2>제출물</h2>
+    <div class="body tight">
+      <p class="sub">두 과제를 <span class="hl">각각 별도 파일로</span> 낸다</p>
+      <ul>
+        <li><span class="code">공간분석-방법조사.md</span>: 1번의 조사내용: 쓰는 경우, 다른 방법과의 차이, 장점과 단점</li>
+        <li><span class="code">공간분석-보고서.md</span>: 2번의 자기 데이터에 적용한 결과</li>
+      </ul>
+      <p class="emph" style="margin-top:14px">제출기한:
+        <span class="t-red">10월 24일(토) 23시 59분 59초</span></p>
+      <div class="doc" style="margin-top:10px">
+        <div class="bar">데이터사이언스 과제 제출 — 한 학기 내내 같은 주소</div>
+        <pre style="font-size:13px;line-height:1.9"><span class="h">docs.google.com/forms/d/e/1FAIpQLSc7AWYdgrGn1gKGoo7VkC6vsDZNXANo-CWokVjY2dm2pucIew/viewform</span></pre>
+      </div>
+      <p class="caption" style="margin-top:8px">
+        2주차와 같은 주소다. 주차 선택에서 <span class="hl">7주차</span>를 고르고,
+        학번 열 자리와 이름을 띄어쓰기 없이 적는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 2026-11-02 교수 수정으로 본편에서 지운 문구 ══════════ -->
+  <section>
+    <h2>2026-11-02 본편에서 뺀 문구</h2>
+    <div class="body tight">
+      <ul class="defs" style="font-size:14px">
+        <li><strong>단계구분도 사례:</strong> 등간은 도심 몇 동 때문에 폭이 넓어져 408동이 첫 계급에 들어감. 분위는 계급마다 85동 안팎으로 고르지만 경계 넷 중 셋이 72 ~ 92 에 몰려, 차이가 작은 주거지끼리 다른 색이 됨. 자연분류는 도심 · 강남 · 여의도가 따로 드러나고 주거지는 한두 계급으로 묶임. 한쪽으로 쏠린 자료는 분류법부터 의심함</li>
+        <li><strong>KDE 사례 (대역폭 1km 지도 한 장):</strong> 가장 촘촘한 곳이 km² 당 12.0곳, 마곡문화공원 · LG사이언스파크 앞. 서울 전체로는 km² 당 4.6곳</li>
+        <li><strong>Moran's I 사례:</strong> 아무렇게나 흩어졌을 때의 기대값 −0.00236. 작동 장의 「이 과목은 정규근사 — 난수를 쓰지 않음」</li>
+        <li><strong>LISA 사례 (유의성 전 네 유형):</strong> HH 는 강남 · 서초와 종로 · 중구에 모임. HL 은 주거지 한가운데의 일터 (가산동 · 상암동 · 구로3동)</li>
+        <li><strong>Gi* 사례:</strong> 로그로 편 뒤에야 콜드스팟이 나옴: 지수 그대로면 낮은 쪽 꼬리가 짧아 콜드스팟이 0. 424번 검정함: 95% 기준이면 우연만으로 스무 동 남짓이 걸릴 수 있음</li>
+        <li><strong>자료 정리 프롬프트:</strong> 경위도를 미터 좌표로 바꾸고 동마다 면적(km²)을 구해 줘. 확인할 값 면적 합 604.3km²</li>
+        <li><strong>과제 3 첫 프롬프트:</strong> CLAUDE.md 와 내 4주차 문제정의서를 읽어 줘. 이 연구에 탐색적 공간분석을 적용하는 계획서를 함께 쓰고 싶어. 바로 쓰지 말고 먼저 나에게 질문해 줘. 공간 단위, 자료, 방법을 하나씩 정하자. 정한 것마다 왜 그렇게 정했는지 내가 말하게 하고, 내가 놓친 위험이 있으면 짚어 줘. (배포 묶음 「분석 프롬프트.md」에는 남아 있음)</li>
+        <li><strong>과제 안내:</strong> 배포 자료의 「결과를 의심해 볼 것」에서 직접 확인한 것을 근거로 하나 이상 넣음. 두 방법 이상을 견주는 문제, 해석의 잘못을 묻는 문제를 섞게 함. 과제마다 새 대화로 시작하고 /export 로 내보냄</li>
+      </ul>
     </div>
   </section>
 
