@@ -15,7 +15,7 @@
  * 이미 폼이 있으면 돌리지 않는다 — 주차를 더할 때는 주차항목갱신() 을 쓴다.
  */
 function 폼만들기() {
-  const form = FormApp.create('데이터사이언스 과제 제출');
+  const form = FormApp.create(폼제목);
   form.setDescription(
     '주차를 고르고 과제 파일을 올립니다.\n' +
     '학번과 이름은 제출물이 담길 폴더 이름이 되므로 정확히 적습니다.\n' +
