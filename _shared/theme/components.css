@@ -629,3 +629,6 @@ ol.dense > li { margin-bottom: 18px; }
 .t-red     { color: var(--accent-red); }      /* 소제목·핵심 라벨 */
 .t-define  { color: var(--define-crimson); }  /* 정의문·발문 */
 .t-blue    { color: var(--chart-blue); }      /* 캡션·도출 결과 */
+
+/* 위첨자 — reveal reset.css 가 sup 의 vertical-align 을 baseline 으로 눌러 둔다 (v<sup>E</sup>) */
+.reveal sup { vertical-align: super; font-size: 0.72em; line-height: 0; }

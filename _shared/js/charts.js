@@ -26,8 +26,11 @@
 window.Fig = (function () {
   const DEFAULT_BOX = { x0: 55, y0: 255, x1: 410, y1: 25 };
 
+  // 「v^E」 처럼 ^ 뒤 한 글자(또는 ^{…})를 위첨자로 그린다. ^ 를 글자로 쓰는 그림은 없다
   const esc = (s) =>
-    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/\^(?:\{([^}]*)\}|(\S))/g, (_, a, b) =>
+        `<tspan baseline-shift="super" font-size="72%">${a ?? b}</tspan>`);
   const round = (v) => Math.round(v * 10) / 10;
 
   /* class 속성 + 누적 공개 속성 (design.md §8) */

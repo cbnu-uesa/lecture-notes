@@ -20,32 +20,29 @@
 
 <script>
   // ── 혼잡 [18장 p.394~397, 그림 18-1·18-2·18-3] ──────────────
-  // 교재가 인쇄한 다섯 값(3.00 · 4.00 · 4.80 · 6.40 · 9.00)을 모두 지나는
-  // 2차 곡선 두 개를 풀었다. v₀=100 까지는 혼잡이 없어 사적비용이 3.00 으로 평평하다.
-  //   pc(200)=4.00 · pc(300)=4.80 · sc(200)=6.40 · sc(300)=9.00
-  // 수요는 sc 와 200 에서, pc 와 300 에서 만난다 → v^E=200 · v*=300.
-  // 그러면 효율적 혼잡세 = sc(200) − pc(200) = 2.40 이 저절로 나온다.
+  // 비용곡선은 v₀ 를 넘으면 기울기가 점점 커지는 지수형이다 (차가 늘수록 감속이 가팔라짐).
+  //   pc = 3 + A(e^{k u} − 1) · sc = 3 + B(e^{j u} − 1),  u = v − v₀
+  // 교재가 인쇄한 네 값을 지나도록 k·A·j·B 를 풀었다 (v₀=100 · v^E=200 · v*=250).
+  //   pc(200)=4.00 · pc(250)=4.80 · sc(200)=6.40 · sc(250)=9.00
+  // 볼록하려면 v* − v^E 가 v^E − v₀ 의 0.76배보다 작아야 한다 (4.80−4.00 < 4.00−3.00 이므로).
+  // 수요는 sc 와 200 에서, pc 와 250 에서 만난다 → 효율적 혼잡세 = sc(200) − pc(200) = 2.40.
+  // 로이스(수요 5.50)의 사회적 비용은 이 곡선에서 7.77 로, 교재 7.70 과 0.07 차이다.
   window.CONG = {
-    v0: 100, vE: 200, vStar: 300, base: 3.00,
-    pc(v) { const u = Math.max(0, v - this.v0); return this.base + 0.011 * u - 1e-5 * u * u; },
-    sc(v) { const u = Math.max(0, v - this.v0); return this.base + 0.038 * u - 4e-5 * u * u; },
-    dem(v) { return this.sc(this.vE) - 0.016 * (v - this.vE); },
+    v0: 100, vE: 200, vStar: 250, base: 3.00, slope: 0.032,
+    pc(v) { const u = Math.max(0, v - this.v0); return this.base + 1.106395 * (Math.exp(0.006439 * u) - 1); },
+    sc(v) { const u = Math.max(0, v - this.v0); return this.base + 4.320550 * (Math.exp(0.005805 * u) - 1); },
+    dem(v) { return this.sc(this.vE) - this.slope * (v - this.vE); },
     get tax() { return this.sc(this.vE) - this.pc(this.vE); },     // 2.40
   };
 
   // ── 혼잡세 도시 [18장 p.400, 그림 18-6] ─────────────────────
-  // 두 도시 각 6백만명. 한 도시가 혼잡세를 도입하면 효용곡선이 위로 옮겨 가며
-  // 정점도 오른쪽으로 간다. 지역 전체 효용은 점 c·d 의 u** 에 고정된다.
-  // 두 도시 합이 12백만명이므로 균형은 u1(N) = u0(12 − N) 인 N 이다.
-  // 교재는 그 균형이 N = 7(세금 도시)과 5(다른 도시)라고 한다.
-  //   u* = u0(6) = 98 · u** = u0(5) = u1(7) = 100 · u″ = u1(6) = 106
-  // 앞서 쓰던 모수(P1=112·g1=1.7)로는 u1(7) = 110.3 ≠ u0(5) = 100 이라
-  // 점 c 와 d 의 높이가 달랐고, 풀어 보면 균형이 아예 없었다(판별식이 음수).
+  // 혼잡세 이후 곡선 = 이전 곡선 + g(N). g 는 양수이고 N 과 함께 커진다 —
+  // 교재: 수직 이동은 노동력이 작을 때 작고 클 때 크다. 그래서 두 곡선은 만나지 않고
+  // 이후 곡선의 정점이 오른쪽(5 → 5.5)으로 간다.
+  //   u* = u0(6) = 98 · u** = u0(5) = u1(7) = 100 · u″ = u1(6) = 104
   window.CONGCITY = {
-    P0: 100, g0: 2, M0: 5,
-    P1: 106, g1: 6, M1: 6,
-    u0(N) { return this.P0 - this.g0 * (N - this.M0) ** 2; },
-    u1(N) { return this.P1 - this.g1 * (N - this.M1) ** 2; },
+    u0(N) { return 100 - 2 * (N - 5) ** 2; },
+    u1(N) { return this.u0(N) + 2 * N - 6; },
   };
 
   // ── 도시별 혼잡세 [18장 p.402, 그림 18-8] ───────────────────
@@ -67,16 +64,41 @@
   };
 
   // ── 교통사고 [18장 p.409~410, 표 18-1 · 그림 18-12] ─────────
+  // 0.140 은 사적 비용과 외부 비용을 합한 평균 사고비용이다. 한계 사적 비용의 값은
+  // 교재에 없으므로 그림은 p*·p** 로만 적고, 두 선의 간격만 교재 값 0.061 을 쓴다.
   window.ACC = {
     items: [['사망 또는 부상', 0.103], ['생산성 손실', 0.013], ['의료비', 0.008],
             ['재산 손해', 0.007], ['법률, 경찰, 소방', 0.004], ['보험 행정', 0.003],
             ['교통 지연', 0.002]],
     total: 0.140, ext: 0.061,
-    get mpc() { return this.total; },
-    get msc() { return this.total + this.ext; },
+    mpc: 0.12,
+    get msc() { return this.mpc + this.ext; },
     mStar: 100,
     dem(m) { return this.mpc + 0.0012 * (this.mStar - m); },
     get mE() { return this.mStar - this.ext / 0.0012; },
+  };
+
+  // ── 급행차선 [18장 p.404~405, 그림 18-9 · 18-10] ────────────
+  // 18-9: 통행비용은 v₀ 까지 c₀ 로 평평하다. 통행료 = 수요가 v₀ 에서 갖는 높이 − c₀.
+  // 18-10: 일반 차선 수요가 급행차선으로 옮긴 만큼(v′ − v‴) 왼쪽으로 간다.
+  //   교점은 Fig.cross 로 구한다 → v′ − v″ 가 v′ − v‴ 보다 작게 나온다 (잠재수요)
+  window.LANE = {
+    v0: 100, c0: 3,
+    cost(v) { const u = Math.max(0, v - this.v0); return this.c0 + 0.25 * (Math.exp(0.045 * u) - 1); },   // 지수형
+    hi(v) { return 8.6 - 0.03 * (v - 20); },   // 수요: 고 — v₀ 에서 c″ = 6.20
+    lo(v) { return 6.8 - 0.03 * (v - 20); },   // 수요: 저 — v₀ 에서 c′ = 4.40
+    d1(v) { return 10.5 - 0.03 * v; },         // 일반 차선, 이동 전
+    shift: 40,
+  };
+
+  // ── 속도와 위험보상 [18장 p.411~412, 그림 18-13] ────────────
+  // 한계편익은 6달러로 평평하다. 기대사고비용은 속도와 함께 "증가하는 비율로" 커지므로
+  // 한계비용은 지수형이다. 두 곡선이 6 을 43 · 46 에서 지나게 두었고,
+  // 에어백 곡선의 증가율(0.18)이 초기(0.26)보다 낮아 그림 구간(40~50)에서 늘 아래에 있다.
+  window.SPEED = {
+    mb: 6,
+    mc0(s) { return 6 * Math.exp(0.26 * (s - 43)); },
+    mc1(s) { return 6 * Math.exp(0.18 * (s - 46)); },
   };
 
   // ── 대중교통 비용 [19장 p.429~430, 그림 19-4·19-5] ──────────
@@ -99,11 +121,27 @@
       { k: '버스',   money: 3, walk: 20, ride: 90 },
       { k: '철도',   money: 3, walk: 45, ride: 60 },
     ],
-    walkCost(r) { return r.walk * this.wWalk; },
-    rideCost(r) { return r.ride * this.wRide; },
+    walkCost(r, w = this.wWalk) { return r.walk * w; },
+    rideCost(r, w = this.wRide) { return r.ride * w; },
     total(r)    { return r.money + this.walkCost(r) + this.rideCost(r); },
+    // 그림 19-3 — 교재 숫자가 아래 두 규칙에서 그대로 나온다
+    //   인구밀도 증가: 대중교통의 시간비용 절반 → 버스 16 · 철도 18 (자동차 22 그대로)
+    //   임금 감소(분당 $0.10): 도보·대기 0.10 · 차량 내 0.05 → 10.00 · 9.50 · 10.50
+    dense(r) { const t = this.walkCost(r) + this.rideCost(r); return r.money + (r.k === '자동차' ? t : t / 2); },
+    poor(r)  { return r.money + this.walkCost(r, 0.10) + this.rideCost(r, 0.05); },
     share: [['버스', 3207], ['지하철 혹은 고가열차', 1886], ['철도', 658], ['전차', 73]],
-    elas: [['첨두', -0.40, -0.24], ['비첨두', -0.80, -0.48], ['전체', -0.50, -0.30]],
+    // 표 19-2 — 열은 버스 · 철도다
+    elas: [['첨두 수요', -0.40, -0.24], ['비첨두', -0.80, -0.48], ['전체', -0.50, -0.30]],
+  };
+
+  // ── 장기 평균비용 [19장 p.432~433, 그림 19-6] ────────────────
+  // 전형적인 미국 도시. 승용차와 도로는 수평, 버스는 시간당 6천명에서 그 아래로 내려가고
+  // 철도와 지선버스는 10천명 부근에서 내려가며, 전 구간에서 버스보다 위에 있다.
+  //   bus(6) = 8 = car · rail(10) = 8 = car
+  window.LAC = {
+    car: 8,
+    bus(q) { return 5.2 + 16.8 / q; },
+    rail(q) { return 5.9 + 21 / q; },
   };
 </script>
 
@@ -126,58 +164,85 @@
   <p class="cover-date" data-course-date>&nbsp;</p>
 </section>
 
-<!-- ══ 지난 시간 — 10주차 요약 ═══════════════════════════════ -->
+<!-- ══ 지난 시간 — 10주차 요약 인포그래픽 ═══════════════════════ -->
 <section>
-  <h2>지난 시간 — 도시주택과 공공정책</h2>
-  <div class="body tight">
-    <div class="cols" style="align-items:flex-start">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">여과</p>
-        <p>주택은 내구적이라 품질사다리를 내려감. 얼마나 내려보낼지는
-          <strong>두 하부시장의 가격 차이</strong>가 정함</p>
-        <p style="margin-bottom:8px">그래서 한 하부시장의 정책이 <strong>다른 하부시장으로 번짐</strong>.
-          신규 주택을 금지하면 낮은-품질 가격이 두 번 오름</p>
-        <p class="sub t-red" style="margin-bottom:2px">네 가지 정책</p>
-        <p>공공주택은 1달러로 <strong>0.24달러</strong>의 편익을 줌.
-          바우처는 같은 후생을 <strong>1/4 비용</strong>으로 줌</p>
-      </div>
-      <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">되풀이된 구조</p>
-        <p>공급측면 정책은 <strong>밀어내기</strong> 때문에 넣은 만큼 늘지 않았고,
-          수요측면 바우처는 <strong>가격을 올려</strong> 중간-소득 가구에까지 번졌음</p>
-        <p style="margin-bottom:8px">주택담보대출 지원은 사적비용을 사회비용보다 낮춰
-          주택자본을 <strong>효율적 수준 이상으로</strong> 늘림</p>
-        <p class="sub t-red" style="margin-bottom:2px">거기서 나온 물음</p>
-        <p>가격이 사회적 비용을 반영하지 못할 때 무슨 일이 생기는지 봤음.
-          <strong>도로에서는 그 일이 매일 일어남</strong></p>
-      </div>
-    </div>
-    <p class="derive t-red" style="margin-top:18px">→ 오늘은 <strong>도시교통</strong>임.
-      18장은 자동차와 도로의 세 외부효과(<strong>혼잡·환경·교통사고</strong>)와 그 정책대응,
-      19장은 <strong>통행수단 선택</strong>과 대중교통 시스템의 선택을 봄</p>
+  <h2>지난 시간: 도시주택과 공공정책</h2>
+  <div class="body" style="padding-top:0">
+    <svg class="fig" id="f-recap10" viewBox="0 0 848 294" style="width:848px;display:block;margin:0" role="img">
+      <title>10강 요약 인포그래픽. 여과로 이어진 하부시장, 공급-측면 정책, 수요-측면 정책(바우처와 주택담보대출 이자 지원)</title></svg>
+    <p class="derive t-red hang" style="margin-top:6px">→ 오늘: 제4편 도시교통<br>
+      18장: 자동차와 도로의 세 외부효과(<strong>혼잡 · 환경의 저하 · 교통사고</strong>)와 정책대응<br>
+      19장: <strong>통행수단</strong>과 <strong>대중교통체계</strong>의 선택</p>
   </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      // 세 칸: 여과(하부시장의 구분과 상호작용) → 공급-측면 정책 → 수요-측면 정책(바우처 · 주택담보대출)
+      const W = 276, X = [0, 286, 572], H = 292;
+      const P = [
+        ['여과', '하부시장의 구분과 상호작용 (17장 01)', [
+          ['하부시장', '높은-품질 · 낮은-품질 (신규 주택은 높은-품질)'],
+          ['하향 여과로 연결', '높은-품질에서 빠진 주택 → 낮은-품질 공급'],
+          ['여과량', '두 시장의 가격 차이가 결정', '200 → 250달러면 남는 높은-품질 40 → 50채'],
+          ['상호작용', '건축금지 · 젠트리피케이션 → 높은-품질 가격 ↑', '→ 낮은-품질 가격도 상승'],
+        ], '한 하부시장의 변화가 다른 하부시장으로 번짐'],
+        ['공급-측면 정책', '공공주택 · 민간주택 지원 (17장 02)', [
+          ['공공주택', '1달러의 편익 0.24달러'],
+          ['민간주택 지원', '임대지원 · 낮은 소득 주택 세금공제'],
+          ['밀어내기', '보조 없는 주택을 대체', '퇴출 증가 · 하향 여과 감소 → 순증가 ↓'],
+        ], '넣은 만큼 주택이 늘지 않음'],
+        ['수요-측면 정책', '바우처 · 주택담보대출 지원 (17장 03)', [
+          ['주택바우처', '같은 후생에 240 대 1,020달러 (공공주택)'],
+          ['바우처의 시장효과', '낮은-품질 수요 ↑ → 가격 ↑', '여과를 거쳐 중간 · 높은-품질 가격도 ↑'],
+          ['주택담보대출 이자 공제', '조세지출 → 주택소유주 가처분소득 ↑'],
+          ['결과', '한계사적비용 0.72 < 한계사회비용 1.00', '→ 주택자본 과다 · 후생손실'],
+        ], '수요 지원은 가격과 주택자본을 부풀림'],
+      ];
+      P.forEach(([q, why, rows, rule], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += `<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>` + t(x + 18, 24.5, String(i + 1), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+        s += t(x + 35, 25, q, 14, RED, { w: 700 });
+        s += t(x + 12, 43, why, 10.5, MUTED);
+        let y = 68;
+        rows.forEach(([k, a, b]) => {
+          s += t(x + 12, y, k, 12, INK, { w: 700 });
+          s += t(x + 12, y + 16, a, 10.5, INK2);
+          if (b) s += t(x + 12, y + 30, b, 10.5, MUTED);
+          y += b ? 56 : 44;
+        });
+        s += `<rect x="${x + 8}" y="${H - 32}" width="${W - 16}" height="24" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 15, rule, 11, RED, { w: 700, a: 'middle' });
+        if (i < 2) s += `<path d="M${x + W},${H / 2} L${X[i + 1] - 2},${H / 2}" stroke="${INK2}" stroke-width="1.5" marker-end="url(#ah-ink)"/>`;
+      });
+      Fig.draw('#f-recap10', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
 </section>
 
 <!-- ══ 섹션 — CHAPTER 18 ═════════════════════════════════════ -->
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">CHAPTER 18 자동차와 도로</p>
-  <p class="section-sub">PART 04 도시교통의 첫 장 — 비효율을 낳는 세 외부효과 · 교재 p.393~412</p>
+  <p class="section-sub">비효율을 낳는 세 외부효과: 혼잡 · 환경의 저하 · 교통사고 · 교재 p.393~412</p>
 </section>
 
 <!-- ══ 발문 (p.393) ══════════════════════════════════════════ -->
 <section class="s-question">
   <div class="body stack">
-    <p class="lead t-define">이제까지는 <span class="mark">가격이 사회적 비용을 반영하지 못할 때</span>
-      생기는 비효율을 주택에서 봤음</p>
-      <p class="lead t-define" style="margin-bottom:16px">이 장에서는 그 일이 매일 일어나는 곳,
-        <span class="mark">도로</span>를 봄</p>
-    <p class="emph">자동차는 세 가지 외부비용을 냄 — <strong>혼잡 · 환경의 저하 · 교통사고</strong></p>
-      <p class="emph" style="margin-bottom:16px">외부비용에 대한 경제적 접근은
-      <strong>외부성을 내재화하는 세금</strong>임. 의사결정자가 자기 선택의 전체 비용을 지게 하는 것</p>
-    <p class="derive t-red">→ 일단 외부비용이 내재화되면 <strong>시장이 알아서 작동함</strong> —
-      개별 의사결정자가 효율적인 선택을 함</p>
-      <p class="derive t-red">→ 오염의 효율적 수준이 0이 아니듯 <strong>혼잡의 효율적 수준도 0이 아님</strong></p>
+    <p class="lead t-define">자동차: 미국 도시의 주요 통행수단
+      (<span class="mark">통근통행의 88%</span> · 모든 통행의 90%)</p>
+    <p class="lead t-define" style="margin-bottom:16px">이 장의 초점: 자동차가 내는 세 외부비용,
+      <span class="mark">혼잡 · 오염 · 교통사고</span></p>
+    <p class="emph">외부비용: 행위의 양을 정하는 사람이 아닌 <strong>다른 누군가가 겪는 비용</strong></p>
+    <p class="emph" style="margin-bottom:16px">경제적 접근: <strong>세금으로 외부성을 내재화</strong>
+      → 의사결정자가 선택의 전체 비용을 부담</p>
+    <p class="derive t-red">→ 외부비용이 내재화되면 개별 의사결정자가 <strong>효율적으로 선택</strong></p>
   </div>
 </section>
 
@@ -185,116 +250,149 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">01 혼잡의 외부효과</p>
-  <p class="section-sub">한 대가 더 들어오면 나머지 모두가 느려진다 · 교재 p.393~401</p>
+  <p class="section-sub">추가 차량 한 대가 다른 운전자 모두를 늦춤 · 교재 p.393~401</p>
 </section>
 
-<!-- ══ 그림 18-1 · 18-2 (p.394~397) ══════════════════════════ -->
-<section>
-  <h2>사적 비용 · 외부 비용 · 사회적 비용</h2>
-  <div class="body tight">
-    <p class="emph">통행량이 v₀ 를 넘어서면 차 한 대가 더 들어올 때마다
-      <strong>나머지 모두의 속도가 떨어져</strong> 시간비용이 올라감. 그 몫이 <strong>외부비용</strong>임</p>
-    <svg class="fig" id="f-cong" viewBox="0 0 700 262" style="width:600px;margin:4px 0 0 118px" role="img">
-      <title>사적 통행비용과 사회적 통행비용의 격차가 외부비용이고, 수요가 사회적 비용과 만나는 v^E가 효율적 통행량인 그림</title></svg>
-    <script>
-      (function () {
-        const C = window.CONG, F = Fig;
-        const parts = [];
-        const mk = (S, f, a, b) => { const o = []; for (let i = 0; i <= 40; i++) { const x = a + ((b - a) * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
-        const panel = (box, withDemand) => {
-          const P = Fig.withBox(box);
-          const S = P.scale({ x: [0, 360], y: [0, 10.5] });
-          parts.push(F.raw(`<path class="axis" d="M${P.BOX.x0},${P.BOX.y1 - 7} L${P.BOX.x0},${P.BOX.y0} L${P.BOX.x1 + 8},${P.BOX.y0}"/>`));
-          parts.push(F.annot(P.BOX.x0, P.BOX.y1 - 12, '달러', { anchor: 'middle', size: 10 }));
-          parts.push(F.curve(mk(S, (v) => C.sc(v), 0, 330)));
-          parts.push(F.annot(S.x(110), S.y(C.sc(110)) - 10, '사회적 통행비용', { size: 10 }));
-          parts.push(F.curve(mk(S, (v) => C.pc(v), 0, 330), { variant: 'demand' }));
-          parts.push(F.annot(S.x(150), S.y(C.pc(150)) + 16, '사적 통행비용', { size: 10, tone: 'blue' }));
-          if (withDemand) {
-            parts.push(F.line(S.x(140), S.y(C.dem(140)), S.x(340), S.y(C.dem(340)), { variant: 'supply' }));
-            parts.push(F.annot(S.x(164), S.y(C.dem(164)) - 10, '수요', { size: 10, tone: 'red' }));
-          }
-          return { P, S };
-        };
-        // 왼쪽 — 그림 18-1
-        const A = panel({ x0: 62, y0: 178, x1: 314, y1: 34 }, false);
-        [[C.v0, C.pc(C.v0), 'a', '3.00'], [C.vE, C.pc(C.vE), 'b', '4.00'],
-         [C.vE, C.sc(C.vE), 'e', '6.40'], [C.vStar, C.pc(C.vStar), 'c', '4.80'],
-         [C.vStar, C.sc(C.vStar), 'd', '9.00']].forEach(([v, y, nm, tick]) => {
-          const Q = A.S.p([v, y]);
-          parts.push(F.raw(`<path class="guide" d="M${A.P.BOX.x0},${Q[1]} L${Q[0]},${Q[1]}"/>`));
-          parts.push(F.annot(A.P.BOX.x0 - 8, Q[1] + 4, tick, { anchor: 'end', size: 10 }));
-          parts.push(F.dot(...Q, { label: nm, lx: 7, ly: -7 }));
-        });
-        [[C.v0, 'v₀'], [C.vE, 'v′'], [C.vStar, 'v″']].forEach(([v, t]) => {
-          parts.push(F.raw(`<path class="guide" d="M${A.S.x(v)},${A.S.y(C.sc(v))} L${A.S.x(v)},${A.P.BOX.y0}"/>`));
-          parts.push(F.annot(A.S.x(v), A.P.BOX.y0 + 15, t, { anchor: 'middle', size: 10 }));
-        });
-        parts.push(F.arrow(A.S.x(C.vStar) + 20, A.S.y(C.pc(C.vStar)), A.S.x(C.vStar) + 20, A.S.y(C.sc(C.vStar))));
-        parts.push(F.arrow(A.S.x(C.vStar) + 20, A.S.y(C.sc(C.vStar)), A.S.x(C.vStar) + 20, A.S.y(C.pc(C.vStar))));
-        parts.push(F.annot(A.S.x(C.vStar) + 24, (A.S.y(C.pc(C.vStar)) + A.S.y(C.sc(C.vStar))) / 2 + 4,
-                           '외부비용', { size: 10 }));
-        parts.push(F.annot(A.S.x(180), A.P.BOX.y0 + 32, '통행량', { anchor: 'middle', size: 11 }));
-        // 오른쪽 — 그림 18-2
-        const B = panel({ x0: 430, y0: 178, x1: 664, y1: 34 }, true);
-        [[C.vE, C.sc(C.vE), 'e', 'v^E', 7, -7], [C.vStar, C.pc(C.vStar), 'c', 'v*', 7, 14],
-         [C.vStar, C.sc(C.vStar), 'd', null, 7, -7]].forEach(([v, y, nm, tick, lx, ly]) => {
-          const Q = B.S.p([v, y]);
-          parts.push(F.raw(`<path class="guide" d="M${Q[0]},${Q[1]} L${Q[0]},${B.P.BOX.y0}"/>`));
-          if (tick) parts.push(F.annot(Q[0], B.P.BOX.y0 + 15, tick, { anchor: 'middle', size: 10 }));
-          parts.push(F.dot(...Q, { label: nm, lx, ly }));
-        });
-        parts.push(F.annot(B.S.x(180), B.P.BOX.y0 + 32, '통행량', { anchor: 'middle', size: 11 }));
-        F.draw('#f-cong', { parts });
-      })();
-    </script>
-    <p class="derive t-red" style="margin-top:4px">→ v′ 에서 사적비용 4.00 · 사회적비용 6.40 이므로 외부비용은 <strong>2.40</strong>.
-      v″ 에서는 4.80 과 9.00 이라 <strong>4.20</strong> 으로 더 커짐</p>
-      <p class="derive t-red" style="margin-top:2px">→ 시장균형은 수요와 <strong>사적</strong> 비용이 만나는 점 c(v*).
-      효율적 통행량은 수요와 <strong>사회적</strong> 비용이 만나는 점 e(v^E)임.
-      <strong>v* &gt; v^E</strong> — 시장은 지나치게 많이 통행함</p>
-  </div>
-</section>
-
-<!-- ══ 그림 18-3 혼잡세 (p.397~399) ══════════════════════════ -->
+<!-- ══ 그림 18-1 (p.394~395) ═════════════════════════════════ -->
 <section class="s-split">
-  <h2>혼잡세는 격차만큼만 매긴다</h2>
+  <h2>통행비용: 외부, 사적, 그리고 사회적</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">효율적 통행량 v^E 에서 사적비용과 사회적비용의 격차는
-        <strong>2.40달러</strong>임. 그만큼을 세금으로 매김</p>
-      <p style="margin-bottom:8px">사적비용 + 세금 곡선이 수요와 만나는 곳이 바로 v^E 임.
-        통행량이 v* 에서 v^E 로 줄어듦</p>
-      <p style="margin-bottom:10px">음영이 <strong>이득</strong>임 — 사라진 통행들에 대해
-        사회적 비용이 지불용의를 넘던 몫</p>
-      <p class="derive t-red">→ 세금은 <strong>통행을 없애려는 것이 아님</strong>.
-        남은 통행은 사회적 비용을 다 치르고도 할 만한 통행임</p>
-      <p class="derive t-red">→ 도로 이용자도 우회 운전자도 <strong>이득과 손실을 함께</strong> 봄.
-        혼잡세를 도입한 도시는 살 만해져 <strong>사람이 모여듦</strong></p>
+      <p class="emph" style="margin-bottom:4px">내가 고속도로에 진입할 때 발생하는 비용은?</p>
+      <p class="formula-key" style="margin-bottom:4px">한계외부비용 = m · v · c</p>
+      <p class="caption" style="margin-bottom:10px">m: 추가 차량 한 대가 늘리는 1인당 통행시간(분)<br>
+        v: 기존 이용자 수 · c: 통행시간의 분당 기회비용</p>
+      <p class="hang" style="margin-bottom:10px">→ 내가 진입함으로써 다른 운전자에게 발생시키는 비용</p>
+      <p class="lbl"><strong>사적 비용:</strong><span>운전자가 부담하는 금전 2.00 + 시간비용<br>
+        v₀ 까지는 제한속도로 달려 3.00 에서 수평<br>
+        v₀ 를 넘으면 속도가 떨어져 시간비용 증가</span></p>
+      <p class="lbl"><strong>사회적 비용:</strong><span>사적 비용 + 외부비용<br>
+        두 곡선의 세로 격차 = 한계외부비용</span></p>
+      <p class="derive t-red hang">→ 통행량이 늘수록 격차가 커짐<br>
+        v′: 4.00 + 2.40 = 6.40 · v″: 4.80 + 4.20 = 9.00</p>
     </div>
     <div class="col-r">
-      <svg class="fig" id="f-tax" viewBox="0 0 430 282" style="width:390px" role="img">
-        <title>사적 통행비용에 세금을 더한 곡선이 수요와 v^E에서 만나고 사회적 비용과 수요 사이의 삼각형이 이득이 되는 그림</title></svg>
+      <svg class="fig" id="f-cost" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>사적 통행비용은 v₀까지 3.00에서 수평이다가 오르고, 사회적 통행비용은 그보다 가파르게 올라 두 곡선의 격차인 외부비용이 커지는 그림</title></svg>
       <script>
         (function () {
           const C = window.CONG, F = Fig.withBox({ x0: 68, y0: 210, x1: 392, y1: 34 });
-          const S = F.scale({ x: [0, 360], y: [0, 10.5] });
+          const S = F.scale({ x: [0, 300], y: [0, 10.5] });
+          const mk = (f) => { const o = []; for (let i = 0; i <= 40; i++) { const x = (272 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
+          const parts = [
+            F.curve(mk((v) => C.sc(v))),
+            F.annot(S.x(150), S.y(C.sc(150)) - 10, '사회적 통행비용', { anchor: 'end', size: 10 }),
+            F.curve(mk((v) => C.pc(v)), { variant: 'demand' }),
+            F.annot(S.x(8), S.y(C.pc(8)) + 17, '사적 통행비용', { size: 10, tone: 'blue' }),
+            F.guide(...S.p([C.v0, C.pc(C.v0)]), { xtick: 'v₀', ytick: '3.00' }),
+            F.dot(...S.p([C.v0, C.pc(C.v0)]), { label: 'a', lx: -4, ly: -10 }),
+            F.guide(...S.p([C.vE, C.sc(C.vE)]), { xtick: 'v′', ytick: '6.40' }),
+            F.dot(...S.p([C.vE, C.sc(C.vE)]), { label: 'e', lx: -15, ly: -6 }),
+            F.guide(...S.p([C.vE, C.pc(C.vE)]), { ytick: '4.00', only: 'y' }),
+            F.dot(...S.p([C.vE, C.pc(C.vE)]), { label: 'b', lx: 7, ly: 15 }),
+            F.guide(...S.p([C.vStar, C.sc(C.vStar)]), { xtick: 'v″', ytick: '9.00' }),
+            F.dot(...S.p([C.vStar, C.sc(C.vStar)]), { label: 'd', lx: -15, ly: -6 }),
+            F.guide(...S.p([C.vStar, C.pc(C.vStar)]), { ytick: '4.80', only: 'y' }),
+            F.dot(...S.p([C.vStar, C.pc(C.vStar)]), { label: 'c', lx: 7, ly: 15 }),
+          ];
+          const xa = S.x(C.vStar) + 16, y1 = S.y(C.pc(C.vStar)), y2 = S.y(C.sc(C.vStar));
+          parts.push(F.arrow(xa, y1, xa, y2), F.arrow(xa, y2, xa, y1));
+          parts.push(F.annot(xa + 5, (y1 + y2) / 2 + 4, '외부비용', { size: 10 }));
+          F.draw('#f-cost', { axes: { x: '통행량', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 18-2 (p.395~397) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>시장균형 대 효율적 결과</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">수요곡선 = 통행의 <strong>한계 사회적 편익</strong></p>
+      <p class="caption" style="margin-bottom:10px">통행에는 양(+)의 외부효과가 없기 때문</p>
+      <p class="lbl"><strong>시장균형:</strong><span>점 c: 수요 = 사적 비용 → 통행량 v*</span></p>
+      <p class="lbl"><strong>효율적 결과:</strong><span>점 e: 수요 = 사회적 비용 → 통행량 v<sup>E</sup></span></p>
+      <p class="lbl"><strong>로이스(점 L):</strong><span>지불용의 5.50 &gt; 사적 비용 4.80 → 도로 이용<br>
+        지불용의 5.50 &lt; 사회적 비용 7.70(점 f) → 비효율</span></p>
+      <p class="derive t-red">→ <strong>v* &gt; v<sup>E</sup></strong>: 남에게 지우는 외부비용을 무시해 과다 통행</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-eq" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>수요가 사적 통행비용과 만나는 v*가 시장균형이고 사회적 통행비용과 만나는 vᴱ가 효율적 통행량이며, 그 사이의 로이스는 지불용의가 사회적 비용보다 낮은 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CONG, F = Fig.withBox({ x0: 68, y0: 210, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 300], y: [0, 10.5] });
+          const mk = (f) => { const o = []; for (let i = 0; i <= 40; i++) { const x = (272 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
+          const vL = C.vE + (C.dem(C.vE) - 5.50) / C.slope;   // 수요 = 5.50 인 통행량 v′
+          const parts = [
+            F.curve(mk((v) => C.sc(v))),
+            F.annot(S.x(150), S.y(C.sc(150)) - 10, '사회적 통행비용', { anchor: 'end', size: 10 }),
+            F.curve(mk((v) => C.pc(v)), { variant: 'demand' }),
+            F.annot(S.x(8), S.y(C.pc(8)) + 17, '사적 통행비용', { size: 10, tone: 'blue' }),
+            F.line(S.x(120), S.y(C.dem(120)), S.x(290), S.y(C.dem(290)), { variant: 'supply' }),
+            F.annot(S.x(290), S.y(C.dem(290)) + 15, '수요', { anchor: 'end', size: 10, tone: 'red' }),
+            F.guide(...S.p([C.vE, C.sc(C.vE)]), { xtick: 'v^E', ytick: '6.40' }),
+            F.dot(...S.p([C.vE, C.sc(C.vE)]), { label: 'e', lx: -15, ly: -6 }),
+            F.guide(...S.p([vL, C.dem(vL)]), { xtick: 'v′', ytick: '5.50' }),
+            F.dot(...S.p([vL, C.dem(vL)]), { label: 'L', lx: -15, ly: 15 }),
+            F.guide(...S.p([vL, C.sc(vL)]), { only: 'x' }),
+            F.dot(...S.p([vL, C.sc(vL)]), { label: 'f', lx: -14, ly: -5 }),
+            F.guide(...S.p([C.vStar, C.pc(C.vStar)]), { xtick: 'v*', ytick: '4.80' }),
+            F.dot(...S.p([C.vStar, C.pc(C.vStar)]), { label: 'c', lx: 7, ly: 15 }),
+            F.guide(...S.p([C.vStar, C.sc(C.vStar)]), { ytick: '9.00', only: 'y' }),
+            F.dot(...S.p([C.vStar, C.sc(C.vStar)]), { label: 'd', lx: 8, ly: 4 }),
+          ];
+          F.draw('#f-eq', { axes: { x: '통행량', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 18-3 혼잡세 (p.397~398) ══════════════════════════ -->
+<section class="s-split">
+  <h2>혼잡세</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">혼잡세 = v<sup>E</sup> 에서의 한계외부비용 <strong>2.40달러</strong></p>
+      <p style="margin-bottom:10px">사적 비용곡선이 세금만큼 위로 이동<br>
+        → 수요와 점 e(v<sup>E</sup>)에서 만남</p>
+      <p class="sub t-red" style="margin-bottom:2px">1. 통행량 감소: v* → v<sup>E</sup></p>
+      <p style="margin-bottom:8px">지불용의 &lt; 사적 비용 + 세금인 통행자가 떠남</p>
+      <p class="sub t-red" style="margin-bottom:2px">2. 효율성 이득: 음영</p>
+      <p style="margin-bottom:10px">떠난 통행의 사회적 비용 − 지불용의<br>
+        로이스 한 명의 이득: 7.70 − 5.50 = 2.20</p>
+      <p class="derive t-red hang">→ 세입이 동일할 때 혼잡세를 통한 세금징수는<br>
+        다른 세금 감면효과를 지님<br>
+        v* = 600, v<sup>E</sup> = 500이면 총세입은 1200달러,<br>
+        소비자당 2달러 감면효과</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-tax" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>사적 통행비용에 세금을 더한 곡선이 수요와 vᴱ에서 만나고 사회적 비용과 수요 사이의 삼각형이 이득이 되는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CONG, F = Fig.withBox({ x0: 68, y0: 210, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 300], y: [0, 10.5] });
           const mk = (f, a, b) => { const o = []; for (let i = 0; i <= 40; i++) { const x = a + ((b - a) * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
           // 음영 — 사회적 비용과 수요 사이, v^E 에서 v* 까지
           const up = mk((v) => C.sc(v), C.vE, C.vStar);
           const dn = mk((v) => C.dem(v), C.vE, C.vStar);
           const parts = [
             F.raw(`<path class="area-surplus" d="${Fig.path(up.concat(dn.slice().reverse()))} Z"/>`),
-            F.curve(mk((v) => C.sc(v), 0, 330)),
-            F.annot(S.x(324), S.y(C.sc(324)) - 10, '사회적 통행비용', { anchor: 'end', size: 10 }),
+            F.curve(mk((v) => C.sc(v), 0, 272)),
+            F.annot(S.x(268), S.y(C.sc(268)) - 10, '사회적 통행비용', { anchor: 'end', size: 10 }),
             // 효율점을 넘는 통행은 없으므로 세금포함 곡선은 v^E 까지만 그린다.
             // 더 그리면 음영 한가운데를 지나 「이득」 글자를 관통한다
             F.curve(mk((v) => C.pc(v) + C.tax, 0, C.vE + 12), { variant: 'i1' }),
             F.annot(S.x(24), S.y(C.pc(24) + C.tax) - 10, '사적 통행비용 + 세금', { size: 10 }),
-            F.curve(mk((v) => C.pc(v), 0, 330), { variant: 'demand' }),
+            F.curve(mk((v) => C.pc(v), 0, 272), { variant: 'demand' }),
             F.annot(S.x(150), S.y(C.pc(150)) + 16, '사적 통행비용', { size: 10, tone: 'blue' }),
-            F.line(S.x(140), S.y(C.dem(140)), S.x(340), S.y(C.dem(340)), { variant: 'supply' }),
-            F.annot(S.x(172), S.y(C.dem(172)) - 10, '수요', { size: 10, tone: 'red' }),
+            F.line(S.x(120), S.y(C.dem(120)), S.x(290), S.y(C.dem(290)), { variant: 'supply' }),
+            F.annot(S.x(122), S.y(C.dem(122)) - 10, '수요', { size: 10, tone: 'red' }),
             F.guide(...S.p([C.vE, C.sc(C.vE)]), { xtick: 'v^E', ytick: '6.40' }),
             F.dot(...S.p([C.vE, C.sc(C.vE)]), { label: 'e', lx: 8, ly: -8 }),
             F.guide(...S.p([C.vE, C.pc(C.vE)]), { ytick: '4.00', only: 'y' }),
@@ -314,22 +412,108 @@
   </div>
 </section>
 
+<!-- ══ 그림 18-4 · 18-5 (p.398~399) ══════════════════════════ -->
+<section>
+  <h2>혼잡세로부터의 이득과 손실</h2>
+  <div class="body tight">
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 412px">
+        <p class="sub t-red" style="margin-bottom:0">계속 이용하는 운전자 (점 H)</p>
+        <svg class="fig" id="f-gain-user" viewBox="0 0 412 250" style="width:412px;max-height:none" role="img">
+          <title>도로를 계속 이용하는 운전자는 세금 2.40을 내지만 통행비용이 4.80에서 4.00으로 내려 시간을 절약하는 그림</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:0">도로를 떠나는 운전자 (점 L)</p>
+        <svg class="fig" id="f-gain-detour" viewBox="0 0 412 250" style="width:412px;max-height:none" role="img">
+          <title>도로를 떠나는 운전자는 지불용의 5.50과 세전 비용 4.80의 차이만큼 소비자잉여를 잃는 그림</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const C = window.CONG;
+        const vL = C.vE + (C.dem(C.vE) - 5.50) / C.slope, vH = C.vE + (C.dem(C.vE) - 9.00) / C.slope;
+        const base = (F, S) => {
+          const mk = (f) => { const o = []; for (let i = 0; i <= 40; i++) { const x = (272 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
+          return [
+            F.curve(mk((v) => C.sc(v))),
+            F.annot(S.x(268), S.y(C.sc(268)) + 4, '  사회적 통행비용', { size: 10 }),
+            F.curve(mk((v) => C.pc(v)), { variant: 'demand' }),
+            F.annot(S.x(8), S.y(C.pc(8)) + 17, '사적 통행비용', { size: 10, tone: 'blue' }),
+            F.line(S.x(102), S.y(C.dem(102)), S.x(290), S.y(C.dem(290)), { variant: 'supply' }),
+            F.annot(S.x(290), S.y(C.dem(290)) + 15, '수요', { anchor: 'end', size: 10, tone: 'red' }),
+          ];
+        };
+        // 왼쪽 — 그림 18-4. 점 H 는 수요 위 9.00. 세금 2.40 · 시간 절약 0.80 (4.80 → 4.00)
+        {
+          const F = Fig.withBox({ x0: 48, y0: 208, x1: 340, y1: 18 });
+          const S = F.scale({ x: [0, 300], y: [0, 10.5] });
+          const parts = base(F, S).concat([
+            F.guide(...S.p([vH, C.dem(vH)]), { xtick: 'v″', ytick: '9.00' }),
+            F.dot(...S.p([vH, C.dem(vH)]), { label: 'H', lx: 7, ly: -6 }),
+            F.guide(...S.p([C.vE, C.sc(C.vE)]), { xtick: 'v^E', ytick: '6.40' }),
+            F.dot(...S.p([C.vE, C.sc(C.vE)]), { label: 'e', lx: 8, ly: -7 }),
+            F.guide(...S.p([C.vE, C.pc(C.vE)]), { ytick: '4.00', only: 'y' }),
+            F.dot(...S.p([C.vE, C.pc(C.vE)]), { label: 'b', lx: -14, ly: 15 }),
+            F.guide(...S.p([C.vStar, C.pc(C.vStar)]), { xtick: 'v*', ytick: '4.80' }),
+            F.dot(...S.p([C.vStar, C.pc(C.vStar)]), { label: 'c', lx: -4, ly: 19 }),
+            F.raw(`<path class="guide" d="M${S.x(C.vE)},${S.y(C.pc(C.vE))} L${S.x(C.vStar) + 34},${S.y(C.pc(C.vE))}"/>`),
+          ]);
+          const xt = S.x(C.vE) - 14, yb = S.y(C.pc(C.vE)), ye = S.y(C.sc(C.vE));
+          parts.push(F.arrow(xt, yb, xt, ye), F.arrow(xt, ye, xt, yb));
+          parts.push(F.annot(xt - 4, (yb + ye) / 2 + 4, '세금', { anchor: 'end', size: 10 }));
+          const xs = S.x(C.vStar) + 34, yc = S.y(C.pc(C.vStar));
+          parts.push(F.arrow(xs, yc, xs, yb), F.arrow(xs, yb, xs, yc));
+          parts.push(F.annot(xs + 5, (yb + yc) / 2 + 4, '시간 절약', { size: 10 }));
+          // 교재 그림 18-4 의 「세금 환급: $2」 — e(6.40) 에서 2.00 만큼 내려온 화살표
+          // v″ 세로 점선 바로 왼쪽 — 사회적 비용곡선이 아직 낮아 겹치지 않는다
+          const xr = S.x(vH) - 12, yr = S.y(C.sc(C.vE) - 2.00);
+          parts.push(F.arrow(xr, ye, xr, yr), F.arrow(xr, yr, xr, ye));
+          parts.push(F.annot(xr - 5, (ye + yr) / 2 + 4, '감세 2.00', { anchor: 'end', size: 10 }));
+          F.draw('#f-gain-user', { axes: { x: '통행량', y: '$' }, parts });
+        }
+        // 오른쪽 — 그림 18-5. 점 L 은 수요 위 5.50. 잃은 소비자잉여 = 5.50 − 4.80 = 0.70
+        {
+          const F = Fig.withBox({ x0: 48, y0: 208, x1: 340, y1: 18 });
+          const S = F.scale({ x: [0, 300], y: [0, 10.5] });
+          const parts = base(F, S).concat([
+            F.guide(...S.p([C.vE, C.sc(C.vE)]), { xtick: 'v^E', only: 'x' }),
+            F.dot(...S.p([C.vE, C.sc(C.vE)]), { label: 'e', lx: -15, ly: -6 }),
+            F.guide(...S.p([vL, C.dem(vL)]), { xtick: 'v′', ytick: '5.50' }),
+            F.dot(...S.p([vL, C.dem(vL)]), { label: 'L', lx: 3, ly: -9 }),
+            F.guide(...S.p([C.vStar, C.pc(C.vStar)]), { xtick: 'v*', ytick: '4.80' }),
+            F.dot(...S.p([C.vStar, C.pc(C.vStar)]), { label: 'c', lx: 9, ly: -4 }),
+          ]);
+          const xa = S.x(vL) - 12, y1 = S.y(4.80), y2 = S.y(5.50);
+          parts.push(F.arrow(xa, y1, xa, y2), F.arrow(xa, y2, xa, y1));
+          parts.push(F.annot(xa, S.y(C.pc(vL)) + 18, '잃은 소비자잉여', { anchor: 'middle', size: 10 }));
+          // 교재 그림 18-5 의 「세금 환급: $2」 — 세전 비용 4.80 에서 2.00 만큼 올린 화살표
+          const xr = S.x(C.vStar) + 22, yr0 = S.y(4.80), yr1 = S.y(6.80);
+          parts.push(F.raw(`<path class="guide" d="M${S.x(C.vStar)},${yr0} L${xr + 6},${yr0}"/>`));
+          parts.push(F.arrow(xr, yr0, xr, yr1), F.arrow(xr, yr1, xr, yr0));
+          parts.push(F.annot(xr + 5, (yr0 + yr1) / 2 + 4, '감세 2.00', { size: 10 }));
+          F.draw('#f-gain-detour', { axes: { x: '통행량', y: '$' }, parts });
+        }
+      })();
+    </script>
+    <p class="derive t-red" style="margin-top:4px">→ 계속 이용(H): 시간 절약 0.80 + 감세 2.00 − 세금 2.40 = 순이득 <strong>0.40</strong></p>
+    <p class="derive t-red" style="margin-top:2px">→ 떠남(L): 감세 2.00 − 잃은 소비자잉여 0.70 (5.50 − 4.80) = 순이득 <strong>1.30</strong></p>
+    <p style="margin-top:4px">감세가 작아 일부가 손해를 보더라도 다른 소비자의 이득이 상쇄 → <strong>소비자 전체 후생 증가</strong></p>
+  </div>
+</section>
+
 <!-- ══ 그림 18-6 혼잡세 도시는 성장한다 (p.399~401) ══════════ -->
 <section class="s-split">
-  <h2>혼잡세를 매긴 도시는 커진다</h2>
+  <h2>혼잡세 도시는 성장한다</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:8px"><strong>4주차 7장의 도시효용곡선</strong>을 다시 씀.
-        노동자 12백만명인 지역에 같은 도시가 둘, 각 6백만명임</p>
-      <p style="margin-bottom:8px">초기에는 두 도시 모두 혼잡이 가격에 반영되지 않음.
-        균형은 점 a, 공통 효용 u*</p>
-      <p style="margin-bottom:10px">한 도시가 <strong>수입-중립</strong> 혼잡세를 도입함 (걷은 돈만큼 소득세를 깎음).
-        효율이 올라 곡선이 <strong>위로</strong> 옮겨 가고 정점도 오른쪽으로 감</p>
-      <p class="derive t-red">→ 즉각적으로 그 도시의 효용이 u*(점 a)에서 <strong>u″(점 b)</strong> 로 오름</p>
-      <p class="derive t-red">→ 노동자가 옮겨 와 그 도시는 7백만, 다른 도시는 5백만이 됨.
-        공통 효용은 <strong>u**</strong> 로 수렴함 (점 c·d)</p>
-      <p class="derive t-red">→ <strong>u** &gt; u*</strong> — 한 도시의 혼잡세가
-        <strong>지역 전체의 효용을 올림</strong>. 편익이 지역 안의 다른 도시로 퍼짐</p>
+      <p class="emph">출발: 같은 도시 둘이 6백만명씩 (점 a, 공통 효용 u*)</p>
+      <p class="caption" style="margin-bottom:10px">4주차 7장의 도시효용곡선을 다시 씀</p>
+      <p class="lbl"><strong>혼잡세 도입:</strong><span>한 도시만 수입-중립 혼잡세 (소득세 인하와 결합)<br>
+        집적의 불경제 감소 → 효용곡선 상향 이동<br>
+        노동력이 클수록 많이 오름</span></p>
+      <p class="lbl"><strong>이주 전:</strong><span>그 도시 u″(점 b) &gt; 다른 도시 u* → 내쉬균형 아님</span></p>
+      <p class="lbl"><strong>이주 후:</strong><span>7백만(점 d) · 5백만(점 c), 두 도시 모두 u**</span></p>
+      <p class="derive t-red">→ <strong>u** &gt; u*</strong>: 한 도시의 혼잡세 편익이 지역 전체로 퍼짐</p>
     </div>
     <div class="col-r">
       <svg class="fig" id="f-congcity" viewBox="0 0 430 276" style="width:390px" role="img">
@@ -337,13 +521,13 @@
       <script>
         (function () {
           const C = window.CONGCITY, F = Fig.withBox({ x0: 68, y0: 208, x1: 392, y1: 34 });
-          const S = F.scale({ x: [3.6, 8.4], y: [74, 110] });
+          const S = F.scale({ x: [3.6, 8.4], y: [78, 107] });
           const mk = (f) => { const o = []; for (let i = 0; i <= 36; i++) { const x = 3.9 + (4.2 * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
           const parts = [
             F.curve(mk((N) => C.u0(N)), { variant: 'demand' }),
-            F.annot(S.x(4.1), S.y(C.u0(4.1)) - 10, '혼잡세 이전', { size: 10, tone: 'blue' }),
+            F.annot(S.x(7.6), S.y(C.u0(7.6)) + 4, '  혼잡세 이전', { size: 10, tone: 'blue' }),
             F.curve(mk((N) => C.u1(N))),
-            F.annot(S.x(8.1), S.y(C.u1(8.1)) + 16, '혼잡세 이후', { anchor: 'end', size: 10 }),
+            F.annot(S.x(8.1), S.y(C.u1(8.1)) - 6, '  혼잡세 이후', { size: 10 }),
           ];
           [[6, C.u0(6), 'a', 'u*', 9, 16], [6, C.u1(6), 'b', 'u″', 9, -8],
            [5, C.u0(5), 'c', 'u**', -15, -8], [7, C.u1(7), 'd', null, 9, -8]]
@@ -362,43 +546,45 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">02 혼잡세 시행</p>
-  <p class="section-sub">실제로 걷을 수 있는가, 얼마인가 · 교재 p.401~405</p>
+  <p class="section-sub">혼잡세의 실용성과 대안인 가치 가격책정 · 교재 p.401~405</p>
 </section>
 
-<!-- ══ 그림 18-7 · 18-8 (p.401~405) ══════════════════════════ -->
+<!-- ══ 그림 18-7 · 18-8 (p.401~403) ══════════════════════════ -->
 <section>
-  <h2>첨두시간에만, 그리고 도시마다 다르게</h2>
+  <h2>혼잡세 시행</h2>
   <div class="body tight">
-    <p class="emph" style="margin-bottom:4px">수요가 낮으면 사적 비용곡선의 <strong>수평 구간</strong>에서 만나
-      혼잡이 없고 세금도 0 임. 수요가 높을수록 세금이 커짐</p>
+    <p class="emph" style="margin-bottom:0">효율적 혼잡세: 효율적 통행량에서 두 비용곡선의 세로 격차 → <strong>수요가 클수록 큼</strong></p>
+    <p style="margin-bottom:4px">수요가 낮으면 사적 비용곡선의 수평 구간에서 만남 → 혼잡도 세금도 없음</p>
     <div class="cols">
       <div class="col-l">
-        <svg class="fig" id="f-peak" viewBox="0 0 430 218" style="width:382px" role="img">
+        <svg class="fig" id="f-peak" viewBox="0 0 430 218" style="width:362px" role="img">
           <title>수요가 상·중·하로 달라질 때 효율적 혼잡세가 달라지고 수요가 낮으면 세금이 0이 되는 그림</title></svg>
         <script>
           (function () {
             const C = window.CONG, F = Fig.withBox({ x0: 60, y0: 162, x1: 400, y1: 26 });
-            const S = F.scale({ x: [0, 360], y: [0, 10.5] });
+            const S = F.scale({ x: [0, 300], y: [0, 10.5] });
             const mk = (f, a, b) => { const o = []; for (let i = 0; i <= 36; i++) { const x = a + ((b - a) * i) / 36; o.push([x, f(x)]); } return S.curve(o); };
             const parts = [
-              F.curve(mk((v) => C.sc(v), 0, 330)),
-              F.annot(S.x(116), S.y(C.sc(116)) - 9, '사회적 통행비용', { size: 9 }),
-              F.curve(mk((v) => C.pc(v), 0, 330), { variant: 'demand' }),
-              F.annot(S.x(150), S.y(C.pc(150)) + 15, '사적 통행비용', { size: 9, tone: 'blue' }),
+              F.curve(mk((v) => C.sc(v), 0, 272)),
+              F.annot(S.x(255), S.y(C.sc(255)) - 9, '사회적 통행비용', { anchor: 'end', size: 9 }),
+              F.curve(mk((v) => C.pc(v), 0, 272), { variant: 'demand' }),
+              F.annot(S.x(6), S.y(C.pc(6)) + 15, '사적 통행비용', { size: 9, tone: 'blue' }),
             ];
             // 수요 상·중·하
             // 「수요: 하」는 사적비용의 수평 구간(v ≤ 100)에서 만나야 세금이 0 이 된다.
-            // 그 조건을 풀면 이동폭이 −5.32 다 — dem(80) − 5.32 = 3.00 = pc(80).
+            // 이동폭을 dem(80) 이 3.00 이 되도록 정한다.
             const scPts = [];
-            for (let i = 0; i <= 60; i++) { const v = (330 * i) / 60; scPts.push([v, C.sc(v)]); }
+            for (let i = 0; i <= 60; i++) { const v = (272 * i) / 60; scPts.push([v, C.sc(v)]); }
             const SC = S.curve(scPts);
-            const toData = (px) => (330 * (px - F.BOX.x0)) / (F.BOX.x1 - F.BOX.x0);
-            [[0, '수요: 상', 'supply'], [-2.0, '수요: 중', 'i2'], [-5.32, '수요: 하', 'cap']]
+            const toData = (px) => (300 * (px - F.BOX.x0)) / (F.BOX.x1 - F.BOX.x0);
+            [[0, '수요: 상', 'supply'], [-2.0, '수요: 중', 'i2'], [C.base - C.dem(C.v0 - 20), '수요: 하', 'cap']]
               .forEach(([sh, lab, va]) => {
                 const d = (v) => C.dem(v) + sh;
-                const DL = S.curve([[70, d(70)], [340, d(340)]]);
+                // 세로축 0 아래로 내려가지 않게 끝을 자른다
+                const vEnd = Math.min(290, C.vE + (C.dem(C.vE) + sh - 0.4) / C.slope);
+                const DL = S.curve([[70, d(70)], [vEnd, d(vEnd)]]);
                 parts.push(F.line(...DL[0], ...DL[1], { variant: va }));
-                parts.push(F.annot(S.x(338), S.y(d(338)) - 8, lab, { anchor: 'end', size: 9 }));
+                parts.push(F.annot(S.x(vEnd) + 4, S.y(d(vEnd)) + 4, lab, { size: 9 }));
                 // 효율점은 수요와 사회적 비용의 교차점에서 구한다 — 손으로 찍지 않는다
                 const X = Fig.cross(SC, DL);
                 if (X && sh > -4) {
@@ -407,16 +593,14 @@
                   parts.push(F.arrow(S.x(v), S.y(C.sc(v)), S.x(v), S.y(C.pc(v))));
                 }
               });
-            parts.push(F.annot(S.x(206), S.y(C.sc(200)) - 10, '세금', { size: 9 }));
+            parts.push(F.annot(S.x(C.vE) - 5, (S.y(C.pc(C.vE)) + S.y(C.sc(C.vE))) / 2 + 4, '세금', { anchor: 'end', size: 9 }));
             F.draw('#f-peak', { axes: { x: '통행량', y: '$' }, parts });
           })();
         </script>
-        <p class="caption" style="margin-top:2px">효율적인 첨두시간 혼잡세는 <strong>마일당 $0.085</strong>.
-          차량인식시스템으로 자동 징수하면 마일당 $0.24 일 때 한 달 20회 통행에
-          <strong>$48.00</strong> 의 청구서가 나간다</p>
+        <p class="caption" style="margin-top:2px">첨두시간 대 비첨두시간의 혼잡세 (교재 그림 18−7)</p>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-tolls" viewBox="0 0 430 218" style="width:382px" role="img">
+        <svg class="fig" id="f-tolls" viewBox="0 0 430 218" style="width:362px" role="img">
           <title>워싱턴 DC·로스앤젤레스·런던의 첨두시간과 비첨두시간 혼잡세를 비교한 막대그래프</title></svg>
         <script>
           (function () {
@@ -447,13 +631,121 @@
             F.draw('#f-tolls', { parts, check: false });
           })();
         </script>
-        <p class="caption" style="margin-top:2px">출처: Parry and Small, <em>American Economic Review</em> 99, 2009
-          (교재 그림 18−8, p.402)</p>
+        <p class="caption" style="margin-top:2px">일부 도시에서의 혼잡세 (교재 그림 18−8)<br>
+          출처: Parry and Small, <em>American Economic Review</em> 99, 2009</p>
       </div>
     </div>
-    <p class="derive t-red" style="margin-top:6px">→ 대안은 <strong>가치 기반 가격책정</strong>임.
-      통행료를 내면 혼잡 없는 차선(<strong>HOT Lane</strong>)을 쓸 수 있게 해
-      통행을 <strong>차별화된 상품</strong>으로 만듦</p>
+    <p class="derive t-red" style="margin-top:4px">→ 첨두 혼잡세: 미국 두 도시는 비첨두의 <strong>약 10배</strong>, 런던은 미국 도시의 5~6배</p>
+    <p class="derive t-red hang" style="margin-top:2px">→ 시행: 차량인식시스템(VIS)으로 자동 청구<br>
+      싱가포르 지역면허(1974) → 전자 도로 요금(1998) · 런던 경계요금(2003) · 스톡홀름(2006)</p>
+  </div>
+</section>
+
+<!-- ══ 사례 사진 — 교재 p.405 「최근 몇 년간 가치 가격책정 및 HOT 차선 도입이 증가」 ══ -->
+<section>
+  <h2>가치 기반 가격책정과 HOT 차선의 사례</h2>
+  <div class="body tight">
+    <div class="cols" style="margin-top:0">
+      <div class="col-l">
+        <img src="../assets/cc-i15-express-lanes-escondido.jpg" alt="I-15 급행차선 입구의 문형 안내판. 최저 통행료와 목적지별 통행료가 전광판으로 표시된다"
+             style="width:100%;height:196px;object-fit:cover;border-radius:6px;display:block">
+        <p class="emph" style="margin-top:10px">가치 기반 가격책정: I-15 급행차선</p>
+        <p>안내판에 최저 통행료와 목적지별 통행료를 표시<br>
+          캘리포니아 에스콘디도(샌디에이고 카운티), 남쪽 방향</p>
+        <p class="caption" style="margin-top:6px">사진: Chevy111 (2014), Wikimedia Commons, CC BY-SA 4.0</p>
+      </div>
+      <div class="col-r">
+        <img src="../assets/cc-i405-hot-lanes-totemlake.jpg" alt="I-405 남쪽 방향. 왼쪽은 일반 차선, 오른쪽 두 차선은 HOT 차선이다"
+             style="width:100%;height:196px;object-fit:cover;border-radius:6px;display:block">
+        <p class="emph" style="margin-top:10px">HOT 차선: I-405 급행 통행료 차선</p>
+        <p>왼쪽은 일반 차선, 오른쪽 두 차선이 HOT 차선<br>
+          워싱턴주 시애틀 대도시권, 남쪽 방향</p>
+        <p class="caption" style="margin-top:6px">사진: SounderBruce (2016), Wikimedia Commons, CC BY-SA 4.0</p>
+      </div>
+    </div>
+    <p class="derive t-red hang" style="margin-top:8px">→ 북미 대도시: 카풀 차선을 바꾸거나 신규 차선을 지어 프리미엄 가격을 매김<br>
+      오렌지 카운티(CA) · 샌디에이고 · 토론토 · 미네아폴리스 · 덴버</p>
+  </div>
+</section>
+
+<!-- ══ 그림 18-9 · 18-10 (p.403~405) ═════════════════════════ -->
+<section>
+  <h2>가치 기반 가격책정과 다인승차량 차선(HOT Lane)</h2>
+  <div class="body tight">
+    <p class="lbl" style="margin-bottom:0"><strong>급행차선:</strong><span>통행료를 내고 혼잡 없이 달리는 차선 (왼쪽 그림)</span></p>
+    <p class="lbl" style="margin-bottom:2px"><strong>HOT 차선:</strong><span>최소 탑승인원(2~3명)을 채우거나 통행료를 내는 카풀 차선</span></p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 412px">
+        <svg class="fig" id="f-hot1" viewBox="0 0 412 236" style="width:340px;max-height:none" role="img">
+          <title>급행차선의 교통량을 v₀로 지키는 통행료가 수요가 높을 때 c″−c₀, 낮을 때 c′−c₀인 그림</title></svg>
+        <p class="caption" style="margin-top:0">고속 차선의 가격책정 (교재 그림 18−9)</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-hot2" viewBox="0 0 412 236" style="width:340px;max-height:none" role="img">
+          <title>급행차선으로 옮긴 만큼 일반 차선의 수요가 왼쪽으로 옮겨 통행량이 v′에서 v″로, 통행비용이 c′에서 c″로 내려가는 그림</title></svg>
+        <p class="caption" style="margin-top:0">일반 차선에 대한 급행차선의 효과 (교재 그림 18−10)</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const L = window.LANE;
+        const mk = (S, f, a, b) => { const o = []; for (let i = 0; i <= 40; i++) { const x = a + ((b - a) * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
+        // 교점은 이분법으로 데이터 좌표에서 구한다 (눈금 이름표를 붙이려면 데이터 값이 필요하다)
+        const solve = (f, a, b) => { for (let k = 0; k < 60; k++) { const m = (a + b) / 2; (f(a) * f(m) <= 0) ? (b = m) : (a = m); } return (a + b) / 2; };
+        // 왼쪽 — 그림 18-9 고속 차선의 가격책정
+        {
+          const F = Fig.withBox({ x0: 48, y0: 196, x1: 330, y1: 18 });
+          const S = F.scale({ x: [0, 200], y: [0, 9.5] });
+          const hi = L.hi(L.v0), lo = L.lo(L.v0);
+          const parts = [
+            F.curve(mk(S, (v) => L.cost(v), 0, 170), { variant: 'demand' }),
+            F.annot(S.x(168), S.y(L.cost(168)) + 4, '  통행비용', { size: 10, tone: 'blue' }),
+            F.line(S.x(20), S.y(L.hi(20)), S.x(190), S.y(L.hi(190)), {}),
+            F.annot(S.x(190), S.y(L.hi(190)) - 8, '수요: 고', { anchor: 'end', size: 10 }),
+            F.line(S.x(20), S.y(L.lo(20)), S.x(150), S.y(L.lo(150)), { variant: 'cap' }),
+            F.annot(S.x(150), S.y(L.lo(150)) + 15, '수요: 저', { anchor: 'end', size: 10 }),
+            F.guide(...S.p([L.v0, hi]), { xtick: 'v₀', ytick: 'c″' }),
+            F.dot(...S.p([L.v0, hi]), { label: 'a', lx: 8, ly: -6 }),
+            F.guide(...S.p([L.v0, lo]), { ytick: 'c′', only: 'y' }),
+            F.dot(...S.p([L.v0, lo]), { label: 'b', lx: 18, ly: -2 }),
+            F.annot(F.BOX.x0 - 8, S.y(L.c0) + 4, 'c₀', { anchor: 'end', size: 11 }),
+          ];
+          const x1 = S.x(L.v0) - 14, x2 = S.x(L.v0) + 12, yc = S.y(L.c0);
+          parts.push(F.arrow(x1, yc, x1, S.y(hi)), F.arrow(x1, S.y(hi), x1, yc));
+          parts.push(F.arrow(x2, yc, x2, S.y(lo)), F.arrow(x2, S.y(lo), x2, yc));
+          parts.push(F.annot(x1 - 5, (yc + S.y(hi)) / 2 + 4, '통행료', { anchor: 'end', size: 10 }));
+          F.draw('#f-hot1', { axes: { x: '통행량(차량)', y: '통행비용($)' }, parts });
+        }
+        // 오른쪽 — 그림 18-10 일반 차선에 대한 급행차선의 효과
+        {
+          const F = Fig.withBox({ x0: 48, y0: 196, x1: 330, y1: 18 });
+          const S = F.scale({ x: [60, 200], y: [0, 11] });
+          const d2 = (v) => L.d1(v + L.shift);
+          const v1 = solve((v) => L.cost(v) - L.d1(v), 100, 200), c1 = L.cost(v1);
+          const v2 = solve((v) => L.cost(v) - d2(v), 100, 200), c2 = L.cost(v2);
+          const v3 = v1 - L.shift;
+          const parts = [
+            F.curve(mk(S, (v) => L.cost(v), 64, 174), { variant: 'demand' }),
+            F.annot(S.x(174), S.y(L.cost(174)) + 4, '  통행비용', { size: 10, tone: 'blue' }),
+            F.line(S.x(110), S.y(L.d1(110)), S.x(196), S.y(L.d1(196)), {}),
+            F.annot(S.x(196), S.y(L.d1(196)) + 15, 'D₁', { anchor: 'end', size: 11 }),
+            F.line(S.x(70), S.y(d2(70)), S.x(156), S.y(d2(156)), { variant: 'i2' }),
+            F.annot(S.x(72), S.y(d2(72)) - 8, 'D₂', { size: 11 }),
+            F.guide(...S.p([v1, c1]), { xtick: 'v′', ytick: 'c′' }),
+            F.dot(...S.p([v1, c1]), { label: 'a', lx: 8, ly: -4 }),
+            F.guide(...S.p([v3, c1]), { xtick: 'v‴', only: 'x' }),
+            F.dot(...S.p([v3, c1]), { label: 'b', lx: -4, ly: -9 }),
+            F.guide(...S.p([v2, c2]), { xtick: 'v″', ytick: 'c″' }),
+            F.dot(...S.p([v2, c2]), { label: 'd', lx: -14, ly: 14 }),
+          ];
+          F.draw('#f-hot2', { axes: { x: '통행량', y: '통행비용($)' }, parts });
+        }
+      })();
+    </script>
+    <p class="derive t-red hang" style="margin-top:0">→ 통행료 = 교통량 v₀ 를 지키는 총비용 − 자유흐름 비용 c₀<br>
+      시간 절약 &gt; 통행료인 통행자, 곧 <strong>시간의 기회비용이 높은 통행자</strong>가 선택</p>
+    <p class="derive t-red hang" style="margin-top:2px">→ 일반 차선(오른쪽 그림): 수요가 v′ − v‴ 만큼 빠져도 통행량은 v′ − v″ 만 감소<br>
+      비용 하락 → 통행 재증가 (<strong>잠재수요</strong>)</p>
   </div>
 </section>
 
@@ -461,25 +753,26 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">03 환경 측면의 외부효과</p>
-  <p class="section-sub">왜 오염세가 아니라 휘발유세인가 · 교재 p.405~408</p>
+  <p class="section-sub">대기오염과 온실가스: 주행 마일당 외부 환경비용 0.016달러 · 교재 p.405~408</p>
 </section>
 
 <!-- ══ 그림 18-11 휘발유세 (p.406~408) ═══════════════════════ -->
 <section class="s-split">
   <h2>휘발유세의 시장효과</h2>
-  <div class="body">
+  <div class="body tight">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">자동차는 <strong>대기오염</strong>과 <strong>온실가스</strong>라는
-        두 환경 외부효과를 냄. 경제적 접근은 <strong>오염세</strong>임</p>
-      <p style="margin-bottom:8px">오염량을 직접 재기 어려워 실제로는 <strong>휘발유</strong>에 세금을 매김.
-        대기오염물질 몫은 <strong>$0.26</strong>임 (마일당 $0.013 × 갤런당 20마일)</p>
-      <p class="formula-key" style="margin-bottom:8px">
-        $s = \dfrac{\Delta p^{*}}{\text{Tax}} = \dfrac{e_S}{e_S - e_D}$</p>
-      <p style="margin-bottom:10px">수요탄력성 −1.0, 공급탄력성 1.0 이면
-        $s = 1/(1-(-1)) = 1/2$ — <strong>절반만</strong> 소비자에게 전가됨</p>
-      <p class="derive t-red">→ 세금 <strong>0.32달러</strong>를 매기면 공급곡선이 그만큼 올라가
-        점 b 는 4.32달러가 되지만, 균형가격은 점 c 의 <strong>4.16달러</strong>에 그침</p>
-      <p class="derive t-red">→ 나머지 절반은 <strong>생산요소 공급자</strong>가 부담함</p>
+      <p class="emph">오염세 대신 휘발유세: 차마다 배출량 측정이 어려움</p>
+      <p class="lbl"><strong>오염세:</strong><span>저배출 차 구매 + 주행 감소</span></p>
+      <p class="lbl"><strong>휘발유세:</strong><span>주행 감소만 · 저배출 차량을 구별하지 못함</span></p>
+      <p class="sub t-red" style="margin:8px 0 2px">우리나라 사례</p>
+      <p class="lbl"><strong>휘발유세:</strong><span>교통·에너지·환경세, 휘발유 리터당 475원 · 경유 340원</span></p>
+      <p class="lbl"><strong>오염세 성격:</strong><span>경유차 환경개선부담금, 소유자에게 반기마다 부과<br>
+        배출가스가 현저히 적은 차량은 감면</span></p>
+      <p class="caption" style="margin-bottom:8px">교통·에너지·환경세법 제2조 · 환경개선비용 부담법 제9조</p>
+      <p style="margin-bottom:2px">공급자에게 휘발유세를 부과할 경우 세금의 전가 발생</p>
+      <p style="margin-bottom:8px">단, 그 정도는 수요와 공급의 가격탄력성에 의해서 결정됨</p>
+      <p class="derive t-red hang">→ 가격 상승은 세금의 <strong>절반</strong>: 소비자와 생산자가 반씩<br>
+        생산자 몫은 원유 공급자 부담 (원유 수요 · 가격 하락)</p>
     </div>
     <div class="col-r">
       <svg class="fig" id="f-gas" viewBox="0 0 430 282" style="width:390px" role="img">
@@ -490,12 +783,12 @@
           const S = F.scale({ x: [280, 520], y: [3.55, 4.55] });
           const g2 = G.gNew();
           const parts = [
-            F.line(S.x(300), S.y(G.sup(300)), S.x(500), S.y(G.sup(500)), { variant: 'demand' }),
+            F.line(S.x(312), S.y(G.sup(312)), S.x(500), S.y(G.sup(500)), { variant: 'demand' }),
             F.annot(S.x(496), S.y(G.sup(496)) - 9, '공급', { anchor: 'end', size: 10, tone: 'blue' }),
-            F.line(S.x(300), S.y(G.sup(300, G.tax)), S.x(500), S.y(G.sup(500, G.tax)), {}),
+            F.line(S.x(300), S.y(G.sup(300, G.tax)), S.x(444), S.y(G.sup(444, G.tax)), {}),
             F.annot(S.x(392), S.y(G.sup(392, G.tax)) - 9, '세금부과 후의 공급', { anchor: 'end', size: 10 }),
-            F.line(S.x(300), S.y(G.dem(300)), S.x(500), S.y(G.dem(500)), { variant: 'supply' }),
-            F.annot(S.x(496), S.y(G.dem(496)) + 15, '수요', { anchor: 'end', size: 10, tone: 'red' }),
+            F.line(S.x(300), S.y(G.dem(300)), S.x(488), S.y(G.dem(488)), { variant: 'supply' }),
+            F.annot(S.x(488), S.y(G.dem(488)) - 8, '수요', { anchor: 'end', size: 10, tone: 'red' }),
           ];
           [[G.gStar, G.pStar, 'a', 'g*', '4.00', 9, 15],
            [g2, G.sup(g2, G.tax), 'c', 'g**', '4.16', -15, -8],
@@ -520,16 +813,16 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">04 교통사고로 인한 외부효과</p>
-  <p class="section-sub">마일당 0.14달러 중 얼마가 남의 몫인가 · 교재 p.408~412</p>
+  <p class="section-sub">평균 사고비용 마일당 0.14달러 중 외부비용 0.061달러 · 교재 p.408~412</p>
 </section>
 
-<!-- ══ 표 18-1 · 그림 18-12 (p.408~410) ══════════════════════ -->
+<!-- ══ 표 18-1 (p.408~409) ═══════════════════════════════════ -->
 <section>
-  <h2>사고비용의 과소가격책정</h2>
-  <div class="body tight">
+  <h2>교통사고의 사회적 비용</h2>
+  <div class="body">
     <div class="cols">
-      <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">주행 마일당 사회적 비용</p>
+      <div class="col-l" style="flex:0 0 380px">
+        <p class="sub t-red" style="margin-bottom:2px">주행 마일당 비용($)</p>
         <table class="tbl-mode">
           <tbody>
             <tr><td>사망 또는 부상</td><td>0.103</td></tr>
@@ -542,47 +835,113 @@
             <tr><td><strong>합계</strong></td><td><strong>0.140</strong></td></tr>
           </tbody>
         </table>
-        <p class="caption" style="margin-top:4px">출처: Small and Verhoef, 2007 · Parry,
-          <em>Journal of Urban Economics</em> 56, 2004 (교재 표 18−1, p.409)</p>
-        <p class="derive t-red" style="margin-top:8px">→ 이 중 <strong>$0.061</strong> 이
-          운전자가 지지 않는 <strong>외부비용</strong>임</p>
+        <p class="caption" style="margin-top:4px">출처: Small and Verhoef, 2007<br>
+          Parry, <em>Journal of Urban Economics</em> 56, 2004<br>
+          (교재 표 18−1, p.409)</p>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-accident" viewBox="0 0 430 250" style="width:386px" role="img">
-          <title>한계 사적 비용이 한계 사회적 비용보다 0.061달러 낮아 주행거리가 효율적 수준을 넘고 삼각형만큼 손실이 생기는 그림</title></svg>
-        <script>
-          (function () {
-            const A = window.ACC, F = Fig.withBox({ x0: 72, y0: 186, x1: 398, y1: 30 });
-            const S = F.scale({ x: [20, 130], y: [0.08, 0.28] });
-            const tri = [S.p([A.mE, A.msc]), S.p([A.mStar, A.mpc]), S.p([A.mStar, A.msc])];
-            const parts = [
-              F.raw(`<path class="area-surplus" d="M${tri[0][0]},${tri[0][1]} L${tri[1][0]},${tri[1][1]} L${tri[2][0]},${tri[2][1]} Z"/>`),
-              F.line(S.x(26), S.y(A.dem(26)), S.x(126), S.y(A.dem(126)), { variant: 'demand' }),
-              F.annot(S.x(38), S.y(A.dem(38)) - 9, '수요 = 한계편익', { size: 10, tone: 'blue' }),
-              F.line(S.x(22), S.y(A.msc), S.x(126), S.y(A.msc), {}),
-              F.annot(S.x(124), S.y(A.msc) - 9, '한계 사회적 비용', { anchor: 'end', size: 10 }),
-              F.line(S.x(22), S.y(A.mpc), S.x(126), S.y(A.mpc), { variant: 'cap' }),
-              F.annot(S.x(30), S.y(A.mpc) + 16, '한계 사적 비용', { size: 10 }),
-              F.guide(...S.p([A.mE, A.msc]), { xtick: 'm^E', ytick: '0.201' }),
-              F.dot(...S.p([A.mE, A.msc]), { label: 'b', lx: -14, ly: -8 }),
-              F.guide(...S.p([A.mStar, A.mpc]), { xtick: 'm*', ytick: '0.140' }),
-              F.dot(...S.p([A.mStar, A.mpc]), { label: 'a', lx: 9, ly: 15 }),
-            ];
-            const xa = S.x(40);
-            parts.push(F.arrow(xa, S.y(A.mpc), xa, S.y(A.msc)));
-            parts.push(F.arrow(xa, S.y(A.msc), xa, S.y(A.mpc)));
-            parts.push(F.annot(xa - 5, (S.y(A.mpc) + S.y(A.msc)) / 2 + 4, '$0.061',
-                               { anchor: 'end', size: 10 }));
-            F.draw('#f-accident', { axes: { x: '마일', y: '달러' }, parts });
-          })();
-        </script>
-        <p class="caption" style="margin-top:2px">음영이 과소가격책정의 효율성 손실이다</p>
+        <p class="emph" style="margin-bottom:8px">가장 큰 비용은 <strong>사망</strong>: 통계적 생명의 가치(VSL)로 환산</p>
+        <p class="lbl"><strong>VSL:</strong><span>사망 위험을 피하려는 지불용의로 산출<br>
+        1,000명이 각자 위험 0.001 을 없애려 5,500달러씩<br>
+        → 5.5백만 달러</span></p>
+        <p class="lbl"><strong>사망 · 부상:</strong><span>VSL 550만 달러 기준</span></p>
+        <p class="lbl"><strong>생산성 손실:</strong><span>둘째로 큰 비용 (회복 기간)</span></p>
+        <p class="derive t-red hang" style="margin-top:10px">→ 합계 0.140 = 사적 비용 + 외부비용<br>
+          운전자가 지지 않는 <strong>외부비용: 0.061</strong></p>
       </div>
     </div>
-    <p class="derive t-red" style="margin-top:6px">→ 외부비용은 운전자마다 다름 — 음주 운전자는 마일당
-      <strong>$0.427</strong>(평균의 약 7배), 25세 미만은 <strong>$0.109</strong>, 25~70세는 <strong>$0.034</strong></p>
-      <p class="derive t-red" style="margin-top:2px">→ <strong>위험보상</strong> — 에어백이 한계비용을 낮추면
-      운전자가 속도를 <strong>43 → 46마일</strong>로 올려 안전장비의 효과가 일부 상쇄됨</p>
+  </div>
+</section>
+
+<!-- ══ 그림 18-12 (p.409~410) ════════════════════════════════ -->
+<section class="s-split">
+  <h2>사고비용 과소가격책정의 비효율성</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:6px">개인의 운전선택과 사회적 비용의 결정</p>
+      <p class="lbl"><strong>한계 사적 비용:</strong><span>운전자 자신의 사고 위험 · 의료비 · 재산피해</span></p>
+      <p class="lbl"><strong>합리적 선택:</strong><span>점 a: 수요 = 한계 사적 비용 → m*</span></p>
+      <p class="lbl"><strong>효율적 결과:</strong><span>점 b: 수요 = 한계 사회적 비용(+0.061) → m<sup>E</sup></span></p>
+      <p class="lbl"><strong>자중손실:</strong><span>음영: m<sup>E</sup> ~ m* 에서 비용이 편익을 넘는 몫<br>
+        m′ 에서는 점 c(비용)와 점 d(편익)의 간격</span></p>
+      <p class="derive t-red hang">→ 대안: 운전하는 대로 지불하는 가격책정<br>
+        주행거리(VMT)에 마일당 0.061달러 과세</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-accident" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>한계 사적 비용이 한계 사회적 비용보다 0.061달러 낮아 주행거리가 효율적 수준을 넘고 삼각형만큼 손실이 생기는 그림</title></svg>
+      <script>
+        (function () {
+          const A = window.ACC, F = Fig.withBox({ x0: 72, y0: 210, x1: 398, y1: 34 });
+          const S = F.scale({ x: [20, 130], y: [0.06, 0.26] });
+          const tri = [S.p([A.mE, A.msc]), S.p([A.mStar, A.mpc]), S.p([A.mStar, A.msc])];
+          const mP = (A.mE + A.mStar) / 2;
+          const parts = [
+            F.raw(`<path class="area-surplus" d="M${tri[0][0]},${tri[0][1]} L${tri[1][0]},${tri[1][1]} L${tri[2][0]},${tri[2][1]} Z"/>`),
+            F.line(S.x(26), S.y(A.dem(26)), S.x(126), S.y(A.dem(126)), { variant: 'demand' }),
+            F.annot(S.x(38), S.y(A.dem(38)) - 9, '수요 = 한계편익', { size: 10, tone: 'blue' }),
+            F.line(S.x(22), S.y(A.msc), S.x(126), S.y(A.msc), {}),
+            F.annot(S.x(126), S.y(A.msc) - 9, '한계 사회적 비용', { anchor: 'end', size: 10 }),
+            F.line(S.x(22), S.y(A.mpc), S.x(126), S.y(A.mpc), { variant: 'cap' }),
+            F.annot(S.x(40), S.y(A.mpc) + 16, '한계 사적 비용', { size: 10 }),
+            F.guide(...S.p([A.mE, A.msc]), { xtick: 'm^E', ytick: 'p**' }),
+            F.dot(...S.p([A.mE, A.msc]), { label: 'b', lx: -14, ly: -8 }),
+            F.guide(...S.p([mP, A.msc]), { xtick: 'm′', only: 'x' }),
+            F.dot(...S.p([mP, A.msc]), { label: 'c', lx: 4, ly: -9 }),
+            F.dot(...S.p([mP, A.dem(mP)]), { label: 'd', lx: 7, ly: 14 }),
+            F.guide(...S.p([A.mStar, A.mpc]), { xtick: 'm*', ytick: 'p*' }),
+            F.dot(...S.p([A.mStar, A.mpc]), { label: 'a', lx: 9, ly: 15 }),
+          ];
+          const xa = S.x(32);
+          parts.push(F.arrow(xa, S.y(A.mpc), xa, S.y(A.msc)));
+          parts.push(F.arrow(xa, S.y(A.msc), xa, S.y(A.mpc)));
+          parts.push(F.annot(xa + 6, (S.y(A.mpc) + S.y(A.msc)) / 2 + 4, '$0.061', { size: 10 }));
+          F.draw('#f-accident', { axes: { x: '마일', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 18-13 (p.411~412) ════════════════════════════════ -->
+<section class="s-split">
+  <h2>안전장비와 위험보상</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">사고 확률: 주행거리 + <strong>운전 행태</strong>(속도 · 주의)</p>
+      <p class="lbl"><strong>한계편익:</strong><span>빨리 가서 아끼는 시간, 6달러로 일정</span></p>
+      <p class="lbl"><strong>한계비용:</strong><span>기대사고비용, 속도와 함께 체증<br>
+        초기 선택: 시속 43마일(점 a)</span></p>
+      <p class="lbl"><strong>에어백:</strong><span>사고 결과 완화 → 한계비용곡선을 아래로 눕힘<br>
+        합리적 속도 43 → 46마일(점 b)</span></p>
+      <p class="derive t-red hang">→ 위험보상(Peltzman, 1975)<br>
+        안전하다고 느끼면 더 빠르고 덜 주의해 운전<br>
+        탑승자 사망 ↓ · 보행자와 자전거 이용자 사망 ↑</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-speed" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>속도의 한계편익은 6달러로 수평이고, 에어백이 한계비용곡선을 눕혀 선택 속도가 43마일에서 46마일로 오르는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.SPEED, F = Fig.withBox({ x0: 68, y0: 210, x1: 392, y1: 34 });
+          const S = F.scale({ x: [40, 50], y: [0, 12] });
+          const mk = (f, lo, hi) => { const o = []; for (let i = 0; i <= 40; i++) { const x = lo + ((hi - lo) * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
+          const parts = [
+            F.line(S.x(40.4), S.y(P.mb), S.x(49.6), S.y(P.mb), {}),
+            F.annot(S.x(49.6), S.y(P.mb) - 8, '한계편익', { anchor: 'end', size: 10 }),
+            F.curve(mk(P.mc0.bind(P), 40.4, 45.4), { variant: 'supply' }),
+            F.annot(S.x(45.4) + 6, S.y(P.mc0(45.4)) + 4, '한계비용: 초기', { size: 10, tone: 'red' }),
+            F.curve(mk(P.mc1.bind(P), 40.4, 49.6), { variant: 'demand' }),
+            F.annot(S.x(49.6), S.y(P.mc1(49.6)) - 8, '한계비용: 에어백 장착', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.guide(...S.p([43, P.mb]), { xtick: '43', ytick: '6' }),
+            F.dot(...S.p([43, P.mb]), { label: 'a', lx: -14, ly: -7 }),
+            F.guide(...S.p([46, P.mb]), { xtick: '46', only: 'x' }),
+            F.dot(...S.p([46, P.mb]), { label: 'b', lx: 7, ly: 16 }),
+          ];
+          F.draw('#f-speed', { axes: { x: '속도(시간당 마일)', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
   </div>
 </section>
 
@@ -590,25 +949,25 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">CHAPTER 19 도시 대중교통</p>
-  <p class="section-sub">18장이 도로였다면 이 장은 그 대안이다 · 교재 p.421~437</p>
+  <p class="section-sub">통행수단과 대중교통체계의 선택 · 교재 p.421~437</p>
 </section>
 
 <!-- ══ 발문 (p.421) ══════════════════════════════════════════ -->
 <section class="s-question">
   <div class="body stack">
     <p class="epigraph emph" style="margin-bottom:30px">
-      “뉴웍, 필라델피아, 피츠버그, 그리고 보스턴 내 실제 운행되고 있는 전차는 단골손님과 정부의 지원이
-      부족하여 운영에 어려움을 겪고 있는 반면, 수백만 명의 사람들은 어디로도 가지 않는 모형 기차를 타기 위해
+      “뉴웍, 필라델피아, 피츠버그, 그리고 보스턴 내 실제 운행되고 있는 전차는<br>
+      단골손님과 정부의 지원이 부족하여 운영에 어려움을 겪고 있는 반면,<br>
+      수백만 명의 사람들은 어디로도 가지 않는 모형 기차를 타기 위해<br>
       디즈니랜드로 무리를 지어 간다.”
       <span class="who">— 케니스 잭슨</span></p>
-    <p class="lead t-define" style="margin-bottom:16px">도시 교통에 대한 <span class="mark">두 번째 장</span>에서
+    <p class="lead t-define" style="margin-bottom:16px">도시 교통의 <span class="mark">두 번째 장</span>으로
       대중교통의 경제학을 봄</p>
-    <p class="emph">미국에서 대중교통의 시장점유율은 <strong>5%보다 낮지만</strong>
-      다른 나라의 많은 도시에서는 훨씬 높음</p>
-      <p class="emph" style="margin-bottom:16px">두 관점에서 봄 — <strong>개인 통행자</strong>가 수단을 고르는 문제와,
-      <strong>지방정부</strong>가 교통시스템을 설계하는 문제</p>
-    <p class="derive t-red">→ 18장에서 본 외부효과가 가격에 반영되지 않는 한
-      이 선택은 <strong>기울어진 운동장 위에서</strong> 이뤄짐</p>
+    <p class="emph">미국의 대중교통 시장점유율: <strong>5% 미만</strong> (미국 많은 도시와 다른 나라는 훨씬 높음)</p>
+    <p class="emph" style="margin-bottom:16px">두 관점<br>
+      ① <strong>개인 통행자</strong>의 수단 선택: 승용차 · 버스 · 기차<br>
+      ② <strong>지방정부</strong>의 교통시스템 설계: 자동차 · 버스 · 경전철 · 중전철의 조합</p>
+    <p class="derive t-red">→ 대중교통 <strong>보조금</strong>의 경제적 합리성도 봄</p>
   </div>
 </section>
 
@@ -616,19 +975,72 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">01 수단선택: 개인 통행자</p>
-  <p class="section-sub">무엇이 통행자의 계산에 들어가는가 · 교재 p.421~427</p>
+  <p class="section-sub">미국 통근자의 4.7%가 대중교통 이용 (중심도시 11% · 교외 2%) · 교재 p.421~427</p>
 </section>
 
-<!-- ══ 그림 19-1 · 표 19-1 (p.422~425) ═══════════════════════ -->
+<!-- ══ 그림 19-1 (p.422~423) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>선택가능한 수단별 통행비용</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="formula-key" style="margin-bottom:10px">통행비용 = 금전비용 + 도보·대기 비용 + 차량 내 비용</p>
+      <p class="lbl"><strong>금전비용:</strong><span>대중교통은 요금<br>
+        자동차는 연료비 · 유지관리 · 감가상각 · 주차비</span></p>
+      <p class="lbl"><strong>도보·대기 비용:</strong><span>T<sub>w</sub> × d<sub>w</sub> (d<sub>w</sub>: 임금의 80~100%)</span></p>
+      <p class="lbl"><strong>차량 내 비용:</strong><span>T<sub>v</sub> × d<sub>v</sub> (d<sub>v</sub>: 임금의 50%)</span></p>
+      <p class="caption" style="margin-bottom:10px">T: 소요시간 · d: 1시간을 아끼려는 지불용의(한계비효용)</p>
+      <p class="derive t-red">→ 걷고 기다리는 시간이 타고 가는 시간보다 <strong>훨씬 비쌈</strong></p>
+      <p class="derive t-red">→ 실제 대중교통 통근: <strong>버스가 절반 이상</strong>, 전차는 작은 몫</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-modeshare" viewBox="0 0 430 236" style="width:376px" role="img">
+        <title>대중교통 통근인원을 수단별로 나눈 원그래프. 버스가 절반을 넘는다</title></svg>
+      <script>
+        (function () {
+          const M = window.MODE, F = Fig;
+          const cx = 150, cy = 112, r = 84;
+          const tot = M.share.reduce((a, [, v]) => a + v, 0);
+          let ang = -Math.PI / 2;
+          const parts = [];
+          const tone = ['0.62', '0.44', '0.28', '0.14'];
+          M.share.forEach(([k, v], i) => {
+            const sw = (v / tot) * 2 * Math.PI, e = ang + sw;
+            const x1 = cx + r * Math.cos(ang), y1 = cy + r * Math.sin(ang);
+            const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+            parts.push(F.raw(`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} ` +
+              `A${r},${r} 0 ${sw > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" ` +
+              `fill="var(--accent-blue)" opacity="${tone[i]}" stroke="#fff" stroke-width="1.5"/>`));
+            const m = (ang + e) / 2;
+            // 맨 위의 얇은 조각(전차)은 이름표가 캔버스 위로 나가므로 눌러 준다
+            parts.push(F.annot(cx + (r + 24) * Math.cos(m),
+                               Math.max(18, cy + (r + 24) * Math.sin(m) + 4),
+                               v.toLocaleString(), { anchor: 'middle', size: 10 }));
+            ang = e;
+          });
+          M.share.forEach(([k], i) => {
+            const y = 34 + i * 20;
+            parts.push(F.raw(`<rect x="286" y="${y - 9}" width="11" height="11" ` +
+                             `fill="var(--accent-blue)" opacity="${tone[i]}"/>`));
+            parts.push(F.annot(302, y, k, { size: 10 }));
+          });
+          parts.push(F.annot(286, 214, '1일 통근인원(천명) · 2004', { size: 9 }));
+          F.draw('#f-modeshare', { parts, check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:2px;text-align:center">교재 그림 19−1 대중교통 이용 (US Census Bureau, <em>Journey to Work</em>, 2004)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 표 19-1 · 그림 19-2 (p.423~425) ═══════════════════════ -->
 <section>
-  <h2>통행자는 무엇을 더해서 고르는가</h2>
+  <h2>수단선택의 수치적 예시</h2>
   <div class="body tight">
-    <p class="emph" style="margin-bottom:4px">시간에도 값이 붙음 —
-      <strong>도보·대기는 분당 $0.40</strong>, <strong>차량 내는 분당 $0.20</strong>.
-      기다리는 시간이 타고 가는 시간보다 두 배 비쌈</p>
+    <p class="emph" style="margin-bottom:4px">시간 단가: 도보·대기 <strong>분당 0.40</strong>(= 임금) · 차량 내 <strong>분당 0.20</strong>(= 임금의 절반)</p>
     <div class="cols">
       <div class="col-l">
         <table class="tbl-mode">
+          <colgroup><col style="width:46%"><col><col><col></colgroup>
           <thead><tr><th></th><th>자동차</th><th>버스</th><th>철도</th></tr></thead>
           <tbody>
             <tr><td>금전적 비용($)</td><td>6</td><td>3</td><td>3</td></tr>
@@ -639,84 +1051,129 @@
             <tr><td><strong>총비용</strong></td><td><strong>22</strong></td><td><strong>29</strong></td><td><strong>33</strong></td></tr>
           </tbody>
         </table>
-        <p class="caption" style="margin-top:4px">버스는 승객을 태우려 정차해 차량 내 시간이 자동차보다 길다.
-          철도는 혼잡이 없어 차량 내 시간이 짧지만 역 간격이 넓어 도보·대기가 길다 (교재 표 19−1, p.424)</p>
+        <p class="caption" style="margin-top:4px">버스: 승객을 태우려 정차 → 차량 내 시간이 자동차보다 김<br>
+          철도: 혼잡이 없어 차량 내 시간은 짧고, 역 간격이 넓어 도보·대기는 김 (교재 표 19−1)</p>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-modeshare" viewBox="0 0 430 236" style="width:376px" role="img">
-          <title>대중교통 통근인원을 수단별로 나눈 원그래프. 버스가 절반을 넘는다</title></svg>
+        <svg class="fig" id="f-modebar" viewBox="0 0 430 200" style="width:386px" role="img">
+          <title>자동차·버스·철도의 통근비용을 금전·도보와 대기·차량 내로 쌓은 가로 막대그래프. 자동차 22, 버스 29, 철도 33</title></svg>
         <script>
           (function () {
             const M = window.MODE, F = Fig;
-            const cx = 150, cy = 112, r = 84;
-            const tot = M.share.reduce((a, [, v]) => a + v, 0);
-            let ang = -Math.PI / 2;
+            const X0 = 64, X1 = 404, sx = (v) => X0 + (v / 36) * (X1 - X0);
+            const seg = [['금전', (r) => r.money, 'var(--muted)'],
+                         ['도보와 대기', (r) => M.walkCost(r), 'var(--brand-crimson)'],
+                         ['차량 내', (r) => M.rideCost(r), 'var(--accent-blue)']];
             const parts = [];
-            const tone = ['0.62', '0.44', '0.28', '0.14'];
-            M.share.forEach(([k, v], i) => {
-              const sw = (v / tot) * 2 * Math.PI, e = ang + sw;
-              const x1 = cx + r * Math.cos(ang), y1 = cy + r * Math.sin(ang);
-              const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
-              parts.push(F.raw(`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} ` +
-                `A${r},${r} 0 ${sw > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" ` +
-                `fill="var(--accent-blue)" opacity="${tone[i]}" stroke="#fff" stroke-width="1.5"/>`));
-              const m = (ang + e) / 2;
-              // 맨 위의 얇은 조각(전차)은 이름표가 캔버스 위로 나가므로 눌러 준다
-              parts.push(F.annot(cx + (r + 24) * Math.cos(m),
-                                 Math.max(18, cy + (r + 24) * Math.sin(m) + 4),
-                                 v.toLocaleString(), { anchor: 'middle', size: 10 }));
-              ang = e;
+            seg.forEach(([k, , c], i) => {
+              const lx = X0 + i * 104;
+              parts.push(F.raw(`<rect x="${lx}" y="14" width="11" height="11" fill="${c}" opacity="0.75"/>`));
+              parts.push(F.annot(lx + 16, 24, k, { size: 10 }));
             });
-            M.share.forEach(([k], i) => {
-              const y = 34 + i * 20;
-              parts.push(F.raw(`<rect x="286" y="${y - 9}" width="11" height="11" ` +
-                               `fill="var(--accent-blue)" opacity="${tone[i]}"/>`));
-              parts.push(F.annot(302, y, k, { size: 10 }));
+            M.row.forEach((r, i) => {
+              const y = 48 + i * 46;
+              let x = 0;
+              seg.forEach(([, f, c]) => {
+                const v = f(r);
+                if (v > 0) {
+                  parts.push(F.raw(`<rect x="${sx(x)}" y="${y}" width="${sx(x + v) - sx(x)}" height="28" fill="${c}" opacity="0.75"/>`));
+                  parts.push(F.raw(`<text class="on-dark" x="${(sx(x) + sx(x + v)) / 2}" y="${y + 18}" ` +
+                                   `style="font-size:11px;fill:#FFF;font-weight:700;text-anchor:middle">${v}</text>`));
+                }
+                x += v;
+              });
+              parts.push(F.annot(X0 - 8, y + 18, r.k, { anchor: 'end', size: 11 }));
+              parts.push(F.annot(sx(x) + 6, y + 18, String(M.total(r)), { size: 12, tone: i === 0 ? 'red' : undefined }));
             });
-            parts.push(F.annot(286, 214, '1일 통근인원(천명) · 2004', { size: 9 }));
-            F.draw('#f-modeshare', { parts, check: false });
+            parts.push(F.raw(`<path class="axis" d="M${X0},40 L${X0},${48 + 3 * 46 - 10}"/>`));
+            F.draw('#f-modebar', { parts, check: false });
           })();
         </script>
+        <p class="caption" style="margin-top:2px;text-align:center">통근 비용($): 자동차 대 버스 대 철도 (교재 그림 19−2)</p>
       </div>
     </div>
-    <p class="derive t-red" style="margin-top:6px">→ 이 예에서 통행자는 <strong>자동차</strong>를 고름 (22 &lt; 29 &lt; 33).
-      금전적 비용은 자동차가 가장 비싼데도 <strong>시간비용</strong>이 결과를 뒤집음</p>
-      <p class="derive t-red" style="margin-top:2px">→ 실제로도 <strong>버스가 대중교통 통근의 절반 이상</strong>을 나름.
-      전차(경전철)의 몫은 매우 작음</p>
+    <p class="derive t-red" style="margin-top:6px">→ <strong>자동차</strong>가 가장 쌈 (22 &lt; 29 &lt; 33): 도보·대기 비용 0 이 비싼 금전비용을 상쇄</p>
+    <p class="derive t-red hang" style="margin-top:2px">→ 버스: 금전 이점 3달러 &lt; 도보·대기 8 + 차량 내 2달러의 불리함<br>
+      철도: 차량 내 4 + 금전 3달러의 이점 &lt; 도보·대기 18달러의 불리함</p>
   </div>
 </section>
 
-<!-- ══ 그림 19-3 · 표 19-2 (p.425~427) ═══════════════════════ -->
+<!-- ══ 그림 19-3 (p.425~426) ═════════════════════════════════ -->
 <section>
-  <h2>무엇이 이 계산을 뒤집는가</h2>
+  <h2>대중교통 선호로의 균형 변경 효과</h2>
   <div class="body tight">
-    <p class="emph" style="margin-bottom:6px">자동차 22달러 대 버스 29달러의 격차를 좁히는 두 가지 변화</p>
-    <div class="cols" style="margin-bottom:14px">
+    <p class="emph" style="margin-bottom:6px">자동차 통근을 대중교통으로 바꾸게 하는 두 가지 변화</p>
+    <div class="cols" style="margin-bottom:6px">
       <div class="col-l">
-        <p class="sub t-red" style="margin-bottom:2px">인구밀도의 증가</p>
-        <p>정거장이 촘촘해지고 배차가 잦아져 <strong>도보·대기 시간이 줄어듦</strong></p>
-        <p>버스 총비용이 <strong>29 → 16</strong> 으로 내려 자동차(22)를 역전함</p>
-        <p class="caption">철도는 18 이 되어 역시 자동차보다 싸진다</p>
+        <p class="sub t-red" style="margin-bottom:2px">1. 인구밀도 증가</p>
+        <p style="margin-bottom:4px">정류장 근처 통근자 증가<br>
+          → 배차 증가(도보·대기 ↓) · 급행버스(차량 내 ↓)<br>
+          대중교통의 <strong>시간비용이 절반</strong>일 때 총비용</p>
+        <svg class="fig" id="f-dense" viewBox="0 0 400 150" style="width:380px" role="img">
+          <title>인구밀도가 높아져 대중교통의 시간비용이 절반이 되면 총비용이 자동차 22, 버스 16, 철도 18이 되는 막대그래프</title></svg>
       </div>
       <div class="col-r">
-        <p class="sub t-red" style="margin-bottom:2px">임금의 감소</p>
-        <p>시간의 기회비용이 낮아지면 <strong>시간비용의 비중이 줄어</strong>
-          금전적 비용이 싼 수단이 유리해짐</p>
-        <p>자동차 <strong>10.00</strong> · 버스 <strong>9.50</strong> · 철도 <strong>10.50</strong> 으로
-          버스가 앞섬</p>
+        <p class="sub t-red" style="margin-bottom:2px">2. 소득 감소</p>
+        <p style="margin-bottom:4px">임금 감소 → 두 시간의 한계비효용이 함께 감소<br>
+          → 금전비용이 싼 수단이 유리<br>
+          임금이 <strong>분당 0.10</strong>일 때 총비용</p>
+        <svg class="fig" id="f-poor" viewBox="0 0 400 150" style="width:380px" role="img">
+          <title>임금이 분당 0.10달러로 줄면 총비용이 자동차 10.00, 버스 9.50, 철도 10.50이 되는 막대그래프</title></svg>
       </div>
     </div>
-    <p class="sub t-red" style="margin-bottom:2px">대중교통 수요의 가격탄력성</p>
-    <table class="tbl-mode" style="width:70%">
-      <thead><tr><th></th><th>단기</th><th>장기</th></tr></thead>
-      <tbody>
-        <tr><td>첨두</td><td>−0.40</td><td>−0.24</td></tr>
-        <tr><td>비첨두</td><td>−0.80</td><td>−0.48</td></tr>
-        <tr><td>전체</td><td>−0.50</td><td>−0.30</td></tr>
-      </tbody>
-    </table>
-    <p class="derive t-red" style="margin-top:8px">→ 모두 <strong>1보다 작아 비탄력적</strong>임.
-      요금을 10% 내려도 승객은 5%만 늘어남. <strong>비첨두</strong>가 첨두보다 두 배 탄력적임</p>
+    <script>
+      (function () {
+        const M = window.MODE, F = Fig;
+        const draw = (id, f, max, fmt) => {
+          const X0 = 64, X1 = 360, sx = (v) => X0 + (v / max) * (X1 - X0);
+          const vals = M.row.map((r) => f(r)), lo = Math.min(...vals);
+          const parts = [];
+          M.row.forEach((r, i) => {
+            const y = 14 + i * 42, v = vals[i];
+            const c = v === lo ? 'var(--brand-crimson)' : 'var(--accent-blue)';
+            parts.push(F.raw(`<rect x="${X0}" y="${y}" width="${sx(v) - X0}" height="26" fill="${c}" opacity="${v === lo ? 0.85 : 0.45}"/>`));
+            parts.push(F.annot(X0 - 8, y + 17, r.k, { anchor: 'end', size: 11 }));
+            parts.push(F.annot(sx(v) + 6, y + 17, fmt(v), { size: 12, tone: v === lo ? 'red' : undefined }));
+          });
+          parts.push(F.raw(`<path class="axis" d="M${X0},6 L${X0},${14 + 3 * 42}"/>`));
+          F.draw(id, { parts, check: false });
+        };
+        draw('#f-dense', (r) => M.dense(r), 26, (v) => String(v));
+        draw('#f-poor', (r) => M.poor(r), 13, (v) => v.toFixed(2));
+      })();
+    </script>
+    <p class="derive t-red">→ 고밀도: <strong>두 대중교통 모두</strong> 자동차보다 쌈 · 저임금: <strong>버스</strong>가 가장 쌈</p>
+  </div>
+</section>
+
+<!-- ══ 표 19-2 (p.426~427) ═══════════════════════════════════ -->
+<section>
+  <h2>대중교통에 대한 수요의 탄력성</h2>
+  <div class="body">
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 360px">
+        <p class="sub t-red" style="margin-bottom:2px">대중교통 수요의 가격탄력성</p>
+        <table class="tbl-mode">
+          <thead><tr><th>하루 중 시간대</th><th>버스</th><th>철도</th></tr></thead>
+          <tbody>
+            <tr><td>첨두 수요</td><td>−0.40</td><td>−0.24</td></tr>
+            <tr><td>비첨두</td><td>−0.80</td><td>−0.48</td></tr>
+            <tr><td>전체</td><td>−0.50</td><td>−0.30</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:4px">출처: Parry and Small, <em>American Economic Review</em> 99, 2009<br>
+          (교재 표 19−2, p.426)</p>
+      </div>
+      <div class="col-r">
+        <p class="emph" style="margin-bottom:8px">전반적 가격탄력성 <strong>−0.40</strong>: 요금 10% 인상 → 승차 4% 감소</p>
+        <p style="margin-bottom:4px"><strong>버스</strong>가 철도보다, <strong>비첨두</strong>가 첨두보다 탄력적</p>
+        <p style="margin-bottom:12px">비탄력적 → 요금 인상 시 <strong>총 요금수입 증가</strong></p>
+        <p class="sub t-red" style="margin-bottom:2px">실증연구의 두 관찰</p>
+        <p class="li-hang" style="margin-bottom:4px">1. 가격보다 <strong>서비스</strong>에 민감<br>
+          보스턴: 가격탄력성 −0.50 · 통행시간 탄력성 −0.80</p>
+        <p class="li-hang">2. 차량 내 시간보다 <strong>도보·대기 시간</strong>에 민감</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -724,24 +1181,61 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">02 대중교통의 비용과 가격책정</p>
-  <p class="section-sub">효율적인 요금은 왜 적자를 내는가 · 교재 p.427~431</p>
+  <p class="section-sub">규모의 경제 → 효율적 가격 &lt; 평균비용 → 효율을 위해 보조금이 필요 · 교재 p.427~431</p>
 </section>
 
-<!-- ══ 그림 19-4 · 19-5 (p.428~431) ══════════════════════════ -->
+<!-- ══ 그림 19-4 (p.427~429) ═════════════════════════════════ -->
 <section class="s-split">
-  <h2>규모의 경제가 적자를 부른다</h2>
+  <h2>대중교통 시스템의 비용곡선</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">승객이 늘면 배차가 잦아져 <strong>대기시간이 줄고</strong>,
-        고정비가 나뉘어 <strong>평균비용이 내려감</strong>. 한계비용은 그보다 더 아래에 있음</p>
-      <p style="margin-bottom:10px">효율적인 요금은 <strong>한계비용</strong>과 같아야 함.
-        점 a 에서 요금 pᴱ, 승객 Rᴱ 임</p>
-      <p style="margin-bottom:10px">그런데 그 요금에서 평균비용은 acᴱ 로 더 높음.
-        음영 직사각형만큼 <strong>적자</strong>가 남</p>
-      <p class="derive t-red">→ 적자를 없애려 요금을 p′ 로 올리면 승객이 R′ 로 줄어듦</p>
-      <p class="derive t-red">→ 그 <strong>예산균형 승객수는 비효율적</strong>임.
-        R′ 에서 Rᴱ 까지의 승객은 한계편익이 한계비용을 넘는데도 타지 못했음</p>
-      <p class="derive t-red">→ 그래서 대중교통 <strong>보조금</strong>의 경제적 근거가 생김</p>
+      <p class="emph" style="margin-bottom:6px">대중교통 이용은 규모의 경제(economies of scale) 존재</p>
+      <p class="emph">비용 = 공급자의 자본 · 운영비용 + 승객의 <strong>시간비용</strong></p>
+      <p class="sub t-red" style="margin-bottom:2px">1. 분리불가능한 투입요소</p>
+      <p style="margin-bottom:8px">선로 · 열차 · 전력 시스템은 작게 나눌 수 없음<br>
+        → 승객이 늘면 고정비가 나뉨</p>
+      <p class="sub t-red" style="margin-bottom:2px">2. 승객수의 경제</p>
+      <p style="margin-bottom:10px">승객 증가 → 배차간격 축소 → 대기시간 감소</p>
+      <p class="derive t-red">→ 평균비용이 하락하므로 한계비용은 그 아래</p>
+      <p class="derive t-red hang">→ 혼잡과 반대: 추가 승객은 남에게 외부편익(잦은 배차)<br>
+        추가 운전자는 남에게 외부비용(지연)</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-scale" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>대중교통의 평균비용과 한계비용이 모두 승객수와 함께 내려가고 한계비용이 평균비용 아래에 있는 그림</title></svg>
+      <script>
+        (function () {
+          const T = window.TRANSIT, F = Fig.withBox({ x0: 70, y0: 210, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 240], y: [0, 12] });
+          const mk = (f) => { const o = []; for (let i = 0; i <= 44; i++) { const R = 18 + (212 * i) / 44; o.push([R, f(R)]); } return S.curve(o); };
+          const parts = [
+            F.curve(mk((R) => T.ac(R))),
+            F.annot(S.x(228), S.y(T.ac(228)) - 10, '평균비용', { anchor: 'end', size: 10 }),
+            F.curve(mk((R) => T.mc(R)), { variant: 'demand' }),
+            F.annot(S.x(228), S.y(T.mc(228)) + 16, '한계비용', { anchor: 'end', size: 10, tone: 'blue' }),
+          ];
+          F.draw('#f-scale', { axes: { x: '승객수', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 19-5 (p.429~431) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>효율적인 승객수와 가격책정</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph">수요곡선 = 승차의 <strong>한계편익</strong></p>
+      <p class="caption" style="margin-bottom:8px">비용곡선은 생산비용만 담음 (시간비용이 변하면 수요가 이동)</p>
+      <p class="lbl"><strong>효율:</strong><span>점 a: 수요 = 한계비용 → 요금 p<sup>E</sup> · 승객 R<sup>E</sup></span></p>
+      <p class="lbl"><strong>적자:</strong><span>R<sup>E</sup> 에서 평균비용 ac<sup>E</sup> &gt; 요금 p<sup>E</sup> → 음영 직사각형</span></p>
+      <p class="lbl"><strong>예산균형:</strong><span>요금 p′ → 승객 R′(점 c)<br>
+        R′ ~ R<sup>E</sup>: 편익 &gt; 비용인데 못 탐 → 비효율</span></p>
+      <p class="derive t-red hang">→ 보조금은 효율 측면에서 정당화<br>
+        상위 20개 대도시 평균 보조금: 운영비용의 54%</p>
+      <p class="derive t-red hang">→ 문제: 운영자에게 비용 최소화 유인 없음<br>
+        해법: 운영자 기반에서 이용자 기반(승객-마일당) 보조로</p>
     </div>
     <div class="col-r">
       <svg class="fig" id="f-transit" viewBox="0 0 430 288" style="width:390px" role="img">
@@ -763,14 +1257,14 @@
             F.annot(S.x(56), S.y(T.mc(56)) - 10, '한계비용', { size: 10, tone: 'blue' }),
             F.line(...demC[0], ...demC[1], { variant: 'supply' }),
             F.annot(S.x(56), S.y(T.dem(56)) - 10, '수요 = 한계편익', { size: 10, tone: 'red' }),
-            F.guide(a[0], a[1], { xtick: 'Rᴱ', ytick: 'pᴱ' }),
+            F.guide(a[0], a[1], { xtick: 'R^E', ytick: 'p^E' }),
             F.dot(a[0], a[1], { label: 'a', lx: 9, ly: 15 }),
             F.guide(c[0], c[1], { xtick: 'R′', ytick: 'p′' }),
             F.dot(c[0], c[1], { label: 'c', lx: -14, ly: -8 }),
             // acᴱ 를 세로축에 찍으면 p′ 과 6px 거리라 겹친다. 점 b 옆에 붙인다
             F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(acE)} L${S.x(RE)},${S.y(acE)}"/>`),
             F.dot(...S.p([RE, acE]), { label: 'b', lx: 9, ly: -8 }),
-            F.annot(S.x(RE) + 24, S.y(acE) + 4, 'acᴱ', { size: 10 }),
+            F.annot(S.x(RE) + 24, S.y(acE) + 4, 'ac^E', { size: 10 }),
           ];
           F.draw('#f-transit', { axes: { x: '승객수', y: '$' }, parts });
         })();
@@ -783,74 +1277,63 @@
 <section class="s-section">
   <div class="section-rule"></div>
   <p class="section-label">03 대중교통 시스템 선택</p>
-  <p class="section-sub">버스인가 경전철인가 — 답은 밀도에 있다 · 교재 p.431~437</p>
+  <p class="section-sub">교통 설계자의 관점: 핵심은 인구밀도와 고용이 정하는 총수요 · 교재 p.431~437</p>
 </section>
 
-<!-- ══ 그림 19-6 · 19-7 (p.432~436) ══════════════════════════ -->
+<!-- ══ 그림 19-6 (p.431~433) ═════════════════════════════════ -->
 <section class="s-split">
-  <h2>경전철은 언제 운영 가능한가</h2>
+  <h2>승객수의 평균비용</h2>
   <div class="body">
     <div class="col-l">
-      <p class="emph" style="margin-bottom:8px">교통 설계자의 관점으로 봄.
-        세 시스템의 <strong>장기 평균비용</strong>을 통행량에 따라 비교함</p>
-      <p style="margin-bottom:8px"><strong>승용차와 도로</strong>는 수평임 — 교통량이 늘면
-        통행시간을 유지하려 도로를 넓힌다고 가정하기 때문</p>
-      <p style="margin-bottom:10px"><strong>버스</strong>는 시간당 5~10천명 사이에서 승용차보다 싸짐.
-        <strong>철도와 지선버스</strong>는 10천명 부근에서 승용차를 따라잡음</p>
-      <p class="derive t-red">→ 경전철이 버스를 이기려면 <strong>아주 높은 통행량</strong>이 필요함.
-        그 통행량은 <strong>높은 인구밀도</strong>에서만 나옴</p>
-      <p class="derive t-red">→ 오른쪽 지도가 그것을 보여줌. 보스턴·시카고처럼 밀도가 높은 도시와
-        애틀란타·포틀랜드처럼 낮은 도시의 차이임</p>
+      <p class="emph">평균비용 = 자본 + 운행 + 승객 시간비용<br>
+        → 승객이 많을수록 하락</p>
+      <p class="lbl"><strong>승객규모:</strong><span>승객규모가 많을수록 전철이, 적을수록 자가용이 유리</span></p>
+      <p class="lbl"><strong>승용차와 도로:</strong><span>교통량에 맞춰 도로를 넓힌다고 가정했을 때<br>
+        수평의 비용곡선</span></p>
+      <p class="derive t-red hang">→ 버스는 6천명 수준일 때부터 승용차와 경쟁가능<br>
+        인구가 충분하지 않으면 중전철 도입어려움</p>
     </div>
     <div class="col-r">
-      <svg class="fig" id="f-lac" viewBox="0 0 430 176" style="width:382px" role="img">
-        <title>승용차와 도로는 수평이고 버스와 철도의 평균비용은 통행량이 늘수록 내려가 차례로 승용차를 따라잡는 그림</title></svg>
+      <svg class="fig" id="f-lac" viewBox="0 0 430 282" style="width:390px" role="img">
+        <title>승용차와 도로는 수평이고, 버스는 시간당 6천명 부근에서, 철도와 지선버스는 10천명 부근에서 그 아래로 내려가며 버스가 끝까지 가장 낮은 그림</title></svg>
       <script>
         (function () {
-          const F = Fig.withBox({ x0: 64, y0: 128, x1: 398, y1: 22 });
-          const S = F.scale({ x: [0, 34], y: [0, 18] });
+          const L = window.LAC, F = Fig.withBox({ x0: 68, y0: 210, x1: 392, y1: 34 });
+          const S = F.scale({ x: [0, 34], y: [5, 13.5] });
           const mk = (f) => { const o = []; for (let i = 0; i <= 40; i++) { const x = 3 + (29 * i) / 40; o.push([x, f(x)]); } return S.curve(o); };
-          // 교재 19-6 은 전형적인 미국 도시다 — 버스가 오른쪽 끝까지 가장 아래에 있다.
-          // 버스는 5~10천명 사이에서, 철도는 10천명 부근에서 승용차 아래로 내려간다.
-          //   bus(5.71) = 8 = car · rail(10) = 8 = car · 전 구간에서 rail > bus
-          const car = 8;
-          const bus = (q) => 5.2 + 16 / q, rail = (q) => 5.9 + 21 / q;
           const parts = [
-            F.line(S.x(2), S.y(car), S.x(32), S.y(car), { variant: 'cap' }),
-            F.annot(S.x(31), S.y(car) - 8, '승용차와 도로', { anchor: 'end', size: 9 }),
-            F.curve(mk(bus), { variant: 'demand' }),
-            F.annot(S.x(31), S.y(bus(31)) + 14, '버스', { anchor: 'end', size: 9, tone: 'blue' }),
-            F.curve(mk(rail)),
-            F.annot(S.x(13), S.y(rail(13)) - 10, '철도와 지선버스', { size: 9 }),
+            F.line(S.x(2), S.y(L.car), S.x(32), S.y(L.car), { variant: 'cap' }),
+            F.annot(S.x(32), S.y(L.car) - 8, '승용차와 도로', { anchor: 'end', size: 10 }),
+            F.curve(mk((q) => L.bus(q)), { variant: 'demand' }),
+            F.annot(S.x(32), S.y(L.bus(32)) - 8, '버스', { anchor: 'end', size: 10, tone: 'blue' }),
+            F.curve(mk((q) => L.rail(q))),
+            F.annot(S.x(3.4), S.y(L.rail(3.4)) - 2, '  철도와 지선버스', { size: 10 }),
+            F.dot(...S.p([6, L.car]), { label: '약 6천명', lx: -24, ly: 20 }),
+            F.dot(...S.p([10, L.car]), { label: '10천명', lx: 4, ly: -10 }),
           ];
           [5, 10, 20, 30].forEach((q) =>
-            parts.push(F.annot(S.x(q), F.BOX.y0 + 15, String(q), { anchor: 'middle', size: 9 })));
-          parts.push(F.annot(S.x(17), F.BOX.y0 + 31, '시간당 승객수(1,000명)', { anchor: 'middle', size: 9 }));
-          F.draw('#f-lac', { axes: { y: '왕복 통행당 비용($)' }, parts });
+            parts.push(F.annot(S.x(q), F.BOX.y0 + 16, String(q), { anchor: 'middle', size: 10 })));
+          F.draw('#f-lac', { axes: { x: '시간당 승객수(1,000명)', y: '왕복 통행당 비용($)' }, parts });
         })();
       </script>
-      <img src="../assets/tb-lightrail-density.jpg"
-           alt="보스턴·애틀란타·시카고·포틀랜드의 인구밀도를 높이로 세운 네 개의 3차원 지도. 보스턴과 시카고의 기둥이 훨씬 높다"
-           style="display:block;height:120px;width:auto;margin:4px auto 0">
-      <p class="caption" style="margin-top:2px;text-align:center">오설리반, 『오설리반의 도시경제학』 제9판,
-        박영사, 2022, 그림 19−7 (p.435)</p>
+      <p class="caption" style="margin-top:2px;text-align:center">전형적인 주거밀도의 미국 도시 (교재 그림 19−6, Small and Verhoef, 2007)</p>
     </div>
   </div>
 </section>
 
-<!-- ══ 마무리 (p.436) ════════════════════════════════════════ -->
+<!-- ══ 대중교통 시스템과 토지이용 형태 (p.436~437) ══════════ -->
 <section>
-  <h2>교통기술이 도시의 모양을 만든다</h2>
+  <h2>대중교통 시스템과 토지이용 형태</h2>
   <div class="body stack">
-    <p class="lead t-define" style="margin-bottom:20px">앞 장들에서 보았듯이,
-      20세기 초의 대규모 <span class="mark">단일도심도시</span>는 세 가지의 결합에서 나왔음</p>
-    <p class="emph">통근자를 위한 <strong>전차</strong></p>
-      <p class="emph">제조업 생산요소와 생산물을 나르는 <strong>마차</strong></p>
-      <p class="emph" style="margin-bottom:20px">도심 안 사무 종사자들의 대면시간을 위한 <strong>보도</strong></p>
-    <p class="derive t-red">→ 7주차에서 본 것이 여기서 다시 나옴 —
-      <strong>교통기술이 바뀌면 도시의 모양이 바뀜</strong></p>
-      <p class="derive t-red">→ 그래서 교통정책은 교통만의 문제가 아니라
-      <strong>토지이용 정책이기도 함</strong></p>
+    <p class="lead t-define" style="margin-bottom:4px">교통기술은 토지이용을 바꿈</p>
+    <p class="emph">20세기 초 <span class="mark">단일도심도시</span>: 전차 · 마차 · 보도의 결합 (7주차)</p>
+    <p class="emph" style="margin-bottom:16px">교외화: 트럭 · 고속도로 → 제조업 고용 · 정보기술 → 정보 고용 · 자동차 → 거주</p>
+    <p class="sub t-red" style="margin-bottom:2px">그러면 철도를 지으면 역 주변 밀도가 높아져 수요가 생기는가</p>
+    <p class="lbl"><strong>애틀랜타 MARTA:</strong><span>1990~1999년 인구 70만 증가 중 역 800m 이내를 고른 몫: 거주자 2% · 일자리 1%</span></p>
+    <p class="lbl"><strong>샌프란시스코 BART:</strong><span>시내 역 근처 고용에만 작은 양(+)의 효과</span></p>
+    <p class="derive t-red" style="margin-top:12px">→ 대중교통의 공급이 대중교통 수요를 만들지는 않음</p>
+    <p class="derive t-red hang">→ 토지이용 정책(용도지역제 · 재산세)이 <strong>고밀도를 만들면</strong><br>
+      철도는 다수의 근로자를 고밀도 고용지역으로 나르는 효율적 수단</p>
   </div>
 </section>
 
