@@ -1,0 +1,154 @@
+<!doctype html>
+<!--
+  기말 개인과제와 발표 안내 (2026-11-16, 교수 요청)
+  강의 덱이 아니라 별도 안내 덱이다. course.json 에 no 0 · noLabel「기말」로 따로 올린다.
+  파일명 앞 두 자리 00 은 deck-init.js 가 course.json 에서 이 항목을 찾는 열쇠다.
+  폼 두 개는 private/과제-수집-설정.md 「기말 개인과제 폼 둘」 절에 있다.
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>기말 개인과제와 발표 안내</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  .reveal p.define { font-size: 17px; font-weight: 700; color: var(--brand-crimson); line-height: 1.45; margin: 0 0 8px; }
+  .reveal p.conclusion { font-size: 15px; font-weight: 500; color: var(--ink); margin: 12px 0 0; line-height: 1.5; }
+  .reveal p.conclusion > .ar { color: var(--brand-crimson); font-weight: 700; }
+  .reveal ul.defs > li { margin-bottom: 8px; font-size: var(--fs-body); line-height: 1.5; }
+  .reveal ul.defs ul.dash { margin: 2px 0 0; padding-left: 1.4em; }
+  .reveal ul.defs ul.dash > li { font-size: 15px; margin-bottom: 2px; line-height: 1.45; }
+  .s-split .body { align-items: flex-start; }
+  .tbl { width: 100%; table-layout: fixed; font-size: 15px; }
+  .tbl th, .tbl td { padding: 8px 10px; line-height: 1.5; vertical-align: top; }
+  .tbl td.d { font-weight: 700; color: var(--brand-crimson); }
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 6px 12px; font-size: 12px; font-weight: 700;
+              letter-spacing: .04em; color: #4A4741; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 12px 14px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 12px; line-height: 1.7; color: var(--brand-crimson); font-weight: 700;
+             white-space: pre-wrap; word-break: break-all; }
+  /* 발표 한 사람의 20분 */
+  .slot { display: flex; height: 54px; margin: 6px 0 4px; font-size: 14px; font-weight: 700; }
+  .slot > div { display: flex; align-items: center; justify-content: center; color: #FFFFFF; }
+  .slot .talk { flex: 15 1 0; background: #A02948; }
+  .slot .qa { flex: 5 1 0; background: #1F5C8B; }
+  .slot-ax { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .steps { display: grid; grid-template-columns: 120px 1fr; row-gap: 0; margin-top: 4px; }
+  .steps p { margin: 0; padding: 9px 0; border-top: 1px solid var(--rule); font-size: 16px; line-height: 1.5; }
+  .steps .when { font-weight: 700; color: var(--brand-crimson); }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- T1 표지 -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>기말 개인과제와 발표 안내</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- T8 일정 -->
+  <section>
+    <h2>일정</h2>
+    <div class="body">
+      <table class="tbl">
+        <thead><tr><th style="width:27%">날짜</th><th>무엇</th><th style="width:22%">누가</th></tr></thead>
+        <tbody>
+          <tr><td class="d">12월 2일(수)<br>23시 59분 59초</td><td>기말 개인과제 제출 마감<br>발표 지원 마감 (선착순)</td><td>전원</td></tr>
+          <tr><td class="d">12월 4일(금)</td><td>발표자 공지 (공지사항)<br>발표자 슬라이드 사전공개</td><td>교수</td></tr>
+          <tr><td class="d">12월 7일(월)<br>수업</td><td>발표 8명: 15분 발표 + 5분 질의응답<br>질문 폼에 실명으로 질문</td><td>발표자<br>나머지 전원</td></tr>
+        </tbody>
+      </table>
+      <p class="conclusion">발표는 8명만 함<br><span class="ar">→</span> 나머지 학생은 제출한 과제로만 평가</p>
+    </div>
+  </section>
+
+  <!-- T4 제출 방법 -->
+  <section class="s-split">
+    <h2>제출 방법</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 50%">
+        <p class="define">Claude 의 슬라이드 기능으로 작성해 제출</p>
+        <ul class="defs">
+          <li><strong>내용:</strong> 본인의 분석 주제와 결과</li>
+          <li><strong>제출할 것 세 가지:</strong>
+            <ul class="dash">
+              <li>① 슬라이드 PDF 파일</li>
+              <li>② 슬라이드 공유 링크</li>
+              <li>③ 발표 희망 여부 체크</li>
+            </ul></li>
+          <li><strong>마감:</strong> 12월 2일(수) 23시 59분 59초</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <div class="doc">
+          <div class="bar">데이터사이언스 기말 개인과제 제출</div>
+          <pre>docs.google.com/forms/d/e/1FAIpQLSdTTupxkzO4_VTixGsY943AWDeCIgHuxuFZkbQhSw3-LLAe2w/viewform</pre>
+        </div>
+        <p class="caption" style="margin-top:8px">매주 쓰던 과제 제출 폼과 다른 주소<br>학교 메일(구글 계정)로 로그인해야 PDF 를 올릴 수 있음</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- T4 발표 -->
+  <section class="s-split">
+    <h2>발표</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 52%">
+        <p class="define">12월 7일 수업에서 8명이 발표</p>
+        <ul class="defs">
+          <li><strong>지원:</strong> 제출 폼에서 발표 희망 체크. 12월 2일까지 선착순</li>
+          <li><strong>가산점:</strong> 발표하면 가산점이 있음</li>
+          <li><strong>선정:</strong> 지원자가 8명 이상이면 교수가 검토해 12월 4일 공지사항에 올림</li>
+          <li><strong>발표:</strong> 15분 이내로 본인의 분석 주제와 결과 발표 → 5분 질의응답</li>
+        </ul>
+        <p class="conclusion">발표하지 않는 학생<br><span class="ar">→</span> 제출한 과제로만 평가</p>
+      </div>
+      <div class="col-r">
+        <p class="caption" style="margin:0 0 2px">발표자 한 명의 시간</p>
+        <div class="slot"><div class="talk">발표 15분 이내</div><div class="qa">질의응답 5분</div></div>
+        <div class="slot-ax"><span>0분</span><span>15분</span><span>20분</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- T4 발표하지 않는 학생 -->
+  <section class="s-split">
+    <h2>발표하지 않는 학생: 실명으로 질문</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 50%">
+        <p class="define">발표 내용을 미리 보고, 발표 때 질문을 올림</p>
+        <div class="steps">
+          <p class="when">12월 4일(금)</p><p>사전공개된 발표자 슬라이드를 봄</p>
+          <p class="when">12월 7일(월)</p><p>발표를 들으며 질문 폼에 <strong>실명</strong>으로 질문을 올림</p>
+        </div>
+        <p class="conclusion">학번 · 이름 · 질문할 발표자 · 질문을 적음<br><span class="ar">→</span> 발표자 한 명당 한 번씩 제출</p>
+      </div>
+      <div class="col-r">
+        <div class="doc">
+          <div class="bar">데이터사이언스 기말과제 질문</div>
+          <pre>docs.google.com/forms/d/e/1FAIpQLScwVvEBOSJZ0rOKfMIK1mKv46NqBcqAdxZX3w6uStFRltPxXw/viewform</pre>
+        </div>
+        <p class="caption" style="margin-top:8px">제출 폼과 다른 주소 · 학교 메일(구글 계정)로 로그인</p>
+      </div>
+    </div>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

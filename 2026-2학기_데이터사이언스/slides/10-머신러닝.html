@@ -1,18 +1,18 @@
 <!doctype html>
 <!--
-  10주차. 예측적 분석 — 머신러닝 (2026-11-09 초안, 같은 날 개조식으로 다시 쓰고 옛 11·12강 내용을 녹임)
+  10주차. 예측적 분석 — 머신러닝 (2026-11-09 초안, 같은 날 개조식으로 다시 쓰고 옛 11·12강 내용을 녹임. 2026-11-14 교수 수정 31건 반영)
   옛 10강 「회귀와 혼란변수」 자리. 회귀는 9강에 모았다. 옛 덱은 보관/10-진단적분석2.html.
   옛 11강(추세예측)·12강(머신러닝과 불확실성)에서 옮긴 것: 예측적 분석의 정의, 홀드아웃 검증,
   검증을 망치는 방법, MAPE, 과적합과 복잡도, ML 을 쓸 때와 회귀를 쓸 때, 예측구간, 예측을 증거로 쓰는 조건.
   옛 두 덱은 보관/11-예측적분석1.html · 보관/12-예측적분석2.html.
   숫자는 analysis/10-머신러닝/10-세종랜덤포레스트.py 가 만든다. window.ML 은 그 --slide 출력이다.
-  이 파일은 scratchpad 의 l9/deck10.html + fig10.js.html 을 gen.py 로 찍은 것이다.
+  2026-11-14 부터는 이 파일을 직접 고친다. 보탬 숫자는 analysis/10-머신러닝/10-세종랜덤포레스트-보탬.py.
 -->
 <html lang="ko">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>10강. 예측적 분석 — 머신러닝</title>
+  <title>10강. 예측적 분석 - 머신러닝</title>
   <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
   <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
   <link rel="stylesheet" href="../../_shared/theme/tokens.css">
@@ -146,68 +146,57 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 </head>
 <body>
 <div class="reveal"><div class="slides">
-
   <section class="s-cover">
     <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
     <p class="cover-label" data-course-label>&nbsp;</p>
-    <h1>10강. 예측적 분석<br>머신러닝</h1>
+    <h1 style="font-size:40px;white-space:nowrap">10강. 예측적 분석 - 머신러닝</h1>
     <p class="cover-date" data-course-date>&nbsp;</p>
   </section>
 
   <section>
-    <h2>지난 시간: 회귀분석으로 「왜」를 물었다</h2>
-    <div class="body">
-      <div class="cols">
-        <div class="col-l">
-          <p class="sub t-red">선형회귀</p>
-          <ul class="defs"><li>세종 ㎡당 가격 ~ 다섯 변수 · R² .548</li>
-            <li>계수 · 유의성 · 여섯 가지 가정 진단</li></ul>
-        </div>
-        <div class="col-r">
-          <p class="sub t-red">로지스틱 회귀</p>
-          <ul class="defs"><li>「비싼 집인가」(0/1) · 승산비로 해석</li>
-            <li>정분류율 79.4% · 종속변수별 모형 선택</li></ul>
-        </div>
-      </div>
-      <p class="derive t-red" style="margin-top:22px">오늘: 같은 자료로 「처음 보는 거래의 가격을 얼마나 맞히는가」</p>
+    <h2>지난 시간: 진단적 분석 - 회귀분석과 그 확장</h2>
+    <div class="body tight">
+      <svg class="fig" id="f-recap" viewBox="0 0 848 300" style="width:848px;max-height:none" role="img">
+        <title>회귀계수, 유의성, 회귀 가정, 로지스틱 회귀 네 단계를 세종 결과와 함께 정리한 인포그래픽</title></svg>
+      <p class="derive t-red" style="margin-top:6px">→ 오늘: 같은 자료로 「처음 보는 거래의 가격을 얼마나 맞히는가」</p>
     </div>
   </section>
 
   <section class="s-question">
-    <h2>설명을 잘하는 모형이 예측도 잘하는가?</h2>
+    <h2>예측적 분석 <span class="en" style="font-size:22px">predictive analysis</span></h2>
     <div class="body">
+      <p class="lead t-define" style="margin-bottom:14px">설명을 잘하는 모형이 예측도 잘하는가?</p>
       <ul>
-        <li>9강 회귀식: 계수 하나하나를 읽을 수 있음</li>
-        <li>그러나 가격 변동의 <span class="mark">45%</span>는 식 밖에 남음</li>
+        <li>예측적 분석: 과거 자료에서 찾은 규칙으로 <span class="mark">새 자료의 값을 맞힘</span></li>
+        <li>회귀식은 계수 하나하나를 읽을 수 있음<br>그러나 가격 변동의 <span class="mark">45%</span>는 식 밖에 남음</li>
         <li>해석을 조금 내주고 예측을 얻는 방법 → 머신러닝</li>
       </ul>
     </div>
   </section>
 
-  <section>
-    <h2>예측적 분석 <span class="en" style="font-size:20px">predictive</span></h2>
-    <div class="body">
-      <p class="define">과거에서 찾은 규칙을 아직 없는 자료에 적용하는 일</p>
-      <ul class="defs">
-        <li><strong>진단:</strong> 지금 자료로 맞는지 확인 가능</li>
-        <li><strong>예측:</strong> 그 값이 생겨야 확인 가능</li>
-      </ul>
-      <p class="conclusion"><span class="ar">→</span> 그래서 <span class="hl">미리 채점하는 법</span>(홀드아웃 검증)이 예측의 출발점</p>
-      <p class="src">출처: 옛 11강 「예측적 분석 Ⅰ」</p>
-    </div>
-  </section>
-
-  <section>
-    <h2>머신러닝: 목적과 정의</h2>
-    <div class="body">
-      <p class="define">사람이 규칙을 적지 않아도 자료에서 규칙을 배워 새 자료를 예측하는 방법</p>
-      <ul class="defs">
-        <li><strong>학습:</strong> 답을 아는 자료(훈련 자료)로 모형을 맞춤</li>
-        <li><strong>예측:</strong> 답을 모르는 새 자료에 적용</li>
-        <li><strong>평가:</strong> 학습에 쓰지 않은 자료(시험 자료)에서 얼마나 맞히나</li>
-      </ul>
-      <p class="conclusion"><span class="ar">→</span> 데이터마이닝(좁은 뜻): 대규모 자료에서 자동으로 규칙 탐색 · 사전 가설 X · 머신러닝 활용</p>
-      <p class="src">출처: 데이터마이닝(2022-1) 1강 p.5. 머신러닝 정의는 이 강의에서 씀</p>
+  <section class="s-split">
+    <h2>머신러닝 <span class="en" style="font-size:22px">machine learning</span></h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="define">사람이 규칙을 적지 않아도 자료에서 규칙을 배워<br>새 자료를 예측하는 방법</p>
+        <ul class="defs">
+          <li><strong>학습:</strong> 답을 아는 자료(훈련 자료)로 모형을 맞춤</li>
+          <li><strong>예측:</strong> 답을 모르는 새 자료에 적용</li>
+          <li><strong>평가:</strong> 학습에 쓰지 않은 자료(시험 자료)에서 얼마나 맞히나</li>
+        </ul>
+        <p class="sub t-red" style="margin:10px 0 2px">인공지능 안에서의 자리</p>
+        <ul class="defs" style="font-size:14px">
+          <li><strong>인공지능(AI):</strong> 사람의 지적 작업을 기계가 하게 하는 기술 전체</li>
+          <li><strong>머신러닝(ML):</strong> 그중 규칙을 자료에서 배우는 것</li>
+          <li><strong>딥러닝(DL):</strong> 그중 층을 깊게 쌓은 신경망</li>
+          <li><strong>거대언어모형(LLM):</strong> 그중 방대한 글로 학습한 언어 모형</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-ai" viewBox="0 0 420 320" style="width:400px" role="img">
+          <title>인공지능 안에 머신러닝, 그 안에 딥러닝, 그 안에 거대언어모형이 들어 있는 포함 관계 그림</title></svg>
+        <p class="caption">포함 관계 · 오늘 다루는 랜덤포레스트는 머신러닝 안, 딥러닝 밖</p>
+      </div>
     </div>
   </section>
 
@@ -222,6 +211,7 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
   <section>
     <h2>지도학습: 분류와 회귀</h2>
     <div class="body">
+      <p class="define">정답 y 가 있는 자료로 배움. y 가 연속값이면 회귀, 범주면 분류</p>
       <div class="cols">
         <div class="col-l">
           <p class="sub t-red">회귀 (regression)</p>
@@ -242,51 +232,50 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
           </ul>
         </div>
       </div>
-      <p class="conclusion"><span class="ar">→</span> 9강의 두 모형 = 두 갈래의 대표 (로지스틱: 「회귀라기보다는 분류의 문제」)</p>
-      <p class="src">출처: 고급도시교통통계분석 10강 p.3·28~31</p>
     </div>
   </section>
 
   <section>
-    <h2>통계 모형과 머신러닝 모형은 묻는 것이 다르다</h2>
+    <h2>통계 모형과 머신러닝 모형의 차이</h2>
     <div class="body tight">
-      <table class="tbl" style="font-size:13.5px">
-        <thead><tr><th style="width:18%"></th><th style="width:41%">통계 모형 (9강)</th><th>머신러닝 모형 (오늘)</th></tr></thead>
+      <p class="define">통계 모형과 머신러닝 모형은 묻는 것이 다름</p>
+      <svg class="fig" id="f-statml" viewBox="0 0 848 200" style="width:820px;max-height:none;display:block;margin:0 auto" role="img">
+        <title>왼쪽은 사람이 정한 직선으로 기울기를 해석하는 통계 모형, 오른쪽은 자료가 정한 모양으로 숨겨 둔 새 점을 맞히는 머신러닝 모형</title></svg>
+      <table class="tbl" style="font-size:12.5px;margin-top:4px">
+        <thead><tr><th style="width:14%"></th><th style="width:43%">통계 모형</th><th>머신러닝 모형</th></tr></thead>
         <tbody>
           <tr><td>목적</td><td>X 가 Y 에 얼마나, 왜</td><td class="y">새 자료의 Y 를 얼마나 맞히나</td></tr>
           <tr><td>식의 모양</td><td>사람이 정함 (직선, 로짓)</td><td>자료가 정함 (나무, 숲, 신경망)</td></tr>
-          <tr><td>가정</td><td>선형성 · 등분산 · 독립 · 정규</td><td>거의 없음</td></tr>
-          <tr><td>판단 기준</td><td>계수 · 표준오차 · p 값</td><td>시험 자료의 오차</td></tr>
-          <tr><td>얻는 것</td><td>해석 가능한 계수</td><td>예측값 · 변수 중요도</td></tr>
-          <tr><td>위험</td><td>가정 위배 → p 값 불신</td><td>훈련 자료를 외움 (과적합)</td></tr>
+          <tr><td>판단 기준</td><td>계수 · 표준오차 · p 값 · 가정 진단</td><td>시험 자료의 오차</td></tr>
+          <tr><td>얻는 것 · 위험</td><td>해석 가능한 계수 · 가정 위배 시 p 값 불신</td><td>예측값 · 변수 중요도 · 훈련 자료를 외움(과적합)</td></tr>
         </tbody>
       </table>
-      <p class="conclusion"><span class="ar">→</span> 대립 X. 「왜」 → 통계 모형 · 「얼마」 → 머신러닝</p>
     </div>
   </section>
 
   <section>
-    <h2>언제 머신러닝을, 언제 회귀를 쓰나</h2>
+    <h2>머신러닝과 회귀의 선택</h2>
     <div class="body tight">
-      <table class="tbl" style="font-size:14px">
+      <p class="define">관측이 많고 관계가 꺾이면 머신러닝, 관측이 적고 이유를 설명해야 하면 회귀</p>
+      <svg class="fig" id="f-when" viewBox="0 0 848 200" style="width:820px;max-height:none;display:block;margin:0 auto" role="img">
+        <title>왼쪽: 관측이 많고 꺾인 관계에서 직선은 놓치고 머신러닝은 따라감. 오른쪽: 관측이 적을 때 머신러닝은 점을 외워 흔들리고 직선이 안정적</title></svg>
+      <table class="tbl" style="font-size:13px;margin-top:4px">
         <thead><tr><th style="width:50%">머신러닝이 낫다</th><th>회귀가 낫다</th></tr></thead>
         <tbody>
-          <tr><td>관측이 많음 (수천~수만)</td><td>관측이 적음 (수십~수백)</td></tr>
-          <tr><td>변수가 많고 관계가 뒤엉킴</td><td>변수가 몇 개뿐</td></tr>
-          <tr><td>맞히는 것 자체가 목적</td><td class="y">왜 그런지 설명해야 함</td></tr>
-          <tr><td>규칙을 미리 알기 어려움</td><td>이론이 꼴을 알려 줌</td></tr>
+          <tr><td>관측이 많음 (수천 ~ 수만)</td><td>관측이 적음 (수십 ~ 수백)</td></tr>
+          <tr><td>변수가 많고 관계가 꺾이거나 뒤엉킴</td><td>변수가 몇 개뿐 · 이론이 꼴을 알려 줌</td></tr>
+          <tr><td>맞히는 것 자체가 목적</td><td class="y">왜 그런지 설명해야 함 (정책 근거)</td></tr>
         </tbody>
       </table>
-      <p class="conclusion"><span class="ar">→</span> 세종 15,486건 · 신도시×나이×시점이 얽힘 → 예측에는 머신러닝이 유리</p>
-      <p class="caption">정책 근거를 만드는 일: 「왜 이 지역인가」를 설명 못 하면 예산 X → 오른쪽 셋째 줄이 자주 결정적</p>
-      <p class="src">출처: 옛 12강 「예측적 분석 Ⅱ」</p>
+      <p class="conclusion">세종: 15,486건 · 신도시 × 나이 × 시점이 얽힘<br><span class="ar">→</span> 예측에는 머신러닝이 유리</p>
     </div>
   </section>
 
   <section class="s-split" data-step="split">
-    <h2>홀드아웃 검증: 숨겨 둔 자료로 채점한다</h2>
+    <h2>홀드아웃 검증 <span class="en" style="font-size:22px">holdout validation</span></h2>
     <div class="body tight">
       <div class="col-l" style="flex:0 0 42%">
+        <p class="define">숨겨 둔 자료로 채점함</p>
         <ul class="defs">
           <li><strong>훈련 자료(80%):</strong> 모형을 만듦</li>
           <li><strong>시험 자료(20%):</strong> 답을 가리고 채점에만 씀</li>
@@ -294,8 +283,8 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
             <ul class="dash"><li>RMSE · MAE: 평균적으로 빗나간 크기 (원 단위)</li>
               <li>MAPE: 빗나간 크기 ÷ 실제값 (%)</li></ul></li>
         </ul>
-        <p class="conclusion fragment"><span class="ar">→</span> 선형회귀: 시험 R² .545 · MAPE 26.1%</p>
-        <p class="conclusion fragment"><span class="ar">→</span> 랜덤포레스트: 시험 R² <span class="hl">.895</span> · MAPE <span class="hl">8.4%</span></p>
+        <p class="conclusion fragment">선형회귀: 시험 R² .545 · MAPE 26.1%</p>
+        <p class="conclusion fragment">랜덤포레스트: 시험 R² <span class="hl">.895</span> · MAPE <span class="hl">8.4%</span></p>
       </div>
       <div class="col-r">
         <svg class="fig" id="f-split" viewBox="0 0 450 300" style="width:450px" role="img">
@@ -305,18 +294,19 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
   </section>
 
   <section>
-    <h2>주의: 검증을 망치는 방법들</h2>
+    <h2>검증의 함정</h2>
     <div class="body tight">
-      <table class="tbl" style="font-size:13.5px">
-        <thead><tr><th style="width:30%">이렇게 하면</th><th>왜 안 되나</th></tr></thead>
+      <p class="define">시험 자료의 정보가 학습에 새어 들면 성적이 실제보다 좋게 나옴</p>
+      <table class="tbl" style="font-size:12.5px">
+        <thead><tr><th style="width:25%">실수</th><th style="width:40%">왜 안 되나</th><th>어떻게 하나</th></tr></thead>
         <tbody>
-          <tr><td>같은 묶음을 양쪽에 나눔</td><td>같은 단지 · 같은 사람의 다른 관측을 외워서 맞힘 → <span class="hl">성적 부풀림</span></td></tr>
-          <tr><td>시계열을 무작위로 나눔</td><td>미래를 보고 과거를 맞힘 → 반드시 뒤쪽을 뗌</td></tr>
-          <tr><td>시험 성적을 보며 모형을 고침</td><td>시험 자료에 맞춰짐 → 더는 시험이 아님</td></tr>
-          <tr><td>학습에 미래 정보가 섞임</td><td>전체 평균 같은 값을 미리 계산해 넣음 → 시험 자료가 새어 듦</td></tr>
+          <tr><td>같은 단지의 거래를 훈련과 시험에 나눠 넣음</td><td>모형이 그 단지의 가격 수준을 외워 시험에서 맞힘 → 새 단지에서는 그만큼 못 맞힘</td><td class="y">단지 단위로 나눔<br>한 단지는 훈련이나 시험 한쪽에만</td></tr>
+          <tr><td>시간 순서가 있는 자료를 무작위로 나눔</td><td>미래 거래로 배워 과거를 맞힘 → 실제로는 미래를 알 수 없음</td><td>앞 기간으로 훈련, 뒤 기간으로 시험</td></tr>
+          <tr><td>시험 성적을 보며 모형을 계속 고침</td><td>시험 자료에 맞춰 모형을 고르게 됨 → 시험 자료가 더는 처음 보는 자료가 아님</td><td>훈련 자료 안에서 검증 자료(교차검증)로 고르고 시험은 마지막에 한 번</td></tr>
+          <tr><td>나누기 전에 전체 자료로 평균 · 표준화를 계산</td><td>시험 자료의 값이 훈련 자료의 변수에 섞임</td><td>나눈 뒤 훈련 자료로만 계산해 시험 자료에 적용</td></tr>
         </tbody>
       </table>
-      <div class="cols" style="margin-top:10px">
+      <div class="cols" style="margin-top:8px">
         <div class="col-l" style="flex:0 0 46%">
           <table class="tbl" style="font-size:13px">
             <thead><tr><th style="width:40%">세종 시험 R²</th><th class="r">거래 무작위</th><th class="r">단지 단위</th></tr></thead>
@@ -327,37 +317,36 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
           </table>
         </div>
         <div class="col-r">
-          <p class="conclusion" style="margin-top:0"><span class="ar">→</span> 네 가지 모두 성적을 <span class="hl">실제보다 좋게</span> 만듦</p>
-          <p class="caption">단지 단위: 133개 단지 중 27개(4,672건)를 통째로 시험 자료로. 「새 단지는 얼마일까」에 맞는 점수</p>
+          <p class="conclusion" style="margin-top:0">단지 단위: 133개 단지 중 27개(4,672건)를 통째로 시험 자료로<br>
+            <span class="ar">→</span> 「새 단지는 얼마일까」에 맞는 점수는 .728</p>
         </div>
       </div>
-      <p class="src">출처: 옛 11강 「검증을 망치는 방법들」에 세종 결과를 더함</p>
     </div>
   </section>
 
   <section>
-    <h2>분류와 회귀에 쓰는 모형들</h2>
+    <h2>분류와 회귀에 쓰는 모형</h2>
     <div class="body tight">
-      <table class="tbl" style="font-size:13px">
-        <thead><tr><th style="width:22%">모형</th><th class="r" style="width:8%">회귀</th><th class="r" style="width:8%">분류</th><th>한 줄 설명</th></tr></thead>
+      <table class="tbl" style="font-size:12.5px">
+        <thead><tr><th style="width:31%">모형</th><th class="r" style="width:7%">회귀</th><th class="r" style="width:7%">분류</th><th style="padding-left:12px">한 줄 설명</th></tr></thead>
         <tbody>
-          <tr><td><strong>선형회귀</strong></td><td class="r">●</td><td class="r"></td><td>회귀의 대표. 직선(평면)으로 맞춤</td></tr>
-          <tr><td><strong>로지스틱 회귀</strong></td><td class="r"></td><td class="r">●</td><td>분류의 대표. 로짓을 직선으로 맞춤</td></tr>
-          <tr><td>릿지 · 라쏘</td><td class="r">●</td><td class="r">●</td><td>계수에 벌점 · 라쏘는 쓸모없는 변수를 0으로</td></tr>
-          <tr><td>K-최근접 이웃</td><td class="r">●</td><td class="r">●</td><td>가장 닮은 K 개 사례의 평균 · 다수결</td></tr>
-          <tr><td>서포트 벡터 머신</td><td class="r">●</td><td class="r">●</td><td>두 범주 사이 여백이 가장 넓은 경계</td></tr>
-          <tr><td><strong>의사결정나무</strong></td><td class="r">●</td><td class="r">●</td><td class="y">예/아니오 질문을 이어 붙여 자료를 나눔</td></tr>
-          <tr><td><strong>랜덤포레스트</strong></td><td class="r">●</td><td class="r">●</td><td class="y">나무 여러 그루의 평균 · 다수결</td></tr>
-          <tr><td>그래디언트 부스팅</td><td class="r">●</td><td class="r">●</td><td>앞 나무가 틀린 만큼을 다음 나무가 고침 (XGBoost · LightGBM)</td></tr>
-          <tr><td>신경망</td><td class="r">●</td><td class="r">●</td><td>층을 쌓아 복잡한 관계 학습 · 자료가 아주 많을 때</td></tr>
+          <tr><td><strong>선형회귀</strong> (linear regression)</td><td class="r">●</td><td class="r"></td><td style="padding-left:12px">회귀의 대표. 직선(평면)으로 맞춤</td></tr>
+          <tr><td><strong>로지스틱 회귀</strong> (logistic regression)</td><td class="r"></td><td class="r">●</td><td style="padding-left:12px">분류의 대표. 로짓을 직선으로 맞춤</td></tr>
+          <tr><td>릿지 · 라쏘 (ridge · lasso)</td><td class="r">●</td><td class="r">●</td><td style="padding-left:12px">계수에 벌점 · 라쏘는 쓸모없는 변수를 0으로</td></tr>
+          <tr><td>K-최근접 이웃 (k-nearest neighbors)</td><td class="r">●</td><td class="r">●</td><td style="padding-left:12px">가장 닮은 K 개 사례의 평균 · 다수결</td></tr>
+          <tr><td>서포트 벡터 머신 (support vector machine)</td><td class="r">●</td><td class="r">●</td><td style="padding-left:12px">두 범주 사이 여백이 가장 넓은 경계</td></tr>
+          <tr><td><strong>의사결정나무</strong> (decision tree)</td><td class="r">●</td><td class="r">●</td><td class="y" style="padding-left:12px">예/아니오 질문을 이어 붙여 자료를 나눔</td></tr>
+          <tr><td><strong>랜덤포레스트</strong> (random forest)</td><td class="r">●</td><td class="r">●</td><td class="y" style="padding-left:12px">의사결정나무 여러 그루의 평균 · 다수결</td></tr>
+          <tr><td>그래디언트 부스팅 (gradient boosting)</td><td class="r">●</td><td class="r">●</td><td style="padding-left:12px">앞 나무가 틀린 만큼을 다음 나무가 고침 (XGBoost · LightGBM)</td></tr>
+          <tr><td>신경망 (neural network)</td><td class="r">●</td><td class="r">●</td><td style="padding-left:12px">층을 쌓아 복잡한 관계 학습 · 자료가 아주 많을 때</td></tr>
         </tbody>
       </table>
-      <p class="conclusion"><span class="ar">→</span> 실습: 회귀 · 분류 모두 되고 손질이 적은 <span class="hl">랜덤포레스트</span></p>
+      <p class="conclusion">실습 모형: 회귀 · 분류 모두 되고 손질이 적은 모형<br><span class="ar">→</span> <span class="hl">랜덤포레스트</span></p>
     </div>
   </section>
 
   <section>
-    <h2>비지도학습 ①: 군집 (7강에서 실습)</h2>
+    <h2>비지도학습 ①: 군집 <span class="en" style="font-size:22px">clustering</span></h2>
     <div class="body">
       <p class="define">y 없이 닮은 것끼리 묶어 자료의 구조를 찾음</p>
       <div class="cols" style="margin-top:8px">
@@ -370,12 +359,12 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
           <ul class="defs"><li>가장 가까운 둘부터 차례로 합침</li><li>덴드로그램을 잘라 묶음 수 결정</li></ul>
         </div>
       </div>
-      <p class="conclusion"><span class="ar">→</span> 분류: 정답 범주가 있음 · 군집: 범주 자체를 자료에서 만듦</p>
+      <p class="conclusion">분류: 정답 범주가 있음<br>군집: 범주 자체를 자료에서 만듦</p>
     </div>
   </section>
 
   <section class="s-split" data-step="pca">
-    <h2>비지도학습 ②: 주성분분석으로 차원을 줄인다</h2>
+    <h2>비지도학습 ②: 주성분분석 <span class="en" style="font-size:22px">PCA</span></h2>
     <div class="body tight">
       <div class="col-l" style="flex:0 0 42%">
         <p class="define">겹친 정보를 담은 여러 변수 → 적은 수의 새 축</p>
@@ -384,7 +373,7 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
           <li class="fragment"><strong>투영:</strong> 점을 그 축에 내림 → 두 변수가 하나로 (축과 수직인 짧은 퍼짐만 잃음)</li>
           <li><strong>설명분산:</strong> 주성분마다 원래 분산의 몇 % 를 담나 → 남길 개수 결정</li>
         </ul>
-        <p class="conclusion"><span class="ar">→</span> 쓰임: 예측 전 변수 줄이기 · 지수 만들기 (예: 쇠퇴지수)</p>
+        <p class="conclusion">쓰임: 예측 전 변수 줄이기 · 지수 만들기 (예: 쇠퇴지수)</p>
       </div>
       <div class="col-r">
         <svg class="fig" id="f-pca" viewBox="0 0 420 300" style="width:420px" role="img">
@@ -402,10 +391,10 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section class="s-split" data-step="tree">
     <p class="mth">의사결정나무</p>
-    <h2>의사결정나무: 질문을 이어 붙인다</h2>
+    <h2>의사결정나무 <span class="en" style="font-size:22px">decision tree</span></h2>
     <div class="body tight">
       <div class="col-l" style="flex:0 0 37%">
-        <p class="define">질문 하나로 둘로 나누고, 칸마다 평균을 예측값으로</p>
+        <p class="define">질문 하나로 둘로 나누고,<br>칸마다 평균을 예측값으로</p>
         <ul class="defs" style="font-size:14px">
           <li class="fragment">질문 1: 건물 나이 ≤ 8.5년?</li>
           <li class="fragment">질문 2: (새 아파트) 2020년 6월 이후 계약?</li>
@@ -424,18 +413,22 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section class="s-split">
     <p class="mth">의사결정나무</p>
-    <h2>나무는 오차가 가장 많이 줄어드는 질문을 고른다</h2>
+    <h2>분기 기준</h2>
     <div class="body tight">
-      <div class="col-l" style="flex:0 0 40%">
-        <ul class="defs">
-          <li><strong>후보:</strong> 모든 변수 × 모든 기준값</li>
-          <li><strong>기준:</strong>
-            <ul class="dash"><li>회귀 나무: 두 묶음의 제곱오차 합 감소</li>
-              <li>분류 나무: 지니 불순도 감소</li></ul></li>
-          <li><strong>반복:</strong> 나뉜 칸마다 같은 방법으로 다음 질문</li>
-        </ul>
-        <p class="conclusion"><span class="ar">→</span> 세종: 나이 8.5년에서 감소율 최대 (22.2%) → 첫 질문</p>
-        <div class="acc-ctl" style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="define">오차가 가장 많이 줄어드는 질문을 고름</p>
+        <ol class="dense" style="font-size:14px;line-height:1.5;padding-left:1.3em">
+          <li style="margin-bottom:3px"><strong>질문 후보:</strong> 변수 하나 × 기준값 하나 (예: 나이 ≤ 8.5년?)</li>
+          <li style="margin-bottom:3px"><strong>나누기:</strong> 예 · 아니오 두 묶음, 묶음마다 평균을 예측값으로</li>
+          <li style="margin-bottom:3px"><strong>채점:</strong> 두 묶음의 제곱오차 합이 나누기 전보다 몇 % 줄었나
+            <ul class="dash" style="margin:1px 0 0;padding-left:1.2em"><li style="font-size:13px">분류 나무는 제곱오차 대신 지니 불순도</li></ul></li>
+          <li style="margin-bottom:3px"><strong>고르기:</strong> 모든 변수 × 모든 기준값을 채점해 감소가 가장 큰 질문</li>
+          <li style="margin-bottom:3px"><strong>반복:</strong> 나뉜 칸마다 1~4를 다시 · 정한 깊이나 잎 크기에서 멈춤</li>
+        </ol>
+        <p class="conclusion">세종 첫 질문: 나이 ≤ 8.5년<br>
+          13,061건(평균 521) 대 2,425건(평균 249)<br>
+          감소 22.2% 로 최대</p>
+        <div class="acc-ctl" style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px">
           <span>기준값</span><input type="range" id="cut-s" min="0" max="24" value="8" style="flex:1;accent-color:#A02948"><span id="cut-v" class="num">8.5년</span>
         </div>
       </div>
@@ -448,20 +441,25 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section class="s-split">
     <p class="mth">의사결정나무</p>
-    <h2>과적합: 복잡해지면 훈련 자료를 외운다</h2>
+    <h2>과적합 <span class="en" style="font-size:22px">overfitting</span></h2>
     <div class="body tight">
-      <div class="col-l" style="flex:0 0 42%">
-        <p class="define">자료의 규칙뿐 아니라 우연까지 따라 그려 새 자료에서 빗나가는 것</p>
-        <ul class="defs">
-          <li><strong>복잡도:</strong> 모형이 자료에 맞춰 조정할 수 있는 정도 (나무의 깊이 · 변수 수 · 다항식 차수)</li>
-          <li><strong>훈련 오차:</strong> 복잡도↑ → 계속 감소</li>
-          <li><strong>시험 오차:</strong> 어느 지점부터 감소 멈춤 · 다시 증가</li>
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="define">자료의 규칙뿐 아니라 우연까지 따라 그려<br>새 자료에서 빗나가는 것</p>
+        <ul class="defs" style="font-size:15px">
+          <li><strong>복잡도:</strong> 자료에 맞춰 조정할 수 있는 정도 (깊이 · 변수 수)</li>
+          <li><strong>판단:</strong>
+            <ul class="dash"><li>훈련 성적이 시험 성적보다 크게 좋음 (격차가 벌어짐)</li>
+              <li>복잡도를 올려도 시험 오차가 줄지 않거나 다시 늘어남</li></ul></li>
+          <li><strong>극복:</strong>
+            <ul class="dash"><li>복잡도 제한: 최대 깊이 · 잎의 최소 거래 수</li>
+              <li>검증 자료(교차검증)의 오차로 복잡도를 고름</li>
+              <li>여러 모형의 평균 (랜덤포레스트) · 자료 늘리기</li></ul></li>
         </ul>
-        <p class="conclusion"><span class="ar">→</span> 세종 나무: 훈련 R² → .996 · 시험 R² 는 깊이 15 근처 .86 에서 멈춤</p>
-        <p class="conclusion"><span class="ar">→</span> 복잡도는 <span class="hl">시험(검증) 오차로</span> 고름. 훈련 R² 로 고르면 과적합 모형이 뽑힘</p>
+        <p class="conclusion">세종 나무: 훈련 R² → .996<br>시험 R² 는 깊이 15 근처 .86 에서 멈춤<br>
+          <span class="ar">→</span> 훈련 R² 로 고르면 과적합 모형이 뽑힘</p>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-depth" viewBox="0 0 460 290" style="width:460px" role="img">
+        <svg class="fig" id="f-depth" viewBox="0 0 460 290" style="width:440px" role="img">
           <title>나무 깊이별 훈련 R²와 시험 R²</title></svg>
       </div>
     </div>
@@ -469,42 +467,79 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section data-step="forest">
     <p class="mth">랜덤포레스트</p>
-    <h2>랜덤포레스트: 다르게 자란 나무들의 평균</h2>
+    <h2>랜덤포레스트 <span class="en" style="font-size:22px">random forest</span></h2>
     <div class="body tight">
+      <p class="define">다르게 자란 의사결정나무들의 평균</p>
       <p class="emph" style="margin-bottom:4px">
         <span class="fragment" data-fragment-index="1">① 부트스트랩: 표본을 복원추출로 다시 뽑음 (한 그루가 보는 거래 ≈ 63%) </span>
         <span class="fragment" data-fragment-index="2">② 질문마다 변수 일부만 후보로 </span>
         <span class="fragment" data-fragment-index="3">③ 예측을 평균</span></p>
-      <svg class="fig" id="f-forest" viewBox="0 0 848 290" style="width:848px" role="img">
+      <svg class="fig" id="f-forest" viewBox="0 0 848 290" style="width:760px;display:block;margin:0 auto" role="img">
         <title>부트스트랩 표본과 변수 부분집합으로 자란 나무 세 그루, 그리고 예측의 평균</title></svg>
       <p class="caption">예시 거래: 신도시 · 나이 5년 · 85㎡ · 10층 · 2020년 7월 계약 · 나무는 깊이 2, 변수 후보 둘 (실제 숲은 300그루, 깊게)</p>
+      <p class="caption fragment" data-fragment-index="1" style="margin-top:2px"><strong>63% 는 정한 값이 아님:</strong> n건에서 n번 복원추출하면 한 거래가 끝내 안 뽑힐 확률 (1 − 1/n)ⁿ ≈ 1/e = 36.8% → 뽑히는 비율 63.2% (세종 훈련 12,388건에서도 63.2%)</p>
     </div>
   </section>
 
   <section class="s-split">
     <p class="mth">랜덤포레스트</p>
-    <h2>나무를 늘리면 예측이 안정된다</h2>
+    <h2>랜덤포레스트의 주요 파라미터</h2>
     <div class="body tight">
-      <div class="col-l" style="flex:0 0 40%">
-        <ul class="defs">
-          <li><strong>1그루:</strong> 시험 R² .811</li>
-          <li><strong>10그루:</strong> .887</li>
-          <li><strong>50그루 이후:</strong> .896 에서 멈춤</li>
-        </ul>
-        <p class="conclusion"><span class="ar">→</span> 나무마다 틀리는 방향이 다름 → 평균하면 오차가 상쇄</p>
-        <p class="caption" style="margin-top:6px">OOB: 부트스트랩에서 빠진 37% 로 각 나무를 채점 → 시험 자료 없이 성능 가늠 (R² .897)</p>
+      <div class="col-l" style="flex:0 0 61%">
+        <p class="define">나무 수는 늘려도 과적합되지 않음. 과적합은 깊이와 잎 크기가 좌우</p>
+        <table class="tbl" style="font-size:12.5px">
+          <thead><tr><th style="width:27%">파라미터</th><th style="width:33%">뜻</th><th>세종 시험 R²</th></tr></thead>
+          <tbody>
+            <tr><td><strong>나무 수</strong><br><span class="code">n_estimators</span></td><td>평균할 나무의 수 · 늘리면 계산 시간만 늘어남</td><td>1그루 .811 · 10그루 .887 · 50그루 이후 .896 에서 멈춤</td></tr>
+            <tr><td><strong>최대 깊이</strong><br><span class="code">max_depth</span></td><td>질문을 몇 번까지 이어 붙이나</td><td>2 → .550 · 8 → .835 · 15 → .891 · 제한 없음 .895</td></tr>
+            <tr><td><strong>잎의 최소 거래 수</strong><br><span class="code">min_samples_leaf</span></td><td>마지막 칸에 남겨야 할 거래 수 · 클수록 단순</td><td>1 → .916 · 5 → .895 · 50 → .823 · 200 → .765</td></tr>
+            <tr><td><strong>질문마다 볼 변수 비율</strong><br><span class="code">max_features</span></td><td>작을수록 나무끼리 덜 닮음</td><td>0.2 → .858 · 0.6 → .895 · 1.0 → .896</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:4px">나무 수 외의 줄은 나무 100그루로 하나씩만 바꿔 계산 · 실습 기본값: 300그루 · 깊이 제한 없음 · 잎 5 · 변수 0.6</p>
+        <p class="conclusion">파라미터는 시험 자료가 아니라 검증 자료(OOB · 교차검증)로 고름</p>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-ntree" viewBox="0 0 450 280" style="width:450px" role="img">
+        <svg class="fig" id="f-ntree" viewBox="0 0 450 280" style="width:330px" role="img">
           <title>나무 수에 따른 시험 R²</title></svg>
+        <p class="caption">OOB: 부트스트랩에서 빠진 37% 로 각 나무를 채점 → 시험 자료 없이 성능 가늠 (R² .897)</p>
       </div>
     </div>
   </section>
 
   <section>
     <p class="mth">랜덤포레스트</p>
-    <h2>회귀와 분류에서 숲과 통계 모형을 견준다</h2>
+    <h2>실습 ①: 랜덤포레스트</h2>
     <div class="body tight">
+      <p class="define">자료: <span class="code">세종_아파트_회귀자료.csv</span> (9강에 받은 15,486건) · 프롬프트를 그대로 입력</p>
+      <div class="cols">
+        <div class="col-l" style="flex:0 0 58%">
+        <div class="prompt-box" style="font-size:13.5px">
+          <p class="who">분석 프롬프트</p>
+          <p>per(㎡당 가격)를 new · age · area · floor 와 계약 시점으로 예측해 줘. 계약 시점은 계약년월로 다시 만들어 줘 (2017년 1월 = 0, 한 달 = 1/12).</p>
+          <p>거래를 80:20 으로 나누고(random_state 10), 선형회귀와 랜덤포레스트(나무 300, min_samples_leaf 5, max_features 0.6)의 훈련·시험 R² · RMSE · MAE · MAPE 를 표로 비교해 줘.</p>
+          <p>㎡당 가격이 중앙값을 넘는지를 같은 변수로 로지스틱 회귀와 랜덤포레스트로 맞히고 정분류율과 AUC 를 비교해 줘.</p>
+        </div>
+        </div>
+        <div class="col-r fragment">
+          <p class="sub t-red" style="margin-bottom:2px">확인할 값</p>
+          <ul class="defs" style="font-size:14px">
+          <li>훈련 12,388건 · 시험 3,098건</li>
+          <li>시험 R²: 선형 .545 · 숲 .895</li>
+          <li>시험 RMSE: 142.5 · 68.3<br>MAPE: 26.1% · 8.4%</li>
+          <li>분류: 정분류율 78.2% · 93.1%<br>AUC .875 · .982</li>
+          </ul>
+          <p class="caption" style="margin-top:6px">숲은 무작위라 셋째 자리가 다를 수 있음</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="mth">랜덤포레스트</p>
+    <h2>랜덤포레스트와 통계 모형의 성능 비교</h2>
+    <div class="body tight">
+      <p class="define">같은 다섯 변수 · 같은 분할에서 숲이 회귀와 분류 모두 우세</p>
       <div class="cols">
         <div class="col-l">
           <p class="sub t-red">회귀: ㎡당 가격</p>
@@ -512,8 +547,8 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
             <thead><tr><th style="width:36%">모형</th><th class="r">훈련 R²</th><th class="r">시험 R²</th><th class="r">시험 RMSE</th></tr></thead>
             <tbody>
               <tr><td>선형회귀</td><td class="r">.558</td><td class="r">.545</td><td class="r">142.5</td></tr>
-              <tr><td>나무 (깊이 4)</td><td class="r">.734</td><td class="r">.727</td><td class="r">110.4</td></tr>
-              <tr><td>나무 (끝까지)</td><td class="r">.996</td><td class="r">.856</td><td class="r">80.2</td></tr>
+              <tr><td>의사결정나무 (깊이 4)</td><td class="r">.734</td><td class="r">.727</td><td class="r">110.4</td></tr>
+              <tr><td>의사결정나무 (끝까지)</td><td class="r">.996</td><td class="r">.856</td><td class="r">80.2</td></tr>
               <tr><td>랜덤포레스트</td><td class="r">.933</td><td class="r y">.895</td><td class="r y">68.3</td></tr>
             </tbody>
           </table>
@@ -530,8 +565,33 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
           <p class="caption" style="margin-top:6px">AUC: ROC 곡선(1−특이도 대 민감도) 아래 넓이 · 0.7 이상 수용 가능</p>
         </div>
       </div>
-      <p class="conclusion"><span class="ar">→</span> 같은 다섯 변수 · 같은 분할에서 숲이 회귀·분류 모두 우세</p>
       <p class="caption">시험 자료 3,098건 · 거래 무작위 분할 기준</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="mth">랜덤포레스트</p>
+    <h2>실습 ②: 단지 단위 검증</h2>
+    <div class="body tight">
+      <p class="define">자료: <span class="code">세종_아파트_회귀자료.csv</span> (9강에 받은 15,486건) · 프롬프트를 그대로 입력</p>
+      <div class="cols">
+        <div class="col-l" style="flex:0 0 58%">
+        <div class="prompt-box" style="font-size:13.5px">
+          <p class="who">분석 프롬프트</p>
+          <p>같은 단지(complex)가 훈련과 시험에 나뉘지 않게 단지 단위로 80:20 을 나눠 줘.</p>
+          <p>실습 ①과 같은 선형회귀와 랜덤포레스트를 다시 채점하고, 거래 무작위 분할의 시험 R² 와 나란히 표로 보여 줘.</p>
+          <p>두 분할에서 점수가 왜 다른지 세 줄로 설명해 줘.</p>
+        </div>
+        </div>
+        <div class="col-r fragment">
+          <p class="sub t-red" style="margin-bottom:2px">확인할 값</p>
+          <ul class="defs" style="font-size:14px">
+          <li>단지 단위 시험 R²: 선형 .4 근처 · 숲 .7 근처</li>
+          <li>거래 무작위: 선형 .545 · 숲 .895</li>
+          </ul>
+          <p class="caption" style="margin-top:6px">단지를 어떻게 뽑느냐에 따라 값이 달라짐</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -541,22 +601,52 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
     <p class="section-sub">숲에는 계수가 없음. 어떤 변수가 얼마나 작용했는지 어떻게 아는가</p>
   </section>
 
+  <section>
+    <p class="mth">설명가능한 AI</p>
+    <h2>실습 ③: 숲 들여다보기</h2>
+    <div class="body tight">
+      <p class="define">자료: <span class="code">세종_아파트_회귀자료.csv</span> (9강에 받은 15,486건) · 프롬프트를 그대로 입력</p>
+      <div class="cols">
+        <div class="col-l" style="flex:0 0 58%">
+        <div class="prompt-box" style="font-size:13.5px">
+          <p class="who">분석 프롬프트</p>
+          <p>실습 ①의 회귀 숲으로 불순도 중요도와 순열 중요도를 막대그래프로 그려 줘.</p>
+          <p>시험 자료 400건으로 SHAP 요약 그림과 건물 나이(age)의 의존 그림을 그려 줘.</p>
+          <p>2017년 7월 계약 · 신도시 · 나이 2년 · 99.9㎡ · 11층 거래 하나의 폭포 그림을 그리고, 같은 거래를 선형회귀 계수 × (값 − 평균)으로 나눈 몫과 표로 견줘 줘.</p>
+          <p>그림마다 무엇이 보이는지 세 줄로 설명해 줘.</p>
+        </div>
+        </div>
+        <div class="col-r fragment">
+          <p class="sub t-red" style="margin-bottom:2px">확인할 값</p>
+          <ul class="defs" style="font-size:14px">
+          <li>중요도: 계약 시점 &gt; 신도시 &gt; 건물 나이 &gt; 면적 &gt; 층</li>
+          <li>의존 그림: 3년 이하 +100 안팎 → 4~5년에 급락</li>
+          <li>폭포: 평균 예측 479 → 예측 357 근처 (실제 358.2)</li>
+          <li>면적의 몫: 숲 − · 회귀 +</li>
+          </ul>
+          <p class="caption" style="margin-top:6px">값이 다르면 프롬프트를 고치기 전에 어떤 계산을 했는지부터 물음</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="s-split">
     <p class="mth">설명가능한 AI</p>
-    <h2>변수 중요도: 어느 변수가 많이 쓰였나</h2>
+    <h2>변수 중요도 <span class="en" style="font-size:22px">feature importance</span></h2>
     <div class="body tight">
-      <div class="col-l" style="flex:0 0 42%">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="define">어느 변수가 예측에 많이 쓰였나</p>
         <ul class="defs">
-          <li><strong>불순도 감소(MDI):</strong> 그 변수로 나눌 때 줄어든 오차를 모든 나무에서 합산</li>
-          <li><strong>순열 중요도:</strong> 그 변수 값만 섞었을 때 예측이 나빠지는 정도</li>
+          <li><strong>불순도 감소*</strong> (mean decrease in impurity, MDI)
+            <ul class="dash"><li>그 변수로 나눌 때 줄어든 불순도를 모든 나무에서 합산</li></ul></li>
+          <li><strong>순열 중요도</strong> (permutation importance)
+            <ul class="dash"><li>그 변수 값만 무작위로 섞었을 때 예측이 나빠지는 정도</li></ul></li>
         </ul>
-        <p class="conclusion"><span class="ar">→</span> 세종: 계약 시점 &gt; 신도시 &gt; 건물 나이 &gt; 면적 &gt; 층</p>
-        <ul class="defs" style="margin-top:8px">
-          <li><strong>한계:</strong>
-            <ul class="dash"><li>방향을 알려 주지 않음 (나이가 많으면 비싼가 싼가?)</li>
-              <li>상관이 높은 변수가 들어오면 크게 흔들림</li></ul></li>
+        <p class="caption" style="margin-top:4px">* 불순도(impurity): 한 칸 안의 값이 서로 섞인 정도. 회귀 나무는 칸 안의 제곱오차, 분류 나무는 지니 지수. 질문으로 칸을 나눌 때 줄어든 만큼이 그 변수의 몫</p>
+        <p class="conclusion">세종: 계약 시점 &gt; 신도시 &gt; 건물 나이 &gt; 면적 &gt; 층</p>
+        <ul class="defs" style="margin-top:6px">
+          <li><strong>한계:</strong> 방향을 알려 주지 않음 · 상관 높은 변수가 있으면 흔들림</li>
         </ul>
-        <p class="src">출처: 설명가능한 AI p.5, 발제논문 1 p.8 (2024-2 머신러닝 이론과 실습)</p>
       </div>
       <div class="col-r">
         <svg class="fig" id="f-imp" viewBox="0 0 420 270" style="width:420px" role="img">
@@ -565,23 +655,79 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
     </div>
   </section>
 
-  <section class="s-split" data-step="wf">
+  <section class="s-split">
     <p class="mth">설명가능한 AI</p>
-    <h2>섀플리 값: 예측을 변수마다 공정하게 나눈다</h2>
+    <h2>섀플리 값 <span class="en" style="font-size:22px">Shapley value</span></h2>
     <div class="body tight">
-      <div class="col-l" style="flex:0 0 40%">
-        <p class="define">예측값 = 평균 예측 + 변수별 몫(SHAP 값)</p>
-        <ul class="defs" style="font-size:14px">
-          <li><strong>출발:</strong> 게임이론 · 함께 번 이익을 기여만큼 배분</li>
-          <li><strong>효율성:</strong> 몫의 합 = 예측값</li>
-          <li><strong>더미:</strong> 기여하지 않은 변수의 몫 = 0</li>
-          <li><strong>대칭성:</strong> 기여가 같으면 몫도 같음</li>
+      <div class="col-l" style="flex:0 0 47%">
+        <p class="define">여럿이 함께 낸 성과를<br>각자의 기여만큼 나누는 게임이론의 방법</p>
+        <ul class="defs" style="font-size:15px">
+          <li><strong>게임 → 모형:</strong> 경기자 = 변수 · 성과 = 예측값 − 평균 예측</li>
+          <li><strong>기여:</strong> 그 변수가 들어오기 전과 후의 예측 차이 (한계기여)</li>
+          <li><strong>문제:</strong> 한계기여가 들어오는 순서에 따라 달라짐</li>
+          <li><strong>해법:</strong> 가능한 모든 순서의 한계기여를 평균 = 섀플리 값</li>
         </ul>
-        <p class="conclusion fragment"><span class="ar">→</span> 이 거래: 평균 479 → 계약 시점 <span class="hl">−173</span> (2017년 7월, 상승 전 계약) → 예측 357</p>
-        <p class="src">출처: 설명가능한 AI p.17·19</p>
+        <p class="sub t-red" style="margin:8px 0 2px">네 가지 성질</p>
+        <ul class="defs" style="font-size:14px">
+          <li><strong>효율성:</strong> 모든 변수의 몫의 합 = 성과 전체</li>
+          <li><strong>더미:</strong> 어떤 순서에서도 기여 없는 변수의 몫 = 0</li>
+          <li><strong>대칭성:</strong> 기여가 같은 두 변수의 몫은 같음</li>
+          <li><strong>가법성:</strong> 두 게임의 몫은 더할 수 있음 (나무마다의 몫 → 숲의 몫)</li>
+        </ul>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-wf" viewBox="0 0 450 290" style="width:450px" role="img">
+        <p class="sub t-red" style="margin-bottom:2px">두 변수 예시 (가상 숫자)</p>
+        <table class="tbl" style="font-size:13px">
+          <thead><tr><th style="width:42%">들어간 변수</th><th class="r">예측 − 평균</th></tr></thead>
+          <tbody>
+            <tr><td>없음</td><td class="r">0</td></tr>
+            <tr><td>신도시만</td><td class="r">+60</td></tr>
+            <tr><td>계약 시점만</td><td class="r">−150</td></tr>
+            <tr><td>둘 다</td><td class="r">−120</td></tr>
+          </tbody>
+        </table>
+        <table class="tbl" style="font-size:13px;margin-top:8px">
+          <thead><tr><th style="width:24%">순서</th><th class="r" style="width:40%">신도시의 기여</th><th class="r">시점의 기여</th></tr></thead>
+          <tbody>
+            <tr><td>신도시 → 시점</td><td class="r">60 − 0 = +60</td><td class="r">−120 − 60 = −180</td></tr>
+            <tr><td>시점 → 신도시</td><td class="r">−120 − (−150) = +30</td><td class="r">−150 − 0 = −150</td></tr>
+            <tr><td><strong>평균 (섀플리 값)</strong></td><td class="r y">+45</td><td class="r y">−165</td></tr>
+          </tbody>
+        </table>
+        <p class="conclusion">+45 + (−165) = −120 = 둘 다 들어간 성과<br><span class="ar">→</span> 효율성</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="s-split" data-step="wf">
+    <p class="mth">설명가능한 AI</p>
+    <h2>SHAP <span class="en" style="font-size:22px">Shapley additive explanations</span></h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="define">예측값 = 평균 예측 + 변수별 섀플리 값(SHAP 값)</p>
+        <ul class="defs" style="font-size:14px">
+          <li><strong>지역 설명:</strong> 거래 한 건의 예측을 변수별 몫으로 나눔 (오른쪽)</li>
+          <li><strong>전역 설명:</strong> 모든 거래의 몫을 모으면 변수의 중요도와 방향</li>
+          <li><strong>계산:</strong> 나무 모형은 TreeExplainer 로 빠르게 정확히 계산</li>
+        </ul>
+        <p class="sub t-red" style="margin:8px 0 2px">같은 거래를 선형회귀로 나누면</p>
+        <table class="tbl" style="font-size:12.5px">
+          <thead><tr><th style="width:26%">변수 (값)</th><th class="r">SHAP (숲)</th><th class="r">회귀 몫*</th></tr></thead>
+          <tbody>
+            <tr><td>계약 시점 (2017.7)</td><td class="r">−172.5</td><td class="r">−155.9</td></tr>
+            <tr><td>신도시 (예)</td><td class="r">+36.8</td><td class="r">+33.1</td></tr>
+            <tr><td>건물 나이 (2년)</td><td class="r">+30.4</td><td class="r">+44.8</td></tr>
+            <tr><td>전용면적 (99.9㎡)</td><td class="r y">−18.2</td><td class="r y">+5.8</td></tr>
+            <tr><td>층 (11층)</td><td class="r">+1.1</td><td class="r">+0.4</td></tr>
+            <tr><td><strong>예측 (실제 358.2)</strong></td><td class="r"><strong>357.0</strong></td><td class="r"><strong>407.5</strong></td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:3px">* 회귀 몫 = 계수 × (이 거래의 값 − 평균). 평균 예측은 둘 다 479</p>
+        <p class="conclusion fragment">시점이 끌어내린 몫은 두 모형이 비슷 · 면적은 부호가 반대<br>
+          <span class="ar">→</span> 숲은 「큰 면적은 ㎡당 가격이 낮은」 구간을 자료에서 찾음</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-wf" viewBox="0 0 450 290" style="width:430px" role="img">
           <title>거래 한 건의 SHAP 폭포 그림</title></svg>
         <p class="caption" id="wf-cap"></p>
       </div>
@@ -590,21 +736,27 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section class="s-split">
     <p class="mth">설명가능한 AI</p>
-    <h2>SHAP 요약 그림: 모든 거래의 몫을 한 장에</h2>
+    <h2>SHAP 요약 그림</h2>
     <div class="body tight">
-      <div class="col-l" style="flex:0 0 36%">
-        <ul class="defs" style="font-size:14px">
-          <li><strong>점:</strong> 거래 하나의 한 변수 몫</li>
-          <li><strong>색:</strong> 특성 값 큼 = 붉은색 · 작음 = 푸른색</li>
-          <li><strong>위치:</strong> 0 오른쪽 = 가격↑ · 왼쪽 = 가격↓</li>
-          <li><strong>순서:</strong> 평균 |SHAP| 큰 변수부터</li>
+      <div class="col-l" style="flex:0 0 41%">
+        <p class="define">모든 거래의 변수별 몫을 한 장에 모은 그림</p>
+        <ol class="dense" style="font-size:13.5px;line-height:1.5;padding-left:1.3em">
+          <li style="margin-bottom:3px"><strong>줄의 순서:</strong> 위일수록 평균 |SHAP| 이 큼 = 중요한 변수</li>
+          <li style="margin-bottom:3px"><strong>점 하나:</strong> 거래 하나에서 그 변수의 몫</li>
+          <li style="margin-bottom:3px"><strong>가로 위치:</strong> 예측을 올린(+) · 내린(−) 만원/㎡</li>
+          <li style="margin-bottom:3px"><strong>색:</strong> 그 변수의 값. 붉으면 큼 · 푸르면 작음</li>
+          <li style="margin-bottom:3px"><strong>색이 좌우로 갈림:</strong> 방향이 일정함</li>
+          <li style="margin-bottom:3px"><strong>퍼진 폭:</strong> 거래마다 영향의 크기가 다른 정도</li>
+        </ol>
+        <ul class="defs" style="font-size:14px;margin-top:4px">
+          <li><strong>계약 시점:</strong> 붉은 점(늦은 계약)이 오른쪽 → 가격↑</li>
+          <li><strong>신도시:</strong> 푸른 점(편입 읍면)이 −250 근처 → 큰 감소</li>
+          <li><strong>건물 나이:</strong> 푸른 점(새 아파트)이 오른쪽 → 가격↑</li>
         </ul>
-        <p class="conclusion"><span class="ar">→</span> 계약 시점: 늦을수록(붉음) 가격↑</p>
-        <p class="conclusion"><span class="ar">→</span> 건물 나이: 새것일수록(푸름) 가격↑</p>
-        <p class="src">읽는 법 출처: 설명가능한 AI p.20</p>
+        <p class="caption" style="margin-top:2px">중요도 순서는 회귀의 표준화계수와 면적 · 층만 바뀜</p>
       </div>
       <div class="col-r">
-        <svg class="fig" id="f-bee" viewBox="0 0 490 300" style="width:490px" role="img">
+        <svg class="fig" id="f-bee" viewBox="0 0 490 300" style="width:470px" role="img">
           <title>시험 자료 400건의 SHAP 요약 그림</title></svg>
       </div>
     </div>
@@ -612,16 +764,15 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section class="s-split" data-step="dep">
     <p class="mth">설명가능한 AI</p>
-    <h2>SHAP 의존 그림: 회귀계수가 보여 주지 못한 모양</h2>
+    <h2>SHAP 의존 그림</h2>
     <div class="body tight">
       <div class="col-l" style="flex:0 0 38%">
+        <p class="define">한 변수의 값에 따라 그 몫이 어떻게 바뀌나</p>
         <ul class="defs">
-          <li><strong>x 축:</strong> 건물 나이 · <strong>y 축:</strong> 나이의 몫</li>
-          <li>3년 이하 +100 안팎 → 4~5년에 급락 → 이후 완만히 감소</li>
-          <li class="fragment">선형회귀: 「1년에 −13.1만원」 직선 하나로 요약</li>
+          <li>3년 이하 +100 안팎<br>→ 4~5년에 급락 → 이후 완만히 감소</li>
+          <li class="fragment">선형회귀는 「1년에 −13.1만원」 직선 하나로 요약</li>
         </ul>
-        <p class="conclusion"><span class="ar">→</span> 숲은 계단 모양을 자료에서 찾음 · 직선은 그 모양을 놓침</p>
-        <p class="caption" style="margin-top:6px">갓 지은 아파트 = 대부분 신도시 · 늦은 거래 → 계단에 지역·시점 차이가 섞임</p>
+        <p class="conclusion">숲은 계단 모양을 자료에서 찾음<br><span class="ar">→</span> 직선은 그 모양을 놓침</p>
       </div>
       <div class="col-r">
         <svg class="fig" id="f-dep" viewBox="0 0 450 290" style="width:450px" role="img">
@@ -632,168 +783,67 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
 
   <section>
     <p class="mth">설명가능한 AI</p>
-    <h2>SHAP 값이 뜻하는 것과 뜻하지 않는 것</h2>
+    <h2>SHAP 해석의 주의점</h2>
     <div class="body">
-      <div class="cols">
-        <div class="col-l">
-          <p class="sub t-red">뜻하는 것</p>
-          <ul class="defs">
-            <li>이 <strong>모형</strong>이 이 예측에서 각 변수에 기댄 정도</li>
-            <li>거래 하나(지역) · 전체(전역)를 같은 단위로</li>
-            <li>방향과 모양</li>
-          </ul>
-        </div>
-        <div class="col-r">
-          <p class="sub t-red">뜻하지 않는 것</p>
-          <ul class="defs">
-            <li><strong>인과 X:</strong> 나이를 바꾸면 값이 그만큼 바뀐다는 뜻 아님</li>
-            <li>변수끼리 상관 ↑ → 몫이 쏠리거나 나뉨</li>
-            <li>모형이 틀리면 설명도 틀림 → 시험 점수 먼저</li>
-          </ul>
-        </div>
-      </div>
-      <p class="conclusion" style="margin-top:14px"><span class="ar">→</span> 예측은 숲 · 「왜」의 단서는 SHAP · 확인은 9강의 회귀</p>
-      <p class="src">출처: 설명가능한 AI p.21</p>
+      <p class="define">SHAP 값은 이 모형이 각 변수에 기댄 정도. 원인의 크기가 아님</p>
+      <ul class="defs" style="margin-top:8px">
+        <li><strong>인과 X:</strong> 나이를 바꾸면 가격이 그만큼 바뀐다는 뜻이 아님</li>
+        <li><strong>상관 높은 변수:</strong> 몫이 한쪽으로 쏠리거나 나뉨</li>
+        <li><strong>모형이 먼저:</strong> 시험 점수가 낮은 모형의 설명은 믿을 수 없음</li>
+      </ul>
+      <p class="conclusion" style="margin-top:14px">예측은 숲, 「왜」의 단서는 SHAP<br><span class="ar">→</span> 확인은 회귀분석으로</p>
     </div>
   </section>
 
-  <section class="s-section">
-    <div class="section-rule"></div>
-    <p class="section-label">예측을 증거로 쓰려면</p>
-    <p class="section-sub">점 하나가 아니라 범위로, 그리고 틀릴 조건까지</p>
-  </section>
-
+  <!-- 과제 1 (2026-11-16 교수 요청: 9강과 같이 강의노트를 위키에 넣고 문제를 푼다) -->
   <section>
-    <p class="mth">불확실성</p>
-    <h2>예측구간: 숫자 하나 대신 범위를 낸다</h2>
+    <h2>과제 1: AI 가 낸 문제 다섯 개를 푼다</h2>
     <div class="body tight">
-      <div class="cols">
-        <div class="col-l" style="flex:0 0 50%">
-          <p class="define">새로 관측될 값이 정한 확률로 들어갈 범위</p>
-          <ul class="defs">
-            <li><strong>점 예측:</strong> 예측값 하나</li>
-            <li><strong>신뢰구간과의 차이:</strong> 신뢰구간 = 평균·계수의 범위 · 예측구간 = 값 하나의 범위 (더 넓음)</li>
-            <li><strong>간단한 방법:</strong> 시험 잔차의 5% · 95% 분위를 예측값에 더함</li>
-          </ul>
-          <p class="conclusion"><span class="ar">→</span> 세종 숲: 예측 −91 ~ +119 만원/㎡ 가 90% 범위</p>
-        </div>
-        <div class="col-r">
-          <p class="sub t-red">같은 예측을 두 가지로 쓰면</p>
-          <ul class="defs" style="font-size:14px">
-            <li>㉠ 「이 거래는 ㎡당 357만원이다」</li>
-            <li>㉡ 「㎡당 357만원으로 예측. 시험 오차로 보면 266~476 만원 범위가 90%」</li>
-          </ul>
-          <p class="conclusion"><span class="ar">→</span> ㉠ 반박당하면 무너짐 · ㉡ 틀릴 수 있음까지 포함</p>
-          <p class="src">틀: 옛 12강 「예측구간」</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <p class="mth">불확실성</p>
-    <h2>구간이 담지 못하는 불확실성</h2>
-    <div class="body tight">
-      <table class="tbl" style="font-size:13.5px">
-        <thead><tr><th style="width:32%">종류</th><th>구간에 들어가나</th></tr></thead>
-        <tbody>
-          <tr><td>자료의 흩어짐</td><td>들어감 (예측구간이 측정하는 것)</td></tr>
-          <tr><td>계수·나무를 잘못 추정한 정도</td><td>들어감</td></tr>
-          <tr><td>모형을 잘못 고른 것</td><td class="y">안 들어감 · 모형이 틀리면 구간도 틀림</td></tr>
-          <tr><td>자료 밖의 대상 · 구조 변화</td><td class="y">안 들어감 · 새 단지, 정책 변화, 시장 급변</td></tr>
-        </tbody>
-      </table>
-      <p class="conclusion"><span class="ar">→</span> 세종: 90% 범위를 새 단지(단지 단위 시험)에 대 보면 <span class="hl">70.2%</span>만 들어감</p>
-      <p class="caption">아래 둘은 시나리오로 다룸 → 13강 처방적 분석</p>
-    </div>
-  </section>
-
-  <section>
-    <p class="mth">불확실성</p>
-    <h2>예측을 증거로 쓰는 조건</h2>
-    <div class="body">
-      <ol class="dense" style="font-size:16px">
-        <li>학습에 쓰지 않은 자료로 채점했는가 (묶음 · 시간 누수 없이)</li>
-        <li>복잡도를 시험(검증) 오차로 골랐는가</li>
-        <li>점이 아니라 범위로 말했는가</li>
-        <li>무엇이 어긋나면 틀리는지 적었는가</li>
+      <p class="define">10강 PDF 를 위키에 넣고, 그 내용으로 AI 가 낸 문제를 풂</p>
+      <ol class="steps" style="margin-top:6px">
+        <li><b>위키에 넣음:</b> 10강 PDF 를 위키에 넣고 정리하게 함</li>
+        <li><b>문제를 받음:</b> 머신러닝과 검증 · 의사결정나무 · 랜덤포레스트 · 설명가능한 AI 전체에 걸쳐 문제 다섯 개를 내 달라고 함</li>
+        <li><b>한 문제씩 풂:</b> 답하기 전에는 정답을 보여 주지 말라고 함. 답은 자기 말로</li>
+        <li><b>채점과 해설을 받음:</b> 채점이 이상하면 그 자리에서 따져 물음</li>
+        <li><b>약한 부분을 정리받음:</b> 다섯 문제가 끝나면</li>
       </ol>
-      <p class="conclusion" style="margin-top:16px"><span class="ar">→</span> 하나라도 빠지면 정책 근거로 쓸 수 없음</p>
-      <p class="src">출처: 옛 12강 「예측을 증거로 쓰는 조건」</p>
+      <p class="emph" style="margin-top:10px"><span class="hl">대화 전체가 제출물</span></p>
     </div>
   </section>
 
   <section>
-    <h2>실습: 랜덤포레스트와 SHAP</h2>
-    <div class="body tighter">
-      <div class="cols">
-        <div class="col-l" style="flex:0 0 50%">
-          <div class="prompt-box">
-            <p class="who">1. 회귀 숲</p>
-            <p>9강에서 정리한 세종 자료로 ㎡당 가격을 예측해 줘. 변수는 신도시 여부·건물 나이·전용면적·층·계약 시점(2017년 1월 = 0, 연 단위)이야.</p>
-            <p>거래를 80:20 으로 나누고(random_state 10), 선형회귀와 랜덤포레스트(나무 300, min_samples_leaf 5, max_features 0.6)의 훈련·시험 R²·RMSE·MAE·MAPE 를 표로 비교해 줘.</p>
-          </div>
-          <p class="caption" style="margin-top:4px"><strong>확인할 값:</strong> 시험 R² 선형 .545 · 숲 .895 · MAPE 26.1% · 8.4%</p>
-          <div class="prompt-box">
-            <p class="who">2. 분류 숲</p>
-            <p>㎡당 가격이 중앙값을 넘는지를 같은 변수로 로지스틱 회귀와 랜덤포레스트로 맞히고 정분류율과 AUC 를 비교해 줘.</p>
-          </div>
-          <p class="caption" style="margin-top:4px"><strong>확인할 값:</strong> AUC 로지스틱 .875 · 숲 .982</p>
-        </div>
-        <div class="col-r">
-          <div class="prompt-box">
-            <p class="who">3. 들여다보기</p>
-            <p>회귀 숲의 불순도 중요도와 순열 중요도를 그려 줘. 시험 자료 400건으로 SHAP 요약 그림, 건물 나이의 의존 그림, 거래 하나의 폭포 그림을 그리고 그림마다 무엇이 보이는지 세 줄로 설명해 줘.</p>
-          </div>
-          <div class="prompt-box">
-            <p class="who">4. 단지 단위 검증과 예측구간</p>
-            <p>같은 단지(시군구 + 단지명)가 훈련과 시험에 나뉘지 않게 단지 단위로 80:20 을 나눠 다시 채점해 줘. 무작위 분할의 시험 잔차로 90% 예측구간을 만들고, 그 구간에 단지 분할 시험 자료가 몇 % 들어가는지 알려 줘.</p>
-          </div>
-          <p class="caption" style="margin-top:4px"><strong>확인할 값:</strong> 숲 시험 R² .7 근처 · 구간 적중 약 70%</p>
-          <p class="caption" style="margin-top:4px">값의 출처: <span class="code">analysis/10-머신러닝/10-세종랜덤포레스트.py</span> · 숲은 무작위라 셋째 자리가 다를 수 있음</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2>과제: 숲으로 예측하고 SHAP 으로 읽는다</h2>
+    <h2>과제 2: 자기 연구대상의 랜덤포레스트</h2>
     <div class="body tight">
-      <div class="cols">
-        <div class="col-l" style="flex:0 0 52%">
-          <p class="sub t-red">1. 세종 실습 정리</p>
-          <ul class="defs">
-            <li>네 프롬프트 결과 ↔ 확인할 값 대조</li>
-            <li>SHAP 의존 그림 하나 ↔ 9강 회귀계수 비교</li>
-            <li>무작위 분할 vs 단지 분할 점수 차이 설명</li>
-          </ul>
-        </div>
-        <div class="col-r">
-          <p class="sub t-red">2. 자기 연구질문에 적용</p>
-          <ul class="defs">
-            <li>9강의 종속변수를 랜덤포레스트로 예측</li>
-            <li>통계 모형과 시험 점수 비교 (누수 없는 분할)</li>
-            <li>SHAP 요약 그림 · 예측구간 · 틀릴 조건</li>
-          </ul>
-        </div>
-      </div>
+      <p class="define">지난 과제의 회귀분석 문제를 랜덤포레스트로 다시 풀고 회귀분석과 견줌</p>
+      <ol class="dense" style="font-size:15px;line-height:1.55">
+        <li><strong>다시 풀기:</strong> 지난 과제와 같은 y · 같은 x 로 랜덤포레스트 (y 가 연속값이면 회귀, 범주면 분류)</li>
+        <li><strong>적합도 비교:</strong> 같은 훈련 · 시험 분할에서 회귀분석과 숲의 시험 성적
+          <ul class="dash"><li>회귀: R² · RMSE · MAPE · 분류: 정분류율 · AUC</li>
+            <li>묶음(지역 · 시설 · 사람)이 있으면 묶음 단위로 나눔</li></ul></li>
+        <li><strong>SHAP:</strong> 변수 중요도 · SHAP 요약 그림 · 중요한 변수의 의존 그림 하나</li>
+        <li><strong>해석:</strong> SHAP 결과를 회귀계수와 견줌
+          <ul class="dash"><li>중요도 순서 · 방향 · 모양이 같은가, 다르면 왜 다른가</li></ul></li>
+      </ol>
+      <p class="conclusion">실습 ① ~ ③ 의 프롬프트를 자기 자료의 열 이름으로 바꿔 쓰면 됨</p>
     </div>
   </section>
 
   <section>
     <h2>제출물</h2>
     <div class="body tight">
-      <p class="sub">두 과제를 <span class="hl">각각 별도 파일로</span> 제출</p>
+      <p class="sub">모두 md 파일로 제출</p>
       <ul>
-        <li><span class="code">세종랜덤포레스트.md</span>: 1번의 비교표 · 그림 · 설명</li>
-        <li><span class="code">자기데이터머신러닝.md</span>: 2번의 비교표 · SHAP 그림 · 예측구간 · 단서</li>
+        <li>과제 1: 대화록만 제출. <span class="code">10-과제1-대화록.md</span></li>
+        <li>과제 2: <span class="code">랜덤포레스트.md</span> + <span class="code">로직.md</span>
+          <ul class="dash"><li><span class="code">랜덤포레스트.md</span>: 적합도 비교표 · 변수 중요도와 SHAP 그림 · 회귀계수와의 비교 해석</li>
+            <li><span class="code">로직.md</span>: 분할 방법 · 파라미터를 고른 판단의 기록</li></ul></li>
       </ul>
       <p class="emph" style="margin-top:14px">제출기한: <span class="t-red">(미정)</span></p>
       <div class="doc" style="margin-top:10px">
         <div class="bar">데이터사이언스 과제 제출 — 한 학기 내내 같은 주소</div>
         <pre style="font-size:13px;line-height:1.9"><span class="h">docs.google.com/forms/d/e/1FAIpQLSc7AWYdgrGn1gKGoo7VkC6vsDZNXANo-CWokVjY2dm2pucIew/viewform</span></pre>
       </div>
-      <p class="caption" style="margin-top:8px">주차 선택에서 <span class="hl">10주차</span> 선택 · 학번 열 자리와 이름을 띄어쓰기 없이</p>
+      <p class="caption" style="margin-top:8px">주차 선택에서 <span class="hl">10강</span> 선택 · 학번 열 자리와 이름을 띄어쓰기 없이</p>
     </div>
   </section>
 
@@ -831,7 +881,7 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
     ln(212, 132, 112, 170); ln(212, 132, 312, 170); ln(636, 132, 536, 170); ln(636, 132, 736, 170);
     box(32, 170, 160, 110, '분류', 'y 가 범주\n로지스틱 회귀\n나무 · 숲 · SVM', '#FFFFFF', INK);
     box(232, 170, 160, 110, '회귀', 'y 가 연속값\n선형회귀\n나무 · 숲 · 부스팅', '#FFFFFF', INK);
-    box(456, 170, 160, 110, '군집', '닮은 것끼리 묶기\nK-means\n계층적 군집 (7강)', '#FFFFFF', INK);
+    box(456, 170, 160, 110, '군집', '닮은 것끼리 묶기\nK-means\n계층적 군집', '#FFFFFF', INK);
     box(656, 170, 160, 110, '차원축소', '변수를 몇 축으로\n주성분분석 (PCA)', '#FFFFFF', INK);
   }
 
@@ -1147,6 +1197,118 @@ window.ML = {"n":15486,"feat":["new","age","area","floor","t"],"ko":{"new":"신�
     el(lin1, 'line', { x1: X(0), y1: Y(y0), x2: X(xe), y2: Y(y0 + b * xe), stroke: BLUE, 'stroke-width': 2.4 });
     el(lin1, 'text', { class: 'an blue', x: X(12), y: Y(y0 + b * 12) + 22 }, `회귀 기울기 ${b.toFixed(1)}/년`);
     STEP.on('dep', (k) => lin1.setAttribute('opacity', k >= 1 ? 1 : 0));
+  }
+  /* ══ 2026-11-14 보탬 그림 ══ */
+  /* ── 지난 시간 인포그래픽 ── */
+  {
+    const svg = document.getElementById('f-recap');
+    const W = 200, X = [0, 216, 432, 648], H = 292;
+    const P = [
+      { n: '①', h: '회귀계수', s: '「다른 조건이 같다면」으로 읽음',
+        rows: [['신도시', '+193.2'], ['건물 나이 1년', '−13.6'], ['계약 시점 1년', '+88.3'], ['단위', '만원/㎡']],
+        foot: ['표준화계수: 시점 > 신도시', '> 나이 ≫ 층 · 면적'] },
+      { n: '②', h: '유의성', s: '계수가 0이 아니라고 말할 수 있는가',
+        rows: [['t = 계수 ÷ 표준오차', ''], ['|t| > 1.96 · p < .05', '유의'], ['F 검정', 'p < .001'], ['R²', '.548']],
+        foot: ['다섯 변수 모두 유의', '가격 변동의 55% 설명'] },
+      { n: '③', h: '회귀 가정', s: '이 모형을 믿어도 되는가',
+        rows: [['선형성 · 등분산성', '위배'], ['독립성 (단지 133개)', '위배'], ['정규성', '위배'], ['다중공선성 · 영향점', '문제 없음']],
+        foot: ['로그 변환 · 군집 표준오차', '로 고침 (R² .700)'] },
+      { n: '④', h: '로지스틱 회귀', s: 'y 가 0과 1이면 로짓을 직선으로',
+        rows: [['신도시 승산비', '41.4'], ['나이 1년 승산비', '0.729'], ['의사 R²', '.377'], ['정분류율', '79.4%']],
+        foot: ['승산비 > 1 증가 · < 1 감소', '확률의 배수가 아님'] },
+    ];
+    P.forEach((p, i) => {
+      const x = X[i], g = el(svg, 'g');
+      el(g, 'rect', { x, y: 0, width: W, height: H, fill: '#FAF8F5', stroke: '#E2DED7' });
+      el(g, 'rect', { x, y: 0, width: W, height: 4, fill: i === 2 ? RED : INK });
+      el(g, 'text', { x: x + 12, y: 32, style: 'font-size:15px;font-weight:700;fill:#16181C' }, `${p.n} ${p.h}`);
+      el(g, 'text', { class: 'tk', x: x + 12, y: 52 }, p.s);
+      el(g, 'line', { x1: x + 12, x2: x + W - 12, y1: 64, y2: 64, stroke: '#E2DED7' });
+      p.rows.forEach(([k, v], j) => {
+        const y = 92 + j * 34;
+        el(g, 'text', { class: 'an', x: x + 12, y }, k);
+        if (v) el(g, 'text', { x: x + W - 12, y, 'text-anchor': 'end', style: `font-size:13px;font-weight:700;fill:${v === '위배' ? RED : '#16181C'}` }, v);
+      });
+      el(g, 'line', { x1: x + 12, x2: x + W - 12, y1: 228, y2: 228, stroke: '#E2DED7' });
+      p.foot.forEach((t, j) => el(g, 'text', { class: 'an', x: x + 12, y: 252 + j * 18, style: 'font-weight:700' }, t));
+      if (i < 3) el(svg, 'text', { x: x + W + 8, y: H / 2 + 6, 'text-anchor': 'middle', style: 'font-size:16px;fill:#8A867E' }, '›');
+    });
+  }
+
+  /* ── 인공지능 포함 관계 ── */
+  {
+    const svg = document.getElementById('f-ai');
+    const L = [[210, 160, 205, 152, '#EDE9E3', '인공지능 (AI)', '규칙 기반 시스템 · 탐색 · 계획'],
+               [210, 192, 165, 118, '#E2D4D8', '머신러닝 (ML)', '회귀 · 의사결정나무 · 랜덤포레스트'],
+               [210, 224, 118, 84, '#D2A9B4', '딥러닝 (DL)', 'CNN · RNN · 트랜스포머'],
+               [210, 258, 66, 46, RED, '', '']];
+    L.forEach(([cx, cy, rx, ry, fill, lab, ex], i) => {
+      el(svg, 'ellipse', { cx, cy, rx, ry, fill, stroke: '#4A4741', 'stroke-width': 1 });
+      if (lab) {
+        el(svg, 'text', { x: cx, y: cy - ry + 22, 'text-anchor': 'middle', style: 'font-size:14px;font-weight:700;fill:#16181C' }, lab);
+        el(svg, 'text', { x: cx, y: cy - ry + 39, 'text-anchor': 'middle', style: `font-size:11px;fill:${i === 1 ? '#A02948' : '#4A4741'};${i === 1 ? 'font-weight:700' : ''}` }, ex);
+      }
+    });
+    el(svg, 'text', { class: 'on-dark', x: 210, y: 256, 'text-anchor': 'middle', style: 'font-size:12px;font-weight:700;fill:#fff' }, '거대언어모형');
+    el(svg, 'text', { class: 'on-dark', x: 210, y: 272, 'text-anchor': 'middle', style: 'font-size:12px;font-weight:700;fill:#fff' }, '(LLM)');
+  }
+
+  /* ── 통계 모형 대 머신러닝 모형 ── */
+  {
+    const svg = document.getElementById('f-statml');
+    const pts = []; for (let i = 0; i < 26; i++) { const x = 0.5 + i * 0.37, y = 7.5 - 0.5 * x + (x > 5 ? -1.6 : 0) + Math.sin(i * 2.3) * 0.55; pts.push([x, y]); }
+    const test = [[1.4, 7.0], [4.3, 5.1], [6.6, 2.6], [8.7, 1.3]];
+    [0, 1].forEach((k) => {
+      const x0 = k ? 468 : 40, g = el(svg, 'g');
+      const { X, Y } = frame(g, { box: [x0, 176, x0 + 300, 30], x: [0, 10], y: [0, 9] });
+      pts.forEach(([a, b]) => el(g, 'circle', { cx: X(a), cy: Y(b), r: 3.4, fill: INK, 'fill-opacity': .55 }));
+      if (!k) {
+        el(g, 'line', { x1: X(0), y1: Y(7.9), x2: X(10), y2: Y(1.6), stroke: BLUE, 'stroke-width': 2.4 });
+        el(g, 'text', { class: 'an blue', x: X(0.3), y: Y(2.2) }, '사람이 정한 직선 y = a + bx');
+        el(g, 'text', { class: 'an', x: X(0.3), y: Y(1.2) }, '기울기 b 를 해석 (p < .001)');
+        el(svg, 'text', { x: x0, y: 14, style: 'font-size:14px;font-weight:700;fill:#16181C' }, '통계 모형: 「x 가 1 늘면 y 는 얼마나, 왜?」');
+      } else {
+        let d = ''; const st = [[0, 7.4], [2.2, 6.5], [4.6, 5.4], [5.1, 3.2], [7.4, 2.3], [10, 1.4]];
+        st.forEach(([a, b], i) => { if (i < st.length - 1) d += `${i ? 'L' : 'M'}${X(a)},${Y(b)}L${X(st[i + 1][0])},${Y(b)}`; });
+        el(g, 'path', { d, stroke: RED, 'stroke-width': 2.4, fill: 'none' });
+        test.forEach(([a, b]) => {
+          const f = st.filter((s) => s[0] <= a).pop()[1];
+          el(g, 'line', { x1: X(a), x2: X(a), y1: Y(b), y2: Y(f), stroke: RED, 'stroke-width': 1.3, 'stroke-dasharray': '3 2' });
+          el(g, 'circle', { cx: X(a), cy: Y(b), r: 5, fill: '#fff', stroke: RED, 'stroke-width': 2 });
+        });
+        el(g, 'text', { class: 'an red', x: X(0.3), y: Y(2.2) }, '자료가 정한 계단 모양');
+        el(g, 'text', { class: 'an', x: X(0.3), y: Y(1.2) }, '○ 숨겨 둔 새 점 · 점선 = 오차');
+        el(svg, 'text', { x: x0, y: 14, style: 'font-size:14px;font-weight:700;fill:#16181C' }, '머신러닝 모형: 「새 점을 얼마나 맞히나?」');
+      }
+    });
+  }
+
+  /* ── 머신러닝이 나은 경우 · 회귀가 나은 경우 ── */
+  {
+    const svg = document.getElementById('f-when');
+    const many = []; for (let i = 0; i < 120; i++) { const x = (i * 0.0833) % 10, y = (x < 4 ? 2 + x * 1.2 : 6.8 - (x - 4) * 0.25) + Math.sin(i * 1.7) * 0.7; many.push([x, y]); }
+    const few = [[1, 2.2], [2.5, 3.6], [4, 3.9], [5.5, 5.4], [7, 5.6], [8.5, 7.3]];
+    [0, 1].forEach((k) => {
+      const x0 = k ? 468 : 40, g = el(svg, 'g');
+      const { X, Y } = frame(g, { box: [x0, 176, x0 + 300, 30], x: [0, 10], y: [0, 9] });
+      const P = k ? few : many;
+      P.forEach(([a, b]) => el(g, 'circle', { cx: X(a), cy: Y(b), r: k ? 4.6 : 2.6, fill: INK, 'fill-opacity': k ? .75 : .4 }));
+      const [a0, b0] = (() => { const n = P.length, mx = P.reduce((s, p) => s + p[0], 0) / n, my = P.reduce((s, p) => s + p[1], 0) / n;
+        const b = P.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0) / P.reduce((s, p) => s + (p[0] - mx) ** 2, 0); return [my - b * mx, b]; })();
+      el(g, 'line', { x1: X(0), y1: Y(a0), x2: X(10), y2: Y(a0 + 10 * b0), stroke: BLUE, 'stroke-width': 2.2 });
+      if (!k) {
+        el(g, 'path', { d: `M${X(0)},${Y(2)}L${X(4)},${Y(6.8)}L${X(10)},${Y(5.3)}`, stroke: RED, 'stroke-width': 2.6, fill: 'none' });
+        el(g, 'text', { class: 'an red', x: X(4.6), y: Y(8.3) }, '머신러닝: 꺾임을 따라감');
+        el(g, 'text', { class: 'an blue', x: X(5.4), y: Y(2.6) }, '직선: 꺾임을 놓침');
+        el(svg, 'text', { x: x0, y: 14, style: 'font-size:14px;font-weight:700;fill:#16181C' }, '관측이 많고 관계가 꺾일 때 → 머신러닝');
+      } else {
+        let d = ''; few.forEach(([a, b], i) => { d += `${i ? 'L' : 'M'}${X(a)},${Y(b)}`; });
+        el(g, 'path', { d: `M${X(0)},${Y(2.2)}L` + d.slice(1) + `L${X(10)},${Y(7.3)}`, stroke: RED, 'stroke-width': 2, fill: 'none', 'stroke-dasharray': '5 3' });
+        el(g, 'text', { class: 'an red', x: X(0.3), y: Y(8.3) }, '머신러닝: 점마다 꺾여 외움');
+        el(g, 'text', { class: 'an blue', x: X(5.6), y: Y(3.2) }, '직선: 안정 · 기울기로 설명');
+        el(svg, 'text', { x: x0, y: 14, style: 'font-size:14px;font-weight:700;fill:#16181C' }, '관측이 적고 이유가 필요할 때 → 회귀');
+      }
+    });
   }
 })();
 </script>

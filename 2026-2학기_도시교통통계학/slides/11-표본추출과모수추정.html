@@ -653,6 +653,40 @@
     </div>
   </section>
 
+  <!-- 새 장 (2026-11-16 교수 요청) — 앞의 정식 설명(p.25~26)을 고지마 히로유키 책 15강의
+       방식으로 다시 설명한다: 표본평균의 범위를 예언하고, 예언이 맞는 μ 만 남긴다.
+       그림의 가로축은 표준오차 단위이고 ±1.96 눈금은 SE.z95 에서 나온다. -->
+  <section>
+    <h2>모평균의 구간추정을 다르게 보기</h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:6px">표본평균이 들어갈 범위를 예언하고, 관측한 표본평균이 그 예언에 맞는 모평균 $\mu$ 만 남긴다</p>
+      <div class="cols" style="gap:18px">
+        <div class="col-l" style="flex:0 0 55%">
+          <ol class="steps" style="margin-top:2px;font-size:15px">
+            <li><b>표본평균의 분포:</b> n개를 관측해 $\bar{x}$ 를 구하는 일을 되풀이하면
+              $\bar{x}$ 는 평균 $\mu$, 표준편차 $\sigma/\sqrt{n}$ 인 정규분포</li>
+            <li><b>관측 전에 예언:</b> $\bar{x}$ 는 95% 확률로 $\mu$ 에서 표준편차의 1.96배 안에 들어옴
+              <p style="margin:4px 0 2px;text-align:center">$-1.96 \le \dfrac{\bar{x}-\mu}{\sigma/\sqrt{n}} \le +1.96$ &nbsp;…(1)</p></li>
+            <li class="fragment"><b>관측 뒤에 거꾸로:</b> $\sigma$ · $n$ · $\bar{x}$ 를 모두 알므로 (1) 에서 모르는 것은 $\mu$ 뿐
+              <br>→ (1) 이 성립하는 $\mu$ 는 남기고, 나머지 $\mu$ 는 버림</li>
+            <li class="fragment"><b>$\mu$ 에 대해 풂:</b> 세 곳에 $\sigma/\sqrt{n}$ 을 곱하고 정리
+              <p style="margin:4px 0 2px;text-align:center">$\bar{x}-1.96\dfrac{\sigma}{\sqrt{n}} \le \mu \le \bar{x}+1.96\dfrac{\sigma}{\sqrt{n}}$ &nbsp;…(2)</p></li>
+          </ol>
+          <p class="conclusion fragment" style="margin-top:6px">(2) 의 범위 = 모평균 $\mu$ 의 95% 신뢰구간<br>
+            예: $\bar{x}=80$, $\sigma/\sqrt{n}=2$ → $76.08 \le \mu \le 83.92$</p>
+        </div>
+        <div class="col-r fragment" data-fragment-index="0">
+          <p class="caption" style="margin:0 0 0 6px">모평균 $\mu$ 를 이 자리라고 가정해 보면</p>
+          <svg class="fig" id="f-kj-out" viewBox="0 0 380 162" style="width:340px" role="img">
+            <title>관측한 표본평균이 μ±1.96σ/√n 밖에 있는 경우 — 이 μ는 버린다</title></svg>
+          <svg class="fig" id="f-kj-in" viewBox="0 0 380 162" style="width:340px" role="img">
+            <title>관측한 표본평균이 μ±1.96σ/√n 안에 있는 경우 — 이 μ는 남긴다</title></svg>
+          <p class="caption" style="margin:2px 0 0 6px">설명 방식: 고지마 히로유키, 15강</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 원본 p.28 -->
   <section>
     <h2>표본평균과 표본비율</h2>
@@ -1056,6 +1090,42 @@ function bell(sel, box, o) {
     },
   });
 })();
+
+/* ── 새 장: 예언이 맞는 μ 만 남긴다 (고지마 방식, 2026-11-16) ──
+ * 가로축은 표준오차 σ/√n 단위. μ 는 0, 경계는 ±SE.z95.
+ * 관측한 x̄ 는 위 그림에서 경계 밖(+2.6), 아래 그림에서 경계 안(+0.9). */
+(function () {
+  const z = SE.z95;
+  function kj(sel, xb, keep) {
+    const BOX = { x0: 40, y0: 104, x1: 300, y1: 20 };
+    bell(sel, BOX, {
+      cuts: [-z, z, xb],
+      ticks: [[0, ''], [-z, ''], [z, '']],
+      before: function (F, S) {
+        return [F.under(S.curve(Fig.normal(0, 1, -z, z, { n: 120 })), { cls: 'area-dwl' })];
+      },
+      after: function (F, S) {
+        const y0 = BOX.y0, xm = S.x(0), xl = S.x(-z), xr = S.x(z), xx = S.x(xb);
+        return [
+          F.raw('<path class="brace" d="M' + xl + ',' + (y0 + 4) + ' Q' + ((xl + xm) / 2) + ',' + (y0 + 18) + ' ' + xm + ',' + (y0 + 4) + '"/>'),
+          F.raw('<path class="brace" d="M' + xm + ',' + (y0 + 4) + ' Q' + ((xm + xr) / 2) + ',' + (y0 + 18) + ' ' + xr + ',' + (y0 + 4) + '"/>'),
+          F.annot((xl + xm) / 2, y0 + 30, '1.96σ/√n', { anchor: 'middle', size: 11 }),
+          F.annot((xm + xr) / 2, y0 + 30, '1.96σ/√n', { anchor: 'middle', size: 11 }),
+          F.annot(xm, y0 + 44, 'μ', { anchor: 'middle', size: 13, tone: 'red' }),
+          F.raw('<path class="thin" d="M' + xx + ',22 L' + xx + ',' + (y0 - 3) + '" marker-end="url(#ah-ink)"/>'),
+          F.annot(xx + 6, 20, '관측한 x̄', { anchor: 'start', size: 12 }),
+          F.annot(372, 40, keep ? '이 μ 는 남긴다' : '이 μ 는 버린다',
+                  { anchor: 'end', size: 13, tone: keep ? 'red' : undefined }),
+          F.annot(372, 58, keep ? 'x̄ 가 95% 범위 안' : 'x̄ 가 95% 범위 밖',
+                  { anchor: 'end', size: 11 }),
+        ];
+      },
+    });
+  }
+  kj('#f-kj-out', 2.6, false);
+  kj('#f-kj-in', 0.9, true);
+})();
+
 
 /* ── 원본 p.29 : 구간추정 절차 순서도 ───────────────────────── */
 (function () {

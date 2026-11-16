@@ -35,6 +35,16 @@
   .num { font-variant-numeric: tabular-nums; }
   .src { font-size: 12.5px; line-height: 1.7; color: var(--muted); margin: 10px 0 0; }
 </style>
+<style>
+  .reveal p.define { font-size: 17px; font-weight: 700; color: var(--brand-crimson); line-height: 1.45; margin: 0 0 6px; }
+  .reveal p.conclusion { font-size: 15px; font-weight: 500; color: var(--ink); margin: 8px 0 0; line-height: 1.5; }
+  .reveal p.conclusion > .ar { color: var(--brand-crimson); font-weight: 700; }
+  .reveal ul.defs { margin: 4px 0 6px; } .reveal ul.defs > li { margin-bottom: 4px; font-size: var(--fs-body); line-height: 1.5; }
+  .src { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 8px 0 0; }
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .tbl { width: 100%; table-layout: fixed; font-size: 12.5px; } .tbl th, .tbl td { padding: 3.5px 6px; line-height: 1.4; vertical-align: top; }
+  .tbl td.y { color: var(--brand-crimson); font-weight: 700; }
+</style>
 </head>
 <body>
 <div class="reveal"><div class="slides">
@@ -58,6 +68,7 @@
         <li><strong>실습 ③ 의 제출 안내와 가정 과제:</strong> 본편 「과제」 · 「제출물」 장으로 합침</li>
       </ul>
       <p class="conclusion">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+    <p class="caption" style="margin-top:8px">2026-11-14: 본편 「10-머신러닝」에서 뺀 「예측적 분석」 정의 장과 「예측을 증거로 쓰려면」 구분 장 · 예측구간 세 장을 맨 뒤에 붙였다 (교수 요청)</p>
     </div>
   </section>
 
@@ -123,6 +134,86 @@
       <p class="caption" style="margin-top:8px">
         <span class="hl">가정 과제 (10주차)</span> — 도로교통공단 TAAS 공개 데이터로
         어린이 교통사고 위험지역을 집에서 분석해 제출한다. 절차는 별도로 배부한다.</p>
+    </div>
+  </section>
+
+<!-- 2026-11-14 본편 10강(머신러닝)에서 뺀 장: 예측적 분석 정의 · 예측구간 묶음(교수 요청) -->
+  <section>
+    <h2>예측적 분석 <span class="en" style="font-size:20px">predictive</span></h2>
+    <div class="body">
+      <p class="define">과거에서 찾은 규칙을 아직 없는 자료에 적용하는 일</p>
+      <ul class="defs">
+        <li><strong>진단:</strong> 지금 자료로 맞는지 확인 가능</li>
+        <li><strong>예측:</strong> 그 값이 생겨야 확인 가능</li>
+      </ul>
+      <p class="conclusion"><span class="ar">→</span> 그래서 <span class="hl">미리 채점하는 법</span>(홀드아웃 검증)이 예측의 출발점</p>
+      <p class="src">출처: 옛 11강 「예측적 분석 Ⅰ」</p>
+    </div>
+  </section>
+
+  <section class="s-section">
+    <div class="section-rule"></div>
+    <p class="section-label">예측을 증거로 쓰려면</p>
+    <p class="section-sub">점 하나가 아니라 범위로, 그리고 틀릴 조건까지</p>
+  </section>
+
+  <section>
+    <p class="mth">불확실성</p>
+    <h2>예측구간: 숫자 하나 대신 범위를 낸다</h2>
+    <div class="body tight">
+      <div class="cols">
+        <div class="col-l" style="flex:0 0 50%">
+          <p class="define">새로 관측될 값이 정한 확률로 들어갈 범위</p>
+          <ul class="defs">
+            <li><strong>점 예측:</strong> 예측값 하나</li>
+            <li><strong>신뢰구간과의 차이:</strong> 신뢰구간 = 평균·계수의 범위 · 예측구간 = 값 하나의 범위 (더 넓음)</li>
+            <li><strong>간단한 방법:</strong> 시험 잔차의 5% · 95% 분위를 예측값에 더함</li>
+          </ul>
+          <p class="conclusion"><span class="ar">→</span> 세종 숲: 예측 −91 ~ +119 만원/㎡ 가 90% 범위</p>
+        </div>
+        <div class="col-r">
+          <p class="sub t-red">같은 예측을 두 가지로 쓰면</p>
+          <ul class="defs" style="font-size:14px">
+            <li>㉠ 「이 거래는 ㎡당 357만원이다」</li>
+            <li>㉡ 「㎡당 357만원으로 예측. 시험 오차로 보면 266~476 만원 범위가 90%」</li>
+          </ul>
+          <p class="conclusion"><span class="ar">→</span> ㉠ 반박당하면 무너짐 · ㉡ 틀릴 수 있음까지 포함</p>
+          <p class="src">틀: 옛 12강 「예측구간」</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="mth">불확실성</p>
+    <h2>구간이 담지 못하는 불확실성</h2>
+    <div class="body tight">
+      <table class="tbl" style="font-size:13.5px">
+        <thead><tr><th style="width:32%">종류</th><th>구간에 들어가나</th></tr></thead>
+        <tbody>
+          <tr><td>자료의 흩어짐</td><td>들어감 (예측구간이 측정하는 것)</td></tr>
+          <tr><td>계수·나무를 잘못 추정한 정도</td><td>들어감</td></tr>
+          <tr><td>모형을 잘못 고른 것</td><td class="y">안 들어감 · 모형이 틀리면 구간도 틀림</td></tr>
+          <tr><td>자료 밖의 대상 · 구조 변화</td><td class="y">안 들어감 · 새 단지, 정책 변화, 시장 급변</td></tr>
+        </tbody>
+      </table>
+      <p class="conclusion"><span class="ar">→</span> 세종: 90% 범위를 새 단지(단지 단위 시험)에 대 보면 <span class="hl">70.2%</span>만 들어감</p>
+      <p class="caption">아래 둘은 시나리오로 다룸 → 13강 처방적 분석</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="mth">불확실성</p>
+    <h2>예측을 증거로 쓰는 조건</h2>
+    <div class="body">
+      <ol class="dense" style="font-size:16px">
+        <li>학습에 쓰지 않은 자료로 채점했는가 (묶음 · 시간 누수 없이)</li>
+        <li>복잡도를 시험(검증) 오차로 골랐는가</li>
+        <li>점이 아니라 범위로 말했는가</li>
+        <li>무엇이 어긋나면 틀리는지 적었는가</li>
+      </ol>
+      <p class="conclusion" style="margin-top:16px"><span class="ar">→</span> 하나라도 빠지면 정책 근거로 쓸 수 없음</p>
+      <p class="src">출처: 옛 12강 「예측을 증거로 쓰는 조건」</p>
     </div>
   </section>
 

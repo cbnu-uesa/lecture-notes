@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>12강. 가설검정</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 글만 있는 2단은 위 정렬로 (design.md §4.3) */
+  .body > .cols.top { align-items: flex-start; }
+  /* 이 강의에서 쓰는 좌우 비율들 */
+  .body > .cols.w40 > .col-l { flex: 0 0 40%; }
+  .body > .cols.w52 > .col-l { flex: 0 0 52%; }
+  .body > .cols.w58 > .col-l { flex: 0 0 58%; }
+  .body > .cols.w62 > .col-l { flex: 0 0 62%; }
+
+  ul.slim > li { margin-bottom: 3px; }
+  ol.dense { margin: 0 0 0 2px; padding-left: 20px; }
+  ol.dense > li { margin-bottom: 5px; }
+  ol.dense ul { margin: 3px 0 0; }
+  /* 원본이 수식 옆에 붙여 둔 작은 회색 각주 */
+  .side-note { font-size: 11px; line-height: 1.45; color: var(--muted); margin: 0; }
+  /* 수식 한 줄을 문단으로 세울 때. MathJax 기본 여백을 눌러 준다 */
+  .eqline { margin: 0 0 4px; }
+
+  /* 기각역·유의확률 면적 — 원본은 진한 빨강이다. .area-loss(28%)로는 옅어 눈에 안 든다 */
+  .reveal svg.fig .area-rej { fill: var(--brand-crimson); fill-opacity: 0.62; stroke: none; }
+  /* 제2종 오류 채움 — 공용 팔레트에 초록 채움이 없어 이 강의에서만 둔다 */
+  .reveal svg.fig .area-t2 { fill: var(--accent-green); fill-opacity: 0.42; stroke: none; }
+
+  /* 흐름도 (원본 p.12·13) — 흰 상자와 크림슨 마름모 */
+  .reveal svg.fig .fbox   { fill: #FFF; stroke: var(--ink); stroke-width: 1.2; }
+  .reveal svg.fig .fdia   { fill: var(--brand-crimson); stroke: none; }
+  /* .reveal svg.fig text 가 흰 테두리를 두르므로(0,3,1) 같은 무게로 눌러야 한다 —
+     그러지 않으면 크림슨 마름모 위의 흰 글자가 제 테두리에 먹혀 뭉개진다 */
+  .reveal svg.fig text.fdia-t { fill: #FFF; stroke: none; }
+  .flow-eq { display: flex; justify-content: center; gap: 90px; margin: 2px 0 0; }
+  .flow-eq > p { margin: 0; }
+
+  /* 기각역 표 (원본 p.9 — 교재 표 18-2 를 다시 짰다) */
+  .rej { width: 100%; table-layout: fixed; font-size: 13px; }
+  .reveal .rej th, .reveal .rej td { padding: 3px 6px; text-align: center; vertical-align: middle; }
+  .rej svg { display: block; margin: 0 auto; }
+  /* 주사위 도수 표 (원본 p.21) — 여덟 줄이라 행을 조인다 */
+  .reveal .tbl-dice th, .reveal .tbl-dice td { padding: 1px 8px; text-align: center; }
+  .rej .cond { margin: 0; font-size: 12px; }
+  /* 가설 칸은 한 줄로 — MathJax 조각 사이에서 줄이 접히면 "대" 만 따로 떨어진다 */
+  .rej .hyp { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  /* rowspan 칸의 아래 괘선이 마지막 줄까지 내려와 헛줄로 보인다 */
+  .reveal .rej td[rowspan] { border-bottom: none; }
+
+  /* 가설검정에서의 오류 표 (원본 p.22) — 왼쪽 위 칸을 대각선으로 나눈다 */
+  .tbl-err { width: 100%; table-layout: fixed; }
+  .reveal .tbl-err th, .reveal .tbl-err td { text-align: center; }
+  .reveal .tbl-err .corner {
+    background: linear-gradient(to top right, transparent calc(50% - 0.7px),
+      var(--rule) calc(50% - 0.7px), var(--rule) calc(50% + 0.7px), transparent calc(50% + 0.7px));
+  }
+  .tbl-err .corner span { display: block; font-size: 13px; }
+  .tbl-err .corner .c-a { text-align: right; }
+  .tbl-err .corner .c-b { text-align: left; }
+
+  /* 원본 p.19 의 제목은 31px 로는 두 줄이 되어 본문 첫 줄을 덮는다 */
+  #s-app-b h2 { font-size: 26px; }
+
+  /* 표본평균의 분포를 감싼 둥근 상자 (원본 p.3) */
+  .mini-card { border: 1.2px solid var(--rule); border-radius: 16px;
+               padding: 10px 20px 4px; display: inline-block; }
+
+  /* 한 학기 강의 내용 (원본 p.27) — 목록 + 중괄호 + 큰 크림슨 라벨 */
+  .grp { display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .grp > ul { flex: 0 0 380px; margin: 0; }
+  .grp > .grp-label { margin: 0; font-size: 24px; font-weight: 700;
+                      color: var(--brand-crimson); letter-spacing: -.02em; }
+  .brace { flex: 0 0 26px; }
+
+  /* 상자 A·B 예시 (원본 p.16) 는 그림 안에서 밑줄을 쓴다 */
+  .reveal svg.fig .ul-t { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>12강에서 뺀 슬라이드</h1>
+  <p class="cover-date">2026-11-16 보관</p>
+</section>
+
+<section>
+  <h2>이 파일은 무엇인가</h2>
+  <div class="body">
+    <p class="lead t-define">12강 「가설검정」에서 뺀 부록 슬라이드를 버리지 않고 모아 둔 것</p>
+    <p>2026-11-16 교수 요청으로 부록 네 장을 모두 뺌</p>
+    <ul class="dense">
+      <li><strong>(부록) 회귀분석 모수추정량의 검정통계량 – 기대 값과 표준오차의 도출</strong></li>
+      <li><strong>(부록) 회귀분석 모수추정량의 검정통계량 – t분포의 활용</strong></li>
+      <li><strong>[부록] 표본평균의 구간추정</strong></li>
+      <li><strong>[부록] 표본평균의 유의성 검정 (significance test)</strong></li>
+    </ul>
+    <p class="derive t-red">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
+  </div>
+</section>
+
+  <!-- 원본 p.19 -->
+  <section id="s-app-b">
+    <h2>(부록) 회귀분석 모수추정량의 검정통계량 – 기대 값과 표준오차의 도출</h2>
+    <div class="body tighter">
+      <p class="sub" style="margin-bottom:4px">확률변수인 모수 추정량의 유의성을 검정하기 위해서는
+        모수 추정량 $b_0$, $b_1$의 분포에 대한 정보가 필요!</p>
+      <p class="derive" style="margin:0 0 10px">→ $b_0$, $b_1$이 어떤 분포를 따를지는 모르지만
+        일단 기대값과 표준오차를 구해보자.</p>
+      <div class="cols top w62">
+        <div class="col-l">
+          <p class="eqline"><span class="mark">$E(b_1)$</span>
+            $=E\!\left(\dfrac{\sum(X_i-\bar{X})(Y_i-\bar{Y})}{\sum(X_i-\bar{X})^{2}}\right)
+             =\mathrm{E}\!\left(\dfrac{\sum(X_i-\bar{X})Y_i}{S_{xx}}\right)$</p>
+          <p class="eqline">$=\mathrm{E}\!\left(\dfrac{\sum(X_i-\bar{X})(\beta_0+\beta_1X_i+\varepsilon_i)}{S_{xx}}\right)
+             =E\!\left(\beta_1+\left(\dfrac{1}{S_{xx}}\right)\sum(X_i-\bar{X})\varepsilon_i\right)$</p>
+          <p class="eqline">$=\beta_1+\left(\dfrac{1}{S_{xx}}\right)\sum(X_i-\bar{X})E(\varepsilon_i)=$
+            <span class="mark">$\beta_1$</span></p>
+
+          <p class="eqline" style="margin-top:16px"><span class="mark">$Var(b_1)$</span>
+            $=\mathrm{Var}\!\left(\beta_1+\left(\tfrac{1}{S_{xx}}\right)\sum(X_i-\bar{X})\varepsilon_i\right)$</p>
+          <p class="eqline">$=\left(\dfrac{1}{S_{xx}}\right)^{2}\mathrm{Var}\!\left(\sum(X_i-\bar{X})\varepsilon_i\right)
+             =\left(\dfrac{1}{S_{xx}}\right)^{2}\sum(X_i-\bar{X})^{2}\mathrm{Var}(\varepsilon_i)$</p>
+          <p class="eqline">$=\left(\dfrac{1}{S_{xx}}\right)^{2}\sum(X_i-\bar{X})^{2}\ \ \sigma^{2}=$
+            <span class="mark">$\dfrac{\sigma^{2}}{\sum(X_i-\bar{X})^{2}}$</span></p>
+        </div>
+        <div class="col-r">
+          <p class="eqline">$\sum(X_i-\bar{X})(Y_i-\bar{Y})=\sum(X_i-\bar{X})Y_i$</p>
+          <p class="eqline">$\sum(X_i-\bar{X})^{2}=S_{xx}$</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- 원본 p.20 -->
+  <section>
+    <h2>(부록) 회귀분석 모수추정량의 검정통계량 – t분포의 활용</h2>
+    <div class="body tighter">
+      <p class="sub" style="margin-bottom:3px">$b_1$의 표준오차를 알았다면 $b_1$이 따를 분포를 고려</p>
+      <p class="derive" style="margin:0 0 3px">→ “오차의 정규분포를 가정”하면 $b_1$는 정규분포를 따름</p>
+      <p class="derive" style="margin:0 0 2px">→ “오차의 분산 $\sigma^{2}$을 알고 있다면”
+        검정통계량은 표준정규분포를 따름</p>
+      <div style="display:flex;align-items:center;gap:40px;margin:0 0 6px 24px">
+        <p class="eqline">$Z=\dfrac{b_1-0}{SE(b_1)}\sim N(0,1)$</p>
+        <p class="eqline" style="font-size:12px">$SE(b_1)=\sqrt{\dfrac{\sigma^{2}}{\sum(X_i-\bar{X})^{2}}}$</p>
+      </div>
+      <p class="derive" style="margin:0 0 2px">→ 하지만 대부분 오차의 분산은 알려져 있지 않으므로
+        그 추정량인 잔차의 분산 $S^{2}$을 사용하여 $b_1$을 검정</p>
+      <p class="eqline" style="margin:0 0 6px 24px">$S^{2}=\dfrac{\sum(y_i-\hat{y}_i)^{2}}{n-2}$</p>
+      <p class="derive" style="margin:0 0 1px">→ “잔차의 분산 $S^{2}$”를 사용하는 경우”
+        $b_1$의 검정통계량은 자유도가 n-2인 t분포를 따름</p>
+      <p style="margin:0 0 4px 14px;font-size:12.5px">(∵ 정규확률변수를 카이제곱확률변수로 나눈 값이
+        검정통계량이 되므로)</p>
+      <div style="display:flex;align-items:center;gap:34px;margin-left:24px">
+        <p class="eqline">$T=\dfrac{b_1-0}{SE(b_1)}\sim T(n-2)$</p>
+        <p class="eqline" style="font-size:12px">$SE(b_1)=\sqrt{\dfrac{\frac{\sum(y_i-\hat{y}_i)^{2}}{n-2}}{\sum(X_i-\bar{X})^{2}}}$</p>
+        <div>
+          <p class="sub" style="margin:0;font-size:12.5px">표본분산에서 자유도가 2만큼 줄어드는 이유</p>
+          <p style="margin:0;font-size:12.5px">: 추정치 계산 시 회귀직선의 기울기와 절편을
+            통계량으로 사용하므로</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- 원본 p.29 — pptx 에 숨김 처리돼 배포 PDF 에는 없던 장이다 (private/확인-필요-사항.md B-3 방침).
+       숨김이라 PDF 로 배치를 확인할 수 없어 본문과 수식만 옮기고 그림은 최소로 다시 그렸다. -->
+  <section>
+    <h2>[부록] 표본평균의 구간추정</h2>
+    <div class="body tighter">
+      <p class="sub" style="margin-bottom:4px">Q) 표본평균이 25일 때 모평균에 대한
+        95% 신뢰구간(같은 방식으로 구간을 여러 번 만들면 그중 95%가 모평균을 포함하는 구간)은?</p>
+      <div class="cols top w62">
+        <div class="col-l">
+          <p style="margin:0 0 2px">모집단에서 뽑은 표본평균은 기대 값이 $\mu$이고
+            분산이 $\sigma^{2}/\mathrm{n}$ 인 정규분포로 출현할 것</p>
+          <p class="derive" style="margin:0 0 8px">→ 따라서 표본평균에서 그 분포의 95% 폭만큼
+            잡은 구간이 모평균을 포함할 것</p>
+          <p class="sub" style="margin:0 0 2px;font-size:14px">모집단의 분산($\sigma^{2}=25$)을
+            알고 있을 경우</p>
+          <ul class="slim">
+            <li>표본의 수는 100개로 충분히 커서 정규분포</li>
+            <li>표본평균의 표준오차는 $\sigma/\sqrt{\mathrm{n}}$ = 0.5일 것</li>
+          </ul>
+          <p class="derive" style="margin:2px 0 8px 10px">→ 25 ± $z_{0.025}$ *
+            $\sigma/\sqrt{\mathrm{n}}$ &nbsp;(∵ $z_{0.025}$ =1.96)</p>
+          <p class="sub" style="margin:0 0 2px;font-size:14px">모집단의 분산을 모를 경우:
+            표본분산으로 대체</p>
+          <ul class="slim">
+            <li>표본의 수는 100개로 충분히 커서 정규분포</li>
+            <li>표본평균의 표준오차는 $S/\sqrt{\mathrm{n}}$ 일 것</li>
+            <li>이 경우 표준정규분포가 아닌 t분포를 사용</li>
+          </ul>
+          <p class="derive" style="margin:2px 0 0 10px">→ 25 ± $t_{(0.025,\ \mathrm{n}-1)}\,S/\sqrt{\mathrm{n}}$</p>
+        </div>
+        <div class="col-r">
+          <p style="margin:0 0 2px;font-size:13px;text-align:center">모집단 &nbsp;→&nbsp;
+            <span style="font-size:11px">100개(n) 추출</span> &nbsp;→&nbsp; 표본 &nbsp;→&nbsp; 표본평균</p>
+          <p style="margin:0;font-size:12px;text-align:center">
+            $X \sim f(x)$, &nbsp; $E(X)=\mu$, &nbsp; $Var(X)=\sigma^{2}$</p>
+          <p style="margin:2px 0 0;font-size:12px;text-align:center">
+            $\bar{X} \sim N\!\left(\mu,\dfrac{\sigma^{2}}{\mathrm{n}}\right)$</p>
+          <p class="derive" style="margin:0;font-size:11px;text-align:center">
+            (∵ 대수의 법칙과 중심극한정리)</p>
+          <svg class="fig" id="f-ci2" viewBox="0 0 320 160" style="width:270px;margin:0 auto" role="img">
+            <title>표준정규분포에서 −1.96 과 1.96 바깥의 꼬리 면적이 각각 2.5% 임을 표시한 그림</title>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- 원본 p.30 — 역시 숨김 처리된 장이다 (private/확인-필요-사항.md B-3 방침) -->
+  <section>
+    <h2>[부록] 표본평균의 유의성 검정 <span class="en">(significance test)</span></h2>
+    <div class="body tight">
+      <p class="sub" style="margin-bottom:6px">Q) 총 세수는 같지만 세 부담은 효율적으로 조정하는
+        목적으로 새로운 세법을 시행하였다. 시행 이후 무작위로 100개의 표본을 뽑아 조사한 결과
+        시행 전후 차이의 평균이 -21만 9천원으로 나왔다. 표본 표준편차도 73만원이었다.
+        새로운 세법 시행에 따른 세수 감소는 표본에 따른 우연인가? 유의미한 현상인가?</p>
+      <ol class="dense">
+        <li>귀무가설(H0): 세법 시행에 따른 세수변화는 0(즉 모평균 0)<br>
+          대립가설(H1): 세법시행에 따른 세수변화가 존재(모평균은 0이 아님)</li>
+        <li>귀무가설의 기각확률: 유의수준을 $\alpha$=0.05로 설정</li>
+        <li>검정통계량 선정: 검정통계량은 어떤 분포를 따르나?
+          <ul class="slim">
+            <li>표본수가 100개이므로 표본평균은 정규분포를 따를 가능성이 높음</li>
+            <li>하지만 모표준편차를 몰라 표본표준편차를 사용</li>
+            <li>표본 표준편차를 사용하더라도 표본 수가 많으므로 t분포가 아닌 정규분포를
+              사용해도 무방 (보수적으로 갈 수도 있음)</li>
+          </ul></li>
+        <li>검정통계량 계산: t = (-21.9만원 – 0원) / 7.3만원 = -3</li>
+        <li>검정통계량이 유의수준에 따른 기각역에 포함되는지를 검토</li>
+        <li>검정결과에 따라 귀무가설을 기각할지, 귀무가설을 기각할 수 없을지 결정</li>
+      </ol>
+    </div>
+  </section>
+
+</div></div>
+
+<script>
+/* 본편 12강의 그림 스크립트에서 이 파일의 장이 쓰는 것만 옮겼다 (2026-11-16) */
+const Z_TWO = 1.959964;   // 유의수준 5% 양측 임계값
+
+/* 데이터 점묶음에서 [lo, hi] 만 잘라 낸다 — 꼬리·가운데를 칠할 때 쓴다 */
+function seg(pts, lo, hi) {
+  return pts.filter(([x]) => x >= lo - 1e-9 && x <= hi + 1e-9);
+}
+
+/* ── 원본 p.29(숨김) : 표준정규분포의 95% 구간 ─────────────────── */
+(function () {
+  const F = Fig.withBox({ x0: 24, y0: 118, x1: 296, y1: 24 });
+  const S = F.scale({ x: [-3.6, 3.6], y: [0, 0.42] });
+  const pts = Fig.normal(0, 1, -3.6, 3.6, { through: [-Z_TWO, Z_TWO] });
+  F.draw('#f-ci2', { check: false, parts: [
+    F.under(S.curve(seg(pts, -3.6, -Z_TWO)), { cls: 'area-rej' }),
+    F.under(S.curve(seg(pts, Z_TWO, 3.6)), { cls: 'area-rej' }),
+    F.raw('<path class="axis" d="M24,118 L296,118"/>'),
+    F.curve(S.curve(pts), { variant: 'demand' }),
+    F.annot(S.x(-Z_TWO), 134, '−1.96', { anchor: 'middle', size: 11 }),
+    F.annot(S.x(0), 134, '0', { anchor: 'middle', size: 11 }),
+    F.annot(S.x(Z_TWO), 134, '1.96', { anchor: 'middle', size: 11 }),
+    F.annot(S.x(2.9), 96, '2.5%', { anchor: 'middle', size: 11, tone: 'red' }),
+  ] });
+})();
+</script>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

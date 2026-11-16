@@ -45,7 +45,8 @@
   {
     const no = +(location.pathname.split('/').pop() || '').slice(0, 2);
     const me2 = (course.lectures || []).find((l) => l.no === no);
-    const kick = `${String(no).padStart(2, '0')}. ${me2 ? me2.title : (course.title || '')}`;
+    // 강의가 아닌 안내 덱(예: 00-기말개인과제안내)은 course.json 항목의 kicker 문구를 그대로 쓴다
+    const kick = me2 && me2.kicker ? me2.kicker : `${String(no).padStart(2, '0')}. ${me2 ? me2.title : (course.title || '')}`;
     sections.forEach((sec) => {
       if (sec.matches('.s-cover, .s-closing, .s-section')) return;
       if (!sec.querySelector('h2')) return;

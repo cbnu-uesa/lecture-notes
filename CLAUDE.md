@@ -66,6 +66,15 @@
 
 URL에 쓸 때도 마찬가지로 한글 경로는 `urllib.parse.quote`로 인코딩한다 (`build-pdf.sh` 참조).
 
+**학생 배포 zip 은 `_scripts/make-zip.py` 로만 만든다** (2026-11-14). 맥의 Finder 「압축」과 `zip` 명령은
+한글 파일명을 UTF-8 표시 없이 자모 분리형(NFD)으로 넣고 `__MACOSX` · `.DS_Store` 를 끼워 넣는다.
+윈도우와 업로드 사이트가 이를 CP949 로 읽어 이름이 깨지거나 압축 해제에 실패했다. 스크립트는 이름을
+NFC 로 바꾸고 UTF-8 플래그를 켜며 숨김 파일을 뺀다. 폴더를 고치면 같은 이름의 zip 도 다시 만든다.
+
+```bash
+python3 _scripts/make-zip.py "<과목>/analysis/data/학생배포/09강-세종아파트회귀"   # 폴더 옆에 .zip
+```
+
 ### 3. 슬라이드를 만들거나 고치기 전에 `design.md`를 읽는다
 
 색·치수·슬라이드 유형이 전부 거기 있다.
@@ -106,7 +115,7 @@ URL에 쓸 때도 마찬가지로 한글 경로는 `urllib.parse.quote`로 인�
 │   ├── img/               cbnu-logo.jpg
 │   └── vendor/            reveal · chartjs · mathjax-tex-svg.js
 ├── _templates/            lecture.html · dossier.md (교재 판독물 규격)
-├── _scripts/              serve.sh · build-pdf.sh · build-site.sh · ocr-scan.sh · dossier-read.sh
+├── _scripts/              serve.sh · build-pdf.sh · build-site.sh · ocr-scan.sh · dossier-read.sh · make-zip.py
 │   └── artifact/          교수가 직접 고치는 편집본(아티팩트) — build.py · edits.py · boot.js · editor.css
 ├── 2026-1학기_도시경제학입문/    (pptx 원본 → 변환 완료)
 │   ├── course.json        과목 메타 — 푸터 문구·강의 목록의 원천
@@ -295,6 +304,9 @@ _scripts/ocr-scan.sh "2026-2학기_도시및지역경제학/source/11장"
 # 교재 판독물 읽기 (http://localhost:8091) — 왼쪽 스캔 원본 · 오른쪽 판독 텍스트
 # 번들은 Drive 밖에 만든다. 배포하지 않는다 (교재 저작권).
 _scripts/dossier-read.sh
+
+# 학생 배포 zip — 한글 파일명이 윈도우·LMS 에서 깨지지 않게 (Finder 압축 금지)
+python3 _scripts/make-zip.py "<과목>/analysis/data/학생배포/<폴더>"
 
 # PDF 빌드 — 인자 없으면 전체, 있으면 해당 파일만
 _scripts/build-pdf.sh

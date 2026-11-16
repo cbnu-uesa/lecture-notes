@@ -68,7 +68,7 @@
 
     const no = document.createElement('span');
     no.className = 'no';
-    no.textContent = l.no + '강';
+    no.textContent = l.noLabel || (l.no + '강');  // 안내 덱은 noLabel(예: 「기말」)
 
     // file 이 없으면 링크를 걸 수 없다. 예전에 이 자리에서 TypeError 가 나
     // 목록이 통째로 비었다 — 한 강의의 결손이 페이지 전체를 죽이지 않게 한다.
