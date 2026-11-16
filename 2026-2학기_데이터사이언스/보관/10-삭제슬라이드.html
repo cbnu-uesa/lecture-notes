@@ -66,6 +66,7 @@
         <li><strong>실습 ① · 실습 ② · 실습 ③:</strong> 2026-10-19 교수 요청으로 과제로 옮김 (6강과 같은 방식).<br>
           통제 변수 정하기 · 단계적 회귀 · 네 문장은 본편 「과제」 장에 그대로 남김</li>
         <li><strong>실습 ③ 의 제출 안내와 가정 과제:</strong> 본편 「과제」 · 「제출물」 장으로 합침</li>
+        <li><strong>과제 2: 자기 연구대상의 랜덤포레스트:</strong> 2026-11-16 교수 요청으로 뺌. 과제는 위키에 넣고 문제 푸는 것만 남김</li>
       </ul>
       <p class="conclusion">→ 배포하지 않는다. course.json 의 강의 목록에도 넣지 않는다.</p>
     <p class="caption" style="margin-top:8px">2026-11-14: 본편 「10-머신러닝」에서 뺀 「예측적 분석」 정의 장과 「예측을 증거로 쓰려면」 구분 장 · 예측구간 세 장을 맨 뒤에 붙였다 (교수 요청)</p>
@@ -214,6 +215,24 @@
       </ol>
       <p class="conclusion" style="margin-top:16px"><span class="ar">→</span> 하나라도 빠지면 정책 근거로 쓸 수 없음</p>
       <p class="src">출처: 옛 12강 「예측을 증거로 쓰는 조건」</p>
+    </div>
+  </section>
+
+<!-- 2026-11-16 본편에서 뺀 과제 -->
+  <section>
+    <h2>과제 2: 자기 연구대상의 랜덤포레스트</h2>
+    <div class="body tight">
+      <p class="define">지난 과제의 회귀분석 문제를 랜덤포레스트로 다시 풀고 회귀분석과 견줌</p>
+      <ol class="dense" style="font-size:15px;line-height:1.55">
+        <li><strong>다시 풀기:</strong> 지난 과제와 같은 y · 같은 x 로 랜덤포레스트 (y 가 연속값이면 회귀, 범주면 분류)</li>
+        <li><strong>적합도 비교:</strong> 같은 훈련 · 시험 분할에서 회귀분석과 숲의 시험 성적
+          <ul class="dash"><li>회귀: R² · RMSE · MAPE · 분류: 정분류율 · AUC</li>
+            <li>묶음(지역 · 시설 · 사람)이 있으면 묶음 단위로 나눔</li></ul></li>
+        <li><strong>SHAP:</strong> 변수 중요도 · SHAP 요약 그림 · 중요한 변수의 의존 그림 하나</li>
+        <li><strong>해석:</strong> SHAP 결과를 회귀계수와 견줌
+          <ul class="dash"><li>중요도 순서 · 방향 · 모양이 같은가, 다르면 왜 다른가</li></ul></li>
+      </ol>
+      <p class="conclusion">실습 ① ~ ③ 의 프롬프트를 자기 자료의 열 이름으로 바꿔 쓰면 됨</p>
     </div>
   </section>
 
