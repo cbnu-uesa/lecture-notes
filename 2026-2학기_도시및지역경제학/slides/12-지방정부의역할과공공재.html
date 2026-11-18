@@ -1,0 +1,1593 @@
+<!doctype html>
+<!--
+  12주차. 지방정부의 역할과 공공재
+  교재: 오설리반의 도시경제학 제9판 — 20장 (p.445~466) · 21장 (p.467~495). PART 05 지방정부, 교육, 그리고 범죄.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12주차. 지방정부의 역할과 공공재</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 지방공공재 [20장 p.450~455, 그림 20-1~20-4] ─────────────────
+  // 교재가 인쇄한 값을 모두 지나게 했다.
+  //   6에이커: mb₁ 20 · mb₂ 28 · mb₃ 40 (MSB 88)   15에이커: 12 · 18 · 30 (MSB 60)
+  //   세금 20 과 만나는 곳: mb₁ 6 · mb₂ 12 · mb₃ 22
+  // mb₂ 의 세 점(28→20→18)과 mb₃ 의 세 점(40→30→20)은 한 직선 위에 있지 않다.
+  // 그래서 mb₁ 만 직선이고 mb₂ 는 볼록(c + A·e^{−kx}), mb₃ 는 완만한 오목(2차식)이다.
+  // mb₂ 는 x < 0.6 에서 mb₃ 위로 올라가므로 곡선은 x = 1.5 부터 그린다 (1.5~23 에서 mb₁ < mb₂ < mb₃).
+  // MSB 는 세 곡선의 수직합으로 계산한다 — 효율점 e 가 15 에 오는 것은 결과이지 입력이 아니다.
+  window.PARK = (function () {
+    const u = (-1 + Math.sqrt(17)) / 2, k = Math.log(u) / 3;           // e^{3k}(e^{3k}+1) = 4
+    const A2 = 2 / (Math.exp(-12 * k) * (1 - Math.exp(-3 * k))), c2 = 20 - A2 * Math.exp(-12 * k);
+    const a3 = (-10 / 7 + 10 / 9) / 16;
+    const P = {
+      mc: 60, tax: 20, xs: 1.5, xe: 23,
+      mb1: (x) => 20 - (8 / 9) * (x - 6),
+      mb2: (x) => c2 + A2 * Math.exp(-k * x),
+      mb3: (x) => 40 - (10 / 9) * (x - 6) + a3 * (x - 6) * (x - 15),
+    };
+    P.msb = (x) => P.mb1(x) + P.mb2(x) + P.mb3(x);
+    // 그림 20-3: 히람의 한계편익이 up 만큼 오르면 효율 수준이 18 이 된다 → up = 60 − MSB(18) ≈ 8.0
+    P.up = P.mc - P.msb(18);
+    P.mb3up = (x) => P.mb3(x) + P.up;
+    P.msbUp = (x) => P.msb(x) + P.up;
+    return P;
+  })();
+
+  // ── 대표민주주의 [20장 p.457~459, 그림 20-5] ─────────────────────
+  // 1~11달러에 10명씩. 더 가까운 후보에게 투표하고, 거리가 같으면 반씩 나눈다.
+  //   (3, 9) → 55 : 55 · (6, 9) → 70 : 40 · (6, 6) → 55 : 55  — 교재 숫자와 같다
+  window.VOTE = {
+    panels: [[3, 9], [6, 9], [6, 6]],
+    share(v, [p, b]) {
+      const dp = Math.abs(v - p), db = Math.abs(v - b);
+      return dp < db ? 1 : db < dp ? 0 : 0.5;     // 페니의 몫
+    },
+    tally(pb) {
+      let P = 0;
+      for (let v = 1; v <= 11; v++) P += 10 * this.share(v, pb);
+      return [P, 110 - P];
+    },
+  };
+
+  // ── 지방정부 수입 [21장 p.468, 그림 21-1] ───────────────────────
+  window.REVENUE = [['정부 간 교부금', 33], ['부과금 및 공공요금', 29], ['재산세', 27],
+                    ['판매세', 6], ['소득세', 2], ['기타', 3]];
+
+  // ── 우리나라 지방정부 수입 [교수 요청, 2026-11-17] ─────────────
+  // 행정안전부 발표(2025. 3. 11.) 2025년 지방자치단체 당초예산, 순계 326조 원, 단위 조 원.
+  // 지방세·세외수입·지방교부세·국고보조금은 시정일보, 보전수입 등·지방채는 경향신문·뉴시안 보도.
+  // 여섯 항목 합 326.1 (반올림 차이). 비율은 이 합으로 나눈다.
+  window.KREV = [['지방세', 115.1, 'own'], ['국고보조금', 89.2, 'tr'], ['지방교부세', 61.7, 'tr'],
+                 ['세외수입', 30.6, 'own'], ['보전수입 등', 23.6, 'etc'], ['지방채', 5.9, 'etc']];
+
+  // ── 재산세 [21장 p.470~476, 그림 21-2~21-5] ─────────────────────
+  //   토지: 공급 600 부지 수직 · 수요가 세금 200 만큼 아래로 → 1,000 → 800
+  //   건축물(부분균형): 공급 4,000 수평 → 4,800 · 수요 기울기 −4 → 600 → 400채
+  //   건축물(일반균형): 수익곡선 r(K) = 4,000 − 4(K − 600) 이 두 도시에 같다. 과세 도시는 −800.
+  //     자본 1,200 이 고정이므로 r(K) − 800 = r(1,200 − K) → K = 500 · 수익 3,600 · 비과세 도시 700
+  //   토지임대료는 두 도시의 주택임대료가 같아지게 움직인다 → 600 · 1,400 · 주택임대료 5,000
+  window.PROP = {
+    lot: 600, land0: 1000, landTax: 200,
+    landD(q) { return this.land0 - 1.6 * (q - this.lot); },
+    house0: 600, ret0: 4000, bldTax: 800,
+    houseD(q) { return this.ret0 - 4 * (q - this.house0); },
+    ret(K) { return this.ret0 - 4 * (K - this.house0); },
+    totalK: 1200,
+    get Kt() {   // 과세 도시의 자본 — 두 도시 수익이 같아지는 곳 (이분법)
+      let a = 0, b = this.totalK;
+      const f = (K) => (this.ret(K) - this.bldTax) - this.ret(this.totalK - K);
+      for (let i = 0; i < 60; i++) { const m = (a + b) / 2; (f(a) * f(m) <= 0) ? (b = m) : (a = m); }
+      return Math.round((a + b) / 2);
+    },
+    get r1() { return this.ret(this.totalK - this.Kt); },              // 3,600
+    get rent() { return this.ret0 + this.land0; },                      // 5,000
+    get landT() { return this.rent - this.r1 - this.bldTax; },          // 600
+    get landN() { return this.rent - this.r1; },                        // 1,400
+  };
+
+  // ── 티부모형과 재산세 [21장 p.478~479, 그림 21-6] ────────────────
+  window.TIEB = { cost: 3000, lo: 100, hi: 200 };   // 주택가치 단위: 천 달러
+
+  // ── 정부 간 교부금 [21장 p.484~489, 그림 21-7·21-8·21-9] ────────
+  // 무차별곡선은 (x − x₀)(y − y₀) = k 꼴의 직각쌍곡선이다. 접점 조건에서 k·y₀ 를 풀었다.
+  //   접점 (x, y) 에서 기울기 −(y − y₀)/(x − x₀) = 예산선 기울기
+  //   21-7·21-8: x₀ = −25 · i(25,50) 기울기 −1 → y₀ 0, k 2,500 · f(30,65) 기울기 −1 → y₀ 10, k 3,025
+  //              g(40,55) 기울기 −0.5 → y₀ 22.5, k 2,112.5
+  //   21-9:      x₀ = 100 · i(210,260) 기울기 −0.22 → y₀ 235.8, k 2,662 · m(170,300) 기울기 −1 → y₀ 230, k 4,900
+  // 같은 그림의 두 곡선은 그림 구간에서 만나지 않는다 (높은 쪽이 언제나 위).
+  const IC = (x, y, slope, x0, y0) => ({ x0, y0, k: (x - x0) * (y - y0), slope,
+    f(t) { return this.y0 + this.k / (t - this.x0); } });
+  window.GRANT = {
+    budget: 75, grant: 20,
+    i: [25, 50], f: [30, 65], g: [40, 55],
+    ic0: IC(25, 50, 1, -25, 50 - 1 * 50),
+    icF: IC(30, 65, 1, -25, 65 - 1 * 55),
+    icG: IC(40, 55, 0.5, -25, 55 - 0.5 * 65),
+    W: { i: [210, 260], g: [140, 330], m: [170, 300], p0: 0.22,
+         icI: IC(210, 260, 0.22, 100, 260 - 0.22 * 110),
+         icM: IC(170, 300, 1, 100, 300 - 1 * 70) },
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .tbl-r { width: 100%; table-layout: fixed; }
+  .tbl-r th, .tbl-r td { text-align: right; }
+  .tbl-r th:first-child, .tbl-r td:first-child { text-align: left; }
+  .tbl-c { width: 100%; table-layout: fixed; }
+  .tbl-c th, .tbl-c td { text-align: center; }
+  .tbl-c th:first-child, .tbl-c td:first-child { text-align: left; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 표지 ══════════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>12주차. 지방정부의 역할과 공공재</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 지난 시간 — 11주차 요약 인포그래픽 ═══════════════════════ -->
+<section>
+  <h2>지난 시간: 도시교통</h2>
+  <div class="body" style="padding-top:0">
+    <svg class="fig" id="f-recap11" viewBox="0 0 848 294" style="width:848px;display:block;margin:0" role="img">
+      <title>11강 요약 인포그래픽. 혼잡과 혼잡세, 휘발유세의 전가, 교통사고와 주행거리 과세, 대중교통의 수단선택과 보조금을 네 카드로 정리</title></svg>
+    <p class="derive t-red hang" style="margin-top:6px">→ 오늘: 제5편 지방정부, 교육, 그리고 범죄<br>
+      20장: 지방정부의 역할과 <strong>지방공공재</strong>의 수준을 고르는 방법<br>
+      21장: 지방정부의 수입, <strong>재산세</strong>와 <strong>정부 간 교부금</strong></p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const W = 206, X = [0, 214, 428, 642], H = 292;
+      const P = [
+        ['혼잡', '18장 01 · 02', [
+          ['개인 균형 ≠ 효율적 수준', '개인은 사적 통행비용만 고려', '외부비용을 무시해 과다 통행'],
+          'diag',
+          ['혼잡세', '한계외부비용만큼 부과', '→ 균형을 효율적 수준으로 조정'],
+        ], '혼잡세로 효율적 수준에 맞춤'],
+        ['환경', '18장 03', [
+          ['휘발유세', '환경오염을 막으려 부과'],
+          ['조세의 전가', '세금 일부가 공급자에게 넘어감', '가격 상승은 세금의 절반'],
+        ], '휘발유세는 전가될 수 있음'],
+        ['교통사고', '18장 04', [
+          ['사고의 외부비용', '운전자가 고려하지 않음'],
+          ['과다 주행', '개인은 차를 더 많이 끌고 다님'],
+          ['주행거리(VMT) 과세', '주행거리에 따라 과세'],
+        ], '주행거리 과세가 효율적'],
+        ['대중교통', '19장', [
+          ['수단선택', '도보 · 대기시간 비용을 크게 느낌', '→ 이 시간이 적은 자동차를 더 이용'],
+          ['규모의 경제', '이용자가 많아야 평균비용 하락', '효율적 요금에서는 적자'],
+          ['보조금', '공급을 위한 보조금이 타당할 수 있음'],
+        ], '적자를 보조금으로 메움'],
+      ];
+      const diag = (x, y) => {
+        const xe = x + 44, xs = x + W - 44, ly = y + 26;
+        let d = `<path d="M${x + 16},${ly} L${x + W - 16},${ly}" stroke="${INK2}" stroke-width="1"/>`;
+        d += `<path d="M${xe},${ly - 5} L${xe},${ly + 5}" stroke="${INK}" stroke-width="1.5"/>`;
+        d += `<path d="M${xs},${ly - 5} L${xs},${ly + 5}" stroke="${RED}" stroke-width="1.5"/>`;
+        d += t(xe, ly + 18, 'vᴱ 효율적 수준', 10, INK, { a: 'middle', w: 700 });
+        d += t(xs, ly + 18, 'v* 개인 균형', 10, RED, { a: 'middle', w: 700 });
+        d += `<path d="M${xs - 4},${ly - 10} L${xe + 6},${ly - 10}" stroke="${RED}" stroke-width="1.5" marker-end="url(#ah-red)"/>`;
+        d += t((xe + xs) / 2, ly - 15, '혼잡세', 10, RED, { a: 'middle', w: 700 });
+        return d;
+      };
+      P.forEach(([q, why, rows, rule], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += `<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>` + t(x + 18, 24.5, String(i + 1), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+        s += t(x + 35, 25, q, 14, RED, { w: 700 });
+        s += t(x + W - 12, 25, why, 10, MUTED, { a: 'end' });
+        let y = 60;
+        rows.forEach((r) => {
+          if (r === 'diag') { s += diag(x, y - 14); y += 56; return; }
+          const [k, a, b] = r;
+          s += t(x + 12, y, k, 12, INK, { w: 700 });
+          s += t(x + 12, y + 16, a, 10.5, INK2);
+          if (b) s += t(x + 12, y + 30, b, 10.5, MUTED);
+          y += b ? 56 : 44;
+        });
+        s += `<rect x="${x + 8}" y="${H - 32}" width="${W - 16}" height="24" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 15, rule, 11, RED, { w: 700, a: 'middle' });
+      });
+      Fig.draw('#f-recap11', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 섹션 — CHAPTER 20 ═════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 20 지방정부의 역할</p>
+  <p class="section-sub">지방정부는 공교육 · 공공 안전 · 공원 · 대중교통 등 다양한 재화와 서비스를 제공 · 교재 p.445~466</p>
+</section>
+
+
+<!-- ══ 표 20-1 · 정부의 3대 역할 (p.446~447) ══════════════════ -->
+<section>
+  <h2>정부의 3대 역할</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:10px">시장경제에서 정부의 역할: 안정화 · 소득재분배 · <span class="mark">자원배분</span></p>
+    <table class="tbl-c" style="margin-bottom:2px">
+      <thead><tr><th>총합</th><th>교육</th><th>경찰</th><th>공공보조</th><th>고속도로</th><th>대중교통</th><th>소방</th><th>기타</th></tr></thead>
+      <tbody><tr><td>4,919</td><td><strong>1,711</strong></td><td>300</td><td>262</td><td>190</td><td>171</td><td>134</td><td>2,151</td></tr></tbody>
+    </table>
+    <p class="caption" style="margin-bottom:14px">지방정부의 1인당 지출(달러), 2012 · 출처: <em>2012 Census of Governments</em>, US Census Bureau</p>
+    <p class="lbl"><strong>안정화:</strong><span>실업 · 물가 조절 → <strong>국가</strong>의 몫<br>
+      지방 화폐는 혼란, 지방소득은 대부분 지역 밖 재화에 쓰여 지방 정책의 효과가 약함</span></p>
+    <p class="lbl"><strong>소득재분배:</strong><span>세금 · 이전지출 → <strong>국가</strong>의 몫<br>
+      부유층 유출 · 빈곤층 유입으로 지방의 재분배 효과가 약화</span></p>
+    <p class="lbl" style="margin-bottom:12px"><strong>자원배분:</strong><span>무엇을 어떻게 생산할지 결정 → 교육 · 경찰 · 대중교통 · 소방 · 공원</span></p>
+    <p class="derive t-red">→ 지방정부의 역할은 자원배분: 지출의 약 1/3이 교육</p>
+  </div>
+</section>
+
+<!-- ══ 연방제도하에서 지방정부 (p.447~449) ══════════════════ -->
+<section>
+  <h2>연방제도하에서 지방정부</h2>
+  <div class="body" style="padding-top:0">
+    <p class="lead t-define" style="margin-bottom:8px">공공재 공급 책임을 연방 · 주 · 지방이 나눔 (국방 · 우주탐사는 국가, 교육 · 치안은 지방)</p>
+    <svg class="fig" id="f-federal" viewBox="0 0 848 292" style="width:848px;display:block;margin:0" role="img">
+      <title>지방 제공의 장점인 수요의 다양성과 단점인 외부효과·규모의 경제를 나눠 놓고, 지방 제공이 효율적인 조건과 파급효과에 대한 두 대응을 아래에 정리한 인포그래픽</title></svg>
+    <p class="derive t-red hang" style="margin-top:6px">→ 파급효과가 수요의 다양성보다 크면 대도시지역 정부가 더 효율적</p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n) => `<circle cx="${x}" cy="${y}" r="11" fill="${RED}"/>` + t(x, y + 4.5, String(n), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      let s = '';
+      const W = 276, X = [0, 286, 572], Y1 = 30, H1 = 104;
+      // 묶음 머리: 장점 1칸 · 단점 2칸
+      s += t(0, 17, '지방 제공의 장점', 14, BLUE, { w: 700 });
+      s += `<path d="M0,${Y1 - 6} L${W},${Y1 - 6}" stroke="${BLUE}" stroke-width="2.5"/>`;
+      s += t(X[1], 17, '지방 제공의 단점', 14, RED, { w: 700 });
+      s += `<path d="M${X[1]},${Y1 - 6} L848,${Y1 - 6}" stroke="${RED}" stroke-width="2.5"/>`;
+      const C = [
+        ['수요의 다양성', ['작은 자치시 · 학군이', '서로 다른 공공재와 세금의 조합을 제공']],
+        ['외부효과', ['편익이 경계 밖으로 파급', '지역 투표자는 외부인의 편익을 고려하지 않음']],
+        ['규모의 경제', ['작은 정부는 생산비용이 높음'], ['상하수도: 완만한 규모의 경제', '치안 · 소방 · 교육: 인구 약 10만에서 소진']],
+      ];
+      C.forEach(([k, rows, notes], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="${Y1}" width="${W}" height="${H1}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 18, Y1 + 22, i + 1);
+        s += t(x + 35, Y1 + 27, k, 14, INK, { w: 700 });
+        let y = Y1 + 56;
+        rows.forEach((r) => { s += t(x + 12, y, r, 11.5, INK2); y += 20; });
+        (notes || []).forEach((r) => { s += t(x + 12, y + 2, r, 10.5, MUTED); y += 17; });
+      });
+      const yb = Y1 + H1 + 12;
+      s += `<rect x="0" y="${yb}" width="848" height="34" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+      s += t(16, yb + 22, '지방 제공이 효율적인 조건', 12, RED, { w: 700 });
+      s += t(200, yb + 22, '수요의 다양성이 크고 · 외부효과의 파급범위가 작으며 · 규모의 경제가 작을 때', 12, INK, { w: 700 });
+      const y2 = yb + 48, H2 = 292 - y2;
+      s += t(12, y2 + 30, '파급효과에 대한 대응', 14, INK, { w: 700 });
+      s += t(12, y2 + 50, '2. 외부효과를 다루는 두 방법', 10.5, MUTED);
+      s += `<path d="M${W - 30},${y2 + H2 / 2} L${X[1] - 4},${y2 + H2 / 2}" stroke="${INK2}" stroke-width="1.5" marker-end="url(#ah-ink)"/>`;
+      [['상위 정부의 보조금', '외부 편익만큼 지원', '→ 한계 사회적 편익에 따라 지출 (21장 03)'],
+       ['대도시권 기구', '경계를 넘는 문제를 다룰 권한 부여', '오레곤주 포틀랜드 · 미네소타주 트윈시티스']].forEach(([k, r1, r2], i) => {
+        const x = X[i + 1];
+        s += `<rect x="${x}" y="${y2}" width="${W}" height="${H2}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += t(x + 12, y2 + 26, k, 13, INK, { w: 700 });
+        s += t(x + 12, y2 + 50, r1, 11.5, INK2);
+        s += t(x + 12, y2 + 70, r2, 10.5, MUTED);
+      });
+      Fig.draw('#f-federal', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 지방공공재의 세 가지 특성 (p.449~450) ═══════════════════ -->
+<section>
+  <h2>지방공공재의 세 가지 특성</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:18px">공공재: 비용 지불 여부와 상관없이 <span class="mark">누구나 소비가능한 재화</span></p>
+    <p class="sub" style="margin-bottom:2px">순수 공공재(pure public goods)의 두 특성</p>
+    <p class="lbl"><strong>1. 비경합성(nonrivalrous):</strong><span>한 사람의 편익이 다른 사람의 편익을 줄이지 않음</span></p>
+    <p class="lbl"><strong>2. 비배제성(nonexcludable):</strong><span>비용을 내지 않는 사람을 배제하기 어려움</span></p>
+    <p class="caption" style="margin-bottom:16px">지방정부의 재화는 이용자가 많으면 경합적: 붐비는 공원 · 첨두시간의 도로</p>
+    <p class="sub" style="margin-bottom:2px">지방공공재의 세 번째 특성</p>
+    <p class="lbl" style="margin-bottom:16px"><strong>3. 편익의 지역 한정:</strong><span>편익이 지방자치시 · 대도시지역 안에 머묾 (지역 경찰서 · 소방서 · 지방도로)</span></p>
+    <p class="derive t-red">→ 관할구역의 적정 규모 = 편익의 지리적 범위, 곧 <strong>지역성(localness)</strong></p>
+  </div>
+</section>
+
+<!-- ══ 그림 20-1 (p.450~452) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>지방공공재의 효율적 수준</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:10px">한계 사회적 편익(MSB)<br>
+        = 개별 한계편익곡선들의 <span class="mark">수직합</span></p>
+      <p class="emph" style="margin-bottom:8px">공원 규모를 정하는 세 시민<br>
+        로이스(mb₁) · 매리안(mb₂) · 히람(mb₃)</p>
+      <p class="li-hang" style="margin-bottom:4px">① 6번째 에이커의 한계편익: 20(a) · 28(b) · 40(c)</p>
+      <p class="li-hang" style="margin-bottom:4px">② 비경합 재화 → 사회적 편익은 사적 편익의 합<br>
+        20 + 28 + 40 = 88 (점 d)</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 한계비용 60 = MSB 인 점 e</p>
+      <p class="derive t-red hang">→ 효율적 공원 규모: 15에이커<br>
+        6에이커에서 1에이커를 더하면 88 − 60 = 28의 순이득</p>
+      <p class="caption" style="margin-top:8px">사적 재화(경합적): 같은 가격에서 각자 사는 양을 더함 → 수요곡선의 수평합<br>
+        공공재(비경합): 같은 양을 함께 소비 → 그 양의 한계편익을 더함 → 수직합</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-park1" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>세 시민의 한계편익곡선을 수직으로 더한 한계 사회적 편익곡선이 한계비용 60과 15에이커에서 만나는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PARK, F = Fig.withBox({ x0: 52, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [0, 25], y: [0, 110] });
+          const mk = (f, a = P.xs, b = P.xe) => { const o = []; for (let i = 0; i <= 60; i++) { const x = a + ((b - a) * i) / 60; o.push([x, f(x)]); } return S.curve(o); };
+          const parts = [
+            F.line(S.x(0), S.y(P.mc), S.x(24), S.y(P.mc), { variant: 'supply' }),
+            F.annot(S.x(24), S.y(P.mc) - 7, '한계비용', { anchor: 'end', size: 10, tone: 'red' }),
+            F.curve(mk(P.msb, 2)),
+            F.annot(S.x(7.5) + 8, S.y(P.msb(7.5)) - 4, '한계 사회적 편익: MSB', { size: 10 }),
+            F.curve(mk(P.mb3), { variant: 'i2' }),
+            F.annot(S.x(19.5), S.y(P.mb3(19.5)) - 8, 'mb₃', { size: 11 }),
+            F.curve(mk(P.mb2), { variant: 'demand' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb2(P.xe)) + 4, 'mb₂', { size: 11, tone: 'blue' }),
+            F.curve(mk(P.mb1), { variant: 'i1' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb1(P.xe)) + 4, 'mb₁', { size: 11 }),
+          ];
+          [[P.mb1, 'a', '20'], [P.mb2, 'b', '28'], [P.mb3, 'c', '40'], [P.msb, 'd', '88']].forEach(([f, nm, tk], i) => {
+            const p = S.p([6, f(6)]);
+            parts.push(F.guide(...p, i === 0 ? { xtick: '6', ytick: tk } : { ytick: tk, only: 'y' }));
+            parts.push(F.dot(...p, { label: nm, lx: 7, ly: i === 3 ? -7 : -5 }));
+          });
+          parts.push(F.raw(`<path class="guide" d="M${S.x(6)},${S.y(P.msb(6))} L${S.x(6)},${S.y(P.mb3(6))}"/>`));
+          // e 는 MSB 와 한계비용의 교점 — 계산으로 구한다
+          const msbC = mk(P.msb, 2), mcC = S.curve([[0, P.mc], [24, P.mc]]);
+          const e = Fig.cross(msbC, mcC);
+          parts.push(F.guide(e[0], e[1], { xtick: '15', ytick: '60' }));
+          parts.push(F.dot(e[0], e[1], { label: 'e', lx: 5, ly: -8 }));
+          F.draw('#f-park1', { axes: { x: '에이커', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 세 메커니즘 (p.445~446) ═══════════════════════════════ -->
+<section>
+  <h2>지방공공재의 수준을 결정하는 세 가지 메커니즘</h2>
+  <div class="body" style="padding-top:40px">
+    <svg class="fig" id="f-mech" viewBox="0 0 848 210" style="width:848px;display:block;margin:0" role="img">
+      <title>지방공공재의 수준을 결정하는 세 메커니즘인 다수결 원칙, 응익세, 이주를 통한 투표를 세 카드로 놓은 인포그래픽</title></svg>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n) => `<circle cx="${x}" cy="${y}" r="12" fill="${RED}"/>` + t(x, y + 5, String(n), 14, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      let s = '';
+      const W = 276, X = [0, 286, 572], H = 210;
+      const C = [
+        ['다수결 원칙', 'majority rule', ['결과 = 중위투표자의 선호'], '효율적인 수준을 담보하지 않음'],
+        ['응익세', 'benefit taxation', ['세금 부담 ∝ 공공재에 대한 지불용의', '(린달 과세)'], '만장일치로 효율적 규모 선택'],
+        ['이주를 통한 투표', 'vote with their feet', ['선호에 맞는 관할구역으로 이동', '(티부모형)'], '동질적 자치시: 다수결의 비효율 제거'],
+      ];
+      C.forEach(([k, en, rows, res], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 22, 28, i + 1);
+        s += t(x + 42, 34, k, 16, INK, { w: 700 });
+        s += t(x + 42, 54, en, 11, MUTED);
+        let y = 98;
+        rows.forEach((r, j) => { s += t(x + 16, y, r, 13, j ? MUTED : INK2); y += 22; });
+        s += `<rect x="${x + 8}" y="${H - 42}" width="${W - 16}" height="30" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 22, '→ ' + res, 12, RED, { w: 700, a: 'middle' });
+      });
+      Fig.draw('#f-mech', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 그림 20-2 · 표 20-2 (p.452~453) ═══════════════════════ -->
+<section class="s-split">
+  <h2>1. 다수결 원칙과 결정적인 중위투표자</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:8px">다수결 원칙의 결과 = <span class="mark">중위투표자</span>의 선호</p>
+      <p class="li-hang" style="margin-bottom:4px">① 에이커당 비용 60을 셋이 나눔<br>
+        → 1인당 세금 20 = 각자의 한계비용</p>
+      <p class="li-hang" style="margin-bottom:4px">② 각자 mb = 20 인 규모를 선호<br>
+        로이스 6(a) · 매리안 12(m) · 히람 22(h)</p>
+      <p class="li-hang" style="margin-bottom:2px">③ 두 안씩 투표 (교재 표 20-2)</p>
+      <table class="tbl-c" style="margin-bottom:8px">
+        <colgroup><col style="width:22%"><col style="width:20%"><col style="width:36%"><col style="width:22%"></colgroup>
+        <thead><tr><th>선거</th><th>6에이커</th><th>12에이커</th><th>22에이커</th></tr></thead>
+        <tbody>
+          <tr><td>6 vs. 12</td><td>로이스</td><td><strong>매리안, 히람</strong></td><td>–</td></tr>
+          <tr><td>12 vs. 22</td><td>–</td><td><strong>매리안, 로이스</strong></td><td>히람</td></tr>
+        </tbody>
+      </table>
+      <p class="derive t-red hang">→ 중위투표자 매리안의 12에이커가 두 선거 모두 승리<br>
+        효율적 규모 15(e)보다 작음 → 비효율적으로 작은 공원</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-park2" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>1인당 세금 20에서 로이스는 6, 매리안은 12, 히람은 22에이커를 선호하고 효율적 규모는 15에이커인 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PARK, F = Fig.withBox({ x0: 52, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [0, 25], y: [0, 110] });
+          const mk = (f, a = P.xs, b = P.xe) => { const o = []; for (let i = 0; i <= 60; i++) { const x = a + ((b - a) * i) / 60; o.push([x, f(x)]); } return S.curve(o); };
+          const taxC = S.curve([[0, P.tax], [24, P.tax]]);
+          const C = { mb1: mk(P.mb1), mb2: mk(P.mb2), mb3: mk(P.mb3), msb: mk(P.msb, 2) };
+          const parts = [
+            F.line(S.x(0), S.y(P.mc), S.x(24), S.y(P.mc), { variant: 'supply' }),
+            F.annot(S.x(24), S.y(P.mc) - 7, '한계비용', { anchor: 'end', size: 10, tone: 'red' }),
+            F.line(...taxC[0], ...taxC[1], { variant: 'cap' }),
+            F.annot(S.x(0.6), S.y(P.tax) + 15, '세금', { size: 10 }),
+            F.curve(C.msb),
+            F.annot(S.x(7.5) + 8, S.y(P.msb(7.5)) - 4, '한계 사회적 편익: MSB', { size: 10 }),
+            F.curve(C.mb3, { variant: 'i2' }),
+            F.annot(S.x(16.5), S.y(P.mb3(16.5)) - 8, 'mb₃', { size: 11 }),
+            F.curve(C.mb2, { variant: 'demand' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb2(P.xe)) + 10, 'mb₂', { size: 11, tone: 'blue' }),
+            F.curve(C.mb1, { variant: 'i1' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb1(P.xe)) + 4, 'mb₁', { size: 11 }),
+          ];
+          // 선호 규모 = 각 mb 와 세금선의 교점 (6 · 12 · 22 가 계산에서 나온다)
+          [[C.mb1, 'a', -12], [C.mb2, 'm', -4], [C.mb3, 'h', 6]].forEach(([c, nm, lx], i) => {
+            const p = Fig.cross(c, taxC);
+            const x = Math.round((p[0] - F.BOX.x0) / (F.BOX.x1 - F.BOX.x0) * 25);
+            parts.push(F.guide(p[0], p[1], i === 0 ? { xtick: String(x), ytick: '20' } : { xtick: String(x), only: 'x' }));
+            parts.push(F.dot(p[0], p[1], { label: nm, lx, ly: -8 }));
+          });
+          const e = Fig.cross(C.msb, S.curve([[0, P.mc], [24, P.mc]]));
+          parts.push(F.guide(e[0], e[1], { xtick: '15', ytick: '60' }));
+          parts.push(F.dot(e[0], e[1], { label: 'e', lx: 5, ly: -8 }));
+          F.draw('#f-park2', { axes: { x: '에이커', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 20-3 (p.453~454) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>1. 다수결 원칙과 결정적인 중위투표자: 고수요자의 편익 상승</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">사고 실험: 수요가 높은 히람의 한계편익 상승</p>
+      <p class="li-hang" style="margin-bottom:4px">① mb₃ 상승 → MSB 도 같은 폭으로 상향</p>
+      <p class="li-hang" style="margin-bottom:4px">② 효율적 규모: 15(e) → <strong>18(f)</strong></p>
+      <p class="li-hang" style="margin-bottom:12px">③ 중위투표자 매리안의 mb₂ 는 그대로<br>
+        → 다수결 결과도 <strong>12(m)</strong> 그대로</p>
+      <p class="derive t-red hang">→ 중위투표자가 결정적: 다른 투표자의 선호는 무관<br>
+        다수결 원칙은 효율적인 원칙이 아님</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-park3" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>히람의 한계편익이 올라 한계 사회적 편익곡선이 위로 옮겨 효율적 규모는 15에서 18로 늘지만 다수결 결과는 12에 머무는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PARK, F = Fig.withBox({ x0: 52, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [0, 25], y: [0, 110] });
+          const mk = (f, a = P.xs, b = P.xe) => { const o = []; for (let i = 0; i <= 60; i++) { const x = a + ((b - a) * i) / 60; o.push([x, f(x)]); } return S.curve(o); };
+          const taxC = S.curve([[0, P.tax], [24, P.tax]]), mcC = S.curve([[0, P.mc], [24, P.mc]]);
+          // 이동 후 MSB 는 그림 위 끝(106)을 넘지 않는 곳부터 그린다
+          let x0 = 2; while (P.msbUp(x0) > 106) x0 += 0.1;
+          const C = { mb1: mk(P.mb1), mb2: mk(P.mb2), mb3: mk(P.mb3up), msb: mk(P.msb, 2), msbUp: mk(P.msbUp, x0) };
+          const parts = [
+            F.line(...mcC[0], ...mcC[1], { variant: 'supply' }),
+            F.annot(S.x(24), S.y(P.mc) - 7, '한계비용', { anchor: 'end', size: 10, tone: 'red' }),
+            F.line(...taxC[0], ...taxC[1], { variant: 'cap' }),
+            F.annot(S.x(0.6), S.y(P.tax) + 15, '세금', { size: 10 }),
+            // 이동 전 MSB — 회색 점선으로 남겨 이동 폭을 보인다
+            F.raw(`<path class="guide" d="${Fig.path(C.msb)}"/>`),
+            F.annot(S.x(3.2) - 4, S.y(P.msb(3.2)) + 14, 'MSB (이전)', { anchor: 'end', size: 9 }),
+            F.curve(C.msbUp),
+            F.annot(S.x(9) + 8, S.y(P.msbUp(9)) - 4, 'MSB (상승 후)', { size: 10 }),
+            F.curve(C.mb3, { variant: 'i2' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb3up(P.xe)) + 4, 'mb₃ (상승 후)', { size: 10 }),
+            F.curve(C.mb2, { variant: 'demand' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb2(P.xe)) + 6, 'mb₂', { size: 11, tone: 'blue' }),
+            F.curve(C.mb1, { variant: 'i1' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb1(P.xe)) + 4, 'mb₁', { size: 11 }),
+          ];
+          [[C.mb1, 'a', -12, '6'], [C.mb2, 'm', -4, '12']].forEach(([c, nm, lx, tk], i) => {
+            const p = Fig.cross(c, taxC);
+            parts.push(F.guide(p[0], p[1], i === 0 ? { xtick: tk, ytick: '20' } : { xtick: tk, only: 'x' }));
+            parts.push(F.dot(p[0], p[1], { label: nm, lx, ly: -8 }));
+          });
+          const e = Fig.cross(C.msb, mcC), f = Fig.cross(C.msbUp, mcC);
+          parts.push(F.guide(e[0], e[1], { xtick: '15', ytick: '60' }));
+          parts.push(F.dot(e[0], e[1], { label: 'e', lx: -12, ly: -8 }));
+          parts.push(F.guide(f[0], f[1], { xtick: '18', only: 'x' }));
+          parts.push(F.dot(f[0], f[1], { label: 'f', lx: 6, ly: -8 }));
+          F.draw('#f-park3', { axes: { x: '에이커', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 20-4 응익세 (p.454~455) ══════════════════════════ -->
+<section class="s-split">
+  <h2>2. 응익세(Benefit Taxation)</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:10px">린달 과세: 세금 부담 ∝ 공공재에 대한 <span class="mark">지불용의</span></p>
+      <p class="li-hang" style="margin-bottom:4px">① 효율적 수준을 먼저 정함: 15에이커(e)</p>
+      <p class="li-hang" style="margin-bottom:4px">② 15에서 각자의 한계편익을 에이커당 세금으로<br>
+        히람 30 · 매리안 18 · 로이스 12</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 세금의 합 30 + 18 + 12 = 60 = 한계비용<br>
+        각자 mb = 자기 세금 → 셋 모두 15에이커 선호</p>
+      <p class="derive t-red" style="margin-bottom:12px">→ 만장일치로 효율적 규모 선택</p>
+      <p class="lbl"><strong>실용성:</strong><span>개별 mb 는 관찰 불가, 지불용의를 과소 표명할 유인<br>
+        편익이 재산가치 · 소득과 비례하면<br>
+        재산세 · 소득세가 대략 응익세 역할</span></p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-park4" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>효율적 규모 15에이커에서 세 시민의 한계편익 30, 18, 12를 각자의 에이커당 세금으로 매기면 합이 한계비용 60이 되는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PARK, F = Fig.withBox({ x0: 52, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [0, 25], y: [0, 110] });
+          const mk = (f, a = P.xs, b = P.xe) => { const o = []; for (let i = 0; i <= 60; i++) { const x = a + ((b - a) * i) / 60; o.push([x, f(x)]); } return S.curve(o); };
+          const C = { msb: mk(P.msb, 2) }, mcC = S.curve([[0, P.mc], [24, P.mc]]);
+          const parts = [
+            F.line(...mcC[0], ...mcC[1], { variant: 'supply' }),
+            F.annot(S.x(0.6), S.y(P.mc) - 7, '한계비용', { size: 10, tone: 'red' }),
+            F.curve(C.msb),
+            F.annot(S.x(7.5) + 8, S.y(P.msb(7.5)) - 4, '한계 사회적 편익', { size: 10 }),
+            F.curve(mk(P.mb3), { variant: 'i2' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb3(P.xe)) - 2, 'mb₃', { size: 11 }),
+            F.curve(mk(P.mb2), { variant: 'demand' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb2(P.xe)) + 8, 'mb₂', { size: 11, tone: 'blue' }),
+            F.curve(mk(P.mb1), { variant: 'i1' }),
+            F.annot(S.x(P.xe) + 4, S.y(P.mb1(P.xe)) + 4, 'mb₁', { size: 11 }),
+          ];
+          const e = Fig.cross(C.msb, mcC);
+          parts.push(F.guide(e[0], e[1], { xtick: '15', ytick: '60' }));
+          parts.push(F.dot(e[0], e[1], { label: 'e', lx: 6, ly: -8 }));
+          [[P.mb3, '30'], [P.mb2, '18'], [P.mb1, '12']].forEach(([f, tk]) => {
+            const p = S.p([15, f(15)]);
+            parts.push(F.guide(...p, { ytick: tk, only: 'y' }));
+            parts.push(F.dot(...p));
+          });
+          parts.push(F.raw(`<path class="guide" d="M${S.x(15)},${S.y(P.mb3(15))} L${S.x(15)},${S.y(P.mc)}"/>`));
+          F.draw('#f-park4', { axes: { x: '에이커', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 티부모형 (p.455~457) ══════════════════════════════════ -->
+<section>
+  <h2>3. 티부모형: 이주를 통한 투표</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:8px">이주를 통한 투표(vote with their feet): <span class="mark">선호에 맞는 관할구역</span>으로 이동</p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub" style="margin-bottom:2px">티부모형(Tiebout model)의 다섯 가정</p>
+        <ol class="dense" style="margin:0;padding:0;list-style-position:inside">
+          <li class="li-hang"><strong>관할구역 선택:</strong> 모든 가구가 맞는 곳을 찾을 만큼 자치시가 충분</li>
+          <li class="li-hang"><strong>완벽한 정보와 이주:</strong> 이사비용 없음</li>
+          <li class="li-hang"><strong>관할구역 간 파급효과의 부재:</strong> 편익은 그 자치시 안에만</li>
+          <li class="li-hang"><strong>규모 경제의 부재:</strong> 평균생산비용 일정</li>
+          <li class="li-hang"><strong>인두세(head tax):</strong> 모든 시민이 같은 세금</li>
+        </ol>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">수요에 따라 모여 살기(sorting)</p>
+        <p class="emph" style="margin-bottom:4px">로이스빌: 수요가 작은 시민 셋</p>
+        <p style="margin-bottom:4px">6에이커의 MSB = 3 × 20 = 60 = 한계비용<br>
+          1인당 세금 20 → 셋 모두 6에이커 선호 → 만장일치</p>
+        <p style="margin-bottom:12px">매리안 셋의 자치시는 12에이커 · 히람은 22에이커 공원이 있는 곳으로</p>
+        <p class="derive t-red hang">→ 동질적 지방자치시: 모두 같은 수준을 선호<br>
+          다수결 원칙의 비효율 제거</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 20-5 (p.457~459) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>1. 대표민주주의에서 중위투표자</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:6px">크고 이질적인 관할구역: 이주보다 <strong>투표용지를 통한 투표</strong></p>
+      <p class="lead t-define" style="margin-bottom:8px;font-size:17px">선출된 관료가 예산 결정<br>
+        → 시민은 선호 예산에 <span class="mark">가장 가까운 후보</span>에게 투표</p>
+      <p style="margin-bottom:6px">유권자: 교육 예산 1~11달러에 10명씩 균등분포</p>
+      <p class="li-hang" style="margin-bottom:3px">① 페니 3 · 벅 9 → 55 : 55 동수</p>
+      <p class="li-hang" style="margin-bottom:3px">② 페니가 중위 예산 6으로 일방적 이탈<br>
+        → 1~7달러 유권자 확보, 70 : 40 페니 승</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 벅도 6으로 → 55 : 55 동수</p>
+      <p class="derive t-red hang">→ 내쉬균형: 두 후보 모두 중위투표자의 예산 6달러<br>
+        중도 유권자 경쟁 → 선출직의 선택 = 중위투표자 선호</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-vote" viewBox="0 0 400 324" style="width:370px" role="img">
+        <title>1부터 11달러까지 10명씩인 유권자를 두 후보가 나누는 세 단계 막대그림. 페니가 중위 예산 6으로 옮기면 이기고, 벅도 옮기면 다시 동수가 된다</title></svg>
+      <script>
+        (function () {
+          const V = window.VOTE, F = Fig;
+          const X0 = 46, BW = 25, BH = 40, top0 = 26, gap = 100;
+          const PEN = 'var(--muted)', BUCK = 'var(--accent-blue)';
+          const parts = [];
+          V.panels.forEach((pb, k) => {
+            const y = top0 + k * gap;
+            const [P, B] = V.tally(pb);
+            for (let v = 1; v <= 11; v++) {
+              const x = X0 + (v - 1) * BW, s = V.share(v, pb);
+              if (s > 0) parts.push(F.raw(`<rect x="${x}" y="${y + 20}" width="${BW * s}" height="${BH}" fill="${PEN}" opacity="0.5"/>`));
+              if (s < 1) parts.push(F.raw(`<rect x="${x + BW * s}" y="${y + 20}" width="${BW * (1 - s)}" height="${BH}" fill="${BUCK}" opacity="0.4"/>`));
+              parts.push(F.raw(`<rect x="${x}" y="${y + 20}" width="${BW}" height="${BH}" fill="none" stroke="var(--ink-2)" stroke-width="0.8"/>`));
+              parts.push(F.annot(x + BW / 2, y + 20 + BH + 13, String(v), { anchor: 'middle', size: 9 }));
+            }
+            // 후보 위치 화살표 (같은 자리면 이름을 한 줄에)
+            const cx = (v) => X0 + (v - 0.5) * BW;
+            if (pb[0] === pb[1]) {
+              parts.push(F.annot(cx(pb[0]), y + 2, '페니 · 벅', { anchor: 'middle', size: 10 }));
+              parts.push(F.arrow(cx(pb[0]), y + 6, cx(pb[0]), y + 18));
+            } else {
+              parts.push(F.annot(cx(pb[0]), y + 2, '페니', { anchor: 'middle', size: 10 }));
+              parts.push(F.arrow(cx(pb[0]), y + 6, cx(pb[0]), y + 18));
+              parts.push(F.annot(cx(pb[1]), y + 2, '벅', { anchor: 'middle', size: 10, tone: 'blue' }));
+              parts.push(F.arrow(cx(pb[1]), y + 6, cx(pb[1]), y + 18, { tone: 'blue' }));
+            }
+            parts.push(F.annot(X0 - 26, y + 20 + BH / 2 + 5, '①②③'[k], { anchor: 'middle', size: 13 }));
+            parts.push(F.annot(X0 + 11 * BW + 10, y + 20 + BH / 2 + 5, `${P} : ${B}`, { size: 12, tone: P > B ? 'red' : undefined }));
+          });
+          parts.push(F.annot(X0, top0 + 2 * gap + 20 + BH + 30, '칸 하나 = 유권자 10명 · 회색 페니 · 파랑 벅', { size: 9 }));
+          F.draw('#f-vote', { parts, check: false });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 중위-투표자모형의 한계 (p.460~461) ═════════════════════ -->
+<section>
+  <h2>중위-투표자모형의 한계</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:18px">선거를 생각하는 데 유용한 틀이지만 <span class="mark">세 가정</span>이 적용을 제한</p>
+    <p class="lbl"><strong>1. 이념:</strong><span>정치인은 당선만을 원한다고 가정<br>
+      실제로는 원칙과 이념으로 입장을 정하고 투표자를 설득 → 추종자가 아닌 지도자</span></p>
+    <p class="lbl"><strong>2. 단일정책 쟁점:</strong><span>경찰예산 · 공원예산 · 노숙자 정책을 묶은 일괄 공약안(package deals)<br>
+      → 중위투표자를 식별하기 어려움</span></p>
+    <p class="lbl" style="margin-bottom:18px"><strong>3. 모든 시민의 투표:</strong><span>후보 간 차이가 없거나(무차별, indifference)<br>
+      가장 가까운 후보도 너무 멀면(소외, alienation) 기권</span></p>
+    <p class="derive t-red">→ 일부가 기권하면 입장 변화가 투표 참여를 바꿔 중위투표자 결과가 반드시 나오지 않음</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — CHAPTER 21 ═════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 21 지방정부의 수입</p>
+  <p class="section-sub">지방정부의 두 가지 가장 큰 재원: 주택에 대한 재산세와 정부 간 교부금 · 교재 p.467~495</p>
+</section>
+
+<!-- ══ 그림 21-1 (p.467~468) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>지방정부의 수입 원천들</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:12px">이전 장: 지방정부가 제공하는 재화와 서비스<br>
+        이 장: 그 재원인 <span class="mark">재산세</span>와 <span class="mark">정부 간 교부금</span></p>
+      <p class="caption" style="margin-top:-8px;margin-bottom:12px">정부 간 교부금: 지방정부가 상위 정부(주 · 연방)로부터 받는 자금이전</p>
+      <p class="sub" style="margin-bottom:2px">두 가지 핵심 질문</p>
+      <p class="li-hang" style="margin-bottom:2px"><strong>1. 재산세는 실제로 누가 부담하는가?</strong></p>
+      <p class="caption" style="margin-bottom:8px">법적 납세자의 「능동적인 회피」 → 시장의 변화로 세금이 다른 사람에게 전가</p>
+      <p class="li-hang" style="margin-bottom:2px"><strong>2. 교부금의 어느 정도가 지정된 공공재에 쓰이는가?</strong></p>
+      <p class="caption" style="margin-bottom:12px">지방정부가 세금 인하로 대응 → 일부는 사적 재화에 쓰임</p>
+      <p class="derive t-red">→ 수입의 약 1/3이 상위 정부의 교부금, 재산세는 27%</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-revenue" viewBox="0 0 430 250" style="width:400px" role="img">
+        <title>지방정부 수입 원천의 원그래프. 정부 간 교부금 33%, 부과금 및 공공요금 29%, 재산세 27%, 판매세 6%, 소득세 2%, 기타 3%</title></svg>
+      <script>
+        (function () {
+          const R = window.REVENUE, F = Fig;
+          const cx = 120, cy = 122, r = 104;
+          const tot = R.reduce((a, [, v]) => a + v, 0);
+          const tone = [['var(--accent-blue)', 0.85], ['var(--accent-blue)', 0.55], ['var(--brand-crimson)', 0.85],
+                        ['var(--accent-blue)', 0.32], ['var(--accent-blue)', 0.2], ['var(--muted)', 0.35]];
+          let ang = -Math.PI / 2;
+          const parts = [];
+          R.forEach(([k, v], i) => {
+            const sw = (v / tot) * 2 * Math.PI, e = ang + sw;
+            const x1 = cx + r * Math.cos(ang), y1 = cy + r * Math.sin(ang);
+            const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+            parts.push(F.raw(`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} ` +
+              `A${r},${r} 0 ${sw > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" ` +
+              `fill="${tone[i][0]}" opacity="${tone[i][1]}" stroke="#fff" stroke-width="1.5"/>`));
+            if (v >= 20) {
+              const m = (ang + e) / 2;
+              parts.push(F.raw(`<text class="on-dark" x="${(cx + r * 0.6 * Math.cos(m)).toFixed(1)}" y="${(cy + r * 0.6 * Math.sin(m) + 5).toFixed(1)}" ` +
+                `style="font-size:15px;fill:#FFF;font-weight:700;text-anchor:middle">${v}%</text>`));
+            }
+            ang = e;
+          });
+          R.forEach(([k, v], i) => {
+            const y = 40 + i * 30;
+            parts.push(F.raw(`<rect x="262" y="${y - 11}" width="13" height="13" fill="${tone[i][0]}" opacity="${tone[i][1]}"/>`));
+            parts.push(F.annot(282, y, k, { size: 12 }));
+            parts.push(F.annot(424, y, `${v}%`, { anchor: 'end', size: 12, tone: i === 2 ? 'red' : undefined }));
+          });
+          F.draw('#f-revenue', { parts, check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:2px;text-align:center">출처: <em>2012 Census of Governments</em>, U.S. Census Bureau</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 우리나라 지방정부의 수입 원천 (교수 요청, 2026-11-17) ═══════ -->
+<section class="s-split">
+  <h2>우리나라 지방정부의 수입 원천</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:12px">2025년 지방자치단체 예산(순계): <span class="mark">326조 원</span></p>
+      <p class="lbl"><strong>자체수입:</strong><span>지방세 115.1조 + 세외수입 30.6조<br>
+        = 145.6조 (44.7%)</span></p>
+      <p class="lbl" style="margin-bottom:2px"><strong>이전수입:</strong><span>국고보조금 89.2조 + 지방교부세 61.7조<br>
+        = 150.9조 (46.3%)</span></p>
+      <p class="caption" style="margin-bottom:8px">지방교부세: 지자체 간 재정 격차를 고르는 국가 재원 (보통교부세는 용도 자유)<br>
+        국고보조금: 국가가 사업을 정해 주는 재원, 지방비를 함께 부담</p>
+      <p class="lbl" style="margin-bottom:12px"><strong>기타:</strong><span>보전수입 등 23.6조 · 지방채 5.9조</span></p>
+      <p class="derive t-red">→ 이전수입이 자체수입보다 큼: 재정자립도 48.6%</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-krev" viewBox="0 0 430 250" style="width:400px" role="img">
+        <title>2025년 우리나라 지방자치단체 세입 원그래프. 지방세 35.3%, 국고보조금 27.4%, 지방교부세 18.9%, 세외수입 9.4%, 보전수입 등 7.2%, 지방채 1.8%</title></svg>
+      <script>
+        (function () {
+          const R = window.KREV, F = Fig;
+          const cx = 120, cy = 122, r = 104;
+          const tot = R.reduce((a, [, v]) => a + v, 0);
+          const pct = (v) => (Math.round((v / tot) * 1000) / 10).toFixed(1);
+          // 그림 21-1 과 같은 색: 이전수입 파랑 · 지방세(재산세 자리) 크림슨 · 나머지 회색조
+          const tone = { 지방세: ['var(--brand-crimson)', 0.85], 국고보조금: ['var(--accent-blue)', 0.85],
+                         지방교부세: ['var(--accent-blue)', 0.55], 세외수입: ['var(--brand-crimson)', 0.4],
+                         '보전수입 등': ['var(--muted)', 0.35], 지방채: ['var(--muted)', 0.2] };
+          let ang = -Math.PI / 2;
+          const parts = [];
+          R.forEach(([k, v]) => {
+            const sw = (v / tot) * 2 * Math.PI, e = ang + sw;
+            const x1 = cx + r * Math.cos(ang), y1 = cy + r * Math.sin(ang);
+            const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+            parts.push(F.raw(`<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} ` +
+              `A${r},${r} 0 ${sw > Math.PI ? 1 : 0} 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" ` +
+              `fill="${tone[k][0]}" opacity="${tone[k][1]}" stroke="#fff" stroke-width="1.5"/>`));
+            if (v / tot >= 0.15) {
+              const m = (ang + e) / 2;
+              parts.push(F.raw(`<text class="on-dark" x="${(cx + r * 0.6 * Math.cos(m)).toFixed(1)}" y="${(cy + r * 0.6 * Math.sin(m) + 5).toFixed(1)}" ` +
+                `style="font-size:14px;fill:#FFF;font-weight:700;text-anchor:middle">${pct(v)}%</text>`));
+            }
+            ang = e;
+          });
+          R.forEach(([k, v], i) => {
+            const y = 40 + i * 30;
+            parts.push(F.raw(`<rect x="256" y="${y - 11}" width="13" height="13" fill="${tone[k][0]}" opacity="${tone[k][1]}"/>`));
+            parts.push(F.annot(276, y, k, { size: 12 }));
+            parts.push(F.annot(426, y, `${v}조 · ${pct(v)}%`, { anchor: 'end', size: 11.5, tone: k === '지방세' ? 'red' : undefined }));
+          });
+          F.draw('#f-krev', { parts, check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:2px;text-align:center">출처: 행정안전부, 2025년 지방자치단체 예산 (2025. 3. 11. 발표)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 01 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">01 재산세</p>
+  <p class="section-sub">재산세는 실제로 누가 부담하는가 · 교재 p.468~476</p>
+</section>
+
+<!-- ══ 표 21-1 (p.468~470) ═══════════════════════════════════ -->
+<section>
+  <h2>재산세: 가시성과 자원 부동성</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:6px">재산세: 주거 · 상업 · 공업용 부동산(<span class="mark">건축물 + 토지</span>)에 대한 연간 세금</p>
+    <p class="sub" style="margin:16px 0 10px">지방재원으로서 재산세의 유리한 두 속성</p>
+    <svg class="fig" id="f-prop2" viewBox="0 0 848 230" style="width:848px;display:block;margin:0" role="img">
+      <title>재산세의 유리한 두 속성인 가시성과 자원 부동성을 두 카드로 놓은 인포그래픽</title></svg>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const W = 418, X = [0, 430], H = 230;
+      const C = [
+        ['가시성', 'visibility', ['매년 고지서 → 지방공공재 비용의 명확한 신호'], '주민이 비용과 편익을 비교해 투표'],
+        ['자원 부동성', 'resource immobility', ['토지는 장기에도 이동 불가 → 「능동적 도피」 불가',
+          '지방소득세 등은 세금이 적은 인근 관할구역으로의 도피를 유발'], '토지 부분은 행태를 왜곡하지 않음'],
+      ];
+      C.forEach(([k, en, rows, res], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += `<circle cx="${x + 26}" cy="32" r="14" fill="${RED}"/>` + t(x + 26, 38, String(i + 1), 16, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+        s += t(x + 50, 39, k, 20, RED, { w: 700 });
+        s += t(x + 50, 62, en, 12, MUTED);
+        let y = 108;
+        rows.forEach((r, j) => { s += t(x + 20, y, r, j ? 12 : 14.5, j ? MUTED : INK, { w: j ? 400 : 600 }); y += 28; });
+        s += `<rect x="${x + 10}" y="${H - 50}" width="${W - 20}" height="36" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 26, '→ ' + res, 15, RED, { w: 700, a: 'middle' });
+      });
+      Fig.draw('#f-prop2', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 주거 부동산에 관한 단순 모형 (p.470) ═══════════════════ -->
+<section class="s-split">
+  <h2>주거 부동산에 관한 단순 모형</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="lead t-define" style="margin-bottom:10px">재산세의 <span class="mark">세부담(incidence)</span>을 보는 단순 모형</p>
+      <p class="lbl"><strong>주택기업:</strong><span>이동주택(mobile home)을 임대, 완전경쟁<br>
+        → 균형에서 경제적 이윤 0</span></p>
+      <p class="lbl"><strong>건축물:</strong><span>다른 곳의 자본소유주에게서 임차<br>
+        도시 사이를 비용 없이 이동</span></p>
+      <p class="lbl"><strong>토지:</strong><span>부재지주(absentee landowners)에게서 임차<br>
+        부지 크기 고정</span></p>
+      <p class="lbl" style="margin-bottom:2px"><strong>재산세:</strong><span>법적으로 주택기업이 납부<br>
+        이동주택당 800 + 부지당 200 (단위세, unit tax)</span></p>
+      <p class="caption" style="margin-bottom:10px">교재의 가정: 건축물 · 토지를 묶어 주택을 공급하는 쪽이 납부<br>
+        법적 납세자 ≠ 실제 부담자일 수 있음 → 가격 변화로 확인</p>
+      <p class="derive t-red hang">→ 네 주체 중 누가 실제로 부담하는가?<br>
+        원리: 공급이 고정된 생산요소의 소유주가 부담</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-model" viewBox="0 0 400 300" style="width:380px" role="img">
+        <title>소비자가 주택기업에 임대료 5,000을 내고, 주택기업은 자본소유주에게 건축물 4,000, 토지소유주에게 토지 1,000을 내며, 정부에 재산세 800과 200을 내는 도식</title></svg>
+      <script>
+        (function () {
+          const P = window.PROP, F = Fig;
+          const box = (x, y, w, h, t1, t2, fill) =>
+            `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${fill || '#FFF'}" stroke="var(--ink)" stroke-width="1.3"/>` +
+            `<text x="${x + w / 2}" y="${y + (t2 ? h / 2 - 2 : h / 2 + 5)}" style="font-size:13px;font-weight:700;text-anchor:middle;fill:var(--ink)">${t1}</text>` +
+            (t2 ? `<text x="${x + w / 2}" y="${y + h / 2 + 14}" style="font-size:10px;text-anchor:middle;fill:var(--muted)">${t2}</text>` : '');
+          const fmt = (v) => v.toLocaleString();
+          const parts = [
+            F.raw(box(130, 8, 140, 46, '소비자', '주택을 임차')),
+            F.raw(box(130, 124, 140, 52, '주택기업', '경제적 이윤 0')),
+            F.raw(box(4, 236, 150, 52, '자본소유주', '이동주택(건축물)')),
+            F.raw(box(246, 236, 150, 52, '토지소유주', '부지 600개, 고정')),
+            F.raw(`<rect x="306" y="124" width="90" height="52" rx="6" fill="none" stroke="var(--brand-crimson)" stroke-width="1.3" stroke-dasharray="4 3"/>` +
+                  `<text x="351" y="155" style="font-size:13px;font-weight:700;text-anchor:middle;fill:var(--brand-crimson)">정부</text>`),
+            F.arrow(200, 56, 200, 120),
+            F.annot(208, 92, `주택임대료 ${fmt(P.rent)}`, { size: 11 }),
+            F.arrow(160, 178, 92, 232),
+            F.annot(118, 202, `건축물 ${fmt(P.ret0)}`, { anchor: 'end', size: 11 }),
+            F.arrow(240, 178, 308, 232),
+            F.annot(266, 216, `토지 ${fmt(P.land0)}`, { anchor: 'end', size: 11 }),
+            F.arrow(272, 150, 302, 150, { tone: 'red' }),
+            F.annot(351, 194, `재산세`, { anchor: 'middle', size: 11, tone: 'red' }),
+            F.annot(351, 209, `${P.bldTax} + ${P.landTax}`, { anchor: 'middle', size: 11, tone: 'red' }),
+          ];
+          F.draw('#f-model', { parts, check: false });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 21-2 (p.470~471) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>재산세의 토지 부문</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">토지 공급: 600개 부지로 고정 → <strong>완전 비탄력적</strong></p>
+      <p class="li-hang" style="margin-bottom:4px">① 초기: 수요 = 공급인 점 i → 토지임대료 1,000</p>
+      <p class="li-hang" style="margin-bottom:4px">② 부지당 세금 200 → 주택기업의 지불용의 200 감소<br>
+        → 수요곡선이 200 만큼 아래로</p>
+      <p class="li-hang" style="margin-bottom:12px">③ 새 균형 점 t → 토지임대료 800</p>
+      <p class="derive t-red hang">→ 고정된 요소 = 토지 → 토지소유주가 세금 전액을 부담<br>
+        주택기업은 토지세를 후방(backward)으로 전가</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-land" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>공급이 600개 부지에서 수직이라 토지세 200이 수요곡선을 내려도 수량은 그대로이고 토지임대료만 1,000에서 800으로 내려가는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PROP, F = Fig.withBox({ x0: 56, y0: 270, x1: 330, y1: 30 });
+          const S = F.scale({ x: [0, 900], y: [0, 1600] });
+          const d0 = S.curve([[260, P.landD(260)], [860, P.landD(860)]]);
+          const d1 = S.curve([[260, P.landD(260) - P.landTax], [860, P.landD(860) - P.landTax]]);
+          const i = Fig.at(d0, { x: S.x(P.lot) }), t = Fig.at(d1, { x: S.x(P.lot) });
+          const parts = [
+            F.line(S.x(P.lot), S.y(0), S.x(P.lot), S.y(1520)),
+            F.annot(S.x(P.lot) + 6, S.y(1520) + 6, '공급 (토지소유주)', { size: 10 }),
+            F.line(...d0[0], ...d0[1], { variant: 'demand' }),
+            F.annot(d0[0][0] + 6, d0[0][1] - 4, '초기 수요 (주택기업)', { size: 10, tone: 'blue' }),
+            F.line(...d1[0], ...d1[1], { variant: 'i2' }),
+            F.annot(d1[1][0], d1[1][1] + 15, '수요: 200 세금', { anchor: 'end', size: 10 }),
+            F.annot(d1[1][0], d1[1][1] + 28, '(주택기업)', { anchor: 'end', size: 10 }),
+            F.guide(i[0], i[1], { ytick: '1,000', only: 'y' }),
+            F.dot(i[0], i[1], { label: 'i', lx: 7, ly: -4 }),
+            F.guide(t[0], t[1], { ytick: '800', only: 'y' }),
+            F.dot(t[0], t[1], { label: 't', lx: 7, ly: 14 }),
+            F.annot(S.x(P.lot), F.BOX.y0 + 17, '600', { anchor: 'middle', size: 11 }),
+          ];
+          const xa = S.x(400), ya = S.y(P.landD(400)), yb = S.y(P.landD(400) - P.landTax);
+          parts.push(F.arrow(xa, ya, xa, yb));
+          parts.push(F.annot(xa - 6, (ya + yb) / 2 + 4, '세금', { anchor: 'end', size: 10 }));
+          F.draw('#f-land', { axes: { x: '이동주택 부지', y: '$' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 21-3 (p.471~473) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>건축물 부문 ①: 한 도시만 볼 때 (부분균형)</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:4px">부분균형: 다른 도시에 대한 영향은 고려하지 않음</p>
+      <p style="margin-bottom:0">가정: 단일 도시에 자본 공급은 완전 탄력적 → 4,000에서 수평</p>
+      <p class="caption" style="margin-bottom:8px">이동주택은 비용 없이 도시를 옮김 → 4,000보다 덜 주면 모두 떠나고<br>
+        4,000이면 필요한 만큼 빌릴 수 있음</p>
+      <p class="li-hang" style="margin-bottom:4px">① 초기 균형 a: 600채 · 건축물 임대료 4,000</p>
+      <p class="li-hang" style="margin-bottom:0">② 이동주택당 세금 800 → 한계비용 4,800<br>
+        → 공급곡선이 800 만큼 위로</p>
+      <p class="caption" style="margin-bottom:6px;padding-left:1.4em">공급곡선 = 주택기업의 한계비용 (자본소유주에게 4,000 + 정부에 800)<br>
+        세금을 내는 쪽이 주택기업이라 기업의 비용곡선이 올라감</p>
+      <p class="li-hang" style="margin-bottom:6px">③ 새 균형 b: 400채 · 주택임대료 4,800</p>
+      <p class="derive t-red hang">→ 건축물세는 소비자에게 전방(forward)으로 전가<br>
+        주택기업: 토지임대료 −200 · 주택임대료 +800 → 이윤 0</p>
+      <p class="derive t-red hang" style="margin-top:4px">→ 주택시장만의 특수한 상황이 아님<br>
+        경쟁적인 산업에 세금 부과 시 통상적으로 발생하는 결과</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-bldg" viewBox="0 0 400 320" style="width:340px" role="img">
+        <title>수평인 건축물 공급곡선이 세금 800만큼 올라 균형이 600채 4,000에서 400채 4,800으로 옮겨 가는 그림</title></svg>
+      <script>
+        (function () {
+          const P = window.PROP, F = Fig.withBox({ x0: 56, y0: 270, x1: 330, y1: 30 });
+          const S = F.scale({ x: [0, 900], y: [0, 6400] });
+          const dem = S.curve([[180, P.houseD(180)], [860, P.houseD(860)]]);
+          const s0 = S.curve([[0, P.ret0], [860, P.ret0]]), s1 = S.curve([[0, P.ret0 + P.bldTax], [860, P.ret0 + P.bldTax]]);
+          const a = Fig.cross(dem, s0), b = Fig.cross(dem, s1);
+          const qx = (px) => String(Math.round((px - F.BOX.x0) / (F.BOX.x1 - F.BOX.x0) * 900));
+          const parts = [
+            F.line(...s0[0], ...s0[1]),
+            F.annot(s0[0][0] + 6, s0[0][1] + 15, '초기 공급 (주택기업)', { size: 10 }),
+            F.line(...s1[0], ...s1[1], { variant: 'i2' }),
+            F.annot(s1[1][0], s1[1][1] - 8, '세금 부과후 공급 (주택기업)', { anchor: 'end', size: 10 }),
+            F.line(...dem[0], ...dem[1], { variant: 'demand' }),
+            F.annot(dem[1][0] + 4, dem[1][1] + 4, '수요 (소비자)', { size: 10, tone: 'blue' }),
+            F.guide(a[0], a[1], { xtick: qx(a[0]), ytick: '4,000' }),
+            F.dot(a[0], a[1], { label: 'a', lx: 8, ly: 14 }),
+            F.guide(b[0], b[1], { xtick: qx(b[0]), ytick: '4,800' }),
+            F.dot(b[0], b[1], { label: 'b', lx: -12, ly: -8 }),
+          ];
+          const xa = S.x(720);
+          parts.push(F.arrow(xa, S.y(P.ret0), xa, S.y(P.ret0 + P.bldTax)));
+          parts.push(F.annot(xa + 6, S.y(P.ret0 + P.bldTax / 2) + 4, '세금', { size: 10 }));
+          F.draw('#f-bldg', { axes: { x: '채', y: '$' }, parts });
+        })();
+      </script>
+      <p class="emph" style="margin:4px 0 2px">이 가정에서는 고정된 요소가 없음 → 소비자가 부담</p>
+      <p class="derive t-red hang">→ 그러나 지역 전체의 자본은 1,200채로 고정<br>
+        다음 장: 지역 전체로 보면 결과가 달라짐</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 21-4 · 21-5 (p.473~474) ══════════════════════════ -->
+<section>
+  <h2>건축물 부문 ②: 지역 전체로 볼 때 (일반균형)</h2>
+  <div class="body tighter">
+    <p class="emph" style="margin-bottom:0">두 도시 지역: 자본 <strong>1,200채 고정</strong> · 자본은 두 도시의 수익률이 같아질 때까지 이동 (내쉬균형)</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 412px">
+        <p class="sub" style="margin-bottom:0;text-align:center">과세 도시</p>
+        <svg class="fig" id="f-gen-t" viewBox="0 0 412 226" style="width:370px;max-height:none" role="img">
+          <title>과세 도시에서 수익곡선이 세금 800만큼 내려 600채에서 수익이 3,200이 되고, 자본 100채가 빠져나가 500채 3,600에서 균형이 되는 그림</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:0;text-align:center">비과세 도시</p>
+        <svg class="fig" id="f-gen-n" viewBox="0 0 412 226" style="width:370px;max-height:none" role="img">
+          <title>비과세 도시로 자본 100채가 들어와 수익곡선을 따라 600채 4,000에서 700채 3,600으로 내려가는 그림</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const P = window.PROP, Kt = P.Kt, Kn = P.totalK - Kt, r1 = P.r1;
+        const fmt = (v) => v.toLocaleString();
+        const frame = (sel, taxed) => {
+          const F = Fig.withBox({ x0: 60, y0: 190, x1: 330, y1: 20 });
+          const S = F.scale({ x: [250, 900], y: [2600, 4800] });
+          const r0 = S.curve([[430, P.ret(430)], [860, P.ret(860)]]);
+          const parts = [
+            F.line(...r0[0], ...r0[1]),
+            F.annot(r0[0][0] + 8, r0[0][1] - 2, taxed ? '초기 수익' : '수익', { size: 10 }),
+          ];
+          const a = Fig.at(r0, { x: S.x(600) });
+          parts.push(F.guide(a[0], a[1], { xtick: '600', ytick: '4,000' }));
+          parts.push(F.dot(a[0], a[1], { label: taxed ? 'a' : 'b', lx: 8, ly: -4 }));
+          if (taxed) {
+            const r1c = S.curve([[330, P.ret(330) - P.bldTax], [760, P.ret(760) - P.bldTax]]);
+            parts.push(F.line(...r1c[0], ...r1c[1], { variant: 'i2' }));
+            parts.push(F.annot(r1c[0][0] + 10, r1c[0][1] + 16, `${P.bldTax} 과세 이후 수익`, { size: 10 }));
+            const c = Fig.at(r1c, { x: S.x(600) }), d = Fig.at(r1c, { x: S.x(Kt) });
+            parts.push(F.guide(c[0], c[1], { ytick: fmt(P.ret(600) - P.bldTax), only: 'y' }));
+            parts.push(F.dot(c[0], c[1], { label: 'c', lx: 8, ly: 4 }));
+            parts.push(F.guide(d[0], d[1], { xtick: String(Kt), ytick: fmt(r1) }));
+            parts.push(F.dot(d[0], d[1], { label: 'd', lx: -13, ly: -6 }));
+            parts.push(F.arrow(a[0], a[1] + 6, c[0], c[1] - 6));
+          } else {
+            const e = Fig.at(r0, { x: S.x(Kn) });
+            parts.push(F.guide(e[0], e[1], { xtick: String(Kn), ytick: fmt(r1) }));
+            parts.push(F.dot(e[0], e[1], { label: 'e', lx: 8, ly: -4 }));
+          }
+          F.draw(sel, { axes: { x: '자본: 이동주택', y: '$' }, parts });
+        };
+        frame('#f-gen-t', true);
+        frame('#f-gen-n', false);
+      })();
+    </script>
+    <p class="li-hang" style="margin-bottom:0">① 초기: 600채씩, 공통 수익률 4,000 (a · b)</p>
+    <p class="li-hang" style="margin-bottom:0">② 과세 도시의 수익곡선이 800 하락 → 600채에서 수익률 3,200 (c)
+      <span class="caption">소비자가 두 도시를 오가므로 임대료를 올릴 수 없음 → 세금이 자본수익에서 빠짐</span></p>
+    <p class="li-hang" style="margin-bottom:2px">③ 자본 100채가 비과세 도시로 이동 → 두 도시 모두 수익률 3,600 (d · e)
+      <span class="caption">받는 도시 수익률도 내려가 100채에서 멈춤 · c의 800 하락은 이동 전 값</span></p>
+    <p class="derive t-red">→ 고정된 요소 = 지역의 자본 → <strong>자본소유주</strong>가 부담: 지역 전체 자본수익 400 감소</p>
+  </div>
+</section>
+
+<!-- ══ 일반균형의 세부담 · 가정들의 변경 (p.474~476) ══════════════ -->
+<section>
+  <h2>건축물 부문: 일반균형의 세부담</h2>
+  <div class="body tight">
+    <p class="formula-key" style="margin-bottom:2px">주택임대료 = 자본수익 + 건축물세 + 토지임대료</p>
+    <p style="margin-bottom:6px">소비자는 두 도시 사이를 자유롭게 이동 → 주택임대료가 같아질 때까지 토지임대료가 조정</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 46%">
+        <table class="tbl-r" id="t-incidence">
+          <colgroup><col style="width:25%"><col style="width:23%"><col style="width:25%"><col style="width:27%"></colgroup>
+          <thead><tr><th></th><th>과세 전</th><th>과세 도시</th><th>비과세 도시</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <script>
+          (function () {
+            const P = window.PROP, f = (v) => v.toLocaleString();
+            const rows = [
+              ['자본수익', P.ret0, P.r1, P.r1],
+              ['건축물세', 0, P.bldTax, 0],
+              ['토지임대료', P.land0, P.landT, P.landN],
+              ['<strong>주택임대료</strong>', P.rent, P.r1 + P.bldTax + P.landT, P.r1 + P.landN],
+            ];
+            document.querySelector('#t-incidence tbody').innerHTML = rows.map(([k, ...v], i) =>
+              `<tr><td>${k}</td>${v.map((x) => `<td>${i === 3 ? `<strong>${f(x)}</strong>` : f(x)}</td>`).join('')}</tr>`).join('');
+          })();
+        </script>
+        <p class="sub" style="margin:10px 0 2px">가정들의 변경</p>
+        <p class="lbl"><strong>자본 공급의 변동:</strong><span>자본이 고정이 아님 → 일부 건축물이 시장에서 철수<br>
+          → 임대료 5,000 초과, 일부를 소비자가 부담</span></p>
+        <p class="lbl"><strong>도시가 10개:</strong><span>자본수익 80 하락 (5배 많은 자본에 분산)<br>
+          토지임대료 9개 도시 +80 · 과세 도시 −720<br>
+          → 세금 대부분을 과세 도시 토지가 부담</span></p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">건축물 부문의 세부담 요약</p>
+        <p class="lbl"><strong>1. 자본소유주:</strong><span>두 도시 모두 수익 400 하락 → 세금을 부담</span></p>
+        <p class="lbl"><strong>2. 토지소유주:</strong><span>과세 도시 −400 · 비과세 도시 +400<br>
+          → 지역 전체로는 영합(zero-sum)</span></p>
+        <p class="lbl"><strong>3. 소비자:</strong><span>과세 전과 같은 5,000 → 부담 없음</span></p>
+        <p class="lbl" style="margin-bottom:10px"><strong>4. 주택기업:</strong><span>자본 · 토지에 400씩 덜 주어 세금 800 마련 → 이윤 0</span></p>
+        <p class="derive t-red hang">→ 생산요소의 공급이 고정되어 있으면<br>
+          그 생산요소의 소유주가 세금을 부담</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 세부담 정리 (p.471~475) [2026-11-17 교수 요청] ═════════════ -->
+<section>
+  <h2>재산세 세부담 정리: 무엇이 고정되어 있는가</h2>
+  <div class="body" style="padding-top:8px">
+    <svg class="fig" id="f-incid" viewBox="0 0 848 268" style="width:848px;display:block;margin:0" role="img">
+      <title>토지세, 한 도시만 본 건축물세, 지역 전체로 본 건축물세 세 경우에 고정된 요소와 가격 변화, 세금을 부담하는 주체를 세 카드로 비교한 인포그래픽</title></svg>
+    <p class="derive t-red hang" style="margin-top:10px">→ 공급이 고정된 생산요소의 소유주가 세금을 부담<br>
+      지역 전체로 보면 주택임대료는 <span id="incid-rent"></span> 그대로 · 부동산(토지 · 자본)의 수익이 하락</p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n, c) => `<circle cx="${x}" cy="${y}" r="12" fill="${c || RED}"/>` + t(x, y + 5, String(n), 14, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      const fmt = (v) => v.toLocaleString();
+      const P = window.PROP;
+      document.getElementById('incid-rent').textContent = fmt(P.rent);
+      let s = '';
+      const W = 270, X = [0, 289, 578], H = 268;
+      const C = [
+        ['토지세 ' + P.landTax, '21쪽', '토지 (600개 부지)',
+          [['토지임대료', `${fmt(P.land0)} → ${fmt(P.land0 - P.landTax)}`]], '토지소유주가 전액 부담'],
+        ['건축물세 ' + P.bldTax + ' · 한 도시', '22쪽 · 부분균형', '없음 (자본이 ' + fmt(P.ret0) + '에 무제한)',
+          [['건축물 임대료', `${fmt(P.ret0)} → ${fmt(P.ret0 + P.bldTax)}`]], '소비자에게 전가'],
+        ['건축물세 ' + P.bldTax + ' · 지역 전체', '23 · 24쪽 · 일반균형', `지역의 자본 (${fmt(P.totalK)}채)`,
+          [['자본수익 (두 도시)', `${fmt(P.ret0)} → ${fmt(P.r1)}`],
+           ['토지임대료', `과세 ${fmt(P.landT)} · 비과세 ${fmt(P.landN)}`]], '자본소유주 부담 · 토지는 영합'],
+      ];
+      C.forEach(([k, src, fixed, rows, res], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 22, 26, i + 1);
+        s += t(x + 42, 31, k, 14.5, INK, { w: 700 });
+        s += t(x + 42, 49, src, 10.5, MUTED);
+        s += t(x + 16, 82, '고정된 요소', 11, MUTED);
+        s += t(x + 16, 102, fixed, 13, i === 1 ? INK2 : RED, { w: 700 });
+        let y = 136;
+        rows.forEach(([a, b]) => { s += t(x + 16, y, a, 11, MUTED); s += t(x + 16, y + 19, b, 13, INK2, { w: 600 }); y += 46; });
+        s += `<rect x="${x + 8}" y="${H - 40}" width="${W - 16}" height="30" rx="4" fill="${RED}" fill-opacity="${i === 1 ? 0.05 : 0.12}"/>`;
+        s += t(x + W / 2, H - 20, '→ ' + res, 12.5, i === 1 ? INK2 : RED, { w: 700, a: 'middle' });
+      });
+      s += `<path d="M${X[1] + W + 2},${H / 2} L${X[2] - 3},${H / 2}" stroke="${INK2}" stroke-width="1.5" marker-end="url(#ah-ink)"/>`;
+      Fig.draw('#f-incid', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 섹션 — 02 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">02 모형에서 현실로</p>
+  <p class="section-sub">인위적 모형으로부터 도출된 교훈들을 현실 시장에 적용 · 교재 p.476~483</p>
+</section>
+
+<!-- ══ 임대부동산소유주와 주택소유주 · 정책입안자들을 위한 실용적인 길잡이 (p.476~478) ══ -->
+<section>
+  <h2>현실의 부동산소유주: 토지와 건축물을 함께 소유</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:4px">모형의 네 주체가 현실에서는 둘로 합쳐짐</p>
+    <p style="margin-bottom:12px">임대주택: 주택기업이 부동산(토지 + 건축물)을 소유 · 자가: 소비자가 곧 부동산소유주</p>
+    <svg class="fig" id="f-owners" viewBox="0 0 848 230" style="width:848px;display:block;margin:0" role="img">
+      <title>과세 도시의 부동산소유주인 내부자는 토지와 자본 양쪽에서 손실을 보고, 다른 도시의 부동산소유주인 외부자는 토지에서 이득, 자본에서 손실을 보는 것을 비교한 인포그래픽</title></svg>
+    <p class="derive t-red hang" style="margin-top:10px">→ 부동산이 세금채무를 지게 되어 구매자가 덜 지불 → 과세 도시 부동산의 시장가치 하락</p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n, c) => `<circle cx="${x}" cy="${y}" r="12" fill="${c || RED}"/>` + t(x, y + 5, String(n), 14, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      const fmt = (v) => v.toLocaleString();
+      let s = '';
+      const W = 418, X = [0, 430], H = 230;
+      const C = [
+        ['내부자', '과세 도시의 부동산소유주', [
+          ['토지소유주로서', '손실', '토지세 + 건축물세 일부가 토지로 전가'],
+          ['자본소유주로서', '손실', '지역 전체의 자본수익 하락'],
+        ], '토지 · 자본 모두 손실', 'red'],
+        ['외부자', '다른 도시의 부동산소유주', [
+          ['토지소유주로서', '이득', '토지임대료 상승'],
+          ['자본소유주로서', '손실', '지역 전체의 자본수익 하락'],
+        ], '순효과는 불명확', 'blue'],
+      ];
+      C.forEach(([k, sub, rows, res, tone], i) => {
+        const x = X[i], c = tone === 'blue' ? BLUE : RED;
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 24, 28, i + 1, c);
+        s += t(x + 46, 34, k, 17, c, { w: 700 });
+        s += t(x + 46, 54, sub, 11.5, MUTED);
+        let y = 92;
+        rows.forEach(([lab, val, note]) => {
+          s += t(x + 18, y, lab, 12, MUTED);
+          s += t(x + 118, y, val, 14, INK, { w: 600 });
+          if (note) s += t(x + 118, y + 19, note, 11, MUTED);
+          y += note ? 50 : 34;
+        });
+        s += `<rect x="${x + 10}" y="${H - 44}" width="${W - 20}" height="32" rx="4" fill="${c}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 23, '→ ' + res, 13.5, c, { w: 700, a: 'middle' });
+      });
+      Fig.draw('#f-owners', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<section>
+  <h2>누가 재산세를 내는가: 무엇이 고정인가에 따라</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">정책입안자를 위한 길잡이: 답은 <span class="mark">관점</span>에 따라 다름</p>
+    <svg class="fig" id="f-mayor" viewBox="0 0 848 214" style="width:848px;display:block;margin:0" role="img">
+      <title>시장의 관점에서는 자본이 다른 도시로 빠져나가 이 도시의 토지가 고정된 요소가 되고, 대통령의 관점에서는 자본이 갈 곳이 없어 전국의 자본이 고정된 요소가 되는 것을 비교한 인포그래픽</title></svg>
+    <p class="caption" style="margin-top:8px">자본 공급이 변동 가능하면 자본소유주는 더 높은 주택임대료로 가구에 전가</p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n, c) => `<circle cx="${x}" cy="${y}" r="12" fill="${c || RED}"/>` + t(x, y + 5, String(n), 14, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      const fmt = (v) => v.toLocaleString();
+      let s = '';
+      const W = 418, X = [0, 430], H = 214;
+      const C = [
+        ['시장(mayor)', '50개 도시 중 한 도시의 건축물세', [
+          ['자본', '다른 도시로 빠져나감', '자본수익 감소는 세금의 1/50'],
+          ['고정된 요소', '이 도시의 토지'],
+        ], '세금의 49/50을 이 도시 토지소유주가 부담', 'red'],
+        ['대통령', '전국에 균일한 재산세', [
+          ['자본', '피해 갈 도시가 없음', '국가 전체의 자본 공급이 고정이면'],
+          ['고정된 요소', '전국의 자본'],
+        ], '자본소유주가 전부 부담', 'blue'],
+      ];
+      C.forEach(([k, sub, rows, res, tone], i) => {
+        const x = X[i], c = tone === 'blue' ? BLUE : RED;
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 24, 28, i + 1, c);
+        s += t(x + 46, 34, k, 17, c, { w: 700 });
+        s += t(x + 46, 54, sub, 11.5, MUTED);
+        let y = 92;
+        rows.forEach(([lab, val, note]) => {
+          s += t(x + 18, y, lab, 12, MUTED);
+          s += t(x + 118, y, val, 14, INK, { w: 600 });
+          if (note) s += t(x + 118, y + 19, note, 11, MUTED);
+          y += note ? 50 : 34;
+        });
+        s += `<rect x="${x + 10}" y="${H - 44}" width="${W - 20}" height="32" rx="4" fill="${c}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 23, '→ ' + res, 13.5, c, { w: 700, a: 'middle' });
+      });
+      Fig.draw('#f-mayor', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 그림 21-6 (p.478~480) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>티부(Tiebout)모형과 재산세</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="caption" style="margin-bottom:2px">지금까지: 재산세 = 전통적 세금 → 고정된 요소에 귀착. 티부세계에서는?</p>
+      <p class="emph" style="margin-bottom:4px">공공재를 재산세로 조달 → 가구가 <strong>주택가치</strong>로 모여 삶</p>
+      <p style="margin-bottom:8px">가구당 공공재 비용 연 3,000 · 주택 10만과 20만 달러가 절반씩</p>
+      <p class="li-hang" style="margin-bottom:4px">① 혼합 자치시: 세율 2% → 2,000 과 4,000<br>
+        비싼 주택이 자기 몫보다 많이 냄</p>
+      <p class="li-hang" style="margin-bottom:4px">② 비싼 주택 소유주가 배타적 자치시를 설립<br>
+        (최소 집값 20만 달러) → 세율 1.5%</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 남은 자치시는 세율 3% → 두 곳 모두 가구당 3,000</p>
+      <p class="derive t-red hang">→ 티부세계의 재산세 = 사용자 요금(user fee)<br>
+        세금전가 없음<br>
+        단, 거대하고 다양한 중심도시에서는 전통적인 세금<br>
+        → 앞의 세부담 분석이 그대로 적용</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-tieb" viewBox="0 0 400 300" style="width:380px" role="img">
+        <title>혼합 자치시에서는 세율 2%로 10만 달러 주택이 2,000, 20만 달러 주택이 4,000을 내고, 균일한 자치시에서는 세율 3%와 1.5%로 둘 다 3,000을 내는 직사각형 그림</title></svg>
+      <script>
+        (function () {
+          const T = window.TIEB, F = Fig;
+          const X0 = 54, Y0 = 250, H = 190, ymax = 3.4, px = 0.52;     // 천 달러당 0.52px
+          const sy = (r) => Y0 - (r / ymax) * H;
+          const groups = [
+            { name: '혼합 자치시', x: X0 + 2, rates: [1, 1].map(() => 100 * T.cost / ((T.lo + T.hi) / 2 * 1000)) },
+            { name: '균일한 자치시', x: X0 + 2 + (T.lo + T.hi) * px + 22,
+              rates: [100 * T.cost / (T.lo * 1000), 100 * T.cost / (T.hi * 1000)] },
+          ];
+          const parts = [];
+          const ticks = new Set();
+          groups.forEach((g) => {
+            let x = g.x;
+            [[T.lo, 0.3], [T.hi, 0.7]].forEach(([v, op], j) => {
+              const r = g.rates[j], w = v * px, tax = Math.round(r / 100 * v * 1000);
+              parts.push(F.raw(`<rect x="${x}" y="${sy(r)}" width="${w}" height="${Y0 - sy(r)}" fill="var(--accent-blue)" opacity="${op}" stroke="#fff"/>`));
+              const tx = x + w / 2, ty = (sy(r) + Y0) / 2;
+              parts.push(F.raw(`<text${op > 0.5 ? ' class="on-dark"' : ''} x="${tx}" y="${ty - 2}" style="font-size:11px;text-anchor:middle;fill:${op > 0.5 ? '#FFF' : 'var(--ink)'}">세금:</text>`));
+              parts.push(F.raw(`<text${op > 0.5 ? ' class="on-dark"' : ''} x="${tx}" y="${ty + 12}" style="font-size:11px;font-weight:700;text-anchor:middle;fill:${op > 0.5 ? '#FFF' : 'var(--ink)'}">$${tax.toLocaleString()}</text>`));
+              parts.push(F.annot(tx, Y0 + 15, String(v), { anchor: 'middle', size: 10 }));
+              ticks.add(r);
+              x += w;
+            });
+            parts.push(F.annot(g.x + (T.lo + T.hi) * px / 2, sy(Math.max(...g.rates)) - 8, g.name, { anchor: 'middle', size: 11 }));
+          });
+          [...ticks].forEach((r) => {
+            parts.push(F.raw(`<path class="guide" d="M${X0},${sy(r)} L${X0 + 4},${sy(r)}"/>`));
+            parts.push(F.annot(X0 - 6, sy(r) + 4, String(r), { anchor: 'end', size: 10 }));
+          });
+          parts.push(F.raw(`<path class="guide" d="M${X0},${sy(3)} L${groups[1].x},${sy(3)}"/>`));
+          parts.push(F.raw(`<path class="axis" d="M${X0},${Y0 - H - 14} L${X0},${Y0} L${groups[1].x + (T.lo + T.hi) * px + 10},${Y0}"/>`));
+          parts.push(F.annot(X0, Y0 - H - 20, '세율(%)', { anchor: 'middle', size: 11 }));
+          parts.push(F.annot(X0 + 170, Y0 + 34, '주택 가치(단위: 1,000달러)', { anchor: 'middle', size: 11 }));
+          F.draw('#f-tieb', { parts, check: false });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 재산세에 대한 한도 설정 (p.480~483) ══════════════════════ -->
+<section>
+  <h2>재산세에 대한 한도 설정</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:4px">재산세 제한: 1852년 델라웨어에서 시작, 현재 <span class="mark">46개 주</span></p>
+    <p class="caption" style="margin-bottom:6px">감정가(assessed value): 세무당국이 과세 목적으로 정한 재산가치, 대개 시장가치보다 작음</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l">
+        <p class="sub" style="margin-bottom:2px">세 유형 (2013년 기준)</p>
+        <p class="lbl"><strong>1. 세율 한도(38개 주):</strong><span>세율을 고정하거나 최대 인상률 설정<br>
+          조지아: 학군 세율 20밀(2.0%)</span></p>
+        <p class="lbl"><strong>2. 감정 한도(11개 주):</strong><span>감정가의 연간 증가율 제한<br>
+          캘리포니아: 연 2%</span></p>
+        <p class="lbl"><strong>3. 세부담 한도(36개 주):</strong><span>총 재산세수입의 증가율 제한</span></p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">두 차례의 조세저항</p>
+        <p class="lbl"><strong>1930년대 대공황:</strong><span>소득 중 재산세 11.3%(1932)<br>
+          11개 주가 조세제한법 → 5.8%(1940)</span></p>
+        <p class="lbl" style="margin-bottom:10px"><strong>1978년 이후:</strong><span>캘리포니아 제안 13호(Proposition 13)<br>
+          서비스를 줄이지 않고 세금만 줄기를 기대 → 3.3%(1995)</span></p>
+        <p class="derive t-red hang">→ 감정가 한도의 수평적 불평등<br>
+          매도할 때만 감정가 재설정 → 장기보유자보다 신규 소유자가 더 냄<br>
+          (로스앤젤레스 약 35%)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 섹션 — 03 ═════════════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">03 정부 간 교부금</p>
+  <p class="section-sub">지방정부들이 상위의 정부들로부터 받는 자금이전에 어떻게 반응하는가 · 교재 p.483~489</p>
+</section>
+
+<!-- ══ 정부 간 교부금의 두 유형 (p.483~484) ═══════════════════ -->
+<section>
+  <h2>정부 간 교부금의 두 유형</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:4px">정부 간 교부금: 지방정부 수입의 <span class="mark">약 2/5</span></p>
+    <p class="emph" style="margin-bottom:22px">이유: 자치구역 간 파급효과의 내재화 · 지출 수요와 지방 세원의 불일치</p>
+    <div class="def-row">
+      <div class="def-tag">정액교부금<br><span class="en">lump-sum grant</span></div>
+      <div>
+        <p>정의: 지방정부의 지출과 독립된 고정 금액</p>
+        <p>대부분 용도가 정해진 조건부교부금(conditional grants): 교육 · 복지 · 보건 · 간선도로 · 주택</p>
+      </div>
+    </div>
+    <div class="def-row" style="margin-top:28px">
+      <div class="def-tag">대응교부금<br><span class="en">matching grant</span></div>
+      <div>
+        <p>정의: 지방정부의 지출에 대응해 상위 정부가 기여</p>
+        <p>예: 지방정부가 1달러를 쓸 때마다 1달러 (일대일 대응)</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:24px">→ 두 교부금에 대한 반응: 중위투표자의 소비자선택모형으로 봄</p>
+  </div>
+</section>
+
+<!-- ══ 그림 21-7 (p.484~485) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>정액의 용도지정교부금</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">중위투표자 매리안의 선택: 특수교육 대 여타 재화</p>
+      <p class="li-hang" style="margin-bottom:4px">① 초기 예산선 ab 와 무차별곡선의 접점 i<br>
+        → 특수교육 25 · 여타 재화 50</p>
+      <p class="li-hang" style="margin-bottom:4px">② 특수교육용 정액교부금 20 → 예산선 acd<br>
+        (c: 자기 예산 75 를 모두 여타 재화에 써도 특수교육 20)</p>
+      <p class="li-hang" style="margin-bottom:12px">③ 새 선택 f → 특수교육 30(+5) · 여타 재화 65(+15)</p>
+      <p class="derive t-red hang">→ 교부금 20 중 1/4만 특수교육 지출을 늘림<br>
+        특수교육에 쓰던 지방세 수입을 25 → 10 으로 줄임</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-lump" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>정액 용도지정교부금 20이 예산선을 ab에서 acd로 옮겨 선택이 i(25, 50)에서 f(30, 65)로 바뀌는 그림</title></svg>
+      <script>
+        (function () {
+          const G = window.GRANT, F = Fig.withBox({ x0: 52, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [0, 100], y: [0, 100] });
+          const B = G.budget, g = G.grant;
+          const ic = (c, a, b) => S.curve(Fig.hyper(c.k, a - c.x0, b - c.x0, { n: 40 }).map(([x, y]) => [x + c.x0, y + c.y0]));
+          const ic0 = ic(G.ic0, 10, 68), icF = ic(G.icF, 12, 72);
+          const parts = [
+            F.line(S.x(0), S.y(B), S.x(B), S.y(0)),
+            F.annot(S.x(50) - 8, S.y(B - 50) + 4, '초기 예산선', { anchor: 'end', size: 10 }),
+            F.line(S.x(0), S.y(B), S.x(g), S.y(B), { variant: 'supply' }),
+            F.line(S.x(g), S.y(B), S.x(B + g), S.y(0), { variant: 'supply' }),
+            F.annot(S.x(72) + 8, S.y(B + g - 72) + 2, '교부금하의 예산선', { size: 10, tone: 'red' }),
+            F.curve(ic0, { variant: 'i1' }),
+            F.curve(icF, { variant: 'i1' }),
+          ];
+          const pt = (x, y, nm, o = {}) => parts.push(F.dot(...S.p([x, y]), { label: nm, ...o }));
+          pt(0, B, 'a', { lx: 6, ly: -7 });
+          pt(g, B, 'c', { lx: -3, ly: 16 });
+          pt(B, 0, 'b', { lx: -4, ly: -8 });
+          pt(B + g, 0, 'd', { lx: 4, ly: -8 });
+          parts.push(F.guide(...S.p(G.i), { ytick: '50' }));
+          pt(...G.i, 'i', { lx: -13, ly: 14 });
+          parts.push(F.guide(...S.p(G.f), { ytick: '65', xtick: '30' }));
+          pt(...G.f, 'f', { lx: 7, ly: -6 });
+          parts.push(F.raw(`<path class="guide" d="M${S.x(g)},${S.y(B)} L${S.x(g)},${F.BOX.y0}"/>`));
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(B) + 4, '75', { anchor: 'end', size: 11 }));
+          // 20 · 25 · 30 은 15px 간격이라 25 를 한 줄 아래로 내린다
+          parts.push(F.annot(S.x(g), F.BOX.y0 + 17, '20', { anchor: 'middle', size: 11 }));
+          parts.push(F.annot(S.x(G.i[0]), F.BOX.y0 + 30, '25', { anchor: 'middle', size: 11 }));
+          F.draw('#f-lump', { axes: { x: '특수교육($)', y: '여타 재화($)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 그림 21-8 (p.485~487) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>대응교부금</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">일대일 대응: 지방 0.50 + 교부금 0.50<br>
+        → 특수교육 1달러의 기회비용이 절반</p>
+      <p class="li-hang" style="margin-bottom:4px">① 예산선이 a 를 축으로 완만해짐 (기울기 −1 → −0.5)</p>
+      <p class="li-hang" style="margin-bottom:4px">② 새 선택 g → 특수교육 40 (그중 20 이 교부금)<br>
+        여타 재화 55</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 같은 20 이라도 정액은 30, 대응은 40<br>
+        소득효과 + <strong>대체효과</strong>(특수교육의 상대가격 하락)</p>
+      <p class="derive t-red" style="margin-bottom:10px">→ 대응교부금이 목표 지출을 더 크게 자극</p>
+      <p class="caption">유한대응교부금(closed-ended matching grant)<br>
+        상한이 구속력을 가지면 무한교부금보다 지출이 적음</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-match" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>일대일 대응교부금이 예산선을 a에서 완만하게 돌려 선택이 i(25, 50)에서 g(40, 55)로 바뀌는 그림</title></svg>
+      <script>
+        (function () {
+          const G = window.GRANT, F = Fig.withBox({ x0: 52, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [0, 110], y: [0, 100] });
+          const B = G.budget;
+          const ic = (c, a, b) => S.curve(Fig.hyper(c.k, a - c.x0, b - c.x0, { n: 40 }).map(([x, y]) => [x + c.x0, y + c.y0]));
+          const parts = [
+            F.line(S.x(0), S.y(B), S.x(B), S.y(0)),
+            F.annot(S.x(52) - 8, S.y(B - 52) + 4, '초기 예산선', { anchor: 'end', size: 10 }),
+            F.line(S.x(0), S.y(B), S.x(106), S.y(B - 0.5 * 106), { variant: 'supply' }),
+            F.annot(S.x(106), S.y(B - 0.5 * 106) - 9, '대응교부금하의 예산선', { anchor: 'end', size: 10, tone: 'red' }),
+            F.curve(ic(G.ic0, 8, 68), { variant: 'i1' }),
+            F.curve(ic(G.icG, 16, 84), { variant: 'i1' }),
+          ];
+          parts.push(F.dot(...S.p([0, B]), { label: 'a', lx: 6, ly: -7 }));
+          parts.push(F.guide(...S.p(G.i), { xtick: '25', ytick: '50' }));
+          parts.push(F.dot(...S.p(G.i), { label: 'i', lx: -13, ly: 14 }));
+          parts.push(F.guide(...S.p(G.g), { xtick: '40', ytick: '55' }));
+          parts.push(F.dot(...S.p(G.g), { label: 'g', lx: 6, ly: -8 }));
+          parts.push(F.dot(...S.p([G.g[0], B - G.g[0]]), { r: 3.5 }));
+          const xa = S.x(G.g[0]) + 10;
+          parts.push(F.arrow(xa, S.y(B - G.g[0]), xa, S.y(G.g[1]) + 3));
+          parts.push(F.annot(xa + 5, S.y((B - G.g[0] + G.g[1]) / 2) + 4, '교부금 20', { size: 10 }));
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(B) + 4, '75', { anchor: 'end', size: 11 }));
+          F.draw('#f-match', { axes: { x: '특수교육($)', y: '여타 재화($)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 파리잡이종이효과 (p.487~488) ═══════════════════════════ -->
+<section>
+  <h2>파리잡이종이효과(flypaper effect)</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:10px">교부금은 처음 지급된 곳(지방정부)에 <span class="mark">들러붙음</span></p>
+    <p class="lbl"><strong>정액교부금 1달러:</strong><span>지방정부 지출 0.25 ~ 0.50달러 증가</span></p>
+    <p class="lbl" style="margin-bottom:8px"><strong>가구소득 1달러:</strong><span>지방정부 지출 0.05 ~ 0.10달러 증가</span></p>
+    <p class="derive t-red" style="margin-bottom:18px">→ 정액교부금이 같은 크기의 소득 증가보다 지출을 크게 늘림: 세금 감소로 가구에 돌아가지 않음</p>
+    <p class="sub" style="margin-bottom:2px">가능한 설명</p>
+    <ol class="dense" style="margin:0;padding:0;list-style-position:inside">
+      <li class="li-hang"><strong>재정 착시(fiscal illusion):</strong> 유권자가 정액교부금을 대응교부금처럼 취급</li>
+      <li class="li-hang"><strong>정신적 계정습관(mental accounting):</strong> 교부금은 공공 지출의 「저장공간」에 기입</li>
+      <li class="li-hang"><strong>예산을 극대화하는 관료들:</strong> 공공재의 잉여가 사라지기 직전까지 예산을 부풀림</li>
+      <li class="li-hang"><strong>은폐:</strong> 공무원이 교부금 정보를 숨겨 유권자가 세금 감면 가능성을 모름</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 그림 21-9 (p.488~489) ═════════════════════════════════ -->
+<section class="s-split">
+  <h2>복지개혁: 대응교부금에서 정액교부금으로</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">1996년 복지개혁<br>
+        연방 대응교부금 → 정액교부금(블록교부금, block grant)</p>
+      <p class="li-hang" style="margin-bottom:4px">① 대응교부금: 저소득 주는 복지 1달러에 0.78 환불<br>
+        → 주의 가격 0.22 → 점 i: 복지 2.1억 · 여타 2.6억</p>
+      <p class="li-hang" style="margin-bottom:4px">② 정액교부금 1.4억 → 예산선 g·m·i<br>
+        점 i 도 여전히 선택 가능</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 복지의 가격 0.22 → 1.00<br>
+        한계대체율 = 1 인 점 m: 복지 1.7억 · 여타 3.0억</p>
+      <p class="derive t-red hang">→ 대체효과로 복지 4천만 달러 감소<br>
+        여타 재화(다른 공공재 · 민간재)는 4천만 달러 증가</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-welfare" viewBox="0 0 400 320" style="width:370px" role="img">
+        <title>대응교부금하의 완만한 예산선에서 i를 고르던 주가 정액교부금하의 가파른 예산선에서 m을 골라 복지 지출이 210에서 170백만 달러로 주는 그림</title></svg>
+      <script>
+        (function () {
+          const W = window.GRANT.W, F = Fig.withBox({ x0: 60, y0: 270, x1: 340, y1: 30 });
+          const S = F.scale({ x: [100, 260], y: [220, 350] });
+          const mLine = (x) => W.i[1] - W.p0 * (x - W.i[0]);        // 대응교부금: 가격 0.22
+          const lLine = (x) => W.g[1] - (x - W.g[0]);               // 정액교부금: 가격 1.00
+          const ic = (c, a, b) => S.curve(Fig.hyper(c.k, a - c.x0, b - c.x0, { n: 48 }).map(([x, y]) => [x + c.x0, y + c.y0]));
+          // 그림 위 끝(348)을 넘지 않는 곳부터 그린다
+          const from = (c) => c.x0 + c.k / (348 - c.y0);
+          const parts = [
+            F.line(S.x(104), S.y(mLine(104)), S.x(256), S.y(mLine(256))),
+            F.annot(S.x(104), S.y(mLine(104)) + 24, '대응교부금하의\n예산선', { size: 10, lh: 13 }),
+            F.line(S.x(W.g[0]), S.y(W.g[1]), S.x(246), S.y(lLine(246)), { variant: 'supply' }),
+            F.annot(S.x(244) - 8, S.y(lLine(244)) + 4, '정액교부금하의 예산선', { anchor: 'end', size: 10, tone: 'red' }),
+            F.curve(ic(W.icI, from(W.icI), 256), { variant: 'i1' }),
+            F.curve(ic(W.icM, from(W.icM), 256), { variant: 'i1' }),
+          ];
+          [[W.g, 'g', '140', '330', -14, -6], [W.m, 'm', '170', '300', 7, -8], [W.i, 'i', '210', '260', -12, 16]]
+            .forEach(([p, nm, xt, yt, lx, ly]) => {
+              parts.push(F.guide(...S.p(p), { xtick: xt, ytick: yt }));
+              parts.push(F.dot(...S.p(p), { label: nm, lx, ly }));
+            });
+          // 두 축 모두 원점 부근을 생략했다는 표시
+          const br = (x, y, vert) => vert
+            ? `<path d="M${x - 5},${y + 2} L${x + 5},${y - 4} M${x - 5},${y + 7} L${x + 5},${y + 1}" stroke="var(--ink)" stroke-width="1" fill="none"/>`
+            : `<path d="M${x - 2},${y + 5} L${x + 4},${y - 5} M${x + 3},${y + 5} L${x + 9},${y - 5}" stroke="var(--ink)" stroke-width="1" fill="none"/>`;
+          parts.push(F.raw(br(F.BOX.x0, F.BOX.y0 - 16, true) + br(F.BOX.x0 + 10, F.BOX.y0, false)));
+          F.draw('#f-welfare', { axes: { x: '복지(백만 달러)', y: '여타 재화(백만 달러)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ Q & A ════════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!doctype html>
+<!--
+  12주차. 지방정부의 역할과 공공재
+  교재: 오설리반의 도시경제학 제9판 — 20장 (p.445~466) · 21장 (p.467~495). PART 05 지방정부, 교육, 그리고 범죄.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12주차에서 뺀 슬라이드</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 지방공공재 [20장 p.450~455, 그림 20-1~20-4] ─────────────────
+  // 교재가 인쇄한 값을 모두 지나게 했다.
+  //   6에이커: mb₁ 20 · mb₂ 28 · mb₃ 40 (MSB 88)   15에이커: 12 · 18 · 30 (MSB 60)
+  //   세금 20 과 만나는 곳: mb₁ 6 · mb₂ 12 · mb₃ 22
+  // mb₂ 의 세 점(28→20→18)과 mb₃ 의 세 점(40→30→20)은 한 직선 위에 있지 않다.
+  // 그래서 mb₁ 만 직선이고 mb₂ 는 볼록(c + A·e^{−kx}), mb₃ 는 완만한 오목(2차식)이다.
+  // mb₂ 는 x < 0.6 에서 mb₃ 위로 올라가므로 곡선은 x = 1.5 부터 그린다 (1.5~23 에서 mb₁ < mb₂ < mb₃).
+  // MSB 는 세 곡선의 수직합으로 계산한다 — 효율점 e 가 15 에 오는 것은 결과이지 입력이 아니다.
+  window.PARK = (function () {
+    const u = (-1 + Math.sqrt(17)) / 2, k = Math.log(u) / 3;           // e^{3k}(e^{3k}+1) = 4
+    const A2 = 2 / (Math.exp(-12 * k) * (1 - Math.exp(-3 * k))), c2 = 20 - A2 * Math.exp(-12 * k);
+    const a3 = (-10 / 7 + 10 / 9) / 16;
+    const P = {
+      mc: 60, tax: 20, xs: 1.5, xe: 23,
+      mb1: (x) => 20 - (8 / 9) * (x - 6),
+      mb2: (x) => c2 + A2 * Math.exp(-k * x),
+      mb3: (x) => 40 - (10 / 9) * (x - 6) + a3 * (x - 6) * (x - 15),
+    };
+    P.msb = (x) => P.mb1(x) + P.mb2(x) + P.mb3(x);
+    // 그림 20-3: 히람의 한계편익이 up 만큼 오르면 효율 수준이 18 이 된다 → up = 60 − MSB(18) ≈ 8.0
+    P.up = P.mc - P.msb(18);
+    P.mb3up = (x) => P.mb3(x) + P.up;
+    P.msbUp = (x) => P.msb(x) + P.up;
+    return P;
+  })();
+
+  // ── 대표민주주의 [20장 p.457~459, 그림 20-5] ─────────────────────
+  // 1~11달러에 10명씩. 더 가까운 후보에게 투표하고, 거리가 같으면 반씩 나눈다.
+  //   (3, 9) → 55 : 55 · (6, 9) → 70 : 40 · (6, 6) → 55 : 55  — 교재 숫자와 같다
+  window.VOTE = {
+    panels: [[3, 9], [6, 9], [6, 6]],
+    share(v, [p, b]) {
+      const dp = Math.abs(v - p), db = Math.abs(v - b);
+      return dp < db ? 1 : db < dp ? 0 : 0.5;     // 페니의 몫
+    },
+    tally(pb) {
+      let P = 0;
+      for (let v = 1; v <= 11; v++) P += 10 * this.share(v, pb);
+      return [P, 110 - P];
+    },
+  };
+
+  // ── 지방정부 수입 [21장 p.468, 그림 21-1] ───────────────────────
+  window.REVENUE = [['정부 간 교부금', 33], ['부과금 및 공공요금', 29], ['재산세', 27],
+                    ['판매세', 6], ['소득세', 2], ['기타', 3]];
+
+  // ── 우리나라 지방정부 수입 [교수 요청, 2026-11-17] ─────────────
+  // 행정안전부 발표(2025. 3. 11.) 2025년 지방자치단체 당초예산, 순계 326조 원, 단위 조 원.
+  // 지방세·세외수입·지방교부세·국고보조금은 시정일보, 보전수입 등·지방채는 경향신문·뉴시안 보도.
+  // 여섯 항목 합 326.1 (반올림 차이). 비율은 이 합으로 나눈다.
+  window.KREV = [['지방세', 115.1, 'own'], ['국고보조금', 89.2, 'tr'], ['지방교부세', 61.7, 'tr'],
+                 ['세외수입', 30.6, 'own'], ['보전수입 등', 23.6, 'etc'], ['지방채', 5.9, 'etc']];
+
+  // ── 재산세 [21장 p.470~476, 그림 21-2~21-5] ─────────────────────
+  //   토지: 공급 600 부지 수직 · 수요가 세금 200 만큼 아래로 → 1,000 → 800
+  //   건축물(부분균형): 공급 4,000 수평 → 4,800 · 수요 기울기 −4 → 600 → 400채
+  //   건축물(일반균형): 수익곡선 r(K) = 4,000 − 4(K − 600) 이 두 도시에 같다. 과세 도시는 −800.
+  //     자본 1,200 이 고정이므로 r(K) − 800 = r(1,200 − K) → K = 500 · 수익 3,600 · 비과세 도시 700
+  //   토지임대료는 두 도시의 주택임대료가 같아지게 움직인다 → 600 · 1,400 · 주택임대료 5,000
+  window.PROP = {
+    lot: 600, land0: 1000, landTax: 200,
+    landD(q) { return this.land0 - 1.6 * (q - this.lot); },
+    house0: 600, ret0: 4000, bldTax: 800,
+    houseD(q) { return this.ret0 - 4 * (q - this.house0); },
+    ret(K) { return this.ret0 - 4 * (K - this.house0); },
+    totalK: 1200,
+    get Kt() {   // 과세 도시의 자본 — 두 도시 수익이 같아지는 곳 (이분법)
+      let a = 0, b = this.totalK;
+      const f = (K) => (this.ret(K) - this.bldTax) - this.ret(this.totalK - K);
+      for (let i = 0; i < 60; i++) { const m = (a + b) / 2; (f(a) * f(m) <= 0) ? (b = m) : (a = m); }
+      return Math.round((a + b) / 2);
+    },
+    get r1() { return this.ret(this.totalK - this.Kt); },              // 3,600
+    get rent() { return this.ret0 + this.land0; },                      // 5,000
+    get landT() { return this.rent - this.r1 - this.bldTax; },          // 600
+    get landN() { return this.rent - this.r1; },                        // 1,400
+  };
+
+  // ── 티부모형과 재산세 [21장 p.478~479, 그림 21-6] ────────────────
+  window.TIEB = { cost: 3000, lo: 100, hi: 200 };   // 주택가치 단위: 천 달러
+
+  // ── 정부 간 교부금 [21장 p.484~489, 그림 21-7·21-8·21-9] ────────
+  // 무차별곡선은 (x − x₀)(y − y₀) = k 꼴의 직각쌍곡선이다. 접점 조건에서 k·y₀ 를 풀었다.
+  //   접점 (x, y) 에서 기울기 −(y − y₀)/(x − x₀) = 예산선 기울기
+  //   21-7·21-8: x₀ = −25 · i(25,50) 기울기 −1 → y₀ 0, k 2,500 · f(30,65) 기울기 −1 → y₀ 10, k 3,025
+  //              g(40,55) 기울기 −0.5 → y₀ 22.5, k 2,112.5
+  //   21-9:      x₀ = 100 · i(210,260) 기울기 −0.22 → y₀ 235.8, k 2,662 · m(170,300) 기울기 −1 → y₀ 230, k 4,900
+  // 같은 그림의 두 곡선은 그림 구간에서 만나지 않는다 (높은 쪽이 언제나 위).
+  const IC = (x, y, slope, x0, y0) => ({ x0, y0, k: (x - x0) * (y - y0), slope,
+    f(t) { return this.y0 + this.k / (t - this.x0); } });
+  window.GRANT = {
+    budget: 75, grant: 20,
+    i: [25, 50], f: [30, 65], g: [40, 55],
+    ic0: IC(25, 50, 1, -25, 50 - 1 * 50),
+    icF: IC(30, 65, 1, -25, 65 - 1 * 55),
+    icG: IC(40, 55, 0.5, -25, 55 - 0.5 * 65),
+    W: { i: [210, 260], g: [140, 330], m: [170, 300], p0: 0.22,
+         icI: IC(210, 260, 0.22, 100, 260 - 0.22 * 110),
+         icM: IC(170, 300, 1, 100, 300 - 1 * 70) },
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .tbl-r { width: 100%; table-layout: fixed; }
+  .tbl-r th, .tbl-r td { text-align: right; }
+  .tbl-r th:first-child, .tbl-r td:first-child { text-align: left; }
+  .tbl-c { width: 100%; table-layout: fixed; }
+  .tbl-c th, .tbl-c td { text-align: center; }
+  .tbl-c th:first-child, .tbl-c td:first-child { text-align: left; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 표지 ══ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>12주차. 지방정부의 역할과 공공재</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 이 파일은 무엇인가 ═══════════════════════════════════ -->
+<section>
+  <h2>이 파일은 무엇인가</h2>
+  <div class="body stack">
+    <p class="emph" style="margin-bottom:10px">2026-11-17 교수 요청으로 본편에서 뺀 장</p>
+    <p style="margin-bottom:4px"><strong>뺀 장:</strong> 「중위-투표자 결과의 함의」 (본편 14쪽, 교재 표 20-3 · p.459~460)</p>
+    <p style="margin-bottom:4px"><strong>내용:</strong> 선거결과 예측, 소득탄력성 계산 (25% ÷ 20% = 1.25), 지방공공재 수요의 소득 · 가격탄력성 표</p>
+    <p style="margin-bottom:4px"><strong>되살릴 때:</strong> 이 장은 window 상수를 쓰지 않는다. 그대로 「대표민주주의에서 중위투표자」 뒤에 넣으면 된다</p>
+    <p class="emph" style="margin:14px 0 6px">같은 날 두 장에서 일부를 뺐다 (아래에 고치기 전 모습을 그대로 둔다)</p>
+    <p style="margin-bottom:4px"><strong>세 메커니즘 장 (본편 4쪽 → 8쪽으로 옮김):</strong> 아래 「미국의 지방정부 (2012)」 박스 · 교재 p.446</p>
+    <p style="margin-bottom:4px"><strong>재산세: 가시성과 자원 부동성 (본편 19쪽):</strong> 실효세율 정의와 표 21-1 (최고 · 최저 실효재산세율, 2015)</p>
+  </div>
+</section>
+
+<!-- ══ 표 20-3 중위-투표자 결과의 함의 (p.459~460) ═════════════ -->
+<section>
+  <h2>중위-투표자 결과의 함의</h2>
+  <div class="body">
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="sub" style="margin-bottom:2px">선거결과 예측</p>
+        <p style="margin-bottom:12px">중위투표자를 찾고 그가 선호하는 예산을 추정<br>
+          선호 지출이 소득에 비례하면 중위소득자 = 중위투표자</p>
+        <p class="sub" style="margin-bottom:2px">수요의 탄력성 추정</p>
+        <p style="margin-bottom:4px">두 도시의 경찰서비스 가격은 같다고 가정</p>
+        <p style="margin-bottom:4px">도시 L: 중위소득 20% 높고 경찰예산 25% 큼</p>
+        <p class="formula-key">소득탄력성 = 25% ÷ 20% = 1.25</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">지방공공재 수요의 소득 · 가격탄력성 (교재 표 20-3)</p>
+        <table class="tbl-c">
+          <colgroup><col style="width:36%"><col><col></colgroup>
+          <thead><tr><th>공공재 혹은 서비스</th><th>소득탄력성</th><th>가격탄력성</th></tr></thead>
+          <tbody>
+            <tr><td>총지출</td><td>0.34 ~ 0.89</td><td>−0.23 ~ −0.56</td></tr>
+            <tr><td>교육</td><td>0.24 ~ 0.85</td><td>−0.07 ~ −0.51</td></tr>
+            <tr><td>공원과 유원지</td><td><strong>0.99 ~ 1.32</strong></td><td>−0.19 ~ −0.92</td></tr>
+            <tr><td>공공안전(경찰 · 소방)</td><td>0.52 ~ 0.71</td><td>−0.19 ~ −1.0</td></tr>
+            <tr><td>공공사업</td><td>0.79</td><td>−0.92 ~ −1.0</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:4px;margin-bottom:10px">출처: Inman, "The Fiscal Performance of Local Governments," <em>Current Issues in Urban Economics</em>, 1979</p>
+        <p class="derive t-red hang">→ 가격탄력성은 절대값 1.0 이하: 지방공공재 수요는 가격-비탄력적<br>
+          소득탄력성은 공원과 유원지가 가장 큼</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 2026-11-17 고치기 전: 세 메커니즘 장 (미국 지방정부 박스 포함) ══ -->
+<section>
+  <div class="body" style="padding-top:24px">
+    <p class="lead t-define" style="margin-bottom:12px">이 장의 초점: 지방공공재의 수준을 고르는 <span class="mark">세 메커니즘</span></p>
+    <svg class="fig" id="f-mech" viewBox="0 0 848 282" style="width:848px;display:block;margin:0 0 0" role="img">
+      <title>지방공공재의 수준을 고르는 세 메커니즘인 다수결 원칙, 응익세, 이주를 통한 투표를 세 카드로 놓고, 아래에 미국 지방정부의 수를 적은 인포그래픽</title></svg>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n) => `<circle cx="${x}" cy="${y}" r="11" fill="${RED}"/>` + t(x, y + 4.5, String(n), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      let s = '';
+      const W = 276, X = [0, 286, 572], H = 168;
+      const C = [
+        ['다수결 원칙', 'majority rule', ['결과 = 중위투표자의 선호'], '효율적인 수준을 담보하지 않음'],
+        ['응익세', 'benefit taxation', ['세금 부담 ∝ 공공재에 대한 지불용의', '(린달 과세)'], '만장일치로 효율적 규모 선택'],
+        ['이주를 통한 투표', 'vote with their feet', ['선호에 맞는 관할구역으로 이동', '(티부모형)'], '동질적 자치시: 다수결의 비효율 제거'],
+      ];
+      C.forEach(([k, en, rows, res], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 20, 24, i + 1);
+        s += t(x + 38, 29, k, 15, INK, { w: 700 });
+        s += t(x + 38, 47, en, 10.5, MUTED);
+        let y = 80;
+        rows.forEach((r, j) => { s += t(x + 14, y, r, 12, j ? MUTED : INK2); y += 20; });
+        s += `<rect x="${x + 8}" y="${H - 36}" width="${W - 16}" height="26" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 18, '→ ' + res, 11.5, RED, { w: 700, a: 'middle' });
+      });
+      const y2 = H + 16;
+      s += `<rect x="0" y="${y2}" width="848" height="${282 - y2}" rx="6" fill="none" stroke="${GUIDE}"/>`;
+      s += t(16, y2 + 30, '미국의 지방정부 (2012)', 13, INK, { w: 700 });
+      s += t(16, y2 + 56, '9만 개 이상', 20, RED, { w: 700 });
+      [[300, '일반기능 정부', '38,000개 이상', '카운티 · 지방자치시 · 군구, 여러 기능을 수행'],
+       [586, '특수기능 정부', '51,000개 이상', '독립 학군 · 특별구역, 한두 기능만 담당']].forEach(([x, k, n, d]) => {
+        s += t(x, y2 + 30, k, 12, INK, { w: 700 });
+        s += t(x + 96, y2 + 30, n, 12, INK2, { w: 700 });
+        s += t(x, y2 + 54, d, 10.5, MUTED);
+      });
+      s += `<path d="M${276},${y2 + 14} L${276},${282 - 14}" stroke="${GUIDE}"/>`;
+      Fig.draw('#f-mech', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 2026-11-17 고치기 전: 재산세 장 (실효세율 · 표 21-1 포함) ══ -->
+<section>
+  <h2>재산세: 가시성과 자원 부동성</h2>
+  <div class="body tighter">
+    <p class="lead t-define" style="margin-bottom:6px">재산세: 주거 · 상업 · 공업용 부동산(<span class="mark">건축물 + 토지</span>)에 대한 연간 세금</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="sub" style="margin-bottom:2px">재산세의 유리한 두 속성</p>
+        <p style="margin-bottom:0"><strong>1. 가시성(visibility)</strong></p>
+        <p style="margin-bottom:6px">매년 고지서 → 지방공공재 비용의 명확한 신호<br>
+          비용과 편익을 비교해 투표</p>
+        <p style="margin-bottom:0"><strong>2. 자원 부동성(resource immobility)</strong></p>
+        <p style="margin-bottom:6px">토지는 장기에도 이동 불가 → 「능동적 도피」 불가<br>
+          → 토지 부분은 행태를 왜곡하지 않음</p>
+        <p class="caption" style="margin-bottom:12px">지방소득세 등은 세금이 적은 인근 관할구역으로의 도피를 유발</p>
+        <p class="sub" style="margin-bottom:2px">실효세율(effective tax rate)</p>
+        <p style="margin-bottom:8px">중위가치 주택의 세금 ÷ 시장가치</p>
+        <p class="derive t-red hang">→ 실효세율이 높은 도시:<br>
+          재산세 의존도 고 · 주택가치 저 · 지방지출 고</p>
+      </div>
+      <div class="col-r">
+        <table class="tbl-c">
+          <colgroup><col style="width:28%"><col style="width:13%"><col style="width:21%"><col style="width:19%"><col style="width:19%"></colgroup>
+          <thead><tr><th>도시</th><th>세율(%)</th><th>재산세 의존도</th><th>주택가치</th><th>지방지출</th></tr></thead>
+          <tbody>
+            <tr><td>브릿지포트, CT</td><td>3.88</td><td>고</td><td></td><td></td></tr>
+            <tr><td>디트로이트, MI</td><td>3.81</td><td></td><td>저</td><td></td></tr>
+            <tr><td>오로라, IL</td><td>3.72</td><td>고</td><td></td><td></td></tr>
+            <tr><td>뉴웍, NJ</td><td>3.05</td><td>고</td><td></td><td></td></tr>
+            <tr><td>밀워키, WI</td><td>2.68</td><td>고</td><td>저</td><td></td></tr>
+            <tr><td>보스턴, MA</td><td>0.67</td><td>저</td><td>고</td><td></td></tr>
+            <tr><td>버밍햄, AL</td><td>0.66</td><td>저</td><td></td><td></td></tr>
+            <tr><td>덴버, CO</td><td>0.66</td><td>저</td><td>고</td><td></td></tr>
+            <tr><td>샤이엔, WY</td><td>0.65</td><td>저</td><td></td><td></td></tr>
+            <tr><td>호놀룰루, HI</td><td>0.30</td><td>저</td><td>고</td><td>저</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:4px">최고 · 최저 실효재산세율, 2015 (교재 표 21-1)<br>
+          출처: Lincoln Institute, <em>50-State Property Tax Comparison Study</em>, 2016</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

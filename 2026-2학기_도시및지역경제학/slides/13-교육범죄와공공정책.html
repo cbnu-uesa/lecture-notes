@@ -1,0 +1,1280 @@
+<!doctype html>
+<!--
+  13주차. 교육, 범죄와 공공정책
+  교재: 오설리반의 도시경제학 제9판 — 22장 (p.496~517) · 23장 (p.524~544). PART 05 지방정부, 교육, 그리고 범죄.
+-->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13주차. 교육, 범죄와 공공정책</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<script>
+  // ── 공용 도우미 ────────────────────────────────────────────
+  // 함수 f 를 [a, b] 에서 촘촘히 뽑은 데이터 좌표 (스플라인과 at() 이 어긋나지 않게 41점)
+  window.SAMPLE = (f, a, b, n = 40) => { const o = []; for (let i = 0; i <= n; i++) { const x = a + ((b - a) * i) / n; o.push([x, f(x)]); } return o; };
+  // 표시용 반올림 + 천 단위 쉼표 (0.1 + 0.2 같은 꼬리를 화면에 찍지 않는다)
+  window.FMT = (v, d = 0) => Number(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  // 픽셀 x → 데이터 x (Fig.cross 가 준 교점을 눈금 이름표로 바꿀 때)
+  window.INVX = (F, xr, px) => xr[0] + ((px - F.BOX.x0) / (F.BOX.x1 - F.BOX.x0)) * (xr[1] - xr[0]);
+
+  // 세로 막대 (인쇄된 숫자가 있는 실측 막대에만 쓴다 — check: false)
+  //   o: { x0, x1, y0, h, max, cats, series: [{ vals, fill | fills }], bw, size, ticks }
+  window.VBARS = function (o) {
+    const n = o.cats.length, k = o.series.length, gw = (o.x1 - o.x0) / n;
+    const bw = Math.min(o.bw || 30, (gw - 8) / k), sy = (v) => o.y0 - (v / o.max) * o.h, sz = o.size || 10;
+    let s = '';
+    (o.ticks || []).forEach((v) => {
+      s += `<path class="guide" d="M${o.x0},${sy(v)} L${o.x1},${sy(v)}"/>`;
+      s += `<text class="tick" x="${o.x0 - 6}" y="${sy(v) + 4}" text-anchor="end">${v}</text>`;
+    });
+    o.cats.forEach((c, i) => {
+      const cx = o.x0 + gw * (i + 0.5);
+      o.series.forEach((se, j) => {
+        const v = se.vals[i], x = cx - (k * bw) / 2 + j * bw, fill = se.fills ? se.fills[i] : se.fill;
+        s += `<rect x="${x + 1}" y="${sy(v)}" width="${bw - 2}" height="${o.y0 - sy(v)}" fill="${fill}"/>`;
+        s += `<text class="annot" x="${x + bw / 2}" y="${sy(v) - 4}" text-anchor="middle" style="font-size:${sz}px">${o.fmt ? o.fmt(v) : v}</text>`;
+      });
+      s += `<text class="annot" x="${cx}" y="${o.y0 + 15}" text-anchor="middle" style="font-size:${sz}px">${c}</text>`;
+    });
+    s += `<path class="axis" d="M${o.x0},${o.y0 - o.h - 6} L${o.x0},${o.y0} L${o.x1 + 4},${o.y0}"/>`;
+    return s;
+  };
+  // 가로 막대: o: { x0, x1, y0, rowH, max, rows: [[이름, 값, 색]], size }
+  window.HBARS = function (o) {
+    const sx = (v) => o.x0 + (v / o.max) * (o.x1 - o.x0), sz = o.size || 10;
+    let s = '';
+    o.rows.forEach(([k, v, fill, bold], i) => {
+      const y = o.y0 + i * o.rowH;
+      s += `<text class="annot" x="${o.x0 - 6}" y="${y + o.rowH / 2 + 3.5}" text-anchor="end" style="font-size:${sz}px${bold ? ';font-weight:700' : ''}">${k}</text>`;
+      s += `<rect x="${o.x0}" y="${y + 2}" width="${sx(v) - o.x0}" height="${o.rowH - 4}" fill="${fill}"/>`;
+      s += `<text class="annot" x="${sx(v) + 4}" y="${y + o.rowH / 2 + 3.5}" style="font-size:${sz}px${bold ? ';font-weight:700' : ''}">${o.fmt ? o.fmt(v) : v}</text>`;
+    });
+    s += `<path class="axis" d="M${o.x0},${o.y0 - 2} L${o.x0},${o.y0 + o.rows.length * o.rowH + 2}"/>`;
+    return s;
+  };
+
+  // ── 22장 실측 자료 [p.497~499, 표 22-1·22-2·22-3 · 그림 22-1] ──
+  window.EDU = {
+    // 표 22-2 는 인쇄 순서 그대로 (미국 481 · 그리스 485 순서도 인쇄 그대로다)
+    pisa: [['OECD 회원국 평균', 494], ['상하이-중국', 613], ['싱가포르', 573], ['한국', 554], ['일본', 536],
+           ['스위스', 531], ['네덜란드', 523], ['핀란드', 519], ['캐나다', 518], ['아일랜드', 501],
+           ['러시아 연방', 482], ['슬로바키아 공화국', 482], ['미국', 481], ['그리스', 485], ['카자흐스탄', 432], ['멕시코', 413]],
+    // 그림 22-1 막대 위 인쇄 숫자
+    school: ['링컨', '윌슨', '그랜트', '매디슨', '제퍼슨'],
+    mathOk: [80, 72, 68, 45, 44],
+    poor: [12, 18, 26, 70, 68],
+  };
+
+  // ── 효율적인 학급규모 [22장 p.504, 그림 22-2] ─────────────────
+  // 교재에 숫자가 없다. 한계편익은 우하향·볼록, 한계비용은 원점에서 오르는 볼록 곡선이다.
+  //   mb(T) = 1.5 + 12/T,  mc(T) = 0.08 T²
+  //   교사 4명: mb 4.50 > mc 1.28 · 5명: mb 3.90 > mc 2.00 → 교점 T* ≈ 6.48 (S* ≈ 15.4명)
+  // 그래서 교재 본문처럼 4 → 5 로 늘리는 것이 효율적이고 T* 는 5 보다 오른쪽에 온다.
+  window.CLASS = {
+    mb(T) { return 1.5 + 12 / T; },
+    mc(T) { return 0.08 * T * T; },
+  };
+
+  // ── 대학원 수강 대 방과 후 수업 [22장 p.505~506, 그림 22-3] ──────
+  // 교재에 숫자가 없다. 방과 후 수업의 한계편익이 대학원 수강의 한계편익보다 늘 위에 있고
+  // 대학원 수강의 한계편익은 0 에 가깝다 (교재 1·2번).
+  //   mbT(h) = 1.2 + 6/(h+1) · mbG(h) = 0.6 e^{−0.3h} · mc(h) = 0.05 h²
+  //   교점: T* ≈ 6.35 (w_T ≈ 2.02) · G* ≈ 2.41 (w_G ≈ 0.29) → G* < T*, w_G < w_T
+  window.TUTOR = {
+    mbT(h) { return 1.2 + 6 / (h + 1); },
+    mbG(h) { return 0.6 * Math.exp(-0.3 * h); },
+    mc(h) { return 0.05 * h * h; },
+  };
+
+  // ── 기금교부금에 대한 반응 [22장 p.512, 그림 22-4 · 표 22-4] ───
+  // 중위투표자의 효용 u = x^α (y − y₀)^{1−α} (x 교육, y 여타 재화, 예산 x + y = M).
+  // 최적 교육지출 x = α(M − y₀) 이므로 교부금 1,000 중 교육으로 가는 몫이 α 다.
+  // 교재: 1,000 교부금 → 교육 +600 · 여타 재화 +400 → α = 0.6 (본문 p.513 의 60% 와 같다).
+  // 초기 예산 Y 는 교재에 없어 8,000 으로 두고, y₀ 는 초기 선택이 교육 3,400 이 되도록 푼다.
+  //   y₀ = Y − 3,400/α = 2,333.3 → a = (3,400, 4,600) · b = (4,000, 5,000)
+  //   두 점에서 한계대체율 = (α/(1−α))(y − y₀)/x = 1 = 가격비율 (node 로 확인)
+  // 한 효용함수의 두 무차별곡선이라 서로 만나지 않는다.
+  window.GRANT = {
+    Y: 8000, grant: 1000, alpha: 0.6, base: 200000, rate0: 0.017,
+    get y0() { return this.Y - (this.rate0 * this.base) / this.alpha; },
+    u(x, y) { return Math.pow(x, this.alpha) * Math.pow(y - this.y0, 1 - this.alpha); },
+    ic(U, x) { return this.y0 + Math.pow(U / Math.pow(x, this.alpha), 1 / (1 - this.alpha)); },
+    best(M) { const x = this.alpha * (M - this.y0); return [x, M - x]; },
+  };
+
+  // ── 합리적인 범죄자 [23장 p.527~538, 그림 23-3·23-4·23-5·23-7·23-8·23-9] ──
+  // 이득 1달러 = g 유틸, 손실 1달러 = l 유틸 (손실회피, l = 2g).
+  //   eu = r·g·부정이득 − (1−r)·l·처벌 − 내적 처벌,  CE = eu / g
+  //   기본 156 → 52 · 내적 처벌 36 → 120 → 40 · r = 1/2 → 105 → 35 · 처벌 35 → 132 → 44
+  // 근로자: 임금 1~100달러, 정수 임금마다 2명 → 임금 w 이하인 사람은 2w 명.
+  // 그래서 합법적 임금선은 w = N/2 이고, CE 수평선과의 교점이 범죄자 수다 (Fig.cross).
+  //   104 · 70 · 88 / 인적자본 +20 이면 w = 20 + N/2 → 64
+  window.CRIME = {
+    g: 3, l: 6, loot: 120, pen: 25, r: 3 / 5,
+    eu(o = {}) {
+      const r = o.r ?? this.r, pen = o.pen ?? this.pen, ip = o.ip ?? 0;
+      return r * this.g * this.loot - (1 - r) * this.l * pen - ip;
+    },
+    ce(o) { return this.eu(o) / this.g; },
+    wage(N, up = 0) { return up + N / 2; },
+    Nmax: 200,
+  };
+
+  // ── 범죄 실측 [23장 p.525~540, 표 23-1 · 그림 23-1·23-2·23-6 · 본문 p.539~540] ──
+  window.CRIMEDATA = {
+    victim: [['강도', 2.2], ['가정 빈집털이', 26.3], ['자동차 절도', 6.6], ['절도: 250달러 미만', 94.8], ['절도: 250달러 이상', 27.0]],
+    incCat: ['<7.5', '7.5-15', '15-25', '25-35', '35-50', '50-75', '>75'],
+    inc: [204, 175, 162, 150, 142, 126, 133],
+    metroCat: ['50k-250k', '250k-500k', '500k-1m', '1m+'],
+    central: [212, 210, 226, 171],
+    suburb: [121, 140, 152, 160],
+    year: ['1975', '1980', '1985', '1990', '1995', '2000', '2005', '2010'],
+    property: [550, 490, 400, 380, 310, 190, 180, 148],
+    eduCat: ['고등학교 중퇴', '고등학교 졸업', '대학 중퇴', '대학 졸업'],
+    inst: [0.040, 0.017, 0.008, 0.003],
+    // 그림 23-10 은 막대 위 숫자가 인쇄되지 않았다. 본문 p.539~540 에 적힌 일곱 나라만 쓴다.
+    prison: [['미국', 760], ['러시아', 624], ['남아프리카', 329], ['이스라엘', 325], ['캐나다', 116], ['아일랜드', 85], ['핀란드', 67]],
+  };
+
+  // ── 범죄의 효율적 수준 [23장 p.541, 그림 23-11] ──────────────
+  // 교재 인쇄값: a(0, 300) · b(30, 900) · c(60, 1,500) → 한계비용 = 300 + 20 × 예방 건수 (직선)
+  window.CONTROL = { mb: 1500, mc(n) { return 300 + 20 * n; }, total: 100 };
+
+  // ── 직업선택 [23장 p.542~544, 그림 23-12·23-13] ─────────────
+  // 교재에는 π 값이 없다. 보수곡선은 우하향·볼록 A + B/n 로 두고 조건에서 계수를 푼다.
+  //   세 곡선 모두 n = 10 에서 π* = 100
+  //   처벌 뒤 절도 곡선 = 원래 − 30 (수직 이동) → π′ = 70
+  //   새 균형 π** = 90: 절도 4 · 강도 12 · 목수 14 (합 30 — 총합의 제약)
+  //   절도  100 = A + B/10, 120 = A + B/4  → B = 400/3, A = 260/3
+  //   강도  100 = A + B/10,  90 = A + B/12 → B = 600, A = 40 (가장 가파르다, 교재 그림과 같음)
+  //   목수  100 = A + B/10,  90 = A + B/14 → B = 350, A = 65
+  window.OCC = {
+    theft(n) { return 260 / 3 + 400 / 3 / n; },
+    rob(n) { return 40 + 600 / n; },
+    carp(n) { return 65 + 350 / n; },
+    drop: 30,
+    victim: { theft: 1500, rob: 13000 },
+  };
+
+  // ── 그림 23-3 · 23-7: 꺾인 효용선 위의 기대효용 ───────────────
+  // 이득 쪽 기울기 g, 손실 쪽 기울기 l 인 꺾인 선이라 curve() 가 아니라 line() 두 개로 그린다 (design.md §6.4).
+  // 기대효용 막대는 실패 효용(f)부터 성공 효용(s)까지이고, eu 는 그 막대의 r₁ 지점이다.
+  //   o: { r, pen, rLabel, box, still }  still 이 없으면 점 u 와 확실성 등가가 둘째 단계에 나온다
+  window.drawEU = function (sel, o) {
+    const C = window.CRIME, F = Fig.withBox(o.box || { x0: 64, y0: 272, x1: 404, y1: 26 });
+    const S = F.scale({ x: [-78, 140], y: [-240, 400] });
+    const us = C.g * C.loot, uf = -C.l * o.pen, eu = C.eu({ r: o.r, pen: o.pen }), ce = eu / C.g;
+    const O = S.p([0, 0]), xb = S.x(-62), step = o.still ? {} : { fragment: 0 };
+    const dash = (x1, y1, x2, y2, f = {}) => Fig.raw(`<path class="guide" d="M${x1},${y1} L${x2},${y2}"/>`, f);
+    const parts = [
+      Fig.raw(`<path class="axis" d="M${S.x(-48)},${O[1]} L${S.x(140) + 6},${O[1]} M${O[0]},${S.y(-236)} L${O[0]},${S.y(400) - 6}"/>`),
+      F.annot(O[0], S.y(400) - 12, '유틸', { anchor: 'middle', size: 11 }),
+      F.annot(S.x(140), O[1] - 6, '이득', { anchor: 'end', size: 11 }),
+      F.annot(S.x(-48), O[1] + 16, '손실', { size: 11 }),
+      F.line(...O, S.x(133), S.y(133 * C.g)),
+      F.annot(S.x(78) - 8, S.y(78 * C.g) - 4, 'Δ효용', { anchor: 'end', size: 11 }),
+      F.line(...O, S.x(-38), S.y(-38 * C.l), { variant: 'demand' }),
+      // 실패와 성공의 효용 — 막대까지 가로 점선, 가로축까지 세로 점선
+      dash(xb, S.y(us), S.x(C.loot), S.y(us)), dash(S.x(C.loot), S.y(us), S.x(C.loot), O[1]),
+      dash(xb, S.y(uf), S.x(-C.pen * 0 - o.pen), S.y(uf)), dash(S.x(-o.pen), S.y(uf), S.x(-o.pen), O[1]),
+      F.dot(...S.p([C.loot, us]), { label: 's', lx: -14, ly: -6 }),
+      F.dot(...S.p([-o.pen, uf]), { label: 'f', lx: 8, ly: 4 }),
+      F.annot(S.x(C.loot), O[1] + 16, window.FMT(C.loot), { anchor: 'middle', size: 11 }),
+      F.annot(S.x(-o.pen), O[1] - 6, '−' + window.FMT(o.pen), { anchor: 'middle', size: 11 }),
+      // 기대효용 막대 (f 의 효용 ~ s 의 효용)
+      Fig.raw(`<path d="M${xb},${S.y(uf)} L${xb},${S.y(us)} M${xb - 5},${S.y(uf)} L${xb + 5},${S.y(uf)} M${xb - 5},${S.y(us)} L${xb + 5},${S.y(us)}" stroke="var(--ink)" stroke-width="1.4" fill="none"/>`),
+      Fig.raw(`<circle cx="${xb}" cy="${S.y(eu)}" r="4" fill="var(--brand-crimson)"/>`),
+      F.annot(xb - 7, S.y(us) + 4, window.FMT(us), { anchor: 'end', size: 11 }),
+      F.annot(xb - 7, S.y(uf) + 4, '−' + window.FMT(-uf), { anchor: 'end', size: 11 }),
+      F.annot(xb - 7, S.y(eu) + 4, window.FMT(eu), { anchor: 'end', size: 11, tone: 'red' }),
+      F.annot(xb + 7, S.y(eu) - 7, '기대효용', { size: 10, tone: 'red' }),
+      F.annot(xb + 7, S.y(eu) + 15, o.rLabel, { size: 10 }),
+      dash(xb, S.y(eu), O[0], S.y(eu)),
+      // 확실성 등가: 이득 쪽 선에서 효용이 eu 인 금액
+      dash(O[0], S.y(eu), S.x(ce), S.y(eu), step), dash(S.x(ce), S.y(eu), S.x(ce), O[1], step),
+      F.dot(...S.p([ce, eu]), { label: 'u', lx: -14, ly: -6, ...step }),
+      F.annot(S.x(ce), O[1] + 16, window.FMT(ce), { anchor: 'middle', size: 11, tone: 'red', ...step }),
+      F.arrow(O[0], O[1] + 26, S.x(ce), O[1] + 26, { tone: 'red', ...step }),
+      F.arrow(S.x(ce), O[1] + 26, O[0], O[1] + 26, { tone: 'red', ...step }),
+      F.annot(O[0] + 4, O[1] + 42, '확실성 등가', { size: 11, tone: 'red', ...step }),
+    ];
+    F.draw(sel, { parts });
+  };
+
+  // ── 그림 23-4 · 23-5 · 23-8 · 23-9: 합법적 임금선과 범죄의 CE ───
+  // 임금 w 이하인 근로자는 2w 명 → 합법적 임금선 w = N/2 (인적자본 투자면 w = up + N/2).
+  // 범죄자 수는 임금선과 CE 수평선의 교점이다. 손으로 찍지 않고 Fig.cross 로 구한다.
+  //   o: { lines: [{ ce, label, variant, tone, pt }], up, marks: [[N, 이름]], box, xmax, ymax }
+  window.drawWage = function (sel, o) {
+    const C = window.CRIME, xmax = o.xmax || 220, ymax = o.ymax || 130, xr = [0, xmax];
+    const F = Fig.withBox(o.box || { x0: 56, y0: 250, x1: 356, y1: 26 });
+    const S = F.scale({ x: xr, y: [0, ymax] });
+    const end = (up) => Math.min(xmax - 6, 2 * (ymax - 4 - up));
+    const W0 = S.curve([[0, C.wage(0)], [end(0), C.wage(end(0))]]);
+    const W1 = o.up ? Fig.shift(S.curve([[0, 0], [end(o.up), C.wage(end(o.up))]]), 0, S.y(o.up) - S.y(0)) : null;
+    const W = W1 || W0, N = (px) => Math.round(window.INVX(F, xr, px));
+    const parts = [];
+    if (W1) {
+      parts.push(F.curve(W0, { variant: 'demand' }));
+      parts.push(F.annot(W0[1][0] + 4, W0[1][1] + 12, '이전 임금', { size: 10, tone: 'blue' }));
+    }
+    parts.push(F.curve(W));
+    parts.push(F.annot(W[1][0] - 4, W[1][1] - 8, '합법적 임금', { anchor: 'end', size: 11 }));
+    let last = null;
+    o.lines.forEach((L) => {
+      const H = S.curve([[0, L.ce], [xmax - 4, L.ce]]);
+      parts.push(F.curve(H, L.variant ? { variant: L.variant } : {}));
+      parts.push(F.annot(F.BOX.x0 + 6, H[0][1] - 6, L.label, { size: 10, tone: L.tone }));
+      const X = Fig.cross(W, H);
+      parts.push(F.guide(X[0], X[1], { xtick: String(N(X[0])), ytick: window.FMT(L.ce) }));
+      parts.push(F.dot(X[0], X[1], { label: L.pt || 'b', lx: -12, ly: -8 }));
+      last = X;
+    });
+    if (W1) {
+      // 이전 교점 b 와, 같은 사람(104번째)의 새 임금 d
+      const H = S.curve([[0, o.lines[0].ce], [xmax - 4, o.lines[0].ce]]), B = Fig.cross(W0, H), nb = window.INVX(F, xr, B[0]);
+      const D = Fig.at(W1, { x: B[0] });
+      parts.push(F.guide(B[0], B[1], { xtick: String(Math.round(nb)), only: 'x' }));
+      parts.push(F.dot(...B, { label: 'b', lx: 6, ly: 14 }));
+      parts.push(F.guide(...D, { ytick: window.FMT(C.wage(nb, o.up)), only: 'y' }));
+      parts.push(F.dot(...D, { label: 'd', lx: 7, ly: 8 }));
+      parts.push(F.arrow(B[0] - 6, B[1] + 8, last[0] + 6, last[1] + 8));
+    }
+    (o.marks || []).forEach(([n, k]) => {
+      const p = S.p([n, C.wage(n, o.up || 0)]);
+      parts.push(F.guide(...p, { xtick: String(n), ytick: window.FMT(C.wage(n, o.up || 0)) }));
+      parts.push(F.dot(...p, { label: k, lx: -13, ly: -6 }));
+    });
+    // 가로축 아래 괄호: 범죄자 | 합법적 근로자
+    const yb = F.BOX.y0 + 30, xe = Math.min(S.x(C.Nmax), F.BOX.x1);
+    parts.push(F.arrow(F.BOX.x0, yb, last[0] - 1, yb), F.arrow(last[0] - 1, yb, F.BOX.x0, yb));
+    parts.push(F.arrow(last[0] + 1, yb, xe, yb), F.arrow(xe, yb, last[0] + 1, yb));
+    parts.push(F.annot((F.BOX.x0 + last[0]) / 2, yb + 15, '범죄자', { anchor: 'middle', size: 11 }));
+    parts.push(F.annot((last[0] + xe) / 2, yb + 15, `합법적 근로자 = ${C.Nmax - N(last[0])}`, { anchor: 'middle', size: 11 }));
+    F.draw(sel, { axes: { x: 'N', y: '달러' }, parts });
+  };
+</script>
+
+<style>
+  .body > .cols { align-items: flex-start; }
+  .tbl-num { width: 100%; table-layout: fixed; }
+  .tbl-num th, .tbl-num td { text-align: right; }
+  .tbl-num th:first-child, .tbl-num td:first-child { text-align: left; }
+  .tbl-sm { font-size: 13px; }
+  .tbl-sm td, .tbl-sm th { padding: 1px 8px; line-height: 1.3; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 표지 ══════════════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>13주차. 교육, 범죄와 공공정책</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 지난 시간 — 12주차 요약 인포그래픽 ═══════════════════════ -->
+<!-- 지난 시간: 12주차 덱과 대조함 (2026-11-16) -->
+<section>
+  <h2>지난 시간: 지방정부의 역할과 공공재</h2>
+  <div class="body" style="padding-top:0">
+    <svg class="fig" id="f-recap12" viewBox="0 0 848 294" style="width:848px;display:block;margin:0" role="img">
+      <title>12강 요약 인포그래픽. 지방공공재와 중위투표자, 재산세의 부담, 정부 간 교부금</title></svg>
+    <p class="derive t-red hang" style="margin-top:6px">→ 오늘: 제5편 지방정부, 교육, 그리고 범죄<br>
+      22장: <strong>교육생산함수</strong>와 지출 불평등을 줄이는 <strong>교부금</strong><br>
+      23장: <strong>합리적인 범죄자</strong> 모형과 범죄를 줄이는 공공정책</p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      let s = '';
+      const W = 276, X = [0, 286, 572], H = 292;
+      const P = [
+        ['지방공공재와 중위투표자', '효율적 수준과 결정 방식 (20장 02~03)', [
+          ['효율적 수준', '한계 사회적 편익(MSB) = 한계비용'],
+          ['다수결 원칙', '중위투표자의 선호가 결정', '효율 15에이커 ≠ 중위투표자 12에이커'],
+          ['응익세', '지불용의에 비례한 세금 → 효율적 규모'],
+          ['티부모형', '이주를 통한 투표 → 패지어 살기'],
+        ], '다수결 원칙은 효율을 보장하지 않음'],
+        ['재산세', '누가 부담하는가 (21장 01~02)', [
+          ['토지 부문', '토지소유주에게 후방 전가'],
+          ['건축물 부문: 부분균형', '소비자에게 전방 전가'],
+          ['건축물 부문: 일반균형', '지역 전체의 자본소유주가 부담'],
+          ['티부모형과 재산세', '패지어 살기 → 사용자 요금'],
+        ], '보는 범위에 따라 부담자가 달라짐'],
+        ['정부 간 교부금', '정액 · 대응 교부금 (21장 03)', [
+          ['정액의 용도지정교부금', '20달러 → 특수교육 25 → 30달러', '나머지는 여타 재화로 (소득효과)'],
+          ['대응교부금', '20달러 → 특수교육 25 → 40달러', '기회비용 하락 (소득효과 + 대체효과)'],
+          ['파리잡이종이효과', '교부금이 처음 닿는 곳에 많이 남음'],
+        ], '같은 금액이면 대응교부금의 자극이 큼'],
+      ];
+      P.forEach(([q, why, rows, rule], i) => {
+        const x = X[i];
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += `<circle cx="${x + 18}" cy="20" r="11" fill="${RED}"/>` + t(x + 18, 24.5, String(i + 1), 13, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+        s += t(x + 35, 25, q, 14, RED, { w: 700 });
+        s += t(x + 12, 43, why, 10.5, MUTED);
+        let y = 68;
+        rows.forEach(([k, a, b]) => {
+          s += t(x + 12, y, k, 12, INK, { w: 700 });
+          s += t(x + 12, y + 16, a, 10.5, INK2);
+          if (b) s += t(x + 12, y + 30, b, 10.5, MUTED);
+          y += b ? 56 : 44;
+        });
+        s += `<rect x="${x + 8}" y="${H - 32}" width="${W - 16}" height="24" rx="4" fill="${RED}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 15, rule, 11, RED, { w: 700, a: 'middle' });
+        if (i < 2) s += `<path d="M${x + W},${H / 2} L${X[i + 1] - 2},${H / 2}" stroke="${INK2}" stroke-width="1.5" marker-end="url(#ah-ink)"/>`;
+      });
+      Fig.draw('#f-recap12', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 섹션 — CHAPTER 22 ═════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 22 교육</p>
+  <p class="section-sub">교육성취는 대도시지역 안에서도, 대도시지역 사이에서도 격차가 큼 · 교재 p.496~517</p>
+</section>
+
+<!-- ══ 발문 (p.496) ══════════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="lead t-define">교육: 미국 지방정부 지출의 <span class="mark">약 절반</span>
+      (두 번째 지출인 치안의 약 7배)</p>
+    <p class="lead t-define" style="margin-bottom:16px">학교의 질 → 가구와 기업의 입지 · 도시의 경제성장</p>
+    <p class="emph">교육생산함수: 교육과정의 <strong>투입요소와 산출물</strong>의 관계</p>
+    <p class="emph" style="margin-bottom:16px">산출물: 인지 검사 점수 → 최근에는 <strong>평생소득</strong>의 변화로 측정</p>
+    <p class="derive t-red hang">→ 투입요소 변화의 비용-편익 분석 가능<br>
+      예: 학급규모 감소의 추가 편익이 추가 비용을 넘는가?</p>
+  </div>
+</section>
+
+<!-- ══ 01 지출과 성취 — 표 22-1 · 22-2 (p.496~498) ═════════════ -->
+<section>
+  <h2>지출과 성취: 주별 지출과 국가 비교</h2>
+  <div class="body tight">
+    <p class="lead t-define" style="margin-bottom:6px">더 많이 지출한다고 성취가 높아지지는 않음</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 330px">
+        <p class="sub" style="margin-bottom:2px">학생 1인당 지출 (2014, 달러)</p>
+        <table class="tbl-num tbl-sm">
+          <colgroup><col style="width:66%"><col></colgroup>
+          <tbody>
+            <tr><td>뉴욕</td><td>20,600</td></tr>
+            <tr><td>컬럼비아 특구(Washington, DC)</td><td>18,500</td></tr>
+            <tr><td>알래스카</td><td>18,400</td></tr>
+            <tr><td>뉴저지</td><td>17,900</td></tr>
+            <tr><td>커넷티컷</td><td>17,800</td></tr>
+            <tr><td>미시시피</td><td>8,300</td></tr>
+            <tr><td>오클라호마</td><td>7,800</td></tr>
+            <tr><td>애리조나</td><td>7,500</td></tr>
+            <tr><td>아이다호</td><td>6,600</td></tr>
+            <tr><td>유타</td><td>6,500</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:2px">출처: 미국 인구조사국, 학교 시스템 재정에 대한 연간 조사 (2014)</p>
+        <p class="derive t-red" style="margin-top:8px">→ 1960~2014년 1인당 실질지출 4배 이상 증가</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:0">PISA 수학 점수 (2012)</p>
+        <svg class="fig" id="f-pisa" viewBox="0 0 480 232" style="width:470px;max-height:none" role="img">
+          <title>PISA 수학 점수를 나라별 가로 막대로 비교한 그림. 미국은 481점으로 OECD 평균 494점보다 낮다</title></svg>
+        <script>
+          (function () {
+            const rows = window.EDU.pisa.map(([k, v]) => [k, v,
+              k === '미국' ? 'var(--brand-crimson)' : k.startsWith('OECD') ? 'var(--ink-2)' : 'var(--chart-sky)', k === '미국' || k.startsWith('OECD')]);
+            const s = window.HBARS({ x0: 118, x1: 440, y0: 2, rowH: 14, max: 640, rows, size: 10 });
+            Fig.draw('#f-pisa', { parts: [Fig.raw(s)], check: false });
+          })();
+        </script>
+        <p class="caption" style="margin-top:0">출처: OECD, 국제 학업성취도 평가(PISA) (2012)</p>
+        <p class="derive t-red hang" style="margin-top:6px">→ 미국: 34개 OECD 회원국 중 27위<br>
+          슬로바키아는 미국의 절반가량을 지출하고 비슷한 점수</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 01 지출과 성취 — 표 22-3 · 그림 22-1 (p.498~499) ═══════ -->
+<section>
+  <h2>지출과 성취: 대도시 안의 격차</h2>
+  <div class="body tight">
+    <p class="lead t-define" style="margin-bottom:6px">대도시와 학교마다 학업성취의 차이가 큼</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 300px">
+        <p class="sub" style="margin-bottom:2px">NAEP 수학 기준 이하 8학년 비중 (2009, %)</p>
+        <table class="tbl-num tbl-sm">
+          <colgroup><col style="width:62%"><col></colgroup>
+          <tbody>
+            <tr><td><strong>미국 전체</strong></td><td><strong>29</strong></td></tr>
+            <tr><td><strong>대도시</strong></td><td><strong>40</strong></td></tr>
+            <tr><td>샌디에고</td><td>32</td></tr>
+            <tr><td>보스턴</td><td>33</td></tr>
+            <tr><td>뉴욕시</td><td>40</td></tr>
+            <tr><td>시카고</td><td>49</td></tr>
+            <tr><td>애틀란타</td><td>54</td></tr>
+            <tr><td>로스앤젤레스</td><td>54</td></tr>
+            <tr><td>볼티모어</td><td>57</td></tr>
+            <tr><td>클리블랜드</td><td>58</td></tr>
+            <tr><td>디트로이드</td><td>77</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:2px">출처: NCES, Digest of Education Statistics 2010</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:0">오레곤주 포틀랜드 학군의 고등학교 (%)</p>
+        <svg class="fig" id="f-portland" viewBox="0 0 500 222" style="width:500px;max-height:none" role="img">
+          <title>포틀랜드 다섯 고등학교의 수학 평가 기준 충족 비중과 경제적으로 불우한 학생 비중을 나란히 놓은 막대그래프</title></svg>
+        <script>
+          (function () {
+            const E = window.EDU;
+            let s = window.VBARS({ x0: 44, x1: 484, y0: 194, h: 150, max: 80, ticks: [0, 20, 40, 60, 80], cats: E.school, bw: 34, size: 11,
+              series: [{ vals: E.mathOk, fill: 'var(--accent-blue)' }, { vals: E.poor, fill: 'var(--guide)' }] });
+            [['수학 평가 기준을 충족하는 비중', 'var(--accent-blue)', 0], ['경제적으로 불우한 학생 비중', 'var(--guide)', 210]].forEach(([k, c, dx]) => {
+              s += `<rect x="${48 + dx}" y="8" width="11" height="11" fill="${c}"/>`;
+              s += `<text class="annot" x="${64 + dx}" y="17.5" style="font-size:11px">${k}</text>`;
+            });
+            Fig.draw('#f-portland', { parts: [Fig.raw(s)], check: false });
+          })();
+        </script>
+        <p class="caption" style="margin-top:0">출처: Oregon Department of Education, Report Cards, 2009−2010</p>
+        <p class="derive t-red hang" style="margin-top:6px">→ 수학 기준 충족 44~80%<br>
+          경제적으로 불우한 학생 12~70%</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 교육생산함수 (p.500) ═════════════════════════════════ -->
+<section>
+  <h2>교육생산함수</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:6px">학업성취도: 1년 수업에 따른 인지적 · 사회적 · 신체적 능력의 변화</p>
+    <p class="formula-key" style="margin-bottom:14px">학업성취도 = f(H, P, T, Z)</p>
+    <p class="lbl"><strong>H 가정환경:</strong><span>해당 학생의 가정</span></p>
+    <p class="lbl"><strong>P 또래집단:</strong><span>학급 안의 급우</span></p>
+    <p class="lbl"><strong>T 교원 투입:</strong><span>교사의 질(생산성) + 학급규모가 정하는 학생 1명당 교사 투입량</span></p>
+    <p class="lbl" style="margin-bottom:16px"><strong>Z 기타 투입:</strong><span>교과과정 · 교과서 · 컴퓨터 · 실습장비</span></p>
+    <p class="sub" style="margin-bottom:2px">가정환경에서 부모의 세 역할</p>
+    <p style="margin-bottom:12px">① 가정의 규칙 (텔레비전 대신 독서 · 숙제) ② 동기부여와 보상 ③ 책 · 컴퓨터 같은 교육용 자료</p>
+    <p class="derive t-red">→ 가정환경의 영향이 크고, 성취는 소득 · 부모의 학력과 함께 증가</p>
+  </div>
+</section>
+
+<!-- ══ 또래집단효과 (p.501) ═══════════════════════════════════ -->
+<section>
+  <h2>또래집단효과(peer effects)</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:16px">영리하고 의욕적인 급우가 있으면 더 많이 배움</p>
+    <p class="lbl"><strong>협력:</strong><span>아이들은 서로에게서 배움</span></p>
+    <p class="lbl"><strong>경쟁:</strong><span>아이들은 서로 경쟁함</span></p>
+    <p class="lbl"><strong>수업시간:</strong><span>훈계 대신 가르치는 데 시간을 씀 · 의욕 없는 학생은 나쁜 역할모델</span></p>
+    <p class="emph" style="margin:10px 0 18px">중국 고등학교: 또래집단의 질 1% 증가 → 학업성취 <strong>0.088%</strong> 증가</p>
+    <p class="sub" style="margin-bottom:2px">능력별 반편성 대 혼합반</p>
+    <p style="margin-bottom:12px">우등생을 혼합반으로 옮기면 우등생은 성취가 낮아지고 급우는 높아짐</p>
+    <p class="derive t-red">→ 우등생의 손실과 급우의 이득 중 어느 쪽이 큰지는 입증되지 않음</p>
+  </div>
+</section>
+
+<!-- ══ 학교 투입요소: 교사의 기여 (p.502~503) ══════════════════ -->
+<section>
+  <h2>학교 투입요소: 교사의 기여</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:16px">학교 간 성취 차이의 가장 중요한 요인: <span class="mark">교사의 생산성</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub" style="margin-bottom:2px">평균 교사(50번째) → 우등 교사(84번째)</p>
+        <p class="lbl"><strong>학생:</strong><span>백분위 50번째 → 58번째</span></p>
+        <p class="lbl"><strong>평생소득:</strong><span>학생 1명당 21,311달러 증가</span></p>
+        <p class="lbl" style="margin-bottom:12px"><strong>20명 학급:</strong><span>매년 <strong>426,220달러</strong></span></p>
+        <p class="derive t-red hang">→ 생산성 낮은 교사를 해임(deselecting)하면<br>
+          높은 보수(payoff)</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">생산적인 교사를 미리 알기 어려움</p>
+        <p class="li-hang" style="margin-bottom:6px">1. <strong>교육수준:</strong> 대학원 과정 이수 → 생산성 증가 X</p>
+        <p class="li-hang" style="margin-bottom:6px">2. <strong>경력:</strong> 처음 3년 정도만 생산성 증가</p>
+        <p class="li-hang">3. <strong>구술능력(verbal skills):</strong> 구술능력 시험 점수가 높은<br>
+          교사에게서 더 많이 배움</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 학교 투입요소: 교사와 학급규모 (p.503~505, 그림 22-2) ════ -->
+<section class="s-split">
+  <h2>학교 투입요소: 교사와 학급규모</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:2px">학급규모 감소 → 학생 1명당 교사 시간 증가</p>
+      <p class="caption" style="margin-bottom:10px">성취 이득은 낮은-소득 · 낮은-성취 학생에게 큼</p>
+      <p class="emph" style="margin-bottom:10px">스웨덴: 4~6학년 학급을 1명 줄이면<br>성인 소득 <strong>1.2%</strong> 증가</p>
+      <p class="li-hang" style="margin-bottom:4px">① 가로축: 100명당 교사 수(→) = 학급규모(←)</p>
+      <p class="li-hang" style="margin-bottom:4px">② 교사 4명(25명): $mb_4$(점 a) &gt; $mc_4$(점 b)<br>
+        → 다섯째 교사 채용이 효율적 (점 c &gt; 점 d)</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 점 e: 한계편익 = 한계비용 → 교사 T*, 학급규모 S*</p>
+      <p class="derive t-red hang">→ 작은 학급이 효율적인지는<br>
+        추가 편익이 추가 비용을 넘는지에 달림</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-class" viewBox="0 0 430 320" style="width:390px;max-height:none" role="img">
+        <title>교사 수가 늘수록 한계편익은 내려가고 한계비용은 올라, 두 곡선이 만나는 점 e에서 효율적인 교사 수와 학급규모가 정해지는 그림</title></svg>
+      <script>
+        (function () {
+          const C = window.CLASS, xr = [0, 8];
+          const F = Fig.withBox({ x0: 60, y0: 252, x1: 360, y1: 26 });
+          const S = F.scale({ x: xr, y: [0, 7] });
+          const MB = S.curve(window.SAMPLE((T) => C.mb(T), 2.2, 7.8)), MC = S.curve(window.SAMPLE((T) => C.mc(T), 0, 7.8));
+          const E = Fig.cross(MB, MC), Ts = window.INVX(F, xr, E[0]);
+          const parts = [
+            F.curve(MB),
+            F.annot(S.x(2.6), S.y(C.mb(2.6)) - 6, '한계편익', { size: 11 }),
+            F.curve(MC, { variant: 'demand' }),
+            F.annot(S.x(7.8), S.y(C.mc(7.8)) - 8, '한계비용', { anchor: 'end', size: 11, tone: 'blue' }),
+            F.guide(...S.p([4, C.mb(4)]), { xtick: '4', ytick: 'mb₄' }),
+            F.dot(...S.p([4, C.mb(4)]), { label: 'a', lx: -4, ly: -10 }),
+            F.guide(...S.p([4, C.mc(4)]), { ytick: 'mc₄', only: 'y' }),
+            F.dot(...S.p([4, C.mc(4)]), { label: 'b', lx: -14, ly: -4 }),
+            F.guide(...S.p([5, C.mb(5)]), { xtick: '5' }),
+            F.dot(...S.p([5, C.mb(5)]), { label: 'c', lx: 2, ly: -10 }),
+            F.dot(...S.p([5, C.mc(5)]), { label: 'd', lx: -14, ly: -4 }),
+            F.guide(E[0], E[1], { xtick: 'T*' }),
+            F.dot(E[0], E[1], { label: 'e', lx: 4, ly: -10 }),
+          ];
+          // 아래 줄: 학급규모 = 100 / 교사 수
+          [[4, '25'], [5, '20'], [Ts, 'S*']].forEach(([T, k]) =>
+            parts.push(F.annot(S.x(T), F.BOX.y0 + 33, k, { anchor: 'middle', size: 11 })));
+          parts.push(F.annot(F.BOX.x1 + 14, F.BOX.y0 + 5, '교사 수', { size: 11 }));
+          parts.push(F.annot(F.BOX.x1 + 14, F.BOX.y0 + 33, '학급규모', { size: 11 }));
+          F.draw('#f-class', { axes: { y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 교사에 대한 보상과 생산성 (p.505~506, 그림 22-3) ═════════ -->
+<section class="s-split">
+  <h2>교사에 대한 보상과 생산성</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:6px">교사의 생산성은 서로 다르지만<br>임금은 생산성과 무관한 두 요인이 결정</p>
+      <p class="lbl"><strong>경력:</strong><span>20년 경력 = 3년 경력 임금의 1.44배</span></p>
+      <p class="lbl" style="margin-bottom:10px"><strong>대학원 교육:</strong><span>석사학위 임금할증 26%</span></p>
+      <p class="li-hang" style="margin-bottom:4px">① 한계비용: 교사의 방과 후 시간의 기회비용</p>
+      <p class="li-hang" style="margin-bottom:4px">② 한계편익: 방과 후 수업 &gt; 대학원 수강(거의 0)</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 효율: 점 t(T*, $w_T$) · 점 g(G*, $w_G$), $w_G &lt; w_T$</p>
+      <p class="derive t-red hang">→ 실제는 $w_T = 0$, $w_G$ 는 큼 → 대학원 수강 과다<br>
+        보상을 방과 후 수업으로 옮기면<br>
+        예산 증가 없이 학업성취 증가</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-tutor" viewBox="0 0 430 310" style="width:390px;max-height:none" role="img">
+        <title>방과 후 수업의 한계편익은 대학원 수강의 한계편익보다 위에 있어, 한계비용과 만나는 효율적 시간이 방과 후 수업 T*가 대학원 수강 G*보다 긴 그림</title></svg>
+      <script>
+        (function () {
+          const U = window.TUTOR, xr = [0, 9];
+          const F = Fig.withBox({ x0: 60, y0: 270, x1: 370, y1: 26 });
+          const S = F.scale({ x: xr, y: [0, 4.6] });
+          const BT = S.curve(window.SAMPLE((h) => U.mbT(h), 0.9, 8.8)), BG = S.curve(window.SAMPLE((h) => U.mbG(h), 0, 8.8));
+          const MC = S.curve(window.SAMPLE((h) => U.mc(h), 0, 9.3));
+          const t = Fig.cross(BT, MC), g = Fig.cross(BG, MC);
+          const sub = (x, y, a, b) => `<text class="tick" x="${x}" y="${y}" text-anchor="end">${a}<tspan baseline-shift="sub" font-size="72%">${b}</tspan></text>`;
+          const parts = [
+            F.curve(BT),
+            F.annot(S.x(1.4), S.y(U.mbT(1.4)) - 8, '한계편익(방과 후 수업)', { size: 11 }),
+            F.curve(BG, { variant: 'i1' }),
+            F.annot(S.x(4.2), S.y(U.mbG(4.2)) - 9, '한계편익(대학원 수강)', { size: 11 }),
+            F.curve(MC, { variant: 'demand' }),
+            F.annot(S.x(9.3) - 4, S.y(U.mc(9.3)) + 2, '한계비용', { anchor: 'end', size: 11, tone: 'blue' }),
+            F.guide(t[0], t[1], { xtick: 'T*' }),
+            F.dot(t[0], t[1], { label: 't', lx: 2, ly: -10 }),
+            F.guide(g[0], g[1], { xtick: 'G*' }),
+            F.dot(g[0], g[1], { label: 'g', lx: -4, ly: -9 }),
+            F.raw(sub(F.BOX.x0 - 8, t[1] + 4, 'w', 'T') + sub(F.BOX.x0 - 8, g[1] + 2, 'w', 'G')),
+          ];
+          F.draw('#f-tutor', { axes: { x: '시간', y: '달러' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 차터스쿨의 혁신 (p.507~508) ════════════════════════════ -->
+<section>
+  <h2>차터스쿨(Charter Schools)의 혁신</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:16px">차터스쿨: 교과과정과 운영이 전통적인 학교보다 유연</p>
+    <p class="lbl"><strong>엄격한(no-excuse) 차터스쿨:</strong><span>긴 수업일수 · 품행 강조 · 높은 기대치 · 주기적 시험</span></p>
+    <p class="lbl" style="margin-bottom:16px"><strong>프로미스 아카데미(뉴욕 할렘):</strong><span>일반 학교의 약 2배를 학교공부에 씀<br>
+      시험점수로 교사 성과를 측정해 우수 교사를 포상</span></p>
+    <p class="emph" style="margin-bottom:16px">6학년 입학 때 수학 백분위 <strong>39번째 → 8학년 74번째</strong></p>
+    <p class="derive t-red hang">→ 잠정 결론: 생산성 낮은 교사를 배제하고 우수 교사를 채용한 결과<br>
+      또는 교사 생산성 · 집중된 학습환경 등 여러 특성의 복합 효과</p>
+  </div>
+</section>
+
+<!-- ══ 교육예산지출의 전반적인 효과 (p.508~509) ══════════════════ -->
+<section>
+  <h2>교육예산지출의 전반적인 효과</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:14px">학생 1인당 지출 증가 → <span class="mark">성인 소득 증가</span></p>
+    <p class="emph" style="margin-bottom:12px">공립학교 12년 동안 1인당 지출 10% 증가 →<br>
+      교육이수 0.31년 증가 · 성인임금 <strong>7%</strong> 증가 · 성인빈곤율 3.2%p 감소</p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 470px">
+        <p class="sub" style="margin-bottom:2px">낮은-소득 가정의 아이에게 더 큰 효과</p>
+        <table class="tbl-num tbl-sm">
+          <colgroup><col style="width:44%"><col><col></colgroup>
+          <thead><tr><th></th><th>낮은-소득 학생</th><th>빈곤하지 않은 학생</th></tr></thead>
+          <tbody>
+            <tr><td>고교 졸업 확률</td><td>+9.8%p</td><td>+2.4%p</td></tr>
+            <tr><td>성인임금</td><td>+9.6%</td><td>+5.5%</td></tr>
+            <tr><td>빈곤율</td><td>−6.1%p</td><td>효과 없음</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">늘어난 지출이 쓰인 곳</p>
+        <p>학생-교사 비율 감소 · 수업일수 증가 · 교사 급여 증가</p>
+        <p>→ 더 나은 교사가 더 긴 수업일수 동안<br>학생과 더 많은 시간</p>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:14px">→ 비용-편익 비율 약 <strong>3.0</strong>: 교육지출은 비용-편익분석을 통과</p>
+  </div>
+</section>
+
+<!-- ══ 03 지출 불평등과 공공정책 (p.509~510) ═══════════════════ -->
+<section>
+  <h2>지출 불평등과 공공정책</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:8px">전통적인 기금 원천: <span class="mark">지방재산세</span> → 학군 간 지출과 성취의 불평등</p>
+    <p class="emph" style="margin-bottom:18px">1970년대부터 재산세 기금의 합헌성 소송 (주 헌법: 교육은 시민의 근본적 권리)</p>
+    <p class="sub" style="margin-bottom:4px">주들이 개발한 평등의 세 개념</p>
+    <p class="lbl"><strong>1. 적합성(adequacy):</strong><span>모든 학군이 주 전역의 최소 표준 이상의 교육 제공</span></p>
+    <p class="lbl"><strong>2. 접근 평등성(access equality):</strong><span>모든 학군이 같은 실질과세표준에 접근<br>
+      → 같은 재산세율이면 학생 1명당 같은 수입</span></p>
+    <p class="lbl" style="margin-bottom:18px"><strong>3. 교육 평등성(educational equality):</strong><span>모든 학군이 같은 수준의 교육 제공</span></p>
+    <p class="derive t-red">→ 대부분의 주: 지출 불평등을 줄이는 데 초점 → 정부 간 교부금</p>
+  </div>
+</section>
+
+<!-- ══ 정부 간 교부금: 기금계획 (p.510~511, 표 22-4) ════════════ -->
+<section>
+  <h2>정부 간 교부금: 기금계획(Foundation Plans)</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">재산세 과세표준이 낮은 학군에 <span class="mark">더 큰 교부금</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="formula-key" style="margin-bottom:2px">기금교부금 = 기금수준 − 기금세율 · L</p>
+        <p class="caption" style="margin-bottom:12px">L: 학생 1명당 지방재산가치(재산세 과세표준)</p>
+        <p class="emph" style="margin-bottom:4px">기금수준 5,000달러 · 기금세율 0.02 · L = 200,000달러</p>
+        <p style="margin-bottom:12px">→ 교부금 = 5,000 − 0.02 × 200,000 = <strong>1,000달러</strong></p>
+        <p>L 이 1달러 높으면 교부금은 0.02달러 적음</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">지방세율에 따른 지출 (학생 1명당, 달러)</p>
+        <table class="tbl-num tbl-sm">
+          <thead><tr><th>지방세율</th><th>지방세입</th><th>기금교부금</th><th>교육지출</th></tr></thead>
+          <tbody>
+            <tr><td>1.7%</td><td>3,400</td><td>1,000</td><td>4,400</td></tr>
+            <tr><td>1.8%</td><td>3,600</td><td>1,000</td><td>4,600</td></tr>
+            <tr><td>1.5%</td><td>3,000</td><td>1,000</td><td>4,000</td></tr>
+          </tbody>
+        </table>
+        <p class="caption" style="margin-top:2px">교재 표 22−4 (1.8% 행은 역자가 6,000 → 4,600 으로 고침)</p>
+        <p class="derive t-red" style="margin-top:12px">→ 교부금은 실제 지방세율과 무관</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 기금교부금에 대한 반응 (p.512~513, 그림 22-4) ═════════════ -->
+<section class="s-split">
+  <h2>기금교부금에 대한 반응</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:10px">12주차 소비자선택모형 + 중위투표자 결과<br>→ 교부금에 대한 학군의 반응 예측</p>
+      <p class="li-hang" style="margin-bottom:4px">① 초기 점 a: 교육 3,400달러 (세율 1.7% × 재산가치 200,000)</p>
+      <p class="li-hang" style="margin-bottom:4px">② 교부금 1,000달러: 예산선이 1,000만큼 오른쪽으로 (점 s부터)</p>
+      <p class="li-hang" style="margin-bottom:4px">③ 새 접점 b: 교육 4,000달러(+600) · 여타 재화 +400</p>
+      <p class="li-hang" style="margin-bottom:10px">④ 지방 기여 3,000달러 → 세율 1.7% → 1.5%로 인하</p>
+      <p class="derive t-red hang">→ 실증: 교부금의 60%는 교육, 40%는 다른 재화<br>
+        파리잡이종이효과: 큰 몫이 처음 닿는 학군에 남음</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-grant" viewBox="0 0 430 320" style="width:390px;max-height:none" role="img">
+        <title>기금교부금 1,000달러가 예산선을 오른쪽으로 옮겨 중위투표자의 선택이 a에서 b로 바뀌고, 교육지출은 600달러, 여타 재화는 400달러 늘어나는 그림</title></svg>
+      <script>
+        (function () {
+          const G = window.GRANT, xr = [0, 6400], yr = [3000, 8800];
+          const F = Fig.withBox({ x0: 62, y0: 272, x1: 396, y1: 28 });
+          const S = F.scale({ x: xr, y: yr });
+          const a = G.best(G.Y), b = G.best(G.Y + G.grant);
+          // 예산선은 보이는 구간만 그린다 (가로축 아래로 내려가지 않게)
+          const B0 = S.curve([[0, G.Y], [G.Y - yr[0], yr[0]]]);
+          const B1 = S.curve([[G.grant, G.Y], [G.Y + G.grant - yr[0], yr[0]]]);
+          const ic = (p, lo, hi) => S.curve(window.SAMPLE((x) => G.ic(G.u(p[0], p[1]), x), lo, hi));
+          const I0 = ic(a, 2500, 5000), I1 = ic(b, 3000, 5700);
+          const parts = [
+            F.curve(B0, { variant: 'i2' }),
+            F.annot(S.x(1500) - 8, S.y(G.Y - 1500) + 14, '초기 예산선', { anchor: 'end', size: 11 }),
+            F.curve(B1, { variant: 'supply' }),
+            F.annot(S.x(2000) + 10, S.y(G.Y + G.grant - 2000) - 2, '기금교부금하의 예산선', { size: 11, tone: 'red' }),
+            F.curve(I0, { variant: 'demand' }),
+            F.curve(I1, { variant: 'demand' }),
+            F.guide(...S.p([G.grant, G.Y]), { xtick: '1,000', only: 'x' }),
+            F.dot(...S.p([G.grant, G.Y]), { label: 's', lx: -14, ly: -4 }),
+            F.guide(...S.p(a)),
+            F.dot(...S.p(a), { label: 'a', lx: -14, ly: 12 }),
+            F.guide(...S.p(b)),
+            F.dot(...S.p(b), { label: 'b', lx: 7, ly: -8 }),
+            F.annot(S.x(a[0]) + 2, F.BOX.y0 + 17, window.FMT(a[0]), { anchor: 'end', size: 11 }),
+            F.annot(S.x(b[0]) + 2, F.BOX.y0 + 17, window.FMT(b[0]), { size: 11 }),
+          ];
+          // 여타 재화 증가(세로)
+          const xv = F.BOX.x0 + 12, ya = S.y(a[1]), yb = S.y(b[1]);
+          parts.push(F.arrow(xv, ya, xv, yb + 2), F.annot(xv + 5, (ya + yb) / 2 + 4, '+' + window.FMT(b[1] - a[1]), { size: 10 }));
+          // 상자 글 — 세율은 지방 기여 / 재산가치로 계산한다
+          const r1 = (G.rate0 * 100).toFixed(2), r2 = (((b[0] - G.grant) / G.base) * 100).toFixed(2);
+          parts.push(F.annot(S.x(3900), S.y(8500), `재산가치 = ${window.FMT(G.base)}달러\n초기 세율 = ${r1}%\n새로운 세율 = ${r2}%`, { size: 10, lh: 14 }));
+          F.draw('#f-grant', { axes: { x: '교육(달러)', y: '여타 재화(달러)' }, parts });
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 대응교부금: 보증된 과세표준 (p.513~514, 표 22-5) ══════════ -->
+<section>
+  <h2>대응교부금: 보증된 과세표준</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">지방세 1달러마다 주가 m달러를 더함 → <span class="mark">교육의 기회비용 하락</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub" style="margin-bottom:2px">대응교부금(matching grant)</p>
+        <p class="formula-key" style="margin-bottom:2px">1달러당 지방비용 = 1 / (1 + m)</p>
+        <p style="margin-bottom:12px">m = 0.25 → 1 / 1.25 = <strong>0.80달러</strong></p>
+        <p class="lbl"><strong>소득효과:</strong><span>실질소득 증가 → 교육 포함 정상재 지출 증가</span></p>
+        <p class="lbl" style="margin-bottom:12px"><strong>대체효과:</strong><span>교육의 기회비용 1.00 → 0.80달러</span></p>
+        <p class="derive t-red">→ 기금교부금보다 큰 자극효과</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">보증된 과세표준계획(GTB: guaranteed tax base plan)</p>
+        <p class="formula-key" style="margin-bottom:2px">GTB 교부금 = 지방세율 · (B − L)</p>
+        <p class="caption" style="margin-bottom:6px">B: 학생 1명당 보증된 과세표준 · L: 지방과세표준</p>
+        <p style="margin-bottom:4px">L = 200,000 · B = 250,000달러</p>
+        <table class="tbl-num tbl-sm">
+          <thead><tr><th>지방세율</th><th>지방세입</th><th>교부금</th><th>교육지출</th></tr></thead>
+          <tbody>
+            <tr><td>2%</td><td>4,000</td><td>1,000</td><td>5,000</td></tr>
+            <tr><td>3%</td><td>6,000</td><td>1,500</td><td>7,500</td></tr>
+          </tbody>
+        </table>
+        <p class="derive t-red hang" style="margin-top:10px">→ 1달러당 지방비용 = L / B<br>
+          = 2,000 / 2,500 = 200,000 / 250,000 = 0.80달러</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 균등화계획의 효과 (p.514~517) ══════════════════════════ -->
+<section>
+  <h2>균등화계획의 지출불균등과 학업성취불균등에 대한 효과</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:18px">주법원 판례 → 교육재정 개혁 → <span class="mark">학군 간 지출 격차 감소</span></p>
+    <p class="lbl"><strong>1970~80년대 (형평성):</strong><span>대부분 낮은-지출 학군을 「상향 조정」하는 기금계획 선택</span></p>
+    <p class="lbl"><strong>1990년대~ (적정성):</strong><span>낮은-소득 학군 지출 +1,023달러 대 높은-소득 학군 +510달러<br>
+      → 낮은-소득 학군의 시험성적이 상대적으로 올라 성취 격차 감소</span></p>
+    <p class="lbl" style="margin-bottom:18px"><strong>미시건 제안서 A (1994):</strong><span>지방재산세 폐지 · 주 판매세 인상 · 낮은-지출 학군에 더 많은 보조금<br>
+      → 학생 1명당 지출의 95/5 백분위 비율 1.84(1991) → 1.46(2000)</span></p>
+    <p class="derive t-red hang">→ 지출의 효과는 낮은-소득 학생에게 1달러당 더 큼<br>
+      미시건 개혁은 효과가 큰 학군에 더 많은 예산을 배정</p>
+  </div>
+</section>
+
+<!-- ══ 섹션 — CHAPTER 23 ═════════════════════════════════════ -->
+<section class="s-section">
+  <div class="section-rule"></div>
+  <p class="section-label">CHAPTER 23 범죄와 공공정책</p>
+  <p class="section-sub">재산의 이전(transfer)과 관련된 범죄의 경제학 · 교재 p.524~544</p>
+</section>
+
+<!-- ══ 발문 (p.524) ══════════════════════════════════════════ -->
+<section class="s-question">
+  <div class="body stack">
+    <p class="lead t-define">합리적인 범죄자: 기대편익 &gt; 기대비용이면 <span class="mark">대물범죄(property crime)</span></p>
+    <p class="lead t-define" style="margin-bottom:16px">이 장의 초점: 범죄를 줄이는 두 접근</p>
+    <p class="emph">전통적 접근: 경찰 · 형사법원 · 교도소 → <strong>처벌의 확실성과 단호함</strong> 증가</p>
+    <p class="emph" style="margin-bottom:16px">또 다른 접근: <strong>교육 투자</strong> → 중퇴율 감소 · 합법적 고용의 수익 증가</p>
+    <p class="derive t-red">→ 교육 투자도 견고한 이론과 실증적 기반을 가진 범죄 대책</p>
+  </div>
+</section>
+
+<!-- ══ 01 범죄에 대한 사실들 — 표 23-1 · 그림 23-1 (p.524~527) ══ -->
+<section class="s-split">
+  <h2>범죄에 대한 사실들: 피해율</h2>
+  <div class="body">
+    <div class="col-l" style="flex:0 0 40%">
+      <p class="emph" style="margin-bottom:4px">대물범죄: 합리적 선택 모형으로 설명</p>
+      <p class="caption" style="margin-bottom:8px">폭력범죄는 동기가 더 복잡하지만 입지와 주택 · 토지시장에 영향<br>
+        2010년 폭력범죄 피해율 1,000명당 19.3명</p>
+      <p class="sub" style="margin-bottom:2px">대물범죄 피해율 (1,000명 또는 가구당)</p>
+      <table class="tbl-num tbl-sm">
+        <colgroup><col style="width:70%"><col></colgroup>
+        <tbody>
+          <tr><td>강도 (무력 범죄)</td><td>2.2</td></tr>
+          <tr><td>가정 빈집털이</td><td>26.3</td></tr>
+          <tr><td>자동차 절도</td><td>6.6</td></tr>
+          <tr><td>절도: 250달러 미만</td><td>94.8</td></tr>
+          <tr><td>절도: 250달러 이상</td><td>27.0</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:2px">출처: U.S. Bureau of Justice, Criminal Victimization in the United States (2011)</p>
+      <p class="derive t-red hang" style="margin-top:8px">→ 피해율: 소득이 높을수록 대체로 낮음<br>
+        중심 도시 &gt; 교외 · 최대 대도시의 중심 도시가 최저</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-victim" viewBox="0 0 480 330" style="width:480px;max-height:none" role="img">
+        <title>범죄 피해율을 가구소득 구간별, 그리고 대도시 인구 규모별 중심 도시와 교외로 나눠 보인 막대그래프</title></svg>
+      <script>
+        (function () {
+          const D = window.CRIMEDATA;
+          let s = '';
+          s += `<text class="annot" x="40" y="14" style="font-size:11px;font-weight:700">가구소득(1,000달러)별 피해율(1,000명당)</text>`;
+          s += window.VBARS({ x0: 40, x1: 470, y0: 140, h: 100, max: 230, cats: D.incCat, bw: 34, size: 10,
+            series: [{ vals: D.inc, fill: 'var(--accent-blue)' }] });
+          s += `<text class="annot" x="40" y="186" style="font-size:11px;font-weight:700">대도시 인구(k = 천명, m = 백만명)별 피해율(1,000명당)</text>`;
+          s += window.VBARS({ x0: 40, x1: 470, y0: 312, h: 100, max: 230, cats: D.metroCat, bw: 40, size: 10,
+            series: [{ vals: D.central, fill: 'var(--accent-blue)' }, { vals: D.suburb, fill: 'var(--chart-sky)' }] });
+          [['중심 도시', 'var(--accent-blue)', 0], ['교외', 'var(--chart-sky)', 76]].forEach(([k, c, dx]) => {
+            s += `<rect x="${330 + dx}" y="177" width="11" height="11" fill="${c}"/>`;
+            s += `<text class="annot" x="${345 + dx}" y="186.5" style="font-size:10px">${k}</text>`;
+          });
+          Fig.draw('#f-victim', { parts: [Fig.raw(s)], check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:0">출처: U.S. Bureau of Justice, Criminal Victimization in the United States (2011)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 01 범죄에 대한 사실들 — 그림 23-2 (p.526~527) ════════════ -->
+<section class="s-split">
+  <h2>범죄에 대한 사실들: 시간적 추세</h2>
+  <div class="body">
+    <div class="col-l" style="flex:0 0 40%">
+      <p class="emph" style="margin-bottom:6px">대물범죄 피해율 (1,000명당)</p>
+      <p class="li-hang" style="margin-bottom:12px">1975년 550 → 2010년 148:<br>1975년의 약 1/4을 겨우 넘음</p>
+      <p class="emph" style="margin-bottom:6px">폭력범죄 피해율</p>
+      <p class="li-hang" style="margin-bottom:12px">1973~1993년 비교적 안정<br>2010년: 1993년 최고치의 약 1/4</p>
+      <p class="derive t-red">→ 대물범죄와 폭력범죄 모두 크게 감소</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-trend" viewBox="0 0 470 270" style="width:450px;max-height:none" role="img">
+        <title>대물범죄 피해율이 1975년 1,000명당 550명에서 2010년 148명으로 줄어든 막대그래프</title></svg>
+      <script>
+        (function () {
+          const D = window.CRIMEDATA;
+          let s = `<text class="annot" x="40" y="16" style="font-size:11px;font-weight:700">대물범죄 피해율(1,000명당)</text>`;
+          s += window.VBARS({ x0: 40, x1: 460, y0: 248, h: 200, max: 560, cats: D.year, bw: 36, size: 11,
+            series: [{ vals: D.property, fill: 'var(--accent-blue)' }] });
+          Fig.draw('#f-trend', { parts: [Fig.raw(s)], check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:0">출처: U.S. Bureau of Justice, NCVS Victimization Analysis Tool (2017)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02 범죄로부터의 기대효용 · 확실성 등가 (p.527~530, 그림 23-3) ══ -->
+<section class="s-split">
+  <h2>범죄로부터의 기대효용과 확실성 등가</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:2px">절도를 할지 고민하는 바트: 결과가 불확실</p>
+      <p class="formula-key" style="margin-bottom:2px">범죄복권 L = {120, −25; 3/5, 2/5}</p>
+      <p class="caption" style="margin-bottom:8px">부정이득 120달러(성공 확률 3/5) · 처벌 25달러(실패 확률 2/5)</p>
+      <p class="lbl" style="margin-bottom:8px"><strong>손실회피:</strong><span>얻은 1달러 g = 3유틸 · 잃은 1달러 l = 6유틸</span></p>
+      <p class="li-hang" style="margin-bottom:4px">① 점 s: +120달러 → 360유틸 · 점 f: −25달러 → −150유틸</p>
+      <p class="li-hang" style="margin-bottom:4px">② 기대효용 eu = 3/5 · 360 − 2/5 · 150 = <strong>156유틸</strong></p>
+      <p class="li-hang fragment" data-fragment-index="0" style="margin-bottom:10px">③ 확실성 등가 CE = eu / g = 156 / 3 = <strong>52달러</strong> (점 u)</p>
+      <p class="derive t-red hang fragment" data-fragment-index="1">→ 바트는 범죄복권과 확실한 52달러가 무차별<br>
+        합법적인 일로 52달러 이상 벌면 범죄 X</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-eu" viewBox="0 0 430 300" style="width:390px;max-height:none" role="img">
+        <title>이득에는 기울기 3, 손실에는 기울기 6인 꺾인 효용선 위에서 성공 s와 실패 f의 효용을 확률로 가중해 기대효용 156유틸과 확실성 등가 52달러를 구하는 그림</title></svg>
+      <script>window.drawEU('#f-eu', { r: 3 / 5, pen: 25, rLabel: 'r₁ = 3/5' });</script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 소득과 범죄행위 (p.530~531, 그림 23-4) ════════════════════ -->
+<section class="s-split">
+  <h2>소득과 범죄행위</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px">범죄의 CE &gt; 합법적 임금(범죄의 기회비용)<br>→ 범죄가 합리적 선택</p>
+      <p class="li-hang" style="margin-bottom:4px">① 근로자 200명: 임금 1~100달러, 정수 임금마다 2명</p>
+      <p class="li-hang" style="margin-bottom:4px">② 합법적 임금선: 그 임금 이하를 받는 근로자 수<br>
+        점 a: 16달러 이하 32명</p>
+      <p class="li-hang" style="margin-bottom:12px">③ 범죄의 CE = 52달러 수평선과 만나는 점 b<br>
+        → 임금 52달러 이하인 104명에게 범죄가 합리적</p>
+      <p class="derive t-red">→ 범죄자 104명 · 합법적 근로자 96명</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-wage" viewBox="0 0 430 318" style="width:390px;max-height:none" role="img">
+        <title>합법적 임금선이 범죄의 확실성 등가 52달러 수평선과 104명에서 만나 104명은 범죄를, 96명은 합법적인 일을 고르는 그림</title></svg>
+      <script>window.drawWage('#f-wage', { lines: [{ ce: window.CRIME.ce(), label: '범죄의 CE' }], marks: [[32, 'a'], [200, 'c']] });</script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 고뇌비용 · 신경과학 (p.531~532) ══════════════════════════ -->
+<section>
+  <h2>고뇌비용과 내적인 처벌 · 신경과학으로부터의 통찰</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:16px">같은 편익과 비용을 마주해도 <span class="mark">사람마다 선택이 다름</span></p>
+    <div class="cols">
+      <div class="col-l">
+        <p class="sub" style="margin-bottom:2px">고뇌비용(anguish costs)과 내적인 처벌</p>
+        <p style="margin-bottom:6px">이제까지: 쉽게 측정할 수 있는 비용과 편익만 고려</p>
+        <p class="lbl" style="margin-bottom:6px"><strong>내적 처벌:</strong><span>범죄를 저지를 때 느끼는 고뇌<br>스스로 부과하고 확실함</span></p>
+        <p class="lbl" style="margin-bottom:12px"><strong>바트 36유틸:</strong><span>eu 156 → <span id="ip-eu"></span>유틸 · CE 52 → <span id="ip-ce"></span>달러</span></p>
+        <p class="derive t-red hang">→ 내적 처벌이 큰 대부분의 사람에게<br>범죄는 합리적 선택이 아님</p>
+      </div>
+      <div class="col-r">
+        <p class="sub" style="margin-bottom:2px">신경과학으로부터의 통찰</p>
+        <p style="margin-bottom:6px">전두엽 피질: 편익과 비용을 직관으로 평가해 결정<br>
+          배외측 전두엽 피질: 미래 결과를 고려 → 사려 깊은 선택</p>
+        <p class="li-hang" style="margin-bottom:4px">1. <strong>현재에 대한 편향(present bias):</strong> 미래 결과를 무시 · 과소평가</p>
+        <p class="li-hang" style="margin-bottom:12px">2. <strong>극복 능력의 차이:</strong> 배외측 전두엽 피질이 덜 활발<br>→ 충동적 선택</p>
+        <p class="derive t-red">→ 충동적인 사람은 범죄 · 사려 깊은 사람은 범죄 X</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const C = window.CRIME;
+        document.getElementById('ip-eu').textContent = window.FMT(C.eu({ ip: 36 }));
+        document.getElementById('ip-ce').textContent = window.FMT(C.ce({ ip: 36 }));
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 03 인적자본에 대한 투자 (p.533~534, 그림 23-5) ═════════════ -->
+<section class="s-split">
+  <h2>인적자본(human capital)에 대한 투자</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:2px">공공정책: 범죄의 CE 또는 합법적 임금을 바꿈</p>
+      <p class="caption" style="margin-bottom:10px">교육 · 직업훈련 투자 → 인적자본 · 생산성 증가 → 합법적 임금 상승</p>
+      <p class="li-hang" style="margin-bottom:4px">① 모든 근로자의 임금 +20달러 (최저 1 → 21, 최고 100 → 120)</p>
+      <p class="li-hang" style="margin-bottom:4px">② 임금선이 위로 20달러 = 왼쪽으로 40명<br>
+        104번째 근로자 52 → 72달러 (점 b → d)</p>
+      <p class="li-hang" style="margin-bottom:10px">③ CE = 52달러와 새 임금선이 점 e에서 만남<br>
+        → 범죄자 104 → <strong>64명</strong></p>
+      <p class="derive t-red hang">→ 범죄의 임금 탄력성 −1.0 ~ −2.0<br>
+        저숙련 임금 10% 증가 → 범죄 10~20% 감소</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-hc" viewBox="0 0 430 318" style="width:390px;max-height:none" role="img">
+        <title>합법적 임금선이 20달러만큼 위로 평행이동해 확실성 등가 52달러 수평선과의 교점이 104명에서 64명으로 옮겨 가는 그림</title></svg>
+      <script>window.drawWage('#f-hc', { lines: [{ ce: window.CRIME.ce(), label: '범죄의 CE', pt: 'e' }], up: 20 });</script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 인적자본에 대한 투자: 고등학교 졸업 (p.534~535, 그림 23-6) ══ -->
+<section class="s-split">
+  <h2>인적자본에 대한 투자: 고등학교 졸업</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:12px">고교 중퇴자가 보호시설에 갈 가능성<br>
+        = 대졸자의 <strong>13배</strong></p>
+      <p class="sub" style="margin-bottom:2px">졸업 장려의 비용과 편익</p>
+      <p class="lbl"><strong>비용:</strong><span>추가 1년 재학, 학생 1인당 6,000달러 (한 번)</span></p>
+      <p class="lbl" style="margin-bottom:12px"><strong>편익:</strong><span>범죄 감소로 사회에 매년 약 1,600달러<br>
+        범죄자 이력의 남은 기간(30~40년) 동안</span></p>
+      <p class="derive t-red hang">→ 고등학교 교육 투자는<br>범죄를 줄이는 효율적인 방법</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-inst" viewBox="0 0 430 260" style="width:390px;max-height:none" role="img">
+        <title>미국 백인 남성의 보호시설 수감율이 고등학교 중퇴 0.040에서 대학 졸업 0.003으로 교육 수준이 높을수록 낮아지는 막대그래프</title></svg>
+      <script>
+        (function () {
+          const D = window.CRIMEDATA;
+          let s = `<text class="annot" x="40" y="16" style="font-size:11px;font-weight:700">미국 백인 남성의 보호시설 수감율</text>`;
+          s += window.VBARS({ x0: 40, x1: 420, y0: 236, h: 190, max: 0.042, cats: D.eduCat, bw: 56, size: 11,
+            series: [{ vals: D.inst, fills: ['var(--accent-blue)', '#3F7BA8', 'var(--chart-sky)', '#B5D2E6'] }],
+            fmt: (v) => v.toFixed(3) });
+          Fig.draw('#f-inst', { parts: [Fig.raw(s)], check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:0">출처: Raphael and Stoll, Do Prisons Make Us Safer? (2008)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 처벌의 확실성 (p.535~537, 그림 23-7 · 23-8) ═══════════════ -->
+<section>
+  <h2>처벌의 확실성</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:0">경찰 · 법원 지출 증가 → 체포 · 처벌 확률 증가 → <strong>범죄의 CE 감소</strong></p>
+    <div class="cols" style="margin-top:0">
+      <div class="col-l" style="flex:0 0 412px">
+        <p class="sub t-red" style="margin-bottom:0">성공확률과 확실성 등가 (r₁ = 3/5 → 1/2)</p>
+        <svg class="fig" id="f-eu2" viewBox="0 0 412 262" style="width:400px;max-height:none" role="img">
+          <title>성공 확률이 1/2로 낮아져 기대효용이 105유틸, 확실성 등가가 35달러로 내려가는 그림</title></svg>
+        <script>window.drawEU('#f-eu2', { r: 1 / 2, pen: 25, rLabel: 'r₁ = 1/2', box: { x0: 74, y0: 236, x1: 380, y1: 22 }, still: true });</script>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:0">성공확률과 범죄 (CE 52 → 35)</p>
+        <svg class="fig" id="f-cert" viewBox="0 0 412 262" style="width:400px;max-height:none" role="img">
+          <title>범죄의 확실성 등가가 52달러에서 35달러로 내려가 범죄자가 104명에서 70명으로 줄어드는 그림</title></svg>
+        <script>window.drawWage('#f-cert', { lines: [{ ce: window.CRIME.ce(), label: '처벌 확률 증가 전', variant: 'demand', tone: 'blue', pt: 'a' },
+          { ce: window.CRIME.ce({ r: 1 / 2 }), label: '처벌 확률 증가 후', pt: 'b' }], box: { x0: 56, y0: 214, x1: 360, y1: 22 }, xmax: 140, ymax: 70 });</script>
+      </div>
+    </div>
+    <p class="derive t-red" style="margin-top:2px">→ eu 156 → 105유틸 · CE 52 → 35달러 · 범죄자 104 → 70명 (합법적 근로자 130명)</p>
+    <p style="margin-top:2px">실증: 교도소 수감 확률에 대한 범죄의 탄력성 −0.3 (수감 가능성 10% 증가 → 범죄율 3% 감소)</p>
+  </div>
+</section>
+
+<!-- ══ 처벌의 가혹성 (p.537~539, 그림 23-9) ════════════════════ -->
+<section class="s-split">
+  <h2>처벌의 가혹성(severity)</h2>
+  <div class="body tight">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:6px">더 긴 징역형 → 처벌 증가 → 범죄의 CE 감소</p>
+      <p class="li-hang" style="margin-bottom:2px">① 처벌 25 → 35달러: 실패의 효용 −150 → −210유틸</p>
+      <p class="li-hang" style="margin-bottom:2px">② eu = 3/5 · 360 − 2/5 · 210 = <span id="sv-eu"></span>유틸 → CE <span id="sv-ce"></span>달러</p>
+      <p class="li-hang" style="margin-bottom:8px">③ 범죄자 104명(점 a) → <strong><span id="sv-n"></span>명</strong>(점 b)</p>
+      <p class="sub" style="margin-bottom:2px">투옥기간의 체감하는 보수(diminishing returns)</p>
+      <p class="lbl"><strong>현재에 대한 편향:</strong><span>나중의 1년은 지금 결정에서 비중이 작음</span></p>
+      <p class="lbl"><strong>노령범죄자:</strong><span>나이가 들수록 범죄 빈도 감소</span></p>
+      <p class="lbl"><strong>더 비정해짐:</strong><span>긴 투옥 → 내적 처벌 약화 → CE 증가</span></p>
+      <p class="lbl" style="margin-bottom:8px"><strong>교도소 내 학습:</strong><span>숙련된 범죄자 → 처벌 확률 감소</span></p>
+      <p class="derive t-red">→ 처벌 강화의 범죄 감소 효과는 상대적으로 작음</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-sev" viewBox="0 0 430 318" style="width:390px;max-height:none" role="img">
+        <title>처벌이 커져 범죄의 확실성 등가가 52달러에서 44달러로 내려가고 범죄자가 104명에서 88명으로 줄어드는 그림</title></svg>
+      <script>
+        window.drawWage('#f-sev', { lines: [{ ce: window.CRIME.ce(), label: '처벌 강화 전', variant: 'demand', tone: 'blue', pt: 'a' },
+          { ce: window.CRIME.ce({ pen: 35 }), label: '처벌 강화 후', pt: 'b' }], xmax: 140, ymax: 70 });
+        (function () {
+          const C = window.CRIME, ce = C.ce({ pen: 35 });
+          document.getElementById('sv-eu').textContent = window.FMT(C.eu({ pen: 35 }));
+          document.getElementById('sv-ce').textContent = window.FMT(ce);
+          document.getElementById('sv-n').textContent = window.FMT(2 * ce);   // 임금 w 이하인 사람 = 2w 명
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 감옥의 역할 (p.539~540, 그림 23-10) ═════════════════════ -->
+<section class="s-split">
+  <h2>감옥의 역할</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:2px">미국 수감 인원: 수십 년간 7배 → 2008년 230만 명</p>
+      <p class="caption" style="margin-bottom:10px">미국 수감율은 OECD 국가 중위값의 7배</p>
+      <p class="li-hang" style="margin-bottom:4px">1. <strong>저지(deterrence):</strong> 투옥의 위협 → 범죄의 CE 감소</p>
+      <p class="li-hang" style="margin-bottom:4px">2. <strong>무력화(incapacitation):</strong> 범죄자를 격리<br>
+        텍사스: 연간 비용 36,000 &gt; 무력화 편익 15,000달러</p>
+      <p class="li-hang" style="margin-bottom:10px">3. <strong>재활(rehabilitation):</strong> 석방 후 3년 안에 약 2/3 재체포<br>
+        성인 프로그램은 효과 X · 비행 청소년은 보통의 감소</p>
+      <p class="derive t-red hang">→ 수감 인원에 대한 범죄의 탄력성<br>
+        대물범죄 −0.25 · 강력 범죄 −0.40</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-prison" viewBox="0 0 430 210" style="width:390px;max-height:none" role="img">
+        <title>인구 10만 명당 수감자 수를 미국 760, 러시아 624, 남아프리카 329, 이스라엘 325, 캐나다 116, 아일랜드 85, 핀란드 67로 비교한 가로 막대그래프</title></svg>
+      <script>
+        (function () {
+          const rows = window.CRIMEDATA.prison.map(([k, v]) => [k, v, k === '미국' ? 'var(--brand-crimson)' : 'var(--chart-sky)', k === '미국']);
+          let s = `<text class="annot" x="80" y="14" style="font-size:11px;font-weight:700">10만명당 수감자 수</text>`;
+          s += window.HBARS({ x0: 80, x1: 380, y0: 26, rowH: 24, max: 800, rows, size: 11 });
+          Fig.draw('#f-prison', { parts: [Fig.raw(s)], check: false });
+        })();
+      </script>
+      <p class="caption" style="margin-top:0">주: 교재 본문(p.539~540)에 수치가 있는 일곱 나라만 옮김<br>
+        출처: OECD, Factbook 2010 (교재 그림 23−10)</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 04 범죄의 효율적 양 (p.540~541, 그림 23-11) ══════════════ -->
+<section class="s-split">
+  <h2>범죄의 효율적 양</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:2px">범죄 통제도 자원을 씀 → 효율적 범죄 수준은 0이 아님</p>
+      <p class="caption" style="margin-bottom:10px">범죄 1건당 피해자 비용: 절도 370 · 밤도둑 1,500 · 자동차 절도 4,000 · 무장강도 13,000달러</p>
+      <p class="li-hang" style="margin-bottom:4px">① 한계편익: 예방한 범죄 1건당 피해자 비용 1,500달러</p>
+      <p class="li-hang" style="margin-bottom:4px">② 한계비용: 쉬운 범죄부터 예방 → 우상향 (점 a → b)</p>
+      <p class="li-hang" style="margin-bottom:10px">③ 점 c: 한계편익 = 한계비용<br>
+        → 예방 <span id="ctl-n"></span>건 · 겪는 범죄 <span id="ctl-r"></span>건</p>
+      <p class="derive t-red hang">→ 그 너머는 예방 비용 &gt; 범죄를 감당하는 비용</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-control" viewBox="0 0 430 320" style="width:390px;max-height:none" role="img">
+        <title>범죄 예방의 한계편익 1,500달러 수평선과 우상향 한계비용선이 60건에서 만나 60건을 예방하고 40건을 겪는 것이 효율적인 그림</title></svg>
+      <script>
+        (function () {
+          const K = window.CONTROL, xr = [0, 100];
+          const F = Fig.withBox({ x0: 62, y0: 252, x1: 340, y1: 26 });
+          const S = F.scale({ x: xr, y: [0, 1800] });
+          const MB = S.curve([[0, K.mb], [92, K.mb]]), MC = S.curve([[0, K.mc(0)], [70, K.mc(70)]]);
+          const c = Fig.cross(MB, MC), n = Math.round(window.INVX(F, xr, c[0]));
+          const parts = [
+            F.line(...MB[0], ...MB[1], { variant: 'demand' }),
+            F.annot(MB[1][0], MB[1][1] - 8, '한계편익', { anchor: 'end', size: 11, tone: 'blue' }),
+            F.line(...MC[0], ...MC[1], { variant: 'supply' }),
+            F.annot(MC[1][0] - 4, MC[1][1] - 4, '한계비용', { anchor: 'end', size: 11, tone: 'red' }),
+            F.dot(...S.p([0, K.mc(0)]), { label: 'a', lx: 7, ly: -6 }),
+            F.guide(...S.p([30, K.mc(30)]), { ytick: window.FMT(K.mc(30)) }),
+            F.dot(...S.p([30, K.mc(30)]), { label: 'b', lx: 7, ly: 10 }),
+            F.guide(c[0], c[1], { ytick: window.FMT(K.mb) }),
+            F.dot(c[0], c[1], { label: 'c', lx: 7, ly: 14 }),
+            F.annot(F.BOX.x0 - 8, S.y(K.mc(0)) + 4, window.FMT(K.mc(0)), { anchor: 'end', size: 11 }),
+          ];
+          // 가로축 두 줄: 예방된 범죄 / 겪은 범죄 (합이 100)
+          [0, 30, n].forEach((v) => {
+            parts.push(F.annot(S.x(v), F.BOX.y0 + 17, String(v), { anchor: 'middle', size: 11 }));
+            parts.push(F.annot(S.x(v), F.BOX.y0 + 33, String(K.total - v), { anchor: 'middle', size: 11, tone: 'blue' }));
+          });
+          parts.push(F.annot(F.BOX.x1 + 12, F.BOX.y0 + 17, '예방된 범죄', { size: 11 }));
+          parts.push(F.annot(F.BOX.x1 + 12, F.BOX.y0 + 33, '겪은 범죄', { size: 11, tone: 'blue' }));
+          F.draw('#f-control', { axes: { y: '달러' }, parts });
+          document.getElementById('ctl-n').textContent = n;
+          document.getElementById('ctl-r').textContent = K.total - n;
+        })();
+      </script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 직업선택과 한계저지: 균형 직업선택 (p.542~544, 그림 23-12 · 23-13) ══ -->
+<section>
+  <h2>직업선택과 한계저지: 균형 직업선택</h2>
+  <div class="body tight">
+    <p class="emph" style="margin-bottom:2px">범죄도 직업선택: 노동자 30명이 절도 · 강도 · 목수(합법) 중 선택</p>
+    <p style="margin-bottom:2px">보수곡선은 우하향: 목수 = 노동수요곡선 · 범죄 = 수익이 큰 대상부터 범행 (범죄의 보수 = 범죄의 CE)</p>
+    <p style="margin-bottom:0">균형 조건: ① 내쉬균형(세 직업의 보수가 같음) ② 총합의 제약(30명 모두 고용) → 점 a · b · c: 10명씩, 보수 π*</p>
+    <svg class="fig" id="f-occ" viewBox="0 0 848 236" style="width:848px;max-height:none;display:block" role="img">
+      <title>절도·강도·목수 세 직업의 보수곡선. 처음에는 10명씩 π*에서 균형이고, 절도 처벌 강화로 절도 보수곡선이 내려가면 절도 4명, 강도 12명, 목수 14명이 π**에서 균형을 이루는 그림</title></svg>
+    <script>
+      (function () {
+        const O = window.OCC, xr = [0, 16], yr = [55, 180];
+        const W = 270, panels = [['절도범', (n) => O.theft(n), 1.5], ['강도', (n) => O.rob(n), 4.5], ['목수', (n) => O.carp(n), 3.4]];
+        const parts = [];
+        const step = { fragment: 0 };
+        let Fs = [];
+        const solve = (f, a, b) => { for (let k = 0; k < 60; k++) { const m = (a + b) / 2; (f(a) * f(m) <= 0) ? (b = m) : (a = m); } return (a + b) / 2; };
+        const pi0 = O.theft(10), piN = O.theft(4) - O.drop, piP = O.theft(10) - O.drop;
+        // 새 균형 인원: 강도 · 목수 곡선이 π** 가 되는 n 을 구한다 (4 + 12 + 14 = 30 인지 보이려고)
+        const nNew = [4, solve((n) => O.rob(n) - piN, 5, 16), solve((n) => O.carp(n) - piN, 5, 16)];
+        panels.forEach(([name, f, lo], i) => {
+          const F = Fig.withBox({ x0: 44 + i * (W + 12), y0: 196, x1: 44 + i * (W + 12) + W - 40, y1: 20 });
+          const S = F.scale({ x: xr, y: yr });
+          Fs.push([F, S]);
+          const C = S.curve(window.SAMPLE(f, lo, 15.5));
+          parts.push(F.raw(`<path class="axis" d="M${F.BOX.x0},${F.BOX.y1 - 6} L${F.BOX.x0},${F.BOX.y0} L${F.BOX.x1 + 8},${F.BOX.y0}"/>`));
+          parts.push(F.annot(F.BOX.x0, F.BOX.y1 - 10, '보수', { anchor: 'middle', size: 11 }));
+          parts.push(F.annot((F.BOX.x0 + F.BOX.x1) / 2, F.BOX.y0 + 34, name, { anchor: 'middle', size: 12 }));
+          parts.push(F.curve(C));
+          const p0 = S.p([10, f(10)]);
+          parts.push(F.raw(`<path class="guide" d="M${p0[0]},${p0[1]} L${p0[0]},${F.BOX.y0}"/>`));
+          parts.push(F.annot(p0[0], F.BOX.y0 + 16, '10', { anchor: 'middle', size: 11 }));
+          parts.push(F.dot(...p0, { label: 'abc'[i], lx: 5, ly: -8 }));
+          if (i === 0) {
+            const C1 = Fig.shift(C, 0, S.y(yr[0]) - S.y(yr[0] + O.drop));
+            parts.push(F.curve(C1, { variant: 'demand', ...step }));
+            parts.push(F.annot(S.x(15.5), S.y(f(15.5) - O.drop) - 8, '처벌 강화 후', { anchor: 'end', size: 10, tone: 'blue', ...step }));
+            const pd = S.p([10, piP]), pe = S.p([4, piN]);
+            parts.push(F.guide(pd[0], pd[1], { only: 'x', ...step }));
+            parts.push(F.dot(...pd, { label: 'd', lx: 5, ly: -8, ...step }));
+            parts.push(F.guide(pe[0], pe[1], { only: 'x', ...step }));
+            parts.push(F.annot(pe[0], F.BOX.y0 + 16, '4', { anchor: 'middle', size: 11, ...step }));
+            parts.push(F.dot(...pe, { label: 'e', lx: -12, ly: 14, ...step }));
+            parts.push(F.annot(F.BOX.x0 - 6, S.y(pi0) + 4, 'π*', { anchor: 'end', size: 11 }));
+            parts.push(F.annot(F.BOX.x0 - 6, S.y(piN) + 6, 'π**', { anchor: 'end', size: 11, ...step }));
+            parts.push(F.annot(F.BOX.x0 - 6, S.y(piP) + 4, 'π′', { anchor: 'end', size: 11, ...step }));
+          } else {
+            const pn = S.p([nNew[i], piN]);
+            parts.push(F.guide(pn[0], pn[1], { only: 'x', ...step }));
+            parts.push(F.annot(pn[0], F.BOX.y0 + 16, String(Math.round(nNew[i])), { anchor: 'middle', size: 11, ...step }));
+            parts.push(F.dot(...pn, { label: 'fg'[i - 1], lx: 6, ly: -9, ...step }));
+          }
+        });
+        // π* · π** 점선은 세 판을 가로지른다 (세 판의 세로 눈금이 같다)
+        const [F0, S0] = Fs[0], [F2] = Fs[2];
+        parts.unshift(Fig.raw(`<path class="guide" d="M${F0.BOX.x0},${S0.y(pi0)} L${F2.BOX.x1},${S0.y(pi0)}"/>`));
+        parts.unshift(Fig.raw(`<path class="guide" d="M${F0.BOX.x0},${S0.y(piN)} L${F2.BOX.x1},${S0.y(piN)}"/>`, step));
+        Fig.draw('#f-occ', { parts });
+      })();
+    </script>
+    <p class="derive t-red fragment" data-fragment-index="0" style="margin-top:0">→ 절도 처벌 강화: 절도 보수 π* → π′ → 이직 → 절도 4 · 강도 12 · 목수 14명, 보수 π** (&lt; π*)</p>
+  </div>
+</section>
+
+<!-- ══ 직업선택과 한계저지: 범죄대체 (p.544) ══════════════════════ -->
+<section>
+  <h2>직업선택과 한계저지: 범죄대체</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:18px"><span class="mark">한계저지(marginal deterrence)</span>: 피해자 비용이 큰 범죄일수록 기대처벌이 커야 함</p>
+    <p class="emph" style="margin-bottom:8px">절도 처벌 강화의 결과: 6명이 직업을 바꿈 (강도로 2명 · 목수로 4명)</p>
+    <p class="lbl"><strong>절도범 6명 감소:</strong><span>피해자 비용 −<span id="sub-a"></span>달러 (6 × 1,500)</span></p>
+    <p class="lbl" style="margin-bottom:10px"><strong>강도범 2명 증가:</strong><span>피해자 비용 +<span id="sub-b"></span>달러 (2 × 13,000)</span></p>
+    <p class="derive t-red" style="margin-bottom:18px">→ 범죄 피해자 비용 <strong><span id="sub-c"></span>달러 증가</strong>: 범죄대체(crime substitution)</p>
+    <p style="margin-bottom:4px">강도의 피해자 비용 ≈ 절도의 약 9배<br>
+      → 강도 1건이 늘 때 절도가 9건보다 적게 줄면 총 피해자 비용 증가</p>
+    <p class="emph">정책 과제: 효율적인 범죄 조합을 고르게 하는 <strong>기대처벌 메뉴</strong></p>
+    <script>
+      (function () {
+        const V = window.OCC.victim, a = 6 * V.theft, b = 2 * V.rob;
+        document.getElementById('sub-a').textContent = window.FMT(a);
+        document.getElementById('sub-b').textContent = window.FMT(b);
+        document.getElementById('sub-c').textContent = window.FMT(b - a);
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ Q & A ════════════════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
