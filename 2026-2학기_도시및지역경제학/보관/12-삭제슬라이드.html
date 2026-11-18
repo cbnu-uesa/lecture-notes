@@ -153,6 +153,9 @@
     <p class="emph" style="margin:14px 0 6px">같은 날 두 장에서 일부를 뺐다 (아래에 고치기 전 모습을 그대로 둔다)</p>
     <p style="margin-bottom:4px"><strong>세 메커니즘 장 (본편 4쪽 → 8쪽으로 옮김):</strong> 아래 「미국의 지방정부 (2012)」 박스 · 교재 p.446</p>
     <p style="margin-bottom:4px"><strong>재산세: 가시성과 자원 부동성 (본편 19쪽):</strong> 실효세율 정의와 표 21-1 (최고 · 최저 실효재산세율, 2015)</p>
+    <p class="emph" style="margin:14px 0 6px">2026-11-18 교수 요청으로 두 장을 더 뺐다 (맨 뒤 두 장)</p>
+    <p style="margin-bottom:4px"><strong>「누가 재산세를 내는가: 무엇이 고정인가에 따라」 (본편 28쪽):</strong> 시장 · 대통령 관점 비교. 그림 스크립트를 장 안에 품고 있어 그대로 되돌리면 된다</p>
+    <p style="margin-bottom:4px"><strong>「파리잡이종이효과」 (본편 35쪽, 교재 p.487~488):</strong> 「대응교부금」 뒤에 있던 장</p>
   </div>
 </section>
 
@@ -281,6 +284,74 @@
           출처: Lincoln Institute, <em>50-State Property Tax Comparison Study</em>, 2016</p>
       </div>
     </div>
+  </div>
+</section>
+
+<section>
+  <h2>누가 재산세를 내는가: 무엇이 고정인가에 따라</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:12px">정책입안자를 위한 길잡이: 답은 <span class="mark">관점</span>에 따라 다름</p>
+    <svg class="fig" id="f-mayor" viewBox="0 0 848 214" style="width:848px;display:block;margin:0" role="img">
+      <title>시장의 관점에서는 자본이 다른 도시로 빠져나가 이 도시의 토지가 고정된 요소가 되고, 대통령의 관점에서는 자본이 갈 곳이 없어 전국의 자본이 고정된 요소가 되는 것을 비교한 인포그래픽</title></svg>
+    <p class="caption" style="margin-top:8px">자본 공급이 변동 가능하면 자본소유주는 더 높은 주택임대료로 가구에 전가</p>
+  </div>
+  <script>
+    (function () {
+      const RED = 'var(--brand-crimson)', BLUE = 'var(--accent-blue)', INK = 'var(--ink)', INK2 = 'var(--ink-2)', MUTED = 'var(--muted)', GUIDE = 'var(--guide)';
+      const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      const t = (x, y, str, size, fill, o = {}) =>
+        `<text${o.cls ? ` class="${o.cls}"` : ''} x="${x}" y="${y}" style="font-size:${size}px;fill:${fill}` +
+        `${o.w ? ';font-weight:' + o.w : ''}${o.a ? ';text-anchor:' + o.a : ''}">${esc(str)}</text>`;
+      const num = (x, y, n, c) => `<circle cx="${x}" cy="${y}" r="12" fill="${c || RED}"/>` + t(x, y + 5, String(n), 14, '#FFF', { w: 700, a: 'middle', cls: 'on-dark' });
+      const fmt = (v) => v.toLocaleString();
+      let s = '';
+      const W = 418, X = [0, 430], H = 214;
+      const C = [
+        ['시장(mayor)', '50개 도시 중 한 도시의 건축물세', [
+          ['자본', '다른 도시로 빠져나감', '자본수익 감소는 세금의 1/50'],
+          ['고정된 요소', '이 도시의 토지'],
+        ], '세금의 49/50을 이 도시 토지소유주가 부담', 'red'],
+        ['대통령', '전국에 균일한 재산세', [
+          ['자본', '피해 갈 도시가 없음', '국가 전체의 자본 공급이 고정이면'],
+          ['고정된 요소', '전국의 자본'],
+        ], '자본소유주가 전부 부담', 'blue'],
+      ];
+      C.forEach(([k, sub, rows, res, tone], i) => {
+        const x = X[i], c = tone === 'blue' ? BLUE : RED;
+        s += `<rect x="${x}" y="0" width="${W}" height="${H}" rx="6" fill="#FFF" stroke="${GUIDE}"/>`;
+        s += num(x + 24, 28, i + 1, c);
+        s += t(x + 46, 34, k, 17, c, { w: 700 });
+        s += t(x + 46, 54, sub, 11.5, MUTED);
+        let y = 92;
+        rows.forEach(([lab, val, note]) => {
+          s += t(x + 18, y, lab, 12, MUTED);
+          s += t(x + 118, y, val, 14, INK, { w: 600 });
+          if (note) s += t(x + 118, y + 19, note, 11, MUTED);
+          y += note ? 50 : 34;
+        });
+        s += `<rect x="${x + 10}" y="${H - 44}" width="${W - 20}" height="32" rx="4" fill="${c}" fill-opacity="0.1"/>`;
+        s += t(x + W / 2, H - 23, '→ ' + res, 13.5, c, { w: 700, a: 'middle' });
+      });
+      Fig.draw('#f-mayor', { parts: [Fig.raw(s)], check: false });
+    })();
+  </script>
+</section>
+
+<!-- ══ 파리잡이종이효과 (p.487~488) ═══════════════════════════ -->
+<section>
+  <h2>파리잡이종이효과(flypaper effect)</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:10px">교부금은 처음 지급된 곳(지방정부)에 <span class="mark">들러붙음</span></p>
+    <p class="lbl"><strong>정액교부금 1달러:</strong><span>지방정부 지출 0.25 ~ 0.50달러 증가</span></p>
+    <p class="lbl" style="margin-bottom:8px"><strong>가구소득 1달러:</strong><span>지방정부 지출 0.05 ~ 0.10달러 증가</span></p>
+    <p class="derive t-red" style="margin-bottom:18px">→ 정액교부금이 같은 크기의 소득 증가보다 지출을 크게 늘림: 세금 감소로 가구에 돌아가지 않음</p>
+    <p class="sub" style="margin-bottom:2px">가능한 설명</p>
+    <ol class="dense" style="margin:0;padding:0;list-style-position:inside">
+      <li class="li-hang"><strong>재정 착시(fiscal illusion):</strong> 유권자가 정액교부금을 대응교부금처럼 취급</li>
+      <li class="li-hang"><strong>정신적 계정습관(mental accounting):</strong> 교부금은 공공 지출의 「저장공간」에 기입</li>
+      <li class="li-hang"><strong>예산을 극대화하는 관료들:</strong> 공공재의 잉여가 사라지기 직전까지 예산을 부풀림</li>
+      <li class="li-hang"><strong>은폐:</strong> 공무원이 교부금 정보를 숨겨 유권자가 세금 감면 가능성을 모름</li>
+    </ol>
   </div>
 </section>
 
