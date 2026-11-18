@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5강. 생산요소시장과 소득분배</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+<script src="../../_shared/vendor/chartjs/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 (p.1) ════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>5강. 생산요소시장과 소득분배</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 생산요소시장의 특징 (p.2) ═════════════════════════ -->
+<section class="s-numbered">
+  <h2>생산요소시장의 특징</h2>
+  <div class="body">
+    <ol>
+      <li>생산요소의 수요는 상품수요의 파생수요(derived demand)</li>
+      <li>가계: 공급자, 기업: 수요자</li>
+      <li>생산요소의 가격이 소득분배와 밀접하게 연관</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 3. 수요의 결정과정 — 표 (p.3) ════════════════════════ -->
+<section class="s-split">
+  <h2>생산요소에 대한 수요의 결정과정</h2>
+  <p class="corner-note t-red">가정: 완전경쟁시장에서 기업은 이윤극대화를 목표</p>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">아이스크림 가격: 2만원</p>
+      <table class="tbl-vmp">
+        <thead><tr><th>노동투입량</th><th>노동의<br>한계생산</th><th>노동의<br>한계생산가치</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>5</td><td>10</td></tr>
+          <tr><td>2</td><td>7</td><td>14</td></tr>
+          <tr><td>3</td><td>8</td><td>16</td></tr>
+          <tr><td>4</td><td>7</td><td>14</td></tr>
+          <tr><td>5</td><td>5</td><td>10</td></tr>
+          <tr class="hi"><td>6</td><td>3</td><td>6</td></tr>
+          <tr><td>7</td><td>1</td><td>2</td></tr>
+          <tr><td>8</td><td>0</td><td>0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-r">
+      <p style="margin-bottom:20px">노동투입을 5단위에서 6단위로 1단위 늘릴 때<br>
+        생산량의 증가 = 노동의 한계생산 = 3단위</p>
+      <p class="sub t-red" style="margin-bottom:26px">노동 1단위 고용에 따른 추가수입 = 3 × 2 = 6만원<br>
+        = 노동의 한계생산가치</p>
+      <p class="sub t-red" style="margin-bottom:6px">기업의 6번째 단위 노동의 추가고용 조건</p>
+      <p class="derive t-red">→ 6번째 노동의 한계생산가치 ≥ 임금수준</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 4. 수요의 결정과정 — 조건 (p.4) ══════════════════════ -->
+<section>
+  <h2>생산요소에 대한 수요의 결정과정</h2>
+  <p class="corner-note t-red">가정: 완전경쟁시장에서 기업은 이윤극대화를 목표</p>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:4px">노동과 자본의 한계생산가치 <span class="en">(value of marginal product)</span></p>
+    <p class="formula-key" style="margin-bottom:40px">$VMP_L = MP_L \times P, \qquad VMP_K = MP_K \times P$</p>
+    <p class="sub t-red" style="margin-bottom:4px">〈기업 이윤극대화를 위한 비용극소화 조건〉</p>
+    <p class="formula-key" style="margin-bottom:40px">$\dfrac{MP_L}{w} = \dfrac{MP_K}{v}$</p>
+    <p class="sub t-red" style="margin-bottom:4px">〈기업 이윤극대화 조건〉</p>
+    <p class="formula-key">$VMP_L = w, \qquad VMP_K = v$</p>
+  </div>
+</section>
+
+<!-- ══ 5. 노동의 수요곡선 (p.5) ═════════════════════════════ -->
+<section>
+  <h2>생산요소에 대한 수요의 결정과정</h2>
+  <div class="body">
+    <p class="lead t-define">가정: 완전경쟁시장에서 기업은 이윤극대화를 목표</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 58%">
+        <svg class="fig" id="f-vmp" viewBox="0 0 500 320" style="width:500px" role="img">
+          <title>한계생산체감 때문에 우하향하는 노동의 한계생산가치곡선</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:8px">노동의 한계생산가치곡선(VMP<sub>L</sub>)<br>= 노동의 수요곡선</p>
+        <p class="caption">노동수요곡선의 우하향<br>: 한계생산체감(수확체감)의 법칙 적용</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 66, y0: 268, x1: 430, y1: 26 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      const D = S.curve(Fig.hyper(12, 1.5, 9.6, { through: [4] }));
+      F.draw('#f-vmp', {
+        axes: { x: 'L (시간/월)', y: 'w' },
+        parts: [
+          F.curve(D, { variant: 'i3' }),
+          F.guide(...S.p([4, 3]), { xtick: 'L̄', ytick: 'w̄' }),
+          F.annot(F.BOX.x0 + 6, S.y(2.1), '완전경쟁시장이므로\n임금수준은 사회적으로 주어짐', { size: 10, lh: 13 }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 6. 노동공급곡선 (p.6 + p.7) ══════════════════════════
+     원본은 곡선만 보인 장과 설명을 덧붙인 장 두 개다. fragment 로 합친다. -->
+<section>
+  <h2>생산요소에 대한 (노동)공급의 결정과정</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:2px">가정: 완전경쟁시장에서 가계는 효용극대화를 목표<br>
+      → 가용시간 = 노동시간 + 여가시간</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 56%">
+        <svg class="fig" id="f-ls" viewBox="0 0 480 300" style="width:480px" role="img">
+          <title>임금이 오르면 노동공급이 늘다가 다시 줄어드는 후방굴절 노동공급곡선</title></svg>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red fragment" data-fragment-index="0" style="margin-bottom:24px">U = f(노동, 여가)</p>
+        <p class="sub t-red fragment" data-fragment-index="0" style="margin-bottom:24px">
+          상품가격변화에 따른 수요량 변화<br>= 대체효과 + 소득효과의 결과</p>
+        <p class="sub t-red fragment" data-fragment-index="0" style="margin-bottom:4px">노동공급의 대체효과</p>
+        <p class="fragment" data-fragment-index="0" style="margin-bottom:20px">임금 ↑ → 여가의 기회비용 ↑</p>
+        <p class="sub t-red fragment" data-fragment-index="0" style="margin-bottom:4px">노동공급의 소득효과</p>
+        <p class="fragment" data-fragment-index="0">임금 ↑ → 정상재인 여가의 소비 ↑</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 62, y0: 258, x1: 400, y1: 24 });
+      const S = F.scale({ x: [0, 10], y: [0, 10] });
+      // 후방굴절: 임금이 오를수록 노동시간이 늘다가 w2 를 넘으면 다시 줄어든다
+      const SL = S.curve([[2.4, 1.0], [3.6, 2.0], [5.2, 3.4], [6.6, 4.6], [7.4, 6.0],
+                          [7.2, 7.2], [6.4, 8.4], [5.8, 9.4]]);
+      F.draw('#f-ls', {
+        axes: { x: 'L (시간/월)', y: 'w' },
+        parts: [
+          F.curve(SL, { variant: 'supply' }),
+          F.guide(...S.p([5.2, 3.4]), { xtick: 'L₁', ytick: 'w₁' }),
+          F.guide(...S.p([7.4, 6.0]), { xtick: 'L₃', ytick: 'w₂' }),
+          F.guide(...S.p([6.4, 8.4]), { xtick: 'L₂', ytick: 'w₃' }),
+          F.annot(S.x(8.4), S.y(9.6), '노동공급곡선', { size: 13, tone: 'red' }),
+          F.arrow(S.x(8.2), S.y(6.6), S.x(8.2), S.y(9.2), { tone: 'red', fragment: 0 }),
+          F.annot(S.x(8.5), S.y(8.1), '소득효과\n큰 구간', { size: 11, lh: 13, tone: 'red', fragment: 0 }),
+          F.arrow(S.x(8.2), S.y(5.4), S.x(8.2), S.y(2.6), { tone: 'red', fragment: 0 }),
+          F.annot(S.x(8.5), S.y(4.2), '대체효과\n큰 구간', { size: 11, lh: 13, tone: 'red', fragment: 0 }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 7. 자본·토지의 공급곡선 (p.8) ════════════════════════
+     원본은 축만 그려 두고 학생에게 물어보는 장이다. 빈 축을 그대로 살린다. -->
+<section class="s-pair">
+  <h2>생산요소에 대한 공급의 결정과정</h2>
+  <p class="pd-lead sub t-red">Q) 다른 생산요소인 자본과 토지의 공급곡선은 어떻게 나타날까?</p>
+  <div class="body" style="margin-top:52px">
+    <div class="pair-cell">
+      <svg class="fig" id="f-ks" viewBox="0 0 420 300" style="width:420px" role="img">
+        <title>자본 서비스의 가격과 수량을 나타낼 빈 좌표축</title></svg>
+    </div>
+    <div class="pair-cell">
+      <svg class="fig" id="f-rs" viewBox="0 0 420 300" style="width:420px" role="img">
+        <title>토지 서비스의 가격과 수량을 나타낼 빈 좌표축</title></svg>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const F = Fig.withBox({ x0: 74, y0: 262, x1: 380, y1: 22 });
+      F.draw('#f-ks', { axes: { x: 'K', y: '자본\n(서비스)\n가격' }, parts: [] });
+      F.draw('#f-rs', { axes: { x: 'R', y: '토지\n(서비스)\n가격' }, parts: [] });
+    })();
+  </script>
+</section>
+
+<!-- ══ 8~9. 생산요소시장의 균형 (p.9, p.10) ═════════════════ -->
+<script>
+  window.factorEq = function (selP, selL, shift) {
+    const B = { x0: 56, y0: 246, x1: 300, y1: 24 };
+    const M = Fig.withBox(B), N = Fig.withBox(B);
+    const S = M.scale({ x: [0, 10], y: [0, 10] });
+    const D = S.curve([[0.6, 8.6], [9.4, 2.0]]);
+    const Sp = S.curve([[0.6, 1.4], [9.4, 8.0]]);
+    const E = Fig.cross(D, Sp);
+    M.draw(selP, {
+      axes: { x: 'Q', y: 'P' },
+      parts: [
+        shift ? M.curve(Fig.shift(D, 0, -46), { variant: 'demand' }) : '',
+        M.curve(D, { variant: 'demand', dash: shift ? '8 6' : '' }),
+        M.curve(Sp, { variant: 'supply' }),
+        M.guide(E[0], E[1], { xtick: 'Q*', ytick: 'P*' }),
+        M.dot(E[0], E[1], { label: 'E', lx: -4, ly: -12, free: true }),
+        shift ? M.arrow(E[0] + 14, E[1] - 6, E[0] + 74, E[1] - 6, { tone: 'blue' }) : '',
+        M.annot(S.x(6.4), S.y(9.4), '시장공급곡선', { size: 13 }),
+        M.annot(S.x(6.0), S.y(1.0), '시장수요곡선', { size: 13 }),
+      ],
+    });
+    // 노동시장: 우하향 수요 × 후방굴절 공급
+    const T = N.scale({ x: [0, 10], y: [0, 10] });
+    const LD = T.curve(Fig.hyper(16, 2.2, 9.6, { through: [4.6] }));
+    const LS = T.curve([[2.6, 1.0], [3.8, 2.2], [5.0, 3.8], [5.8, 5.4], [6.0, 6.8],
+                        [5.6, 8.2], [5.0, 9.4]]);
+    const Le = Fig.cross(LD, LS) || Fig.at(LD, { x: T.x(4.6) });
+    N.draw(selL, {
+      axes: { x: 'L (시간/월)', y: 'w' },
+      parts: [
+        shift ? N.curve(Fig.shift(LD, 0, -40), { variant: 'i3' }) : '',
+        N.curve(LD, { variant: 'i3', dash: shift ? '8 6' : '' }),
+        N.curve(LS, { variant: 'supply' }),
+        N.guide(Le[0], Le[1], { xtick: 'L*', ytick: 'w*' }),
+        shift ? N.arrow(Le[0] + 16, Le[1] - 4, Le[0] + 72, Le[1] - 4, { tone: 'blue' }) : '',
+        N.annot(T.x(5.6), T.y(9.8), '노동공급곡선', { size: 13, tone: 'red' }),
+        N.annot(T.x(7.0), T.y(1.6), '노동수요곡선', { size: 13 }),
+        N.annot(T.x(7.0), T.y(0.7), 'w = MP_L × P*', { size: 12 }),
+      ],
+    });
+  };
+</script>
+
+<section class="s-pair">
+  <h2>생산요소시장의 균형</h2>
+  <div class="body">
+    <div class="pair-cell">
+      <p class="pair-title">1) 상품시장</p>
+      <svg class="fig" id="f-fe-p" viewBox="0 0 340 272" role="img">
+        <title>상품시장의 수요·공급 균형</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title">2) 노동시장</p>
+      <svg class="fig" id="f-fe-l" viewBox="0 0 420 272" role="img">
+        <title>노동수요와 노동공급이 만나는 임금과 노동시간</title></svg>
+    </div>
+  </div>
+  <script>factorEq('#f-fe-p', '#f-fe-l', false);</script>
+</section>
+
+<section class="s-pair">
+  <h2>생산요소시장의 균형: 시장수요의 변화</h2>
+  <div class="body">
+    <div class="pair-cell">
+      <p class="pair-title">1) 상품시장</p>
+      <svg class="fig" id="f-fe2-p" viewBox="0 0 340 272" role="img">
+        <title>상품수요가 늘어 시장수요곡선이 오른쪽으로 이동한 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title">2) 노동시장</p>
+      <svg class="fig" id="f-fe2-l" viewBox="0 0 420 272" role="img">
+        <title>파생수요인 노동수요곡선도 따라서 오른쪽으로 이동한 그림</title></svg>
+    </div>
+  </div>
+  <script>factorEq('#f-fe2-p', '#f-fe2-l', true);</script>
+</section>
+
+<!-- ══ 10. 임금격차의 존재 이유 (p.11) ══════════════════════ -->
+<section class="s-numbered">
+  <h2>임금격차의 존재 이유</h2>
+  <div class="body">
+    <ol>
+      <li>인적투자: 생산성의 차이</li>
+      <li>보상격차: 쾌적성이나 위험의 정도에 대한 추가보수</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 11. 우리나라의 노동시장 (p.12) ═══════════════════════ -->
+<section>
+  <h2>우리나라의 노동시장</h2>
+  <div class="body">
+    <p class="lead t-define">노동생산성증가율과 임금상승률 사이에 상당한 상관관계가 존재</p>
+    <img class="photo" src="../assets/labor-productivity-wage.jpeg"
+         alt="1970년부터 2020년까지 노동생산성 증가율과 실질임금 상승률이 함께 움직여 온 그래프"
+         style="height:330px;margin:16px auto 0">
+  </div>
+</section>
+
+<!-- ══ 12. 지대와 경제적 지대 (p.13) ════════════════════════ -->
+<section>
+  <h2>지대와 경제적 지대</h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-body);line-height:1.55;margin-bottom:4px">
+      지대(rent): 토지서비스의 가격, 공급이 고정된 생산요소에 대한 보수<br>
+      경제적 지대(economic rent): 어떤 생산요소의 공급이 비탄력적이기에 받는 보수로서 일반화된 지대개념<br>
+      전용수입(transfer earnings): 생산요소 공급자가 받기 원하는 최소금액, 현재 생산상태에 묶어 두기 위한 비용</p>
+    <div class="cols" style="margin-top:2px">
+      <div class="col-l">
+        <svg class="fig" id="f-land" viewBox="0 0 400 260" style="width:400px" role="img">
+          <title>공급이 수직인 토지시장에서 수요가 지대를 정하는 그림</title></svg>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-erent" viewBox="0 0 420 260" style="width:420px" role="img">
+          <title>노동시장에서 균형보수를 경제적 지대와 전용수입으로 나눈 그림</title></svg>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // ① 토지: 공급이 완전 비탄력이라 지대는 수요가 혼자 정한다
+      const A = Fig.withBox({ x0: 58, y0: 216, x1: 330, y1: 22 });
+      const S = A.scale({ x: [0, 10], y: [0, 10] });
+      const D1 = S.curve([[1.0, 5.4], [9.2, 1.2]]);
+      const D2 = S.curve([[1.0, 8.8], [9.2, 4.6]]);
+      const SUP = S.curve([[5.0, 0.4], [5.0, 9.6]]);
+      A.draw('#f-land', {
+        axes: { x: 'R', y: '토지가격' },
+        parts: [
+          A.curve(SUP, { variant: 'supply' }),
+          A.curve(D1, { variant: 'i3' }), A.curve(D2, { variant: 'i3' }),
+          A.guide(...S.p([5, 3.35]), { only: 'y' }),
+          A.guide(...S.p([5, 6.75]), { only: 'y' }),
+          A.dot(...S.p([5, 3.35])), A.dot(...S.p([5, 6.75])),
+          A.annot(S.x(5.3), S.y(9.9), '토지공급곡선', { size: 12, tone: 'red' }),
+          A.annot(S.x(9.4), S.y(4.6), 'D₂', { size: 12 }),
+          A.annot(S.x(9.4), S.y(1.2), 'D₁', { size: 12 }),
+        ],
+      });
+
+      // ② 노동: 균형보수를 공급곡선이 위아래로 가른다
+      const B = Fig.withBox({ x0: 58, y0: 216, x1: 350, y1: 22 });
+      const T = B.scale({ x: [0, 10], y: [0, 10] });
+      const LS = T.curve([[0.2, 0.5], [1.6, 1.5], [3.0, 2.6], [5.0, 4.4], [7.0, 6.6], [8.6, 8.6]]);
+      const w = 4.4, L = 5.0;
+      const under = [];
+      for (const [x, y] of LS) if (x <= T.x(L) + 0.01) under.push([x, y]);
+      under.push([T.x(L), T.y(0)], [T.x(0.2), T.y(0)]);
+      B.draw('#f-erent', {
+        axes: { x: 'L', y: 'w' },
+        parts: [
+          B.raw(`<polygon class="area-transfer" points="${under.map((p) => p.join(',')).join(' ')}"/>`),
+          B.raw(`<polygon class="area-erent" points="${[[T.x(0.2), T.y(0.5)], ...LS.filter((p) => p[0] <= T.x(L) + 0.01), [T.x(L), T.y(w)], [B.BOX.x0, T.y(w)]].map((p) => p.join(',')).join(' ')}"/>`),
+          B.curve(LS, { variant: 'supply' }),
+          B.line(B.BOX.x0, T.y(w), T.x(L), T.y(w), { variant: 'cap' }),
+          B.raw(`<path class="guide" d="M${T.x(L)},${T.y(w)} L${T.x(L)},${B.BOX.y0}"/>`),
+          B.dot(...T.p([L, w])),
+          B.annot(T.x(9.0), T.y(9.4), '노동공급곡선', { size: 12, tone: 'red' }),
+          B.annot(T.x(1.4), T.y(3.6), '경제적 지대', { size: 12, tone: 'blue' }),
+          B.annot(T.x(2.4), T.y(1.1), '전용수입', { size: 12, tone: 'red' }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 13. 자본과 자본축적 (p.14) ═══════════════════════════ -->
+<section>
+  <h2>자본과 자본축적</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">자본(capital)</p>
+    <p style="margin-bottom:22px">생산과정에 사용되는 건물, 기계, 도구, 재고 등</p>
+    <p class="sub t-red" style="margin-bottom:2px">자본축적</p>
+    <p style="margin-bottom:22px">자본재(capital goods)를 생산하여 그 양을 늘려가는 것 → 미래 더 큰 소비를 위해 현재소비를 줄이는 행위</p>
+    <p class="sub t-red" style="margin-bottom:2px">자본스톡(capital stock)</p>
+    <p style="margin-bottom:8px">한 나라에 존재하는 자본재의 총량</p>
+    <ul style="margin-bottom:22px">
+      <li>구조물: 공장, 집, 다리 등</li>
+      <li>설비: 기계, 공구 등 생산과정에서 활용가능한 물건</li>
+      <li>재고: 투입물이나 산출물의 일부</li>
+    </ul>
+    <p class="sub t-red" style="margin-bottom:2px">감가상각(depreciation)</p>
+    <p>시간이 지남에 따라 자본재의 가치가 떨어지는 것 (수명, 기술한계 등)</p>
+  </div>
+</section>
+
+<!-- ══ 14. 투자의 결정기준 — 정의 (p.15) ════════════════════ -->
+<section>
+  <h2>투자의 결정기준: 할인과 현재가치</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">기업의 투자</p>
+    <p style="margin-bottom:34px">자본재를 구입해 생산과정에 투입하는 행위</p>
+    <p class="sub t-red" style="margin-bottom:2px">기업투자의 결정기준</p>
+    <p style="margin-bottom:34px">미래 수익의 현재 가치 〉 자본재 투입비용</p>
+    <p class="sub t-red" style="margin-bottom:2px">현재가치(present value)</p>
+    <p style="margin-bottom:34px">미래에 발생할 수익이나 비용을 현재의 시점에서 평가한 가치</p>
+    <p class="sub t-red" style="margin-bottom:2px">할인(discounting)</p>
+    <p>미래의 금액을 현재가치로 환산하는 기준이 되는 비율</p>
+  </div>
+</section>
+
+<!-- ══ 15. 현재가치의 계산 (p.16) ═══════════════════════════ -->
+<section>
+  <h2>투자의 결정기준: 할인과 현재가치</h2>
+  <div class="body">
+    <p class="lead t-define">현재가치(present value): 미래 현금흐름의 현 시점에서의 가치</p>
+    <div class="cols">
+      <div class="col-l" style="flex:0 0 56%">
+        <p class="emph" style="margin-bottom:14px">은행 이자율이 연 10%라고 할 때 100만원을 은행에 예금한다면?</p>
+        <ul style="margin-bottom:22px">
+          <li>현재 – 100만원</li>
+          <li>1년 후의 가치 – 100만원 × (1.1) = 110만원</li>
+          <li>2년 후의 가치 – 100만원 × (1.1) × (1.1) = 121만원</li>
+          <li>3년 후의 가치 – 100만원 × (1.1) × (1.1) × (1.1) = 133만원</li>
+        </ul>
+        <p class="derive t-red">→ 3년 후에 133만원을 받기로 했다면 133만원의 현재가치는?</p>
+        <p style="margin-left:22px">(133만원) / (1.1³) = 100만원</p>
+      </div>
+      <div class="col-r" style="text-align:center">
+        <p class="caption" style="margin-bottom:2px">N시점의 현금흐름</p>
+        <p class="formula-key" style="font-size:22px">$V_0 = \dfrac{V_n}{(1+r)^n}$</p>
+        <p class="caption" style="margin-top:2px">V<sub>n</sub>의 현재가치 &nbsp;/&nbsp; r: 할인율(Discount Rate)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 16. 투자 판단 문제 (p.17) ════════════════════════════ -->
+<section>
+  <h2>투자의 결정기준: 할인과 현재가치</h2>
+  <div class="body">
+    <p class="lead t-define">Q) 가격 10억원인 기계가 있고 연간할인율이 10%일 때<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;아래와 같은 현금흐름에서 투자하는 것이 옳을까?</p>
+    <div class="cols" style="margin-top:34px">
+      <div class="col-l" style="flex:0 0 34%">
+        <ul>
+          <li>1년 후: 2억원</li>
+          <li>2년 후: 3억원</li>
+          <li>3년 후: 3억원</li>
+          <li>4년 후: 3억원</li>
+          <li>5년 후: 2억원</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red">수익의 현재가치는 9.84억</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 17. 이자율의 결정 (p.18) ═════════════════════════════ -->
+<section>
+  <h2>이자율의 결정</h2>
+  <div class="body">
+    <p class="lead t-define">이자율(interest rate): 자금을 빌리는 것에 대한 가격</p>
+    <svg class="fig" id="f-int" viewBox="0 0 560 300" style="width:560px;margin:8px 0 0 180px" role="img">
+      <title>대부가능자금의 수요와 공급이 만나 이자율이 정해지는 그림</title></svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 76, y0: 260, x1: 440, y1: 24 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const D = S.curve([[0.6, 8.6], [9.4, 2.0]]);
+        const SUP = S.curve([[0.6, 1.4], [9.4, 8.0]]);
+        const E = Fig.cross(D, SUP);
+        F.draw('#f-int', {
+          axes: { x: '대부가능자금의 양', y: '이자율' },
+          parts: [
+            F.curve(D, { variant: 'demand' }), F.curve(SUP, { variant: 'supply' }),
+            F.guide(E[0], E[1], { xtick: 'Q*', ytick: 'r*' }),
+            F.dot(E[0], E[1], { label: 'E', lx: -4, ly: -12, free: true }),
+            F.annot(S.x(7.0), S.y(9.0), '공급곡선', { size: 13 }),
+            F.annot(S.x(7.4), S.y(1.4), '수요곡선', { size: 13 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 18. 소득분배 (p.19) ══════════════════════════════════ -->
+<section>
+  <h2>소득분배</h2>
+  <div class="body stack">
+    <p class="sub t-red" style="margin-bottom:2px">기능별 소득분배(functional distribution of income)</p>
+    <p style="margin-bottom:2px">경제 전체의 소득이 각 생산요소 사이에서 어떻게 나누어지는지에 주목</p>
+    <p class="derive t-red" style="margin-bottom:56px">→ 국민소득의 임금, 이자, 이윤, 지대에 돌아가는 몫</p>
+    <p class="sub t-red" style="margin-bottom:2px">계층별 소득분배(size distribution of income)</p>
+    <p style="margin-bottom:2px">소득이 가장 큰사람부터 차례로 배열했을 때 각 소득계층에 돌아가는 몫에 주목</p>
+    <p class="derive t-red">→ 상위 10%, 하위 10%의 소득</p>
+  </div>
+</section>
+
+<!-- ══ 19. 우리나라 소득분배 (p.20) ═════════════════════════ -->
+<section class="s-split wide-left">
+  <h2>우리나라 소득분배</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="emph" style="margin-bottom:8px">우리나라 도시가계의 소득 10분위별 점유비율 (2019년)(%)</p>
+      <table class="tbl-decile">
+        <thead><tr><th>소득분위</th><th>소득점유율</th><th>누적비율</th></tr></thead>
+        <tbody>
+          <tr><td>1분위</td><td>2.1</td><td>2.1</td></tr>
+          <tr><td>2분위</td><td>4.3</td><td>6.4</td></tr>
+          <tr><td>3분위</td><td>5.8</td><td>12.3</td></tr>
+          <tr><td>4분위</td><td>7.1</td><td>19.4</td></tr>
+          <tr><td>5분위</td><td>8.3</td><td>27.8</td></tr>
+          <tr><td>6분위</td><td>9.7</td><td>37.5</td></tr>
+          <tr><td>7분위</td><td>11.2</td><td>48.7</td></tr>
+          <tr><td>8분위</td><td>12.8</td><td>61.5</td></tr>
+          <tr><td>9분위</td><td>15.5</td><td>77.0</td></tr>
+          <tr><td>10분위</td><td>23.0</td><td>100.0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="col-r">
+      <p class="sub t-red" style="margin-bottom:4px">십분위분배율</p>
+      <p>하위 40% 소득 비율 / 상위 20%의 소득 비율</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 20. 로렌츠곡선 (p.21) ════════════════════════════════ -->
+<section>
+  <h2>불평등도의 측정: 로렌츠곡선</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:2px">불평등지수</p>
+    <p style="margin-bottom:12px">현실의 분배상태가 균등한 분배상태에서 얼마나 멀리 떨어져 있는지를 나타내기 위한 지표</p>
+    <p class="sub t-red" style="margin-bottom:2px">로렌츠곡선(Lorenz curve)</p>
+    <p style="margin-bottom:2px">가장 가난한 몇 퍼센트의 사람들이 전체 소득 중 몇 퍼센트를 차지하고 있는지를 나타내는 점들을 이어 만든 직선</p>
+    <p class="derive t-red">→ 대각선에 가까울수록 소득이 평등하게 분배</p>
+    <svg class="fig" id="f-lorenz" viewBox="0 0 620 252" style="width:480px;margin:0 0 0 150px" role="img">
+      <title>완전평등 대각선과 그 아래로 처진 로렌츠곡선</title></svg>
+    <p class="caption" style="margin:2px 0 0 250px">— 소득이 낮은 순서대로 나열 →</p>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 130, y0: 226, x1: 420, y1: 22 });
+        const S = F.scale({ x: [0, 110], y: [0, 110] });
+        // 원본의 누적비율(2.6, 7.3 …)을 그대로 지나는 곡선
+        const LZ = S.curve([[0, 0], [10, 2.6], [20, 7.3], [40, 19.4], [60, 37.5],
+                            [80, 61.5], [90, 77], [100, 100]]);
+        F.draw('#f-lorenz', {
+          axes: { x: '사람의 비율(%)', y: '전체 소득 중\n점유비율(%)' },
+          parts: [
+            F.raw(`<path class="curve curve-cap" style="stroke-width:4" d="M${S.x(0)},${S.y(0)} L${S.x(100)},${S.y(100)}"/>`),
+            F.raw(`<path class="curve curve-supply" d="M${S.x(0)},${S.y(0)} L${S.x(100)},${S.y(0)} L${S.x(100)},${S.y(100)}"/>`),
+            F.curve(LZ, { variant: 'i3' }),
+            F.guide(...S.p([10, 2.6]), { ytick: '2.6', xtick: '10' }),
+            F.guide(...S.p([20, 7.3]), { xtick: '20' }),
+            F.annot(F.BOX.x0 - 8, S.y(7.3) + 4, '7.3', { anchor: 'end', size: 11 }),
+            F.annot(F.BOX.x0 - 8, S.y(100) + 4, '100', { anchor: 'end', size: 11 }),
+            F.annot(F.BOX.x0 - 8, S.y(0) + 4, '0', { anchor: 'end', size: 11 }),
+            F.annot(S.x(100), F.BOX.y0 + 17, '100', { anchor: 'middle', size: 11 }),
+            F.annot(S.x(30), S.y(46), '완전 평등 상태', { size: 12, tone: 'green' }),
+            F.annot(S.x(62), S.y(24), '로렌츠 곡선', { size: 12, tone: 'blue' }),
+            F.annot(S.x(104), S.y(52), '극단적인\n불평등상태', { size: 12, lh: 14, tone: 'red' }),
+                      ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 21. 지니계수 (p.22) ══════════════════════════════════ -->
+<section>
+  <h2>불평등도의 측정: 지니계수</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:4px">로렌츠곡선(Lorenz curve)의 한계: 두 로렌츠 곡선이 서로 교차할 경우 분배상태 비교 불가</p>
+    <p class="sub t-red" style="margin-bottom:2px">지니계수(Gini index) &nbsp;(0: 완전평등, 1: 완전불평등)</p>
+    <p class="formula-key" style="margin-bottom:2px">$G = \dfrac{\alpha}{\alpha + \beta}$</p>
+    <svg class="fig" id="f-gini" viewBox="0 0 620 232" style="width:620px;margin:0 0 0 150px" role="img">
+      <title>대각선과 로렌츠곡선 사이 면적 알파와 그 아래 면적 베타</title></svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 130, y0: 208, x1: 420, y1: 20 });
+        const S = F.scale({ x: [0, 110], y: [0, 110] });
+        const LZ = S.curve([[0, 0], [10, 2.6], [20, 7.3], [40, 19.4], [60, 37.5],
+                            [80, 61.5], [90, 77], [100, 100]]);
+        F.draw('#f-gini', {
+          axes: { x: '사람의 비율(%)', y: '전체 소득 중\n점유비율(%)' },
+          parts: [
+            F.raw('<defs><pattern id="h-gini" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">' +
+                  '<line x1="0" y1="0" x2="0" y2="7" stroke="var(--chart-blue)" stroke-width="0.8"/></pattern></defs>'),
+            F.raw(`<polygon fill="url(#h-gini)" points="${[[S.x(0), S.y(0)], ...LZ, [S.x(100), S.y(100)]].map((p) => p.join(',')).join(' ')}"/>`),
+            F.raw(`<path class="curve curve-cap" style="stroke-width:4" d="M${S.x(0)},${S.y(0)} L${S.x(100)},${S.y(100)}"/>`),
+            F.raw(`<path class="curve curve-supply" d="M${S.x(0)},${S.y(0)} L${S.x(100)},${S.y(0)} L${S.x(100)},${S.y(100)}"/>`),
+            F.curve(LZ, { variant: 'i3' }),
+            F.annot(F.BOX.x0 - 8, S.y(100) + 4, '100', { anchor: 'end', size: 11 }),
+            F.annot(F.BOX.x0 - 8, S.y(0) + 4, '0', { anchor: 'end', size: 11 }),
+            F.annot(S.x(100), F.BOX.y0 + 17, '100', { anchor: 'middle', size: 11 }),
+            F.annot(S.x(24), S.y(42), '완전 평등 상태', { size: 12, tone: 'green' }),
+            F.annot(S.x(58), S.y(38), 'α', { size: 20 }),
+            F.annot(S.x(74), S.y(22), 'β', { size: 20 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 22. 지니계수 변동추이 (p.23) ═════════════════════════
+     실측 통계이므로 Chart.js 를 쓴다 (design.md §6.3). -->
+<section>
+  <h2>우리나라 지니계수 변동추이</h2>
+  <div class="body">
+    <div style="width:800px;height:318px;margin:2px auto 0">
+      <canvas id="c-gini" role="img"
+        aria-label="1990년 0.266에서 2019년 0.339까지 완만히 올라온 우리나라 지니계수 추이"></canvas>
+    </div>
+    <p class="caption" style="margin-top:6px;margin-left:60px">자료: 통계청, 2021<br>
+      주: 2016년부터는 가계금융복지조사 결과를 이용하여 최근 OECD 작성기준(wave7)에 따라 작성</p>
+  </div>
+  <script>
+    (function () {
+      const years = [], vals = [];
+      const raw = [0.266,0.259,0.254,0.256,0.255,0.259,0.266,0.264,0.293,0.298,
+                   0.279,0.290,0.293,0.283,0.293,0.298,0.305,0.316,0.319,0.320,
+                   0.315,0.313,0.310,0.307,0.308,0.305,0.355,0.354,0.345,0.339];
+      raw.forEach((v, i) => { years.push(String(1990 + i)); vals.push(v); });
+      // 캔버스는 CSS 변수를 해석하지 못한다. 토큰 값을 읽어 넣는다 (design.md §3).
+      const T = getComputedStyle(document.documentElement);
+      const LINE = T.getPropertyValue('--brand-crimson').trim() || '#A02948';
+      const GRID = T.getPropertyValue('--rule').trim() || '#E2DED7';
+      new Chart(document.getElementById('c-gini'), {
+        type: 'line',
+        data: { labels: years, datasets: [{
+          data: vals, borderColor: LINE, backgroundColor: LINE,
+          borderWidth: 2.5, pointRadius: 3, pointStyle: 'rect', tension: 0 }] },
+        options: {
+          animation: false,                 // PDF 캡처가 흔들리지 않게 끈다 (design.md §6.3)
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: {
+            y: { min: 0, max: 0.4, ticks: { stepSize: 0.05, font: { size: 12 } },
+                 grid: { color: GRID } },
+            x: { ticks: { font: { size: 11 }, maxRotation: 45, minRotation: 45,
+                 callback(v, i) { return i % 2 === 0 ? this.getLabelForValue(v) : ''; } },
+                 grid: { display: false } },
+          },
+        },
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 23. Q & A (p.24) ═════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>

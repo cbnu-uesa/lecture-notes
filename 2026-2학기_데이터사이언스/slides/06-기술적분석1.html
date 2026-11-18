@@ -1,0 +1,1553 @@
+<!doctype html>
+<!--
+  6주차. 기술적 분석 1 — 기술통계량과 시각화
+  방법론 카탈로그 양식 (계획서 indexed-toasting-hennessy.md 3단계).
+  방법 하나 = 「목적과 정의 / 어떻게 작동하나 / 적용 사례」 세 장.
+  2026-10-19 교수 요청으로 정의 장에 개념별 정의를, 실습자료 장 · 연도별 박스플롯 실습 ·
+  k 를 정하는 법 · 2020년 단지 군집 함께 해 보기를 더하고 실습 셋을 과제로 바꿨다.
+  뺀 장은 보관/06-삭제슬라이드.html
+
+  숫자는 전부 analysis/07-기술적분석/ 이 만든 것이다. head 의 window.SJ 한 곳에만
+  적고 표와 그림이 모두 거기서 나온다 (design.md §6.5).
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6강. 기술적 분석 1 — 기술통계량과 시각화</title>
+
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+  <link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+  <link rel="stylesheet" href="../../_shared/theme/tokens.css">
+  <link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+  <link rel="stylesheet" href="../../_shared/theme/components.css">
+  <link rel="stylesheet" href="../../_shared/theme/print.css">
+
+  <script src="../../_shared/js/charts.js"></script>
+<style>
+  /* 방법 번호 — kicker 와 같은 줄의 오른쪽 끝. 보통 흐름에 두면
+     deck-init 이 절대배치로 넣는 kicker 보다 위로 올라간다. */
+  .mth { position: absolute; right: var(--gutter-r); top: 28px; margin: 0;
+         font-size: 11px; font-weight: 700; letter-spacing: .14em; color: var(--muted); }
+  .num { font-variant-numeric: tabular-nums; }
+  /* 방법론 목록 표 */
+  .tbl-mth { width: 100%; table-layout: fixed; font-size: 13.5px; }
+  .tbl-mth th, .tbl-mth td { padding: 5px 10px; vertical-align: top; }
+  .tbl-mth th:first-child, .tbl-mth td:first-child { width: 34px; text-align: center; }
+  .tbl-mth th:nth-child(2), .tbl-mth td:nth-child(2) { width: 210px; }
+  .tbl-mth th:last-child, .tbl-mth td:last-child { width: 150px; }
+  .tbl-mth td b { color: var(--ink); }
+  /* 「필요한 자료」 한 줄 딱지 */
+  .need { display: inline-block; background: #F2EFEA; color: var(--ink-2);
+          font-size: 12.5px; padding: 3px 10px; margin-top: 2px; }
+  /* 단계 목록 — 어떻게 작동하나 */
+  .steps { counter-reset: st; margin: 10px 0 0; padding: 0; list-style: none; }
+  .steps > li { counter-increment: st; position: relative; padding-left: 32px;
+                margin-bottom: 9px; font-size: var(--fs-body); line-height: 1.55; }
+  .steps > li::before { content: counter(st); position: absolute; left: 0; top: 1px;
+                        width: 21px; height: 21px; border-radius: 50%;
+                        background: var(--brand-crimson); color: #FFF;
+                        font-size: 12px; font-weight: 700; text-align: center; line-height: 21px; }
+  .src { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 8px 0 0; }
+  /* 실습 세 장 공통 */
+  .lab { display: flex; gap: 22px; margin-top: 10px; }
+  .lab > div { flex: 1 1 0; }
+  .lab .hd { font-size: 13px; font-weight: 700; color: var(--brand-crimson); margin: 0 0 4px; }
+  /* 정의 목록 — 「개념: 정의」 한 줄씩 (2026-10-19) */
+  .reveal ul.defs { margin: 6px 0 8px; }
+  .reveal ul.defs > li { margin-bottom: 5px; font-size: var(--fs-body); line-height: 1.5; }
+  /* 프롬프트 상자 · 코드 · 제출 주소 — 4주차 덱과 같은 모양 */
+  .prompt-box { border: 1px solid var(--rule); background: #FAF8F5; padding: 11px 15px;
+                font-size: 13px; line-height: 1.6; color: var(--ink-2); margin-top: 8px; }
+  .prompt-box .who { font-size: 11px; font-weight: 700; letter-spacing: .12em;
+                     color: var(--brand-crimson); margin: 0 0 5px; }
+  .prompt-box p { margin: 0; }
+  .prompt-box p + p { margin-top: 6px; }
+  .code { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; font-size: 12px;
+          background: #F2EFEA; padding: 1px 5px; border-radius: 2px; color: #4A4741; }
+  .doc { border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+  .doc .bar { background: #EDE9E3; padding: 5px 10px; font-size: 11px; font-weight: 700;
+              letter-spacing: .04em; color: #4A4741; border-bottom: 1px solid var(--rule); }
+  .doc pre { margin: 0; padding: 11px 13px; font-family: 'SFMono-Regular', Menlo, monospace;
+             font-size: 11px; line-height: 1.7; color: #4A4741; white-space: pre-wrap; }
+  .doc .h { color: var(--brand-crimson); font-weight: 700; }
+</style>
+<script>
+  /* ── 세종 아파트 실거래가 — analysis/07-기술적분석/ 이 만든 값 ──────────
+     표와 그림이 같은 숫자에서 나오게 여기 한 번만 적는다 (design.md §6.5).
+     07-세종주택시장.py · 07-세종군집.py 를 다시 돌리면 같은 값이 나온다. */
+  window.SJ = {
+    n: 15486, mean: 43199, med: 39000, sd: 20194, q1: 29000, q3: 53400, min: 3800, max: 170000,
+    perMean: 478, perMed: 436,
+    // [계급하한, 빈도] — 계급 폭 1억. 빈 계급도 남긴다
+    freq: [[0, 41], [1, 1200], [2, 2893], [3, 3913], [4, 2742], [5, 1791], [6, 1254], [7, 709], [8, 548], [9, 187], [10, 75], [11, 49], [12, 43], [13, 25], [14, 12], [15, 2], [16, 0], [17, 2]],
+    // [연도, 건수, 금액중앙값, ㎡당중앙값]
+    year: [["2017", 3407, 30900, 360], ["2018", 2332, 35000, 399], ["2019", 4295, 42000, 482], ["2020", 5452, 51000, 589]],
+    // [동, 거래건수, ㎡당중앙값, 군집번호]
+    dong: [
+      ["대평동", 226, 790, 2],
+      ["새롬동", 783, 741, 2],
+      ["다정동", 623, 708, 2],
+      ["보람동", 538, 663, 2],
+      ["소담동", 660, 641, 2],
+      ["어진동", 220, 639, 2],
+      ["반곡동", 118, 634, 2],
+      ["도담동", 1580, 576, 1],
+      ["종촌동", 2122, 464, 1],
+      ["한솔동", 1655, 399, 1],
+      ["아름동", 2518, 389, 1],
+      ["고운동", 1722, 383, 1],
+      ["신흥리", 599, 234, 3],
+      ["신안리", 421, 221, 3],
+      ["죽림리", 1145, 215, 3],
+      ["침산리", 156, 176, 3],
+      ["남리", 122, 148, 3],
+    ],
+    // [k, 군집내제곱합]
+    elbow: [[1, 34.0], [2, 19.247], [3, 4.389], [4, 3.379], [5, 2.421], [6, 1.896]],
+    // [묶음A, 묶음B, A크기, B크기, 거리] — 합쳐진 순서
+    merge: [
+      ["한솔동", "고운동", 1, 1, 0.121],
+      ["어진동", "반곡동", 1, 1, 0.141],
+      ["침산리", "남리", 1, 1, 0.141],
+      ["보람동", "소담동", 1, 1, 0.196],
+      ["신흥리", "신안리", 1, 1, 0.251],
+      ["새롬동", "다정동", 1, 1, 0.27],
+      ["새롬동", "보람동", 2, 2, 0.39],
+      ["신흥리", "침산리", 2, 2, 0.595],
+      ["종촌동", "아름동", 1, 1, 0.646],
+      ["새롬동", "어진동", 4, 2, 0.716],
+      ["대평동", "새롬동", 1, 6, 0.763],
+      ["도담동", "한솔동", 1, 2, 0.888],
+      ["도담동", "종촌동", 3, 2, 1.016],
+      ["신흥리", "죽림리", 4, 1, 1.131],
+      ["도담동", "신흥리", 5, 5, 2.32],
+      ["대평동", "도담동", 7, 10, 2.374],
+    ],
+    // [연도, 건수, 최소, Q1, 중앙값, Q3, 최대] — 연도별 박스플롯 실습의 확인값 (07-세종주택시장-연도별박스.csv)
+    box: [["2017", 3407, 8700, 25000, 30900, 36700, 120000], ["2018", 2332, 8000, 28000, 35000, 44000, 97500], ["2019", 4295, 7000, 32700, 42000, 52800, 115000], ["2020", 5452, 3800, 34000, 51000, 69000, 170000]],
+    // [k, 평균 실루엣] — 17개 동 (07-세종군집-실루엣.csv)
+    sil: [[2, 0.411], [3, 0.664], [4, 0.573], [5, 0.502], [6, 0.492]],
+    // [동, 단지명, 2020년 거래건수, ㎡당중앙값, 건축년도, 군집] — 106개 단지, k = 3 (07-세종단지군집-결과.csv)
+    danji: [
+      ["대평동", "해들마을6단지", 37, 1130, 2018, 1],
+      ["새롬동", "새뜸마을11단지(더샵힐스테이트)", 35, 1070, 2017, 1],
+      ["새롬동", "새뜸마을10단지(더샵힐스테이트)", 22, 1043, 2017, 1],
+      ["반곡동", "수루배마을3단지", 13, 1043, 2019, 1],
+      ["새롬동", "새뜸마을12단지(금성백조예미지)", 12, 983, 2017, 1],
+      ["새롬동", "새뜸마을14단지(더샵힐스테이트)", 15, 975, 2017, 1],
+      ["새롬동", "새뜸마을6단지(메이저시티)", 23, 936, 2017, 1],
+      ["다정동", "가온마을12단지", 30, 903, 2018, 1],
+      ["다정동", "가온마을5단지(중흥에스클래스센텀시티)", 17, 899, 2018, 1],
+      ["다정동", "가온마을10단지", 21, 898, 2018, 1],
+      ["새롬동", "새뜸마을9단지(금성백조예미지)", 12, 891, 2017, 1],
+      ["대평동", "해들마을1단지", 16, 889, 2018, 1],
+      ["대평동", "해들마을4단지", 45, 879, 2018, 1],
+      ["대평동", "해들마을2단지", 16, 864, 2018, 1],
+      ["소담동", "새샘마을9단지(중흥S클래스 리버뷰)", 47, 855, 2016, 1],
+      ["보람동", "호려울마을10단지(중흥S클래스)", 52, 854, 2016, 1],
+      ["보람동", "호려울마을5단지(제일풍경채)", 19, 854, 2017, 1],
+      ["도담동", "도램마을9단지(제일풍경채)", 40, 851, 2015, 1],
+      ["도담동", "도램마을 14단지(한림풀에버)", 58, 848, 2015, 1],
+      ["다정동", "가온마을6단지", 70, 844, 2018, 1],
+      ["다정동", "가온마을4단지", 10, 841, 2019, 1],
+      ["새롬동", "새뜸마을3단지(캐슬&파밀리에)", 47, 838, 2017, 1],
+      ["소담동", "새샘마을3단지(모아미래도리버시티)", 74, 824, 2016, 1],
+      ["새롬동", "새뜸마을5단지(메이저시티)", 31, 824, 2017, 1],
+      ["소담동", "새샘마을1단지", 41, 824, 2018, 1],
+      ["어진동", "더샵센트럴시티", 22, 820, 2013, 1],
+      ["대평동", "해들마을3단지", 10, 799, 2017, 1],
+      ["도담동", "도램마을10단지 호반 어반시티", 44, 778, 2014, 1],
+      ["도담동", "현대힐스테이트(도램마을15단지)", 58, 761, 2014, 1],
+      ["보람동", "호려울마을 4단지 센트럴파크", 48, 757, 2017, 1],
+      ["보람동", "호려울마을6단지(모아엘가)", 16, 754, 2017, 1],
+      ["다정동", "가온마을1단지", 112, 752, 2018, 1],
+      ["새롬동", "새뜸마을1단지(메이저시티)", 74, 745, 2017, 1],
+      ["어진동", "더샵레이크파크", 41, 744, 2013, 1],
+      ["새롬동", "새뜸마을4단지(캐슬&파밀리에)", 67, 742, 2017, 1],
+      ["보람동", "호려울마을8단지(중흥 에코시티)", 71, 741, 2017, 1],
+      ["한솔동", "첫마을3단지(퍼스트프라임)", 62, 736, 2011, 1],
+      ["다정동", "가온마을3단지", 80, 729, 2018, 1],
+      ["도담동", "도램마을11단지(반도유보라)", 58, 725, 2017, 1],
+      ["종촌동", "가재마을12단지", 73, 706, 2015, 1],
+      ["소담동", "새샘마을5단지(한양수자인엘시티)", 21, 703, 2017, 1],
+      ["소담동", "새샘마을6단지(한신더휴펜타힐스)", 40, 702, 2017, 1],
+      ["다정동", "가온마을2단지", 51, 695, 2018, 1],
+      ["종촌동", "가재마을9단지", 48, 684, 2014, 1],
+      ["고운동", "가락마을1단지(힐데스하임)", 17, 672, 2018, 1],
+      ["종촌동", "가재마을10단지", 27, 659, 2014, 1],
+      ["종촌동", "가재마을 5단지", 50, 650, 2014, 1],
+      ["아름동", "범지기마을12단지(중흥S-에코타운)", 29, 648, 2015, 1],
+      ["고운동", "가락마을18단지", 27, 648, 2018, 1],
+      ["도담동", "도램마을18단지(모아미래도)", 17, 647, 2015, 1],
+      ["종촌동", "가재마을7단지", 63, 647, 2014, 1],
+      ["고운동", "가락마을 19단지", 26, 643, 2019, 1],
+      ["아름동", "범지기마을1단지(한양수자인에듀센텀)", 54, 643, 2015, 1],
+      ["한솔동", "첫마을1단지(퍼스트프라임)", 67, 642, 2011, 1],
+      ["한솔동", "첫마을2단지(퍼스트프라임)", 10, 642, 2011, 1],
+      ["종촌동", "가재마을11단지", 15, 631, 2013, 1],
+      ["도담동", "도램마을1단지(웅진스타클래스)", 43, 622, 2014, 1],
+      ["도담동", "도램마을20단지(에듀파크)", 61, 619, 2014, 1],
+      ["도담동", "도램마을16단지(모아미래도)", 32, 618, 2015, 1],
+      ["한솔동", "첫마을7단지(래미안)", 67, 601, 2012, 1],
+      ["종촌동", "가재마을3단지", 30, 596, 2015, 1],
+      ["도담동", "도램마을 19단지(모아미래도)", 27, 595, 2015, 1],
+      ["반곡동", "수루배마을4단지(세종더샵예미지)", 35, 574, 2019, 1],
+      ["아름동", "푸르지오(8단지)", 61, 555, 2013, 1],
+      ["아름동", "범지기마을3단지(중흥에듀하이)", 72, 549, 2015, 1],
+      ["아름동", "대우푸르지오(10단지)", 219, 538, 2014, 2],
+      ["한솔동", "첫마을6단지(힐스테이트)", 73, 537, 2012, 1],
+      ["아름동", "범지기마을 4단지", 51, 530, 2014, 1],
+      ["고운동", "가락마을22단지(에듀힐스)", 49, 529, 2015, 1],
+      ["종촌동", "가재마을4단지(센트레빌)", 170, 528, 2015, 2],
+      ["종촌동", "가재마을2단지", 19, 526, 2014, 1],
+      ["도담동", "도램마을17단지(모아미래도)", 16, 525, 2015, 1],
+      ["아름동", "범지기마을7단지 호반에코시티", 44, 513, 2014, 1],
+      ["고운동", "가락마을21단지(에듀포레)", 53, 504, 2015, 1],
+      ["한솔동", "첫마을4단지(대우푸르지오)", 15, 503, 2012, 1],
+      ["고운동", "가락마을 20단지(호반베르디움5차)", 48, 500, 2015, 1],
+      ["고운동", "가락마을14단지(우남퍼스트빌)", 14, 495, 2020, 1],
+      ["고운동", "이지더원(가락마을4단지)", 13, 490, 2014, 1],
+      ["한솔동", "첫마을5단지(푸르지오)", 82, 484, 2012, 1],
+      ["고운동", "가락마을5단지(유승한내들)", 28, 484, 2015, 1],
+      ["고운동", "가락마을8단지(고운뜰아파트)", 103, 482, 2015, 1],
+      ["고운동", "가락마을15단지(중흥파크뷰)", 22, 482, 2015, 1],
+      ["고운동", "가락마을16단지(에듀그린)", 41, 470, 2015, 1],
+      ["고운동", "가락마을3단지(호반베르디움)", 21, 465, 2014, 1],
+      ["아름동", "한신엘리트파크(범지기9단지)", 66, 462, 2015, 1],
+      ["고운동", "가락마을11단지(중흥에듀카운티)", 33, 459, 2016, 1],
+      ["고운동", "이지더원(가락마을10단지)", 131, 455, 2015, 2],
+      ["고운동", "가락마을9단지(신동아 파밀리에)", 28, 420, 2015, 1],
+      ["고운동", "가락마을13단지(대광로제비앙)", 46, 414, 2015, 1],
+      ["아름동", "범지기마을11단지(영무예다음)", 97, 393, 2014, 1],
+      ["고운동", "가락마을7단지(중흥S-클래스프라디움)", 99, 302, 2015, 1],
+      ["용포리", "신성연기미소지움", 24, 292, 2007, 3],
+      ["신흥리", "조치원 신흥 e편한세상(아)", 99, 268, 2008, 3],
+      ["신흥리", "신흥대우푸르지오", 88, 250, 2006, 3],
+      ["죽림리", "조치원죽림자이", 331, 241, 2008, 2],
+      ["죽림리", "죽림대우푸르지오", 57, 236, 2007, 3],
+      ["신안리", "세종e편한세상", 182, 230, 2013, 2],
+      ["죽림리", "죽림우방유셀", 71, 218, 2008, 3],
+      ["침산리", "욱일아파트", 55, 194, 1996, 3],
+      ["죽림리", "조치원신동아파밀리에", 56, 190, 2008, 3],
+      ["신흥리", "신흥주공", 27, 189, 1999, 3],
+      ["봉암리", "대원네스트빌", 28, 175, 2002, 3],
+      ["죽림리", "삼정하이츠", 24, 163, 1991, 3],
+      ["남리", "다원파크리안", 54, 162, 2003, 3],
+      ["교리", "현대", 22, 160, 1992, 3],
+      ["죽림리", "신동아", 19, 144, 1996, 3],
+    ],
+    // 산점도 표본 [전용면적, 거래금액] — 51건마다 하나씩 300개
+    samp: [
+      [84.99,32000],[84.97,31800],[84.93,31300],[84.81,18800],[84.97,34000],[84.92,18300],[154.55,28000],[84.96,32000],[84.99,36800],[99.98,36500],
+      [79.63,13500],[128.95,23700],[84.66,19000],[73.98,31000],[74.77,26400],[84.81,29900],[119.98,54000],[98.05,40500],[84.94,37000],[84.86,37000],
+      [84.97,23000],[84.66,34000],[84.81,35900],[84.66,18800],[108.81,39700],[84.7,28000],[112,59500],[84.81,34000],[96.14,36700],[96.14,35000],
+      [84.94,35400],[84.66,17100],[99.94,34000],[84.99,32700],[74.98,29000],[99.96,35300],[99.98,35400],[74.98,29300],[96.25,40200],[84.91,35000],
+      [84.39,37800],[101.54,32800],[84.84,50000],[79.63,12500],[84.97,23300],[74.98,28600],[84.66,37000],[84.99,37700],[84.7,39000],[74.52,31500],
+      [71.48,32500],[84.88,19000],[114.84,64000],[98.06,44500],[84.98,25000],[84.98,25000],[84.98,25000],[84.98,25000],[84.98,25000],[84.98,25000],
+      [84.98,25000],[84.98,25000],[84.98,25000],[84.98,25000],[84.98,25000],[84.93,12200],[61.9,8700],[114.16,35900],[84.99,41000],[84.98,21000],
+      [84.98,32800],[84.94,41000],[65.78,9500],[84.93,11900],[84.94,31200],[74.98,28300],[74.98,29200],[84.99,32000],[84.99,41000],[84.97,35800],
+      [84.63,42700],[84.84,14900],[126.7,22500],[96.14,35500],[84.76,48400],[84.61,28000],[97.99,65000],[84.76,51000],[114.19,39000],[84.99,44600],
+      [101.72,56201],[84.7,49000],[108.99,53700],[84.95,32200],[84.81,39500],[84.97,21500],[97.99,62000],[100.9,41400],[97.99,53800],[102.63,44700],
+      [101.45,45500],[84.11,34000],[84.66,19500],[99.96,34900],[75,44800],[84.98,53500],[84.99,42850],[84.96,46500],[84.99,33000],[74.77,28000],
+      [74.98,28300],[84.9,49800],[71.48,33800],[84.86,32500],[84.99,30850],[84.99,42500],[84.99,36800],[84.99,32800],[84.98,23520],[84.99,31500],
+      [84.95,35000],[84.94,35850],[84.92,19000],[97.99,60000],[84.86,33500],[99.99,56000],[128.95,24500],[97.99,60000],[84.81,42000],[84.96,41000],
+      [84.08,30200],[83.26,13900],[84.98,33000],[84.67,40700],[98.19,70500],[84.92,44500],[84.97,34500],[84.94,45200],[84.99,44000],[84.62,30800],
+      [84.18,32000],[84.93,9000],[84.08,30500],[98.6,75200],[84.95,29500],[84.94,32000],[95.8,58500],[84.9,42000],[95.8,59500],[99.98,35500],
+      [101.81,56500],[84.95,30800],[95.8,59800],[84.76,50000],[79.8,56300],[84.7,27800],[84.81,36600],[111.98,66500],[84.66,31500],[118.83,95000],
+      [84.66,42000],[84.99,42200],[84.94,50500],[84.96,42000],[84.94,43500],[99.98,33500],[108.86,88000],[84.94,40700],[75.55,42670],[84.95,50000],
+      [98.64,89500],[84.98,34294],[84.97,49900],[84.95,34500],[85,56000],[75.58,40200],[84.97,53000],[101.73,79400],[75,52900],[74.52,31500],
+      [128.95,23800],[84.98,42300],[84.92,37500],[84.81,43200],[106.64,78500],[114.16,38000],[101.95,44400],[98.19,91000],[84.11,38000],[84.99,45500],
+      [99.96,35000],[85,61800],[84.95,33900],[84.92,35000],[98.71,59500],[84.94,35600],[75,44000],[84.98,32000],[74.77,28000],[100.55,52000],
+      [85,32800],[84.98,23522],[99.99,69000],[84.66,32300],[84.94,49750],[84.99,33800],[84.89,60000],[84.95,36000],[84.98,35500],[84.99,43900],
+      [99.98,38000],[74.52,36000],[84.9,34000],[108.98,65500],[96.14,39000],[84.99,59700],[125.54,25500],[84.99,35000],[84.9,56000],[75.58,50000],
+      [97.57,66800],[84.95,42500],[84.94,60000],[84.98,43800],[84.86,38000],[97.99,62500],[96.14,45500],[84.87,52500],[84.98,22450],[84.89,40700],
+      [117.9,56500],[100.92,56000],[84.66,18800],[84.99,39500],[83.26,13000],[128.95,29900],[97.99,81000],[107.7,48000],[74.98,38500],[75.9,51750],
+      [104.9,19000],[74.77,38000],[84.99,55800],[84.66,20900],[101.81,75000],[84.97,52000],[74.97,54500],[99.07,102000],[98.11,79000],[128.95,29800],
+      [74.52,41200],[84.87,19000],[84.98,48000],[84.99,15000],[84.78,75000],[84.7,53000],[84.86,59000],[98.99,81800],[99.96,55000],[84.99,13700],
+      [98.95,87000],[106.76,70000],[84.99,48000],[84.97,51000],[152.78,28000],[84.99,46000],[120.64,26700],[111.98,96000],[79.63,13100],[84.98,52000],
+      [84.99,82000],[80.8,69000],[84.96,69000],[84.99,82000],[98.06,97000],[98.93,87000],[84.92,30000],[107.7,61000],[74.71,75000],[84.96,84000],
+      [84.99,60500],[97.99,72000],[102.94,129000],[128.95,38900],[83.26,16900],[84.92,32000],[84.98,36800],[84.97,40000],[100.73,87000],[84.84,24000],
+      [84.99,73000],[84.66,34000],[84.66,37100],[84.08,70500],[85,95500],[84.71,31000],[99.94,60000],[84.99,17000],[74.97,73000],[84.98,66100],
+    ],
+  };
+</script>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+  <!-- ══ 1. 표지 ══════════════════════════════════════════════ -->
+  <section class="s-cover">
+    <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+    <p class="cover-label" data-course-label>&nbsp;</p>
+    <h1>6강. 기술통계량과 시각화</h1>
+    <p class="cover-date" data-course-date>&nbsp;</p>
+  </section>
+
+  <!-- ══ 2. 발문 ══════════════════════════════════════════════ -->
+  <section class="s-question">
+    <h2>자료를 처음 열었다. 무엇부터 보나</h2>
+    <div class="body">
+      <ul>
+        <li>세종 아파트 실거래 <span class="num">15,486</span>건. 그대로는 아무도 못 읽음</li>
+        <li>줄이는 방법은 여럿이고 <span class="mark">무엇을 고르느냐에 따라 다른 것이 보임</span></li>
+        <li>오늘은 일곱 가지를 <strong>목록으로</strong> 펼치고 언제 무엇을 고르는지까지</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 3. 방법론 목록 ═══════════════════════════════════════ -->
+  <section>
+    <h2>오늘의 방법 일곱</h2>
+    <div class="body tight">
+      <table class="tbl-mth">
+        <thead><tr><th></th><th>방법</th><th>무엇을 답하나</th><th>필요한 자료</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><b>도수분포표와 히스토그램</b></td><td>값이 어디에 몰려 있나</td><td>연속변수 1개</td></tr>
+          <tr><td>2</td><td><b>대표값</b> — 평균·중앙값·최빈값</td><td>가운데를 하나의 숫자로</td><td>연속변수 1개</td></tr>
+          <tr><td>3</td><td><b>산포</b> — 범위·사분위수범위·표준편차</td><td>얼마나 흩어져 있나</td><td>연속변수 1개</td></tr>
+          <tr><td>4</td><td><b>박스플롯</b></td><td>분포를 다섯 숫자로 압축</td><td>연속변수 1개 (+집단)</td></tr>
+          <tr><td>5</td><td><b>산점도와 상관계수</b></td><td>두 변수가 함께 움직이나, 얼마나 직선적인가</td><td>연속변수 2개</td></tr>
+          <tr><td>6</td><td><b>K-means 군집분석</b></td><td>대상을 정한 개수의 그룹으로 묶음</td><td>연속변수 여럿</td></tr>
+          <tr><td>7</td><td><b>계층적 군집분석</b></td><td>대상을 가까운 순서대로 묶어 나무로</td><td>연속변수 여럿</td></tr>
+        </tbody>
+      </table>
+      <p class="conclusion" style="margin-top:10px">→ 1~4 는 <strong>변수 하나</strong>를,
+        5 는 <strong>둘</strong>을, 6~7 은 <strong>여럿</strong>을 다룸</p>
+    </div>
+  </section>
+
+  <!-- ══ 오늘의 실습자료와 자료 정리 (2026-10-19 추가) ═══════════════
+     배포 묶음은 analysis/data/학생배포/06강-세종아파트실거래가.zip (깃에 없다).
+     프롬프트는 그 안의 「분석 프롬프트.md」 0번과 같다. -->
+  <section class="s-split">
+    <h2>오늘의 실습자료와 자료 정리</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="sub t-red" style="margin-bottom:4px">세종시 아파트 매매 실거래가</p>
+        <ul class="defs">
+          <li><strong>파일:</strong> <span class="code">06강-세종아파트실거래가.zip</span></li>
+          <li><strong>기간:</strong> 2017년 1월 ~ 2020년 12월 계약분</li>
+          <li><strong>규모:</strong> <span class="num">23,597</span>건</li>
+          <li><strong>열:</strong> 계약년월 · 시군구 · 단지명 · 전용면적(㎡) ·
+            거래금액(만원) · 건축년도 · 해제사유발생일 등 11개</li>
+          <li><strong>함께 든 것:</strong> 열 설명(README) · 방법별 프롬프트 · 로직 문서 본보기</li>
+        </ul>
+        <p class="conclusion" style="margin-top:8px">→ 정리 기준이 결과를 바꿈.
+          <strong>무엇을 왜 뺐는지</strong>를 남김</p>
+        <p class="src">자료: COMPAS 「주택 시장 특성분석」(세종, SBJ_2102_001)</p>
+      </div>
+      <div class="col-r">
+        <div class="prompt-box">
+          <p class="who">자료 정리 프롬프트</p>
+          <p>세종시_아파트매매_실거래가_2017-2020.csv 를 읽고 행 수, 열 이름, 열마다 빈 값의 개수를 보여 줘.</p>
+          <p>거래금액(만원)은 "8,600" 같은 문자열이야. 숫자로 바꿔 줘.</p>
+          <p>해제사유발생일이 있는 거래(취소)와 전용면적 60㎡ 이하는 빼 줘.
+            기준마다 몇 건이 빠졌는지 따로 알려 줘.</p>
+          <p>시군구의 마지막 단어로 「동」 열을, 거래금액 ÷ 전용면적으로 「㎡당 가격」 열을 만들어 줘.</p>
+          <p>무엇을 왜 뺐는지 로직 문서로 정리해 줘.</p>
+        </div>
+        <p class="caption" style="margin-top:8px"><strong>확인할 값:</strong>
+          23,597건 → 취소 537건 제외 23,060건 → 60㎡ 이하 7,574건 제외 <strong>15,486건</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 방법 1 — 목적과 정의 (2026-10-19 개념마다 정의를 붙임) ══════ -->
+  <section class="s-definition">
+    <p class="mth">방법 1 / 7</p>
+    <h2>도수분포표와 히스토그램: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">값의 범위를 <span class="t-red">계급으로 나누고</span>
+        계급마다 몇 개가 들어가는지 센 것</p>
+      <ul class="defs">
+        <li><strong>계급:</strong> 값의 범위를 일정한 폭으로 나눈 구간</li>
+        <li><strong>도수(빈도):</strong> 한 계급에 들어간 관측치의 개수</li>
+        <li><strong>상대도수:</strong> 도수를 전체 관측치 수로 나눈 비율</li>
+        <li><strong>도수분포표:</strong> 계급별 도수를 표로 정리한 것</li>
+        <li><strong>히스토그램:</strong> 계급을 가로축에, 도수를 막대 높이로 그린 그림. 막대를 붙여 그림</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 1개</p>
+      <p class="conclusion">→ 자료를 처음 열었을 때 <strong>가장 먼저 하는 일</strong>.
+        가운데가 어디고 꼬리가 어느 쪽으로 늘어지는지가 한눈에 들어옴</p>
+    </div>
+  </section>
+
+  <!-- ══ 5. 방법 1 — 어떻게 작동하나 ══════════════════════════ -->
+  <section>
+    <p class="mth">방법 1 / 7</p>
+    <h2>도수분포표와 히스토그램: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 42%">
+        <ol class="steps">
+          <li><b>계급 폭을 정함</b><br>세종은 1억 단위로 잘랐음</li>
+          <li><b>값을 계급에 떨어뜨림</b><br>39,000만원 → 3~4억 계급</li>
+          <li><b>계급마다 셈</b><br>그것이 빈도</li>
+          <li><b>막대 높이로 세움</b><br>붙여 그림. 막대 사이를 띄우지 않음</li>
+        </ol>
+        <p class="conclusion" style="margin-top:10px">→ 계급 폭이 결과를 바꿈.
+          넓으면 뭉개지고 좁으면 들쭉날쭉함</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-hist-how" viewBox="0 0 400 250" role="img">
+          <title>같은 자료를 넓은 계급과 좁은 계급으로 나눴을 때 히스토그램 모양이 달라지는 그림</title></svg>
+        <p class="caption" style="text-align:center;margin-top:2px">같은 자료 15,486건. 계급 폭만 다름</p>
+      </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        // 1억 폭 빈도를 둘씩 합쳐 2억 폭을 만든다 — 같은 자료임이 계산으로 보장된다
+        const f1 = SJ.freq.map((b) => b[1]);
+        const f2 = [];
+        for (let i = 0; i < f1.length; i += 2) f2.push((f1[i] || 0) + (f1[i + 1] || 0));
+        const panel = (box, vals, top, label) => {
+          const F = Fig.withBox(box);
+          const S = F.scale({ x: [0, vals.length], y: [0, top] });
+          return [
+            F.raw(F.bars(S, vals).svg),
+            F.raw(`<path class="axis" d="M${box.x0},${box.y1 - 6} L${box.x0},${box.y0} L${box.x1 + 6},${box.y0}"/>`),
+            F.annot((box.x0 + box.x1) / 2, box.y1 - 8, label, { anchor: 'middle', size: 12, tone: 'red' }),
+          ];
+        };
+        Fig.draw('#f-hist-how', {
+          check: false,
+          parts: [
+            ...panel({ x0: 30, y0: 112, x1: 380, y1: 40 }, f1, 4200, '계급 폭 1억 — 18칸'),
+            ...panel({ x0: 30, y0: 236, x1: 380, y1: 164 }, f2, 7000, '계급 폭 2억 — 9칸'),
+          ],
+        });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 6. 방법 1 — 적용 사례 ════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 1 / 7</p>
+    <h2>도수분포표와 히스토그램: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 38%">
+        <p class="emph" id="k-hist-lead"></p>
+        <p>봉우리가 <strong>3~4억</strong>에 있고 오른쪽으로 길게 늘어짐</p>
+        <p>왼쪽에는 더 갈 데가 없고 오른쪽은 17억까지 열려 있음</p>
+        <p class="conclusion" style="margin-top:12px">→ 이 모양이면 평균이 중앙값보다 큼</p>
+        <p class="conclusion">→ 다음 방법에서 확인함</p>
+        <p class="src">자료: COMPAS 「주택 시장 특성분석」(세종, SBJ_2102_001)<br>
+          계산: analysis/07-기술적분석/07-세종주택시장.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-hist" viewBox="0 0 470 280" style="width:430px" role="img">
+          <title>세종 아파트 거래금액 히스토그램. 3~4억에 봉우리가 있고 오른쪽으로 꼬리가 길다</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        document.getElementById('k-hist-lead').innerHTML =
+          `거래 <span class="num">${SJ.n.toLocaleString()}</span>건을 1억 단위 18개 계급으로 나눔`;
+        const vals = SJ.freq.map((b) => b[1]);
+        const F = Fig.withBox({ x0: 52, y0: 236, x1: 452, y1: 26 });
+        const S = F.scale({ x: [0, vals.length], y: [0, 4200] });
+        const b = F.bars(S, vals);
+        const parts = [F.raw(b.svg)];
+        [0, 1000, 2000, 3000, 4000].forEach((t) =>
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(t) + 4, t.toLocaleString(),
+                             { anchor: 'end', size: 11 })));
+        [0, 3, 6, 9, 12, 15, 18].forEach((i) =>
+          parts.push(F.annot(S.x(i), F.BOX.y0 + 17, String(i), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(S.x(3.5), S.y(3913) - 10, '3,913건',
+                           { anchor: 'middle', size: 12, tone: 'red' }));
+        F.draw('#f-hist', { axes: { x: '거래금액(억원)', y: '거래건수' }, parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 2 — 목적과 정의 (2026-10-19 개념마다 정의를 붙임) ══════ -->
+  <section class="s-definition">
+    <p class="mth">방법 2 / 7</p>
+    <h2>대표값: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">흩어진 값들의 <span class="t-red">가운데를 숫자 하나로</span> 나타낸 것</p>
+      <ul class="defs">
+        <li><strong>평균:</strong> 모든 값을 더해 값의 개수로 나눈 것</li>
+        <li><strong>중앙값:</strong> 값을 크기순으로 늘어놓았을 때 한가운데에 오는 값.
+          개수가 짝수이면 가운데 두 값의 평균</li>
+        <li><strong>최빈값:</strong> 가장 자주 나타나는 값. 연속변수는 계급으로 묶은 뒤
+          도수가 가장 큰 계급을 씀</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 1개 (최빈값은 범주도 가능)</p>
+      <p class="conclusion">→ 셋은 <strong>서로 다른 가운데</strong>.
+        어느 것을 쓰느냐로 결론이 달라짐</p>
+    </div>
+  </section>
+
+  <!-- ══ 8. 방법 2 — 어떻게 작동하나 ══════════════════════════ -->
+  <section>
+    <p class="mth">방법 2 / 7</p>
+    <h2>대표값: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <p class="formula-key" style="text-align:center;margin:4px 0 10px">
+        $\bar{x} = \dfrac{1}{n}\sum_{i=1}^{n} x_i$ &nbsp;&nbsp;·&nbsp;&nbsp;
+        중앙값 $= x_{((n+1)/2)}$ (크기순으로 세운 뒤)</p>
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="sub t-red" style="margin-bottom:2px">평균은 무게중심</p>
+        <p>값 하나가 멀리 있으면 <strong>그쪽으로 끌려감</strong></p>
+        <p class="sub t-red" style="margin-bottom:2px;margin-top:12px">중앙값은 순위</p>
+        <p>얼마나 먼지는 보지 않고 <strong>몇 번째인지만</strong> 봄</p>
+        <p class="conclusion" style="margin-top:12px">→ 그래서 한쪽 꼬리가 긴 자료에서
+          <strong>평균 &gt; 중앙값</strong></p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-mean-how" viewBox="0 0 400 238" role="img">
+          <title>같은 다섯 값에서 마지막 값만 크게 키우면 평균은 따라 움직이고 중앙값은 그대로인 그림</title></svg>
+      </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        // 다섯 값. 마지막 하나만 키워 평균과 중앙값이 어떻게 갈리는지 보인다
+        const A = [2, 3, 4, 5, 6], B = [2, 3, 4, 5, 26];
+        const mean = (v) => v.reduce((s, x) => s + x, 0) / v.length;
+        const med = (v) => [...v].sort((a, b) => a - b)[(v.length - 1) / 2];
+        const row = (vals, y, label) => {
+          const F = Fig.withBox({ x0: 40, y0: y, x1: 380, y1: y - 1 });
+          const S = F.scale({ x: [0, 28], y: [0, 1] });
+          const out = [F.raw(`<path class="axis" d="M${S.x(0)},${y} L${S.x(28)},${y}"/>`)];
+          vals.forEach((v) => out.push(F.raw(
+            `<circle cx="${S.x(v)}" cy="${y}" r="5" fill="var(--ink)" fill-opacity="0.55"/>`)));
+          out.push(F.raw(`<path d="M${S.x(med(vals))},${y - 26} L${S.x(med(vals))},${y + 8}"
+                            stroke="var(--ink)" stroke-width="2"/>`));
+          out.push(F.annot(S.x(med(vals)), y - 32, '중앙값 ' + med(vals), { anchor: 'middle', size: 11 }));
+          out.push(F.raw(`<path d="M${S.x(mean(vals))},${y + 8} L${S.x(mean(vals))},${y + 32}"
+                            stroke="var(--brand-crimson)" stroke-width="2"/>`));
+          out.push(F.annot(S.x(mean(vals)), y + 46, '평균 ' + mean(vals).toFixed(1),
+                           { anchor: 'middle', size: 11, tone: 'red' }));
+          out.push(F.annot(40, y - 46, label, { anchor: 'start', size: 12 }));
+          return out;
+        };
+        Fig.draw('#f-mean-how', { check: false, parts: [...row(A, 70, '다섯 값 2·3·4·5·6'), ...row(B, 178, '마지막만 26 으로')] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 9. 방법 2 — 적용 사례 ════════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 2 / 7</p>
+    <h2>대표값: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 38%">
+        <table class="tbl-mth" style="font-size:14px">
+          <tbody>
+            <tr><td style="width:auto"><b>평균</b></td><td id="k-mean" style="width:auto;text-align:right"></td></tr>
+            <tr><td><b>중앙값</b></td><td id="k-med" style="text-align:right"></td></tr>
+            <tr><td><b>차이</b></td><td id="k-gap" style="text-align:right"></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:10px">앞의 히스토그램에서 본 <strong>오른쪽 긴 꼬리</strong>가
+          평균을 위로 끌어올림</p>
+        <p class="conclusion">→ 세종 집값을 하나로 말해야 한다면 <strong>중앙값</strong>.
+          평균은 소수의 고가 거래를 담고 있음</p>
+        <p class="src">계산: analysis/07-기술적분석/07-세종주택시장.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-mean" viewBox="0 0 470 280" style="width:430px" role="img">
+          <title>세종 거래금액 히스토그램 위에 중앙값 3.9억과 평균 4.32억을 세로선으로 표시한 그림</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const f = (v) => v.toLocaleString() + '만원';
+        document.getElementById('k-mean').textContent = f(SJ.mean);
+        document.getElementById('k-med').textContent = f(SJ.med);
+        document.getElementById('k-gap').innerHTML =
+          `<span style="color:var(--brand-crimson);font-weight:700">${f(SJ.mean - SJ.med)}</span>`;
+        const vals = SJ.freq.map((b) => b[1]);
+        const F = Fig.withBox({ x0: 52, y0: 236, x1: 452, y1: 40 });
+        const S = F.scale({ x: [0, vals.length], y: [0, 4200] });
+        const parts = [F.raw(F.bars(S, vals).svg)];
+        const mark = (v, label, color, dy) => {
+          const x = S.x(v / 10000);
+          parts.push(F.raw(`<path d="M${x},${F.BOX.y0} L${x},${F.BOX.y1 + dy}"
+                              stroke="${color}" stroke-width="2"/>`));
+          parts.push(F.annot(x, F.BOX.y1 + dy - 6, label, { anchor: 'middle', size: 12 }));
+        };
+        mark(SJ.med, '중앙값 ' + (SJ.med / 10000).toFixed(1) + '억', 'var(--ink)', 24);
+        mark(SJ.mean, '평균 ' + (SJ.mean / 10000).toFixed(2) + '억', 'var(--brand-crimson)', 0);
+        [0, 3, 6, 9, 12, 15, 18].forEach((i) =>
+          parts.push(F.annot(S.x(i), F.BOX.y0 + 17, String(i), { anchor: 'middle', size: 11 })));
+        F.draw('#f-mean', { axes: { x: '거래금액(억원)', y: '거래건수' }, parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 3 — 목적과 정의 (2026-10-19 개념마다 정의를 붙임) ══════ -->
+  <section class="s-definition">
+    <p class="mth">방법 3 / 7</p>
+    <h2>산포: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">값들이 가운데에서 <span class="t-red">얼마나 멀리 흩어져 있는지</span>를 측정한 것</p>
+      <ul class="defs">
+        <li><strong>범위:</strong> 최댓값에서 최솟값을 뺀 것</li>
+        <li><strong>사분위수:</strong> 크기순으로 늘어놓은 값을 네 등분하는 세 값.
+          Q1 은 아래에서 25%, Q3 은 75% 지점</li>
+        <li><strong>사분위수범위(IQR):</strong> Q3 − Q1. 가운데 50% 가 퍼진 폭</li>
+        <li><strong>분산:</strong> 각 값과 평균의 차이를 제곱해 평균 낸 것</li>
+        <li><strong>표준편차:</strong> 분산의 제곱근. 퍼짐을 원래 단위로 나타냄</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 1개</p>
+      <p class="conclusion">→ 대표값만으로는 <strong>같은 가운데, 다른 분포</strong>를 구별하지 못함</p>
+    </div>
+  </section>
+
+  <!-- ══ 11. 방법 3 — 어떻게 작동하나 ═════════════════════════ -->
+  <section>
+    <p class="mth">방법 3 / 7</p>
+    <h2>산포: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <p class="formula-key" style="text-align:center;margin:2px 0 8px">
+        $s = \sqrt{\dfrac{1}{n}\sum (x_i - \bar{x})^2}$ &nbsp;&nbsp;·&nbsp;&nbsp;
+        $\text{IQR} = Q_3 - Q_1$</p>
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 46%">
+        <ol class="steps">
+          <li><b>평균에서 얼마나 떨어졌나</b>를 각 값마다 측정함</li>
+          <li><b>제곱함</b> — 양쪽 방향을 같게 만들고 먼 값을 키움</li>
+          <li><b>평균 냄</b> — 그것이 분산</li>
+          <li><b>제곱근</b> — 원래 단위로 돌아옴</li>
+        </ol>
+        <p class="conclusion" style="margin-top:8px">→ 표준편차는 <strong>제곱</strong>을 거치므로
+          먼 값 하나에 민감함. IQR 은 가운데 절반만 보므로 둔감함</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-sd-how" viewBox="0 0 380 250" role="img">
+          <title>같은 평균을 가진 두 자료에서 점이 퍼진 정도가 다르면 표준편차가 달라지는 그림</title></svg>
+      </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        // 평균이 같고 퍼짐만 다른 두 벌. 수치는 여기서 계산한다
+        const A = [8, 9, 10, 11, 12], B = [2, 6, 10, 14, 18];
+        const sd = (v) => {
+          const m = v.reduce((s, x) => s + x, 0) / v.length;
+          return Math.sqrt(v.reduce((s, x) => s + (x - m) ** 2, 0) / v.length);
+        };
+        const row = (vals, y, name) => {
+          const F = Fig.withBox({ x0: 46, y0: y, x1: 348, y1: y - 1 });
+          const S = F.scale({ x: [0, 20], y: [0, 1] });
+          const m = 10;
+          const out = [
+            F.annot(46, y - 44, name, { anchor: 'start', size: 12 }),
+            F.raw(`<path class="axis" d="M${S.x(0)},${y} L${S.x(20)},${y}"/>`),
+            F.raw(`<path d="M${S.x(m)},${y - 30} L${S.x(m)},${y + 10}"
+                     stroke="var(--brand-crimson)" stroke-width="2"/>`),
+          ];
+          vals.forEach((v) => {
+            out.push(F.raw(`<path d="M${S.x(v)},${y} L${S.x(m)},${y}"
+                              stroke="var(--ink-2)" stroke-width="1" stroke-dasharray="3 3"/>`));
+            out.push(F.raw(`<circle cx="${S.x(v)}" cy="${y}" r="5"
+                              fill="var(--ink)" fill-opacity="0.55"/>`));
+          });
+          out.push(F.annot(S.x(m), y - 36, '평균 10', { anchor: 'middle', size: 11, tone: 'red' }));
+          out.push(F.annot(348, y + 30, '표준편차 ' + sd(vals).toFixed(2),
+                           { anchor: 'end', size: 12, tone: 'red' }));
+          return out;
+        };
+        Fig.draw('#f-sd-how', { check: false, parts: [...row(A, 74, '좁게 퍼진 자료'), ...row(B, 186, '넓게 퍼진 자료')] });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 12. 방법 3 — 적용 사례 ═══════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 3 / 7</p>
+    <h2>산포: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 40%">
+        <table class="tbl-mth" style="font-size:14px" id="t-sd"><tbody></tbody></table>
+        <p style="margin-top:10px">가운데 절반은 <strong>2.9억~5.34억</strong> 안에 있음</p>
+        <p>범위는 16.62억으로 IQR 의 <strong>일곱 배 가까움</strong></p>
+        <p class="conclusion">→ 양 끝의 몇 건이 범위를 혼자 정함.
+          퍼짐을 말할 때 <strong>범위보다 IQR</strong> 이 안전함</p>
+        <p class="src">계산: analysis/07-기술적분석/07-세종주택시장.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-sd" viewBox="0 0 470 280" style="width:430px" role="img">
+          <title>세종 거래금액 히스토그램에 사분위수범위와 평균 ±1표준편차 구간을 겹쳐 표시한 그림</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const won = (v) => (v / 10000).toFixed(2) + '억';
+        document.querySelector('#t-sd tbody').innerHTML = [
+          ['범위 (최대−최소)', won(SJ.max - SJ.min)],
+          ['사분위수범위 (Q3−Q1)', won(SJ.q3 - SJ.q1)],
+          ['표준편차', won(SJ.sd)],
+        ].map(([a, b]) => `<tr><td style="width:auto"><b>${a}</b></td>` +
+                          `<td style="width:auto;text-align:right">${b}</td></tr>`).join('');
+        const vals = SJ.freq.map((b) => b[1]);
+        const F = Fig.withBox({ x0: 52, y0: 226, x1: 452, y1: 58 });
+        const S = F.scale({ x: [0, vals.length], y: [0, 4200] });
+        const parts = [F.raw(F.bars(S, vals).svg)];
+        const band = (a, b, y, color, label) => {
+          parts.push(F.raw(`<rect x="${S.x(a / 10000)}" y="${y - 7}"
+              width="${S.x(b / 10000) - S.x(a / 10000)}" height="14"
+              fill="${color}" fill-opacity="0.25" stroke="${color}" stroke-width="1"/>`));
+          parts.push(F.annot((S.x(a / 10000) + S.x(b / 10000)) / 2, y + 4, label,
+                             { anchor: 'middle', size: 11 }));
+        };
+        band(SJ.q1, SJ.q3, F.BOX.y1 - 14, 'var(--ink)', 'IQR — 가운데 절반');
+        band(SJ.mean - SJ.sd, SJ.mean + SJ.sd, F.BOX.y1 - 40, 'var(--brand-crimson)', '평균 ± 1표준편차');
+        [0, 3, 6, 9, 12, 15, 18].forEach((i) =>
+          parts.push(F.annot(S.x(i), F.BOX.y0 + 17, String(i), { anchor: 'middle', size: 11 })));
+        F.draw('#f-sd', { axes: { x: '거래금액(억원)' }, parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 4 — 목적과 정의 (2026-10-19 개념마다 정의를 붙임) ══════ -->
+  <section class="s-definition">
+    <p class="mth">방법 4 / 7</p>
+    <h2>박스플롯: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">분포를 <span class="t-red">다섯 숫자</span>로 압축해 그린 그림</p>
+      <ul class="defs">
+        <li><strong>다섯 숫자 요약:</strong> 최솟값 · Q1 · 중앙값 · Q3 · 최댓값</li>
+        <li><strong>상자:</strong> Q1 에서 Q3 까지의 직사각형. 안의 선이 중앙값</li>
+        <li><strong>울타리:</strong> Q1 − 1.5×IQR 과 Q3 + 1.5×IQR. 이상치를 가르는 경계</li>
+        <li><strong>수염:</strong> 상자에서 울타리 안의 가장 먼 값까지 뻗은 선</li>
+        <li><strong>이상치:</strong> 울타리 밖에 있는 값. 점으로 따로 찍음</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 1개. 집단이 있으면 나란히 놓고 견줌</p>
+      <p class="conclusion">→ 히스토그램보다 <strong>자리를 덜 먹음</strong>.
+        여러 집단을 한 화면에서 비교할 때 씀</p>
+    </div>
+  </section>
+
+  <!-- ══ 14. 방법 4 — 어떻게 작동하나 ═════════════════════════ -->
+  <section>
+    <p class="mth">방법 4 / 7</p>
+    <h2>박스플롯: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 44%">
+        <ol class="steps">
+          <li><b>크기순으로 세움</b></li>
+          <li><b>Q1 · 중앙값 · Q3</b> 를 찾아 상자를 그림</li>
+          <li><b>울타리</b>를 침 — Q1−1.5×IQR 과 Q3+1.5×IQR</li>
+          <li><b>수염</b>은 울타리 안의 마지막 값까지만 뻗음</li>
+          <li>울타리 밖의 값은 <b>점으로 따로</b> 찍음</li>
+        </ol>
+        <p class="conclusion" style="margin-top:8px">→ 1.5 는 약속된 관습이지 법칙이 아님.
+          <strong>「이상치」로 찍혔다고 잘못된 값은 아님</strong></p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-box-how" viewBox="0 0 400 250" role="img">
+          <title>다섯 숫자와 1.5배 울타리로 상자와 수염과 이상치가 만들어지는 박스플롯 구조도</title></svg>
+      </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const q1 = 40, med = 50, q3 = 62, iqr = q3 - q1;
+        const lo = q1 - 1.5 * iqr, hi = q3 + 1.5 * iqr;   // 7 과 95
+        const whiskLo = 20, whiskHi = 88, outs = [106, 120];
+        const F = Fig.withBox({ x0: 40, y0: 168, x1: 372, y1: 60 });
+        const S = F.scale({ x: [0, 130], y: [0, 1] });
+        const y = 118, h = 34;
+        const parts = [
+          F.raw(`<rect x="${S.x(q1)}" y="${y - h / 2}" width="${S.x(q3) - S.x(q1)}" height="${h}"
+                   fill="var(--brand-crimson)" fill-opacity="0.18"
+                   stroke="var(--brand-crimson)" stroke-width="1.6"/>`),
+          F.raw(`<path d="M${S.x(med)},${y - h / 2} L${S.x(med)},${y + h / 2}"
+                   stroke="var(--brand-crimson)" stroke-width="2.6"/>`),
+          F.raw(`<path d="M${S.x(whiskLo)},${y} L${S.x(q1)},${y} M${S.x(q3)},${y} L${S.x(whiskHi)},${y}"
+                   stroke="var(--ink)" stroke-width="1.4"/>`),
+          F.raw(`<path d="M${S.x(whiskLo)},${y - 11} L${S.x(whiskLo)},${y + 11}
+                          M${S.x(whiskHi)},${y - 11} L${S.x(whiskHi)},${y + 11}"
+                   stroke="var(--ink)" stroke-width="1.4"/>`),
+        ];
+        outs.forEach((o) => parts.push(F.raw(
+          `<circle cx="${S.x(o)}" cy="${y}" r="4.5" fill="none"
+             stroke="var(--brand-crimson)" stroke-width="1.6"/>`)));
+        // 울타리
+        [[lo, '아래 울타리'], [hi, '위 울타리']].forEach(([v, t]) => {
+          parts.push(F.raw(`<path d="M${S.x(v)},${y - 46} L${S.x(v)},${y + 46}"
+                              stroke="var(--muted)" stroke-width="1" stroke-dasharray="4 3"/>`));
+          parts.push(F.annot(S.x(v), y + 60, t, { anchor: 'middle', size: 11 }));
+        });
+        [[q1, 'Q1'], [med, '중앙값'], [q3, 'Q3']].forEach(([v, t]) =>
+          parts.push(F.annot(S.x(v), y - h / 2 - 8, t, { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(S.x(outs[1]), y - 14, '이상치', { anchor: 'middle', size: 11, tone: 'red' }));
+        parts.push(F.annot(S.x((q1 + q3) / 2), y + h / 2 + 62, 'IQR = Q3 − Q1',
+                           { anchor: 'middle', size: 11, tone: 'red' }));
+        Fig.draw('#f-box-how', { check: false, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 15. 방법 4 — 적용 사례 ═══════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 4 / 7</p>
+    <h2>박스플롯: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="emph">세종 거래금액의 다섯 숫자</p>
+        <table class="tbl-mth" style="font-size:14px" id="t-box"><tbody></tbody></table>
+        <p style="margin-top:10px">상자가 <strong>왼쪽으로 치우쳐</strong> 있고
+          위쪽 수염이 훨씬 김</p>
+        <p class="conclusion">→ 히스토그램이 보여 준 <strong>오른쪽 긴 꼬리</strong>가
+          다섯 숫자만으로도 드러남</p>
+        <p class="src">계산: analysis/07-기술적분석/07-세종주택시장.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-box" viewBox="0 0 440 260" style="width:400px" role="img">
+          <title>세종 거래금액 박스플롯. 상자가 왼쪽에 치우치고 위쪽 수염이 길다</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const won = (v) => (v / 10000).toFixed(2) + '억';
+        document.querySelector('#t-box tbody').innerHTML = [
+          ['최소', SJ.min], ['Q1', SJ.q1], ['중앙값', SJ.med], ['Q3', SJ.q3], ['최대', SJ.max],
+        ].map(([a, b]) => `<tr><td style="width:auto"><b>${a}</b></td>` +
+                          `<td style="width:auto;text-align:right">${won(b)}</td></tr>`).join('');
+        const F = Fig.withBox({ x0: 44, y0: 196, x1: 412, y1: 70 });
+        const S = F.scale({ x: [0, 18], y: [0, 1] });
+        const g = (v) => S.x(v / 10000);
+        const y = 130, h = 46;
+        const parts = [
+          F.raw(`<path class="axis" d="M${S.x(0)},${196} L${S.x(18)},${196}"/>`),
+          F.raw(`<rect x="${g(SJ.q1)}" y="${y - h / 2}" width="${g(SJ.q3) - g(SJ.q1)}" height="${h}"
+                   fill="var(--brand-crimson)" fill-opacity="0.18"
+                   stroke="var(--brand-crimson)" stroke-width="1.6"/>`),
+          F.raw(`<path d="M${g(SJ.med)},${y - h / 2} L${g(SJ.med)},${y + h / 2}"
+                   stroke="var(--brand-crimson)" stroke-width="2.6"/>`),
+          F.raw(`<path d="M${g(SJ.min)},${y} L${g(SJ.q1)},${y} M${g(SJ.q3)},${y} L${g(SJ.max)},${y}"
+                   stroke="var(--ink)" stroke-width="1.4"/>`),
+          F.raw(`<path d="M${g(SJ.min)},${y - 12} L${g(SJ.min)},${y + 12}
+                          M${g(SJ.max)},${y - 12} L${g(SJ.max)},${y + 12}"
+                   stroke="var(--ink)" stroke-width="1.4"/>`),
+        ];
+        [[SJ.min, '최소'], [SJ.q1, 'Q1'], [SJ.med, '중앙값'], [SJ.q3, 'Q3'], [SJ.max, '최대']]
+          .forEach(([v, t], i) => {
+            parts.push(F.annot(g(v), y - h / 2 - (i % 2 ? 24 : 10), t, { anchor: 'middle', size: 11 }));
+          });
+        [0, 3, 6, 9, 12, 15, 18].forEach((i) =>
+          parts.push(F.annot(S.x(i), 213, String(i), { anchor: 'middle', size: 11 })));
+        parts.push(F.annot(S.x(18), 236, '거래금액(억원)', { anchor: 'end', size: 12 }));
+        Fig.draw('#f-box', { check: false, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 실습 — 연도별 박스플롯 (2026-10-19 추가) ══════════════════
+     확인값은 analysis/07-기술적분석/07-세종주택시장-연도별박스.csv -->
+  <section class="s-split">
+    <p class="mth">방법 4 / 7 · 실습</p>
+    <h2>실습: 계약 연도별 박스플롯을 그린다</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 46%">
+        <p class="emph">박스플롯은 집단을 <strong>나란히 놓을 때</strong> 쓸모가 드러남</p>
+        <div class="prompt-box">
+          <p class="who">프롬프트</p>
+          <p>정리한 15,486건으로 계약 연도(2017~2020)별 거래금액 박스플롯을 나란히 그려 줘.</p>
+          <p>수염의 끝과 이상치를 어떤 기준으로 정했는지 밝히고,
+            연도별 최소·Q1·중앙값·Q3·최대를 표로 보여 줘.</p>
+          <p>해마다 무엇이 달라졌는지 설명해 줘.</p>
+        </div>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">그림에서 볼 것</p>
+        <ul class="defs">
+          <li><strong>중앙선:</strong> 해마다 올라가는가</li>
+          <li><strong>상자 폭:</strong> 넓어지는가, 좁아지는가</li>
+          <li><strong>위쪽 이상치:</strong> 고가 거래가 늘어나는가</li>
+        </ul>
+        <p class="sub t-red" style="margin:12px 0 4px">확인할 값 (만원)</p>
+        <table class="tbl-mth" id="t-boxyear" style="font-size:12.5px"><thead><tr>
+          <th style="width:auto">연도</th><th style="width:auto">Q1</th><th style="width:auto">중앙값</th><th style="width:auto">Q3</th></tr></thead><tbody></tbody></table>
+        <p class="caption" style="margin-top:6px">사분위수 계산법에 따라 Q1·Q3 가 조금 다르게 나올 수 있음.
+          어떤 방법을 썼는지 적으면 됨</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        document.querySelector('#t-boxyear tbody').innerHTML = SJ.box.map(([y, , , q1, md, q3]) =>
+          `<tr><td style="width:auto">${y}</td><td class="num" style="width:auto;text-align:right">${q1.toLocaleString()}</td>` +
+          `<td class="num" style="width:auto;text-align:right">${md.toLocaleString()}</td>` +
+          `<td class="num" style="width:auto;text-align:right">${q3.toLocaleString()}</td></tr>`).join('');
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 5 — 목적과 정의 (2026-10-19 상관계수를 함께 다룸) ══════ -->
+  <section class="s-definition">
+    <p class="mth">방법 5 / 7</p>
+    <h2>산점도와 상관계수: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">두 변수가 <span class="t-red">함께 움직이는지</span>를
+        그림(산점도)과 숫자(상관계수)로 보는 것</p>
+      <ul class="defs">
+        <li><strong>산점도:</strong> 두 변수를 가로·세로 축에 놓고 관측치 하나를 점 하나로 찍은 그림</li>
+        <li><strong>상관계수(피어슨 r):</strong> 두 변수의 직선 관계를 −1 에서 1 사이의 숫자 하나로 나타낸 것</li>
+        <li><strong>r 의 부호:</strong> + 이면 함께 늘고, − 이면 하나가 늘 때 다른 하나가 줆</li>
+        <li><strong>r 의 크기:</strong> ±1 에 가까울수록 점이 직선에 몰리고, 0 에 가까우면 직선 관계가 약함</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 2개</p>
+      <p class="conclusion">→ 그림으로 <strong>모양</strong>을 보고, 숫자로 <strong>직선 관계의 세기</strong>를 측정함</p>
+    </div>
+  </section>
+
+  <!-- ══ 17. 방법 5 — 어떻게 작동하나 ═════════════════════════ -->
+  <section>
+    <p class="mth">방법 5 / 7</p>
+    <h2>산점도와 상관계수: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <p class="formula-key" style="text-align:center;margin:0 0 4px">
+        $r = \dfrac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum (x_i - \bar{x})^2}\,\sqrt{\sum (y_i - \bar{y})^2}}$</p>
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 34%">
+        <ol class="steps">
+          <li><b>방향</b> — 오른쪽 위로 가나, 아래로 가나</li>
+          <li><b>세기</b> — 선 주위에 촘촘한가, 흩어졌나</li>
+          <li><b>모양</b> — 직선인가, 굽었나</li>
+          <li><b>동떨어진 점</b> — 혼자 멀리 있는 것이 있나</li>
+          <li><b>r 을 계산함</b> — 그림 아래 숫자가 각 모양의 r</li>
+        </ol>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-sc-how" viewBox="0 0 460 210" role="img">
+          <title>강한 양의 관계·약한 관계·굽은 관계 세 가지 산점도 모양 비교</title></svg>
+      </div>
+      </div>
+      <p class="conclusion" style="margin-top:4px">→ 상관계수 하나로 줄이기 전에 <strong>반드시 그림을 먼저 봄</strong>.
+        굽은 관계는 계수가 0 에 가깝게 나옴 (9주차에서 다시)</p>
+    </div>
+    <script>
+      (function () {
+        // 세 모양을 식으로 만든다. 난수를 쓰지 않는다 — 흔들림은 사인함수로 준다
+        const wob = (i, k) => Math.sin(i * k) * 1.0;
+        const sets = [
+          ['강한 양의 관계', (i) => [i, i + wob(i, 2.7) * 0.9]],
+          ['약한 관계',      (i) => [i, 5 + wob(i, 1.3) * 3.4 + wob(i, 4.1) * 1.6]],
+          ['굽은 관계',      (i) => [i, 9 - 0.36 * (i - 5) ** 2 + wob(i, 3.3) * 0.5]],
+        ];
+        const parts = [];
+        sets.forEach(([name, fn], k) => {
+          const box = { x0: 26 + k * 152, y0: 152, x1: 132 + k * 152, y1: 40 };
+          const F = Fig.withBox(box);
+          const S = F.scale({ x: [-0.5, 10.5], y: [-1, 11] });
+          parts.push(F.raw(`<path class="axis" d="M${box.x0},${box.y1 - 4} L${box.x0},${box.y0} L${box.x1 + 4},${box.y0}"/>`));
+          for (let i = 0; i <= 10; i += 0.5) {
+            const [x, y] = fn(i);
+            parts.push(F.raw(`<circle cx="${S.x(x)}" cy="${S.y(y)}" r="2.6"
+                                fill="var(--brand-crimson)" fill-opacity="0.55"/>`));
+          }
+          parts.push(F.annot((box.x0 + box.x1) / 2, box.y0 + 24, name, { anchor: 'middle', size: 12 }));
+          // 같은 점들에서 피어슨 r 을 계산해 이름 아래에 적는다
+          const P = []; for (let i = 0; i <= 10; i += 0.5) P.push(fn(i));
+          const mx = P.reduce((s, p) => s + p[0], 0) / P.length, my = P.reduce((s, p) => s + p[1], 0) / P.length;
+          const sxy = P.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0);
+          const sxx = P.reduce((s, p) => s + (p[0] - mx) ** 2, 0), syy = P.reduce((s, p) => s + (p[1] - my) ** 2, 0);
+          parts.push(F.annot((box.x0 + box.x1) / 2, box.y0 + 42, 'r = ' + (sxy / Math.sqrt(sxx * syy)).toFixed(2),
+                             { anchor: 'middle', size: 12, tone: 'red' }));
+        });
+        Fig.draw('#f-sc-how', { check: false, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 18. 방법 5 — 적용 사례 ═══════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 5 / 7</p>
+    <h2>산점도와 상관계수: 적용 사례</h2>
+    <div class="body">
+      <div class="col-l" style="flex:0 0 38%">
+        <p class="emph">전용면적 ↔ 거래금액 · 상관계수 <strong class="t-red">r = 0.206</strong></p>
+        <p>넓으면 비쌀 듯하나 점구름이 <strong>세로로 두껍게</strong> 퍼져 있음</p>
+        <p>같은 85㎡ 라도 <strong>2억대부터 10억대까지</strong> 있음</p>
+        <p class="conclusion">→ 면적만으로는 금액을 못 정함.
+          <strong>어느 동인지, 언제인지</strong>가 더 크게 작용함 (10주차 회귀에서 다시)</p>
+        <p class="src">r 은 15,486건 전체로 계산 · 그림은 51건마다 하나씩 뽑은 300건<br>
+          계산: analysis/07-기술적분석/07-세종군집.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-scatter" viewBox="0 0 470 290" style="width:420px" role="img">
+          <title>전용면적과 거래금액의 산점도. 같은 면적에서도 금액이 세로로 넓게 퍼져 있다</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 56, y0: 244, x1: 452, y1: 30 });
+        const S = F.scale({ x: [60, 200], y: [0, 18] });
+        const parts = SJ.samp.map(([a, m]) => F.raw(
+          `<circle cx="${S.x(Math.min(a, 200))}" cy="${S.y(m / 10000)}" r="2.6"
+             fill="var(--brand-crimson)" fill-opacity="0.42"/>`));
+        [0, 5, 10, 15].forEach((t) =>
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(t) + 4, String(t), { anchor: 'end', size: 11 })));
+        [60, 100, 140, 180].forEach((t) =>
+          parts.push(F.annot(S.x(t), F.BOX.y0 + 17, String(t), { anchor: 'middle', size: 11 })));
+        // 85㎡ 근방이 세로로 얼마나 퍼졌는지 짚는다
+        parts.push(F.raw(`<path d="M${S.x(85)},${F.BOX.y0} L${S.x(85)},${F.BOX.y1 + 10}"
+                            stroke="var(--ink-2)" stroke-width="1" stroke-dasharray="4 3"/>`));
+        parts.push(F.annot(S.x(85), F.BOX.y1 + 2, '85㎡', { anchor: 'middle', size: 11 }));
+        F.draw('#f-scatter', { axes: { x: '전용면적(㎡)', y: '거래금액(억원)' }, parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 6 — 목적과 정의 (2026-10-19 군집분석의 정의와 개념을 붙임) ═ -->
+  <section class="s-definition">
+    <p class="mth">방법 6 / 7</p>
+    <h2>K-means 군집분석: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define"><strong>군집분석</strong>은 대상을 비슷한 것끼리
+        <span class="t-red">몇 개의 그룹으로 묶는 일</span></p>
+      <p style="margin-bottom:6px">K-means 는 그 가운데 대상을 <strong>정해 둔 k 개의 그룹</strong>으로 나누는 방법</p>
+      <ul class="defs">
+        <li><strong>군집:</strong> 서로 가까운 대상끼리 묶인 그룹</li>
+        <li><strong>거리:</strong> 속성값의 차이로 측정한 두 대상 사이의 떨어진 정도 (보통 유클리드 거리)</li>
+        <li><strong>중심(centroid):</strong> 한 군집에 속한 대상들의 평균 위치</li>
+        <li><strong>k:</strong> 나눌 군집의 개수. 분석자가 정하며, 엘보우 기법·실루엣 계수로 고름</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 여럿 · 군집 개수 k</p>
+      <p class="conclusion">→ 맞힐 답이 없음. 자료 안의 <strong>유형</strong>을 스스로 찾음.
+        위치로 묶는 것은 7주차 DBSCAN 에서 다룸</p>
+    </div>
+  </section>
+
+  <!-- ══ 20. 방법 6 — 어떻게 작동하나 ═════════════════════════ -->
+  <section>
+    <p class="mth">방법 6 / 7</p>
+    <h2>K-means: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 36%">
+        <ol class="steps">
+          <li><b>표준화</b> — 단위가 다르면 큰 수가 거리를 독차지</li>
+          <li><b>중심 k 개</b>를 놓음</li>
+          <li><b>배정</b> — 각 점을 가장 가까운 중심에</li>
+          <li><b>갱신</b> — 중심을 그 묶음의 평균으로 옮김</li>
+          <li>움직이지 않을 때까지 <b>3·4 를 되풀이</b></li>
+        </ol>
+        <p class="conclusion" style="margin-top:8px">→ 시작 위치가 답을 바꿈.
+          이 강의 스크립트는 <strong>서로 가장 먼 점</strong>부터 골라 난수를 쓰지 않음</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-km-how" viewBox="0 0 460 250" role="img">
+          <title>중심을 놓고 배정하고 갱신하기를 되풀이해 군집이 자리를 잡는 세 단계</title></svg>
+        <p class="caption" style="text-align:center;margin-top:2px">배정 → 갱신 → 되풀이</p>
+      </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        // 아홉 점을 두 묶음으로. 중심이 옮겨 가는 것을 세 칸으로 보인다
+        const P = [[1, 8], [2, 9], [2.6, 7.4], [4.6, 4.6], [5, 5.4],
+                   [7.4, 2.6], [8, 2], [9, 1.4], [8.4, 3.4]];
+        const step = (c) => {
+          const lab = P.map((p) => (Math.hypot(p[0] - c[0][0], p[1] - c[0][1])
+                                  <= Math.hypot(p[0] - c[1][0], p[1] - c[1][1]) ? 0 : 1));
+          const nc = [0, 1].map((g) => {
+            const m = P.filter((_, i) => lab[i] === g);
+            return m.length ? [m.reduce((s, p) => s + p[0], 0) / m.length,
+                               m.reduce((s, p) => s + p[1], 0) / m.length] : c[g];
+          });
+          return { lab, nc };
+        };
+        let cen = [[2, 2], [7, 8]];          // 일부러 엉뚱한 자리에서 시작한다
+        const frames = [];
+        for (let t = 0; t < 3; t++) {
+          const { lab, nc } = step(cen);
+          frames.push({ cen: cen.map((c) => [...c]), lab });
+          cen = nc;
+        }
+        const COL = ['var(--brand-crimson)', 'var(--chart-blue)'];
+        const parts = [];
+        frames.forEach((fr, k) => {
+          const box = { x0: 22 + k * 152, y0: 190, x1: 138 + k * 152, y1: 40 };
+          const F = Fig.withBox(box);
+          const S = F.scale({ x: [0, 10], y: [0, 10] });
+          parts.push(F.raw(`<rect x="${box.x0 - 8}" y="${box.y1 - 8}"
+            width="${box.x1 - box.x0 + 16}" height="${box.y0 - box.y1 + 16}"
+            fill="none" stroke="var(--rule)" stroke-width="1"/>`));
+          P.forEach((p, i) => parts.push(F.raw(
+            `<circle cx="${S.x(p[0])}" cy="${S.y(p[1])}" r="3.4"
+               fill="${COL[fr.lab[i]]}" fill-opacity="0.55"/>`)));
+          fr.cen.forEach((c, g) => parts.push(F.raw(
+            `<path d="M${S.x(c[0]) - 6},${S.y(c[1])} L${S.x(c[0]) + 6},${S.y(c[1])}
+                      M${S.x(c[0])},${S.y(c[1]) - 6} L${S.x(c[0])},${S.y(c[1]) + 6}"
+               stroke="${COL[g]}" stroke-width="2.4"/>`)));
+          parts.push(F.annot((box.x0 + box.x1) / 2, box.y0 + 30, `${k + 1}회`,
+                             { anchor: 'middle', size: 12 }));
+        });
+        Fig.draw('#f-km-how', { check: false, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 6 — 군집 개수 k 를 정하는 법 (2026-10-19 추가) ═════════
+     WSS 는 SJ.elbow, 실루엣은 SJ.sil (analysis/07-기술적분석/07-세종군집-실루엣.csv) -->
+  <section>
+    <p class="mth">방법 6 / 7</p>
+    <h2>K-means: 군집 개수 k 를 정하는 법</h2>
+    <div class="body tight">
+      <div class="cols" style="align-items:flex-start">
+        <div class="col-l">
+          <p class="sub t-red" style="margin-bottom:2px">엘보우(팔꿈치) 기법</p>
+          <p>k 를 하나씩 늘리며 <strong>군집내 제곱합(WSS)</strong>을 구함.
+            줄어드는 폭이 갑자기 작아지는 <strong>꺾인 점</strong>의 k 를 고름</p>
+        </div>
+        <div class="col-r">
+          <p class="sub t-red" style="margin-bottom:2px">실루엣 계수</p>
+          <p>대상마다 자기 군집에 얼마나 잘 붙어 있는지를 −1~1 로 측정함.
+            평균이 <strong>가장 큰 k</strong> 를 고름</p>
+          <p class="formula-key" style="margin:2px 0 0;font-size:14px">$s = \dfrac{b - a}{\max(a,\,b)}$</p>
+          <p class="caption" style="margin:0">a: 자기 군집 안 평균거리 · b: 가장 가까운 다른 군집까지 평균거리</p>
+        </div>
+      </div>
+      <svg class="fig" id="f-kchoose" viewBox="0 0 860 196" style="width:830px;display:block;margin:4px 0 0" role="img">
+        <title>세종 17개 동에서 k 에 따른 군집내 제곱합이 k=3 에서 꺾이고, 평균 실루엣 계수가 k=3 에서 0.664 로 가장 큰 그림</title></svg>
+      <p class="conclusion" style="margin-top:2px">→ 세종 17개 동은 두 방법 모두 <strong>k = 3</strong>.
+        둘이 다르게 가리키면 군집을 해석해 보고 정함</p>
+    </div>
+    <script>
+      (function () {
+        const parts = [];
+        const panel = (x0, x1, data, ymax, kind, label) => {
+          const F = Fig.withBox({ x0, y0: 160, x1, y1: 30 });
+          const S = F.scale({ x: [0.5, 6.5], y: [0, ymax] });
+          parts.push(F.raw(`<path class="axis" d="M${x0},${24} L${x0},${160} L${x1 + 6},${160}"/>`));
+          parts.push(F.annot(x0, 16, label, { size: 11 }));
+          data.forEach(([k, v]) => {
+            const hot = k === 3;
+            if (kind === 'bar') {
+              parts.push(F.raw(`<rect x="${S.x(k) - 14}" y="${S.y(v)}" width="28" height="${160 - S.y(v)}"
+                 fill="${hot ? 'var(--brand-crimson)' : 'var(--muted)'}" fill-opacity="${hot ? 0.9 : 0.4}"/>`));
+            } else {
+              parts.push(F.raw(`<circle cx="${S.x(k)}" cy="${S.y(v)}" r="${hot ? 5 : 3.6}"
+                 fill="${hot ? 'var(--brand-crimson)' : 'var(--ink)'}"/>`));
+            }
+            parts.push(F.annot(S.x(k), S.y(v) - 8, v.toFixed(kind === 'bar' ? 3 : 1), { anchor: 'middle', size: 10.5, tone: hot ? 'red' : undefined }));
+            parts.push(F.annot(S.x(k), 176, 'k=' + k, { anchor: 'middle', size: 10.5 }));
+          });
+          if (kind === 'line') parts.push(F.raw(`<path d="M${data.map(([k, v]) => `${S.x(k)},${S.y(v)}`).join(' L')}"
+              fill="none" stroke="var(--ink)" stroke-width="1.6"/>`));
+        };
+        panel(40, 400, SJ.elbow, 38, 'line', '군집내 제곱합 (작을수록 촘촘함)');
+        panel(480, 840, SJ.sil, 0.8, 'bar', '평균 실루엣 계수 (클수록 잘 갈림)');
+        Fig.draw('#f-kchoose', { parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 21. 방법 6 — 적용 사례 ═══════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 6 / 7</p>
+    <h2>K-means: 적용 사례</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 40%">
+        <p class="emph">17개 동을 <strong>거래건수</strong>와
+          <strong>㎡당 중앙값</strong>으로 묶음</p>
+        <div id="k-clusters"></div>
+        <p class="conclusion" style="margin-top:8px">→ 군집 3 은 전부 「리」.
+          찾아낸 것은 유형이라기보다 <strong>신도시와 편입 읍면의 경계</strong>임</p>
+        <p class="src">k = 3 은 엘보우(34.0 → 19.2 → <b>4.4</b> → 3.4)와 실루엣(<b>0.664</b>, 최대)으로 골랐음<br>
+          계산: analysis/07-기술적분석/07-세종군집.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-km" viewBox="0 0 460 290" style="width:410px" role="img">
+          <title>세종 17개 동을 거래건수와 ㎡당 중앙값으로 그린 산점도. 세 군집이 색으로 갈린다</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const COL = ['var(--brand-crimson)', 'var(--chart-blue)', 'var(--accent-green)'];
+        const NAME = ['1 — 거래 많고 중간 가격', '2 — 거래 적고 높은 가격', '3 — 읍면 「리」'];
+        const box = document.getElementById('k-clusters');
+        box.innerHTML = [1, 2, 3].map((g) => {
+          const m = SJ.dong.filter((d) => d[3] === g);
+          const cnt = Math.round(m.reduce((s, d) => s + d[1], 0) / m.length);
+          const per = Math.round(m.reduce((s, d) => s + d[2], 0) / m.length);
+          return `<p style="margin:6px 0 0"><b style="color:${COL[g - 1]}">군집 ${NAME[g - 1]}</b>` +
+                 ` <span class="num">${m.length}</span>개 · 평균 ${cnt.toLocaleString()}건 · ${per}만원<br>` +
+                 `<span class="caption">${m.map((d) => d[0]).join(' · ')}</span></p>`;
+        }).join('');
+        const F = Fig.withBox({ x0: 56, y0: 244, x1: 442, y1: 30 });
+        const S = F.scale({ x: [0, 2800], y: [100, 850] });
+        const parts = [];
+        // 이름이 겹치는 짝은 번갈아 위아래로 벌린다 (design.md §6.8)
+        const DOWN = new Set(['어진동', '소담동', '남리', '고운동', '신흥리']);
+        SJ.dong.forEach(([name, n, per, g]) => {
+          parts.push(F.raw(`<circle cx="${S.x(n)}" cy="${S.y(per)}" r="5"
+                              fill="${COL[g - 1]}" fill-opacity="0.6"/>`));
+          parts.push(F.annot(S.x(n), S.y(per) + (DOWN.has(name) ? 19 : -10), name,
+                             { anchor: 'middle', size: 10 }));
+        });
+        [0, 1000, 2000].forEach((t) =>
+          parts.push(F.annot(S.x(t), F.BOX.y0 + 17, t.toLocaleString(), { anchor: 'middle', size: 11 })));
+        [200, 400, 600, 800].forEach((t) =>
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(t) + 4, String(t), { anchor: 'end', size: 11 })));
+        F.draw('#f-km', { axes: { x: '거래건수', y: '㎡당 중앙값(만원)' }, parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 방법 7 — 목적과 정의 (2026-10-19 개념마다 정의를 붙임) ══════ -->
+  <section class="s-definition">
+    <p class="mth">방법 7 / 7</p>
+    <h2>계층적 군집분석: 목적과 정의</h2>
+    <div class="body tight">
+      <p class="define">가장 가까운 둘을 <span class="t-red">차례로 합쳐 나가</span>
+        대상 전체를 하나의 나무로 묶는 군집분석</p>
+      <ul class="defs">
+        <li><strong>덴드로그램:</strong> 합쳐진 순서와 그때의 거리를 나무 모양으로 그린 그림</li>
+        <li><strong>연결법:</strong> 묶음과 묶음 사이의 거리를 측정하는 규칙. 최단·최장·평균연결</li>
+        <li><strong>자르는 높이:</strong> 덴드로그램을 가로로 자르는 거리. 자른 선과 만나는 가지 수가 군집 개수</li>
+      </ul>
+      <p class="need">필요한 자료: 연속변수 여럿. <strong>군집 개수를 미리 정하지 않아도 됨</strong></p>
+      <p class="conclusion">→ K-means 가 「어떤 묶음으로 나뉘나」라면
+        계층군집은 <strong>「어떤 순서로 가까운가」</strong>까지 보여 줌</p>
+    </div>
+  </section>
+
+  <!-- ══ 23. 방법 7 — 어떻게 작동하나 ═════════════════════════ -->
+  <section>
+    <p class="mth">방법 7 / 7</p>
+    <h2>계층적 군집분석: 어떻게 작동하나</h2>
+    <div class="body tight">
+      <div class="cols">
+      <div class="col-l" style="flex:0 0 40%">
+        <ol class="steps">
+          <li><b>각자 하나의 묶음</b>에서 시작함</li>
+          <li>모든 짝의 <b>거리를 측정해</b> 가장 가까운 둘을 합침</li>
+          <li>합친 묶음과 나머지의 <b>거리를 다시 측정함</b></li>
+          <li>하나가 남을 때까지 <b>되풀이</b>함</li>
+        </ol>
+        <p class="sub t-red" style="margin:12px 0 2px">묶음끼리의 거리를 어떻게 측정하나</p>
+        <p><strong>최단연결</strong> 가장 가까운 한 쌍 · <strong>최장연결</strong> 가장 먼 한 쌍 ·
+          <strong>평균연결</strong> 모든 쌍의 평균</p>
+        <p class="conclusion" style="margin-top:8px">→ 이 강의는 <strong>평균연결</strong></p>
+        <p class="conclusion">→ 사슬처럼 늘어지는 것과 이상치에 덜 흔들림</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-hc-how" viewBox="0 0 400 250" role="img">
+          <title>다섯 점이 가까운 순서대로 합쳐져 나무가 되는 과정</title></svg>
+      </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        // 다섯 잎. 합쳐지는 높이는 아래 merge 배열이 정한다
+        const leaf = ['a', 'b', 'c', 'd', 'e'];
+        const merge = [[0, 1, 0.9], [3, 4, 1.2], [2, -1, 2.0], [-2, -3, 3.4]];
+        const F = Fig.withBox({ x0: 54, y0: 206, x1: 372, y1: 36 });
+        const S = F.scale({ x: [-0.6, 4.6], y: [0, 4] });
+        const pos = {};
+        leaf.forEach((n, i) => { pos[i] = { x: S.x(i), y: F.BOX.y0 }; });
+        const parts = leaf.map((n, i) => F.annot(S.x(i), F.BOX.y0 + 18, n, { anchor: 'middle', size: 12 }));
+        merge.forEach(([a, b, h], k) => {
+          const A = a >= 0 ? pos[a] : pos['m' + (-a - 1)];
+          const B = b >= 0 ? pos[b] : pos['m' + (-b - 1)];
+          const y = S.y(h);
+          parts.push(F.raw(`<path d="M${A.x},${A.y} L${A.x},${y} L${B.x},${y} L${B.x},${B.y}"
+                              fill="none" stroke="var(--brand-crimson)" stroke-width="1.6"/>`));
+          pos['m' + k] = { x: (A.x + B.x) / 2, y };
+        });
+        [1, 2, 3].forEach((t) => {
+          parts.push(F.raw(`<path d="M${F.BOX.x0 - 4},${S.y(t)} L${F.BOX.x0},${S.y(t)}"
+                              stroke="var(--ink)" stroke-width="1"/>`));
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(t) + 4, String(t), { anchor: 'end', size: 11 }));
+        });
+        parts.push(F.raw(`<path d="M${F.BOX.x0},${F.BOX.y1 - 6} L${F.BOX.x0},${F.BOX.y0}"
+                            stroke="var(--ink)" stroke-width="1"/>`));
+        parts.push(F.annot(F.BOX.x0, F.BOX.y1 - 14, '합칠 때의 거리', { anchor: 'middle', size: 11 }));
+        parts.push(F.raw(`<path d="M${F.BOX.x0},${S.y(2.7)} L${F.BOX.x1},${S.y(2.7)}"
+                            stroke="var(--ink-2)" stroke-width="1" stroke-dasharray="5 4"/>`));
+        parts.push(F.annot(F.BOX.x1, S.y(2.7) - 8, '여기서 자르면 2묶음',
+                           { anchor: 'end', size: 11, tone: 'red' }));
+        Fig.draw('#f-hc-how', { check: false, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 24. 방법 7 — 적용 사례 ═══════════════════════════════ -->
+  <section class="s-split">
+    <p class="mth">방법 7 / 7</p>
+    <h2>계층적 군집분석: 적용 사례</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 34%">
+        <p class="emph">앞과 같은 17개 동, 같은 두 축</p>
+        <p class="emph">평균연결로 합쳐 나감</p>
+        <p>마지막 두 묶음이 <strong>거리 2.374</strong> 에서 합쳐짐. 그 앞이 크게 벌어져 있음</p>
+        <p class="conclusion">→ 거기서 자르면 <strong>세 덩어리</strong>.
+          K-means 가 k=3 으로 찾은 것과 같은 묶음임</p>
+        <p class="src">계산: analysis/07-기술적분석/07-세종군집.py</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-dendro" viewBox="0 0 520 300" style="width:470px" role="img">
+          <title>세종 17개 동의 덴드로그램. 거리 2.3 부근에서 자르면 세 덩어리가 된다</title></svg>
+      </div>
+    </div>
+    <script>
+      (function () {
+        /* SJ.merge 는 합쳐진 순서다. 각 줄의 「묶음A」는 그 묶음의 첫 동 이름이므로
+           이름으로 묶음을 따라가면 나무가 그대로 복원된다. */
+        const order = [];                       // 잎을 왼쪽부터 늘어놓을 순서
+        const group = {};                       // 대표이름 → 잎 목록
+        SJ.dong.forEach((d) => { group[d[0]] = [d[0]]; });
+        SJ.merge.forEach(([a, b]) => { group[a] = group[a].concat(group[b]); delete group[b]; });
+        const leaves = Object.values(group)[0];
+        leaves.forEach((n) => order.push(n));
+        const X = {}; order.forEach((n, i) => { X[n] = i; });
+        const maxD = SJ.merge[SJ.merge.length - 1][4];
+        const F = Fig.withBox({ x0: 58, y0: 228, x1: 508, y1: 34 });
+        const S = F.scale({ x: [-0.6, order.length - 0.4], y: [0, maxD * 1.06] });
+        const COL = {}; SJ.dong.forEach((d) => { COL[d[0]] = d[3]; });
+        const C = ['var(--brand-crimson)', 'var(--chart-blue)', 'var(--accent-green)'];
+        const parts = [];
+        order.forEach((n) => parts.push(F.raw(
+          `<text class="tick" x="${S.x(X[n])}" y="${F.BOX.y0 + 16}" text-anchor="end" font-size="10"
+             transform="rotate(-58 ${S.x(X[n])} ${F.BOX.y0 + 16})" fill="${C[COL[n] - 1]}">${n}</text>`)));
+        const node = {};  order.forEach((n) => { node[n] = { x: S.x(X[n]), y: F.BOX.y0 }; });
+        SJ.merge.forEach(([a, b, , , d]) => {
+          const A = node[a], B = node[b], y = S.y(d);
+          parts.push(F.raw(`<path d="M${A.x},${A.y} L${A.x},${y} L${B.x},${y} L${B.x},${B.y}"
+                              fill="none" stroke="var(--ink-2)" stroke-width="1.3"/>`));
+          node[a] = { x: (A.x + B.x) / 2, y };
+        });
+        [0.5, 1, 1.5, 2].forEach((t) =>
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(t) + 4, t.toFixed(1), { anchor: 'end', size: 11 })));
+        parts.push(F.raw(`<path d="M${F.BOX.x0},${F.BOX.y1 - 6} L${F.BOX.x0},${F.BOX.y0}"
+                            stroke="var(--ink)" stroke-width="1"/>`));
+        parts.push(F.annot(F.BOX.x0, F.BOX.y1 - 14, '합칠 때의 거리', { anchor: 'middle', size: 11 }));
+        parts.push(F.raw(`<path d="M${F.BOX.x0},${S.y(2.0)} L${F.BOX.x1},${S.y(2.0)}"
+                            stroke="var(--brand-crimson)" stroke-width="1.4" stroke-dasharray="5 4"/>`));
+        parts.push(F.annot(F.BOX.x0 + 8, S.y(2.0) - 8, '여기서 자르면 3묶음',
+                           { anchor: 'start', size: 11, tone: 'red' }));
+        F.draw('#f-dendro', { parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 함께 해 보기 1 — 2020년 단지별 군집: 프롬프트 (2026-10-19 추가) ══
+     결과는 analysis/07-기술적분석/07-세종단지군집.py 가 만든다. 로직은 -로직.md 「실루엣과 단지별 군집」 -->
+  <section class="s-split">
+    <p class="mth">함께 해 보기</p>
+    <h2>함께 해 보기: 2020년 아파트 단지를 군집으로 묶는다</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 52%">
+        <div class="prompt-box" style="margin-top:0">
+          <p class="who">프롬프트</p>
+          <p>정리한 자료에서 2020년 계약분만 골라 줘.</p>
+          <p>단지(동 + 단지명)마다 거래건수, ㎡당 가격의 중앙값, 건축년도를 구하고,
+            2020년 거래가 10건 이상인 단지만 남겨 줘.</p>
+          <p>세 변수를 표준화한 뒤 K-means 로 군집해 줘.
+            k 를 2부터 7까지 바꾸며 군집내 제곱합과 평균 실루엣 계수를 구하고, k 를 고른 이유를 말해 줘.</p>
+          <p>군집마다 단지 수, 세 변수의 평균, 대표 단지 이름을 표로 보여 줘.
+            건축년도와 ㎡당 가격의 산점도에 군집을 색으로 표시해 줘.</p>
+        </div>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">프롬프트에 담은 판단</p>
+        <ul class="defs">
+          <li><strong>2020년만:</strong> 한 해로 묶어야 가격이 시점에 끌려가지 않음</li>
+          <li><strong>동 + 단지명:</strong> 같은 이름의 단지가 다른 동에 있을 수 있음</li>
+          <li><strong>10건 이상:</strong> 거래가 적은 단지의 중앙값은 우연에 흔들림</li>
+          <li><strong>표준화:</strong> 거래건수·가격·연도는 단위가 모두 다름</li>
+        </ul>
+        <p class="conclusion" style="margin-top:10px">→ 답을 받기 전에 <strong>군집이 몇 개로,
+          무엇끼리 나뉠지</strong> 먼저 예상해 적어 둠</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 함께 해 보기 2 — 결과와 해석 (2026-10-19 추가) ══════════════
+     SJ.danji · SJ.danjiK 는 07-세종단지군집-결과.csv · -k선택.csv 의 값 -->
+  <section class="s-split">
+    <p class="mth">함께 해 보기</p>
+    <h2>함께 해 보기: 결과를 함께 해석한다</h2>
+    <div class="body tight">
+      <div class="col-l" style="flex:0 0 44%">
+        <p class="emph" id="k-danji-lead"></p>
+        <div id="k-danji"></div>
+        <ul class="defs" style="margin-top:10px">
+          <li><strong>k:</strong> 실루엣이 k=3 (0.593) 과 k=2 (0.586) 에서 거의 같음. 무엇으로 고르나</li>
+          <li><strong>군집 2:</strong> ㎡당 538만원(아름동)과 230만원(신안리) 단지가 한 묶음. 무엇이 묶었나</li>
+        </ul>
+        <p class="conclusion" style="margin-top:4px">→ <strong>넣은 변수가 군집을 정함</strong>. 거래건수를 빼고 다시 돌려 봄</p>
+      </div>
+      <div class="col-r">
+        <svg class="fig" id="f-danji" viewBox="0 0 470 300" style="width:420px" role="img">
+          <title>2020년 세종 아파트 106개 단지를 건축년도와 ㎡당 중앙값으로 그린 산점도. 신도시 새 단지, 거래가 많은 대단지, 읍면의 오래된 단지 세 군집이 색으로 갈리고 점 크기는 거래건수다</title></svg>
+        <p class="src" style="text-align:right">계산: analysis/07-기술적분석/07-세종단지군집.py</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        const COL = ['var(--brand-crimson)', 'var(--chart-blue)', 'var(--accent-green)'];
+        const NAME = ['신도시의 새 단지', '거래가 아주 많은 단지', '읍면의 오래된 단지'];
+        const D = SJ.danji;
+        document.getElementById('k-danji-lead').innerHTML =
+          `2020년 거래 10건 이상인 <span class="num">${D.length}</span>개 단지 · k = 3`;
+        const mean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+        document.getElementById('k-danji').innerHTML = [1, 2, 3].map((g) => {
+          const m = D.filter((d) => d[5] === g);
+          return `<p style="margin:5px 0 0"><b style="color:${COL[g - 1]}">군집 ${g}: ${NAME[g - 1]}</b> ` +
+            `<span class="num">${m.length}</span>개<br><span class="caption">㎡당 ${Math.round(mean(m.map((d) => d[3])))}만원 · ` +
+            `건축 ${Math.round(mean(m.map((d) => d[4])))}년 · 거래 ${mean(m.map((d) => d[2])).toFixed(1)}건</span></p>`;
+        }).join('');
+        const F = Fig.withBox({ x0: 56, y0: 250, x1: 452, y1: 26 });
+        const S = F.scale({ x: [1988, 2020], y: [100, 1200] });
+        const parts = [];
+        D.forEach(([, , n, per, built, g]) => parts.push(F.raw(
+          `<circle cx="${S.x(built)}" cy="${S.y(per)}" r="${2.2 + Math.sqrt(n) * 0.38}"
+             fill="${COL[g - 1]}" fill-opacity="0.45" stroke="${COL[g - 1]}" stroke-width="0.8"/>`)));
+        [1990, 2000, 2010, 2020].forEach((t) =>
+          parts.push(F.annot(S.x(t), F.BOX.y0 + 17, String(t), { anchor: 'middle', size: 11 })));
+        [200, 400, 600, 800, 1000, 1200].forEach((t) =>
+          parts.push(F.annot(F.BOX.x0 - 8, S.y(t) + 4, String(t), { anchor: 'end', size: 11 })));
+        parts.push(F.annot(F.BOX.x1, F.BOX.y1 + 4, '점 크기: 2020년 거래건수', { anchor: 'end', size: 10.5 }));
+        F.draw('#f-danji', { axes: { x: '건축년도', y: '㎡당 중앙값(만원)' }, parts, check: false });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 선택 순서도 (2026-10-19 군집 갈래를 다시 정리) ═════════════════
+     두 군집분석 모두 개수를 몰라도 쓸 수 있다. K-means 는 엘보우·실루엣으로 k 를 고르고
+     계층군집은 덴드로그램을 자르는 높이로 정한다. 그래서 갈림은 「개수를 아나」가 아니라
+     「대상이 많아 묶음만 필요한가, 대상 사이의 순서·위계를 볼 것인가」로 둔다. -->
+  <section>
+    <h2>어떤 조건에서 무엇을 고르나</h2>
+    <div class="body tight">
+      <svg class="fig" id="f-choose" viewBox="0 0 900 300" style="width:740px" role="img"
+           aria-label="변수 개수로 갈라져 일곱 방법 중 하나에 이르는 선택 순서도">
+        <title>변수가 몇 개인가로 시작해 일곱 방법 중 하나를 고르는 순서도. 여럿이면 대상이 많아 묶음만 필요할 때 K-means, 대상 사이의 순서와 위계를 볼 때 계층군집</title></svg>
+      <p style="margin:2px 0 2px"><strong>두 군집분석 모두 개수를 몰라도 됨:</strong>
+        K-means 는 엘보우·실루엣으로 k 를 고르고, 계층군집은 덴드로그램을 자르는 높이로 정함</p>
+      <p style="margin:0 0 2px"><strong>K-means:</strong> 대상이 많아도 빠름 · 결과는 묶음 하나 ·
+        시작 위치에 따라 답이 달라질 수 있음</p>
+      <p style="margin:0"><strong>계층군집:</strong> 대상 사이의 순서와 위계가 보임 ·
+        한 번 합친 것은 되돌리지 않음 · 대상이 많으면 계산과 그림이 무거움</p>
+    </div>
+    <script>
+      (function () {
+        /* 세 갈래를 세로로 나눠 화살표가 상자를 가로지르지 않게 한다.
+           끝단(방법)은 왼쪽에 크림슨 띠를 둔 밝은 상자다 — 흰 글자를 피한다. */
+        const IK = 'var(--ink-2)', CR = 'var(--brand-crimson)';
+        const parts = [Fig.raw(`<defs><marker id="ah-ch" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,1 L10,5 L0,9" fill="none" stroke="${IK}" stroke-width="1.6"/></marker></defs>`)];
+        const ask = (x, y, w, t) => {
+          parts.push(Fig.raw(`<rect x="${x}" y="${y}" width="${w}" height="38"
+                                fill="#F4F1EC" stroke="var(--rule)" stroke-width="1"/>`));
+          parts.push(Fig.annot(x + w / 2, y + 24, t, { anchor: 'middle', size: 13 }));
+        };
+        const leaf = (x, y, w, t) => {
+          parts.push(Fig.raw(`<rect x="${x}" y="${y}" width="${w}" height="34"
+                                fill="#FBF6F7" stroke="var(--rule)" stroke-width="1"/>`));
+          parts.push(Fig.raw(`<rect x="${x}" y="${y}" width="4" height="34" fill="${CR}"/>`));
+          parts.push(Fig.annot(x + 14, y + 22, t, { anchor: 'start', size: 13, tone: 'red' }));
+        };
+        const arrow = (x1, y1, x2, y2, label, lx, ly) => {
+          parts.push(Fig.raw(`<path d="M${x1},${y1} L${x2},${y2}" fill="none" stroke="${IK}"
+                                stroke-width="1.3" marker-end="url(#ah-ch)"/>`));
+          if (label) parts.push(Fig.annot(lx ?? (x1 + x2) / 2, ly ?? (y1 + y2) / 2 - 7, label,
+                                          { anchor: 'middle', size: 11, tone: 'red' }));
+        };
+        ask(16, 122, 138, '변수가 몇 개인가');
+
+        // 하나 — 위 두 줄
+        ask(232, 14, 122, '분포를 볼까');
+        ask(232, 74, 122, '요약할까');
+        leaf(410, 4, 168, '1 히스토그램');
+        leaf(410, 44, 168, '4 박스플롯');
+        leaf(410, 88, 168, '2 대표값');
+        leaf(410, 128, 168, '3 산포');
+        arrow(154, 132, 228, 40, '하나', 178, 74);
+        arrow(354, 26, 406, 20);
+        arrow(354, 40, 406, 60);
+        arrow(354, 86, 406, 104);
+        arrow(354, 100, 406, 142);
+
+        // 둘 — 가운데 한 줄
+        leaf(410, 168, 220, '5 산점도와 상관계수');
+        arrow(154, 145, 406, 184, '둘', 268, 156);
+
+        // 여럿 — 아래 한 줄
+        ask(232, 224, 190, '무엇이 필요한가');
+        arrow(154, 156, 228, 240, '여럿', 176, 214);
+        leaf(686, 202, 152, '6 K-means');
+        leaf(686, 254, 152, '7 계층군집');
+        arrow(422, 236, 682, 216, '대상이 많고 묶음만', 552, 221);
+        arrow(422, 248, 682, 268, '대상 사이의 순서·위계', 552, 278);
+        Fig.draw('#f-choose', { check: false, parts });
+      })();
+    </script>
+  </section>
+
+  <!-- ══ 과제 (2026-10-19 실습 ①·② 를 과제로 옮김) ══════════════════ -->
+  <section class="s-split">
+    <h2>과제: 일곱 방법을 조사하고 자기 데이터에 적용한다</h2>
+    <div class="body tight">
+      <div class="col-l">
+        <p class="sub t-red" style="margin-bottom:4px">1. 일곱 방법을 모두 조사한다</p>
+        <p style="margin-bottom:4px">방법마다 AI 에게 묻고 확인해 세 가지를 정리함</p>
+        <ul class="defs">
+          <li><strong>쓰는 경우:</strong> 어떤 목적과 자료에서 쓰나</li>
+          <li><strong>다른 방법과의 차이:</strong> 같은 목적의 다른 방법과 무엇이 다른가</li>
+          <li><strong>장점과 단점:</strong> 무엇을 잘 보여 주고 무엇을 놓치나</li>
+        </ul>
+      </div>
+      <div class="col-r">
+        <p class="sub t-red" style="margin-bottom:4px">2. 자기 데이터에 적용해 보고서로 정리한다</p>
+        <ol class="steps" style="margin-top:4px">
+          <li><b>목적을 한 문장으로 적음:</b> 무엇을 알고 싶은가</li>
+          <li><b>방법을 고르고 이유를 적음:</b> 순서도의 어느 갈림을 탔나</li>
+          <li><b>적용하고 결과를 봄:</b> AI 에게 로직을 요구하고 사람이 검증함</li>
+          <li><b>판단을 남김:</b> 무엇을 걸러 냈고 무엇을 정했나</li>
+        </ol>
+        <p class="caption" style="margin-top:4px">본보기: 배포 자료의 「분석 프롬프트.md」와 「로직 문서 본보기.md」</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 제출 (2026-10-19 · 4주차 「제출물」 장과 같은 방식) ═══════════ -->
+  <section>
+    <h2>제출물</h2>
+    <div class="body tight">
+      <p class="sub">두 과제를 <span class="hl">각각 별도 파일로</span> 낸다</p>
+      <ul>
+        <li><span class="code">방법조사.md</span>: 1번의 조사내용: 쓰는 경우, 다른 방법과의 차이, 장점과 단점</li>
+        <li><span class="code">분석보고서.md</span>: 2번의 자기 데이터에 적용한 결과</li>
+      </ul>
+      <p class="emph" style="margin-top:14px">제출기한:
+        <span class="t-red">10월 31일(토) 23시 59분 59초</span></p>
+      <div class="doc" style="margin-top:10px">
+        <div class="bar">데이터사이언스 과제 제출 — 한 학기 내내 같은 주소</div>
+        <pre style="font-size:13px;line-height:1.9"><span class="h">docs.google.com/forms/d/e/1FAIpQLSc7AWYdgrGn1gKGoo7VkC6vsDZNXANo-CWokVjY2dm2pucIew/viewform</span></pre>
+      </div>
+      <p class="caption" style="margin-top:8px">
+        2주차와 같은 주소다. 주차 선택에서 <span class="hl">6주차</span>를 고르고,
+        학번 열 자리와 이름을 띄어쓰기 없이 적는다.</p>
+    </div>
+  </section>
+
+  <!-- ══ 마무리 ═══════════════════════════════════════════════ -->
+  <section class="s-closing">
+    <p class="qa">Q &amp; A</p>
+    <div class="qa-rule"></div>
+    <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+      <span class="en">kyusang.kwon@chungbuk.ac.kr</span></p>
+  </section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
