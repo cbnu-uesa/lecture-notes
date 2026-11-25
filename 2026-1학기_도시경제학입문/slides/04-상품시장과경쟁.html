@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4강. 상품시장과 경쟁</title>
+
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reset.css">
+<link rel="stylesheet" href="../../_shared/vendor/reveal/reveal.css">
+<link rel="stylesheet" href="../../_shared/theme/tokens.css">
+<link rel="stylesheet" href="../../_shared/theme/cbnu.css">
+<link rel="stylesheet" href="../../_shared/theme/components.css">
+<link rel="stylesheet" href="../../_shared/theme/print.css">
+
+<script src="../../_shared/js/charts.js"></script>
+
+<style>
+  .fig-side { width: 470px; }
+  .fig-solo { width: 560px; }
+  .fig-half { width: 430px; }
+
+  /* 지면 테마의 본문 영역(134~500)은 이전보다 74px 짧다. 넘치는 그림만 줄인다. */
+  .rv-row > #r-ic, .rv-row > #r-dem,
+  .rv-row > #r-iq, .rv-row > #r-tc, .rv-row > #r-mc { width: 205px; }
+  .rv-row #r-eq { width: 218px; }
+  .s-pair #f-pdA, .s-pair #f-pdB { width: 400px; }
+</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<!-- ══ 1. 표지 (p.2) ════════════════════════════════════════ -->
+<section class="s-cover">
+  <img class="cover-logo" src="../../_shared/img/cbnu-logo.jpg" alt="충북대학교">
+  <p class="cover-label" data-course-label>&nbsp;</p>
+  <h1>4강. 상품시장과 경쟁</h1>
+  <p class="cover-date" data-course-date>&nbsp;</p>
+</section>
+
+<!-- ══ 2. 지난 강의 리뷰 (p.1) ══════════════════════════════
+     원본은 3강 그래프를 캡처해 붙였다. 같은 배치를 유지하되 벡터로 다시 그린다. -->
+<section class="s-review">
+  <h2>지난 강의 리뷰</h2>
+  <div class="body">
+    <p class="rv-title" style="margin-left:64px">〈개인의 수요곡선 도출〉</p>
+    <div class="rv-row">
+      <svg class="fig" id="r-ic" viewBox="0 0 260 198" role="img">
+        <title>예산선이 회전하며 최적점 F1·F2·F3 이 오른쪽으로 이동하는 그림</title></svg>
+      <svg class="fig" id="r-dem" viewBox="0 0 260 198" role="img">
+        <title>가격에 따른 쌀 수요량 G1·G2·G3 를 이은 수요곡선</title></svg>
+      <svg class="rv-ar" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M4,20 L28,20" stroke="var(--ink-2)" stroke-width="7" marker-end="url(#rvah)"/></svg>
+      <div>
+        <p class="rv-title t-red" style="text-align:center">〈시장수요와 시장공급의 균형〉</p>
+        <svg class="fig" id="r-eq" viewBox="0 0 280 190" role="img">
+          <title>시장수요곡선과 시장공급곡선이 만나는 균형점</title></svg>
+      </div>
+    </div>
+
+    <p class="rv-title" style="margin-left:64px;margin-top:4px">〈개별 기업의 공급곡선 도출〉</p>
+    <div class="rv-row">
+      <svg class="fig" id="r-iq" viewBox="0 0 270 198" role="img">
+        <title>등량곡선과 등비용선이 접하는 F1·F2</title></svg>
+      <svg class="fig" id="r-tc" viewBox="0 0 270 198" role="img">
+        <title>총비용·가변비용·고정비용 곡선</title></svg>
+      <svg class="fig" id="r-mc" viewBox="0 0 270 198" role="img">
+        <title>한계비용곡선과 평균비용곡선</title></svg>
+      <svg class="rv-ar" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20,36 L20,10" stroke="var(--ink-2)" stroke-width="7" marker-end="url(#rvah)"/></svg>
+    </div>
+
+    <svg width="0" height="0" aria-hidden="true"><defs>
+      <marker id="rvah" viewBox="0 0 10 10" refY="5" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="11"
+        orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ink-2)"/></marker>
+    </defs></svg>
+  </div>
+  <script>
+    (function () {
+      // ① 예산선이 회전하며 최적점이 옮겨간다 (3강 소비자 최적선택)
+      const A = Fig.withBox({ x0: 34, y0: 152, x1: 232, y1: 30 });
+      const S1 = A.scale({ x: [0, 78], y: [0, 30] });
+      A.draw('#r-ic', {
+        axes: { x: '쌀(kg)', y: '옷(벌)' },
+        parts: [
+          ...[[50], [66.7], [84]].map(([xi]) => A.curve(S1.curve([[0, 25], [xi, 0]]), { variant: 'budget' })),
+          ...[[312.5, 13, 25], [416.7, 17, 33.3], [525, 21, 42]].map(([k, lo, th]) =>
+            A.curve(S1.curve(Fig.hyper(k, lo, 76, { through: [th] })))),
+          A.guide(...S1.p([25, 12.5]),  { xtick: '26', only: 'x' }),
+          A.guide(...S1.p([33.3, 12.5]), { xtick: '35', only: 'x' }),
+          A.guide(...S1.p([42, 12.5]),  { xtick: '43', only: 'x' }),
+          A.dot(...S1.p([25, 12.5]),   { r: 3.2, label: 'F1', lx: -17, ly: 10 }),
+          A.dot(...S1.p([33.3, 12.5]), { r: 3.2, label: 'F2', lx: -3, ly: -7 }),
+          A.dot(...S1.p([42, 12.5]),   { r: 3.2, label: 'F3', lx: 5, ly: -7 }),
+          A.annot(A.BOX.x0 - 6, S1.y(25) + 4, '25', { anchor: 'end', size: 10 }),
+        ],
+      });
+
+      // ② 거기서 얻은 개인의 수요곡선
+      const B = Fig.withBox({ x0: 44, y0: 152, x1: 234, y1: 30 });
+      const S2 = B.scale({ x: [0, 56], y: [0, 1.7] });
+      B.draw('#r-dem', {
+        axes: { x: '쌀 수요량(kg)', y: '쌀가격\n(만원)' },
+        parts: [
+          B.curve(S2.curve(Fig.hyper(31.25, 19, 54, { through: [25, 31.25, 41.7] })), { variant: 'i3' }),
+          B.guide(...S2.p([25, 1.25]),   { xtick: '26', ytick: '1.25' }),
+          B.guide(...S2.p([31.25, 1]),   { xtick: '35', ytick: '1' }),
+          B.guide(...S2.p([41.7, 0.75]), { xtick: '43', ytick: '0.75' }),
+          B.dot(...S2.p([25, 1.25]),   { r: 3.2, label: 'G1', lx: 5, ly: -5 }),
+          B.dot(...S2.p([31.25, 1]),   { r: 3.2, label: 'G2', lx: 5, ly: -5 }),
+          B.dot(...S2.p([41.7, 0.75]), { r: 3.2, label: 'G3', lx: 5, ly: -5 }),
+          B.annot(S2.x(48), S2.y(0.5), '수요곡선', { size: 10 }),
+        ],
+      });
+
+      // ③ 시장수요와 시장공급의 균형
+      const C = Fig.withBox({ x0: 48, y0: 152, x1: 240, y1: 26 });
+      const S3 = C.scale({ x: [0, 10], y: [0, 10] });
+      C.draw('#r-eq', {
+        axes: { x: 'Q', y: 'P' },
+        parts: [
+          C.curve(S3.curve([[1, 8.6], [9, 1.4]]), { variant: 'demand' }),
+          C.curve(S3.curve([[1, 1.4], [9, 8.6]]), { variant: 'supply' }),
+          C.raw(`<path class="guide" d="M${C.BOX.x0},${S3.y(6.6)} L${S3.x(8.6)},${S3.y(6.6)}"/>`),
+          C.raw(`<path class="guide" d="M${C.BOX.x0},${S3.y(3.4)} L${S3.x(8.6)},${S3.y(3.4)}"/>`),
+          C.guide(...S3.p([5, 5]), { ytick: '균형가격', xtick: '균형거래량' }),
+          C.dot(...S3.p([5, 5]), { r: 3.2, label: 'E: 균형점', lx: 7, ly: 13 }),
+          C.arrow(S3.x(3.6), S3.y(6.6), S3.x(6.4), S3.y(6.6), { tone: 'blue' }),
+          C.arrow(S3.x(6.4), S3.y(3.4), S3.x(3.6), S3.y(3.4), { tone: 'blue' }),
+          C.annot(S3.x(5), S3.y(7.3), '초과공급', { anchor: 'middle', size: 10, tone: 'red' }),
+          C.annot(S3.x(5), S3.y(2.2), '초과수요', { anchor: 'middle', size: 10, tone: 'blue' }),
+          C.annot(S3.x(9.2), S3.y(8.8), 'S', { size: 11 }),
+          C.annot(S3.x(9.2), S3.y(1.2), 'D', { size: 11 }),
+        ],
+      });
+
+      // ④ 등량곡선과 등비용선 — 비용극소화 (3강)
+      const E = Fig.withBox({ x0: 42, y0: 152, x1: 244, y1: 26 });
+      const S4 = E.scale({ x: [0, 520], y: [0, 340] });
+      E.draw('#r-iq', {
+        axes: { x: 'L', y: 'K' },
+        parts: [
+          ...[[100, 150], [200, 300], [300, 450]].map(([k, l]) =>
+            E.curve(S4.curve([[0, k], [l, 0]]), { variant: 'i3' })),
+          E.curve(S4.curve(Fig.hyper(15000, 50, 500, { through: [150] }))),
+          E.curve(S4.curve(Fig.hyper(30000, 92, 505, { through: [240] }))),
+          E.guide(...S4.p([150, 100]), { xtick: 'L*', ytick: 'K*' }),
+          E.dot(...S4.p([150, 100]), { r: 3.2, label: 'F1', lx: -6, ly: -8 }),
+          E.dot(...S4.p([240, 125]), { r: 3.2, label: 'F2', lx: -3, ly: -8 }),
+          E.annot(S4.x(300), S4.y(26), 'Q = 500', { size: 10 }),
+          E.annot(S4.x(360), S4.y(96), 'Q = 800', { size: 10 }),
+        ],
+      });
+
+      // ⑤ 총비용·가변비용·고정비용
+      const G = Fig.withBox({ x0: 46, y0: 152, x1: 246, y1: 26 });
+      const S5 = G.scale({ x: [0, 10.4], y: [0, 1250] });
+      const TC = [[0,300],[1,360],[2,410],[3,450],[4,500],[5,570],[6,660],[7,780],[8,930],[9,1130]];
+      G.draw('#r-tc', {
+        axes: { x: '쌀생산량', y: '비용\n(만원)' },
+        parts: [
+          G.curve(S5.curve(TC), { variant: 'i1' }),
+          G.curve(S5.curve(TC.map(([q, c]) => [q, c - 300])), { variant: 'i3' }),
+          G.curve(S5.curve([[0, 300], [9.9, 300]]), { variant: 'supply' }),
+          G.guide(...S5.p([0, 300]), { ytick: '300', only: 'y' }),
+          G.annot(S5.x(5.4), S5.y(1190), '총비용곡선', { size: 9 }),
+          G.annot(S5.x(6.6), S5.y(870), '가변비용곡선', { size: 9 }),
+          G.annot(S5.x(6.2), S5.y(360), '고정비용곡선', { size: 9 }),
+        ],
+      });
+
+      // ⑥ 한계비용곡선과 평균비용곡선
+      const H = Fig.withBox({ x0: 46, y0: 152, x1: 246, y1: 26 });
+      const S6 = H.scale({ x: [0, 8.4], y: [0, 400] });
+      H.draw('#r-mc', {
+        axes: { x: '쌀 생산량(kg)', y: '비용\n(만원)' },
+        parts: [
+          H.curve(S6.curve([[1, 360], [2, 205], [3, 150], [4, 125], [5, 114], [6, 110], [7, 118], [7.8, 140]]),
+                  { variant: 'i1' }),
+          H.curve(S6.curve([[0.5, 70], [1, 60], [2, 50], [3, 40], [4, 50], [5, 70], [6, 110], [7, 180], [7.6, 240]]),
+                  { variant: 'demand' }),
+          H.guide(...S6.p([2, 50]),  { xtick: '2', only: 'x' }),
+          H.guide(...S6.p([3, 40]),  { xtick: '3', only: 'x' }),
+          H.guide(...S6.p([6, 110]), { xtick: '6', only: 'x' }),
+          H.dot(...S6.p([3, 40]),  { r: 3.2 }),
+          H.dot(...S6.p([6, 110]), { r: 3.2 }),
+          H.annot(S6.x(4.6), S6.y(318), '한계비용곡선', { size: 9 }),
+          H.annot(S6.x(6.4), S6.y(56), '평균비용곡선', { size: 9 }),
+        ],
+      });
+    })();
+  </script>
+</section>
+
+<!-- ══ 3. 시장의 종류 (p.3) ═════════════════════════════════ -->
+<section>
+  <h2>시장의 종류</h2>
+  <div class="body">
+    <p class="emph" style="margin-bottom:10px">전제조건: 구매자의 수는 충분히 큼</p>
+    <table class="tbl-market">
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>독점<br><span class="en">(monopoly)</span></th>
+          <th>과점<br><span class="en">(oligopoly)</span></th>
+          <th>독점경쟁<br><span class="en">(monopolistic competition)</span></th>
+          <th>완전경쟁<br><span class="en">(perfect competition)</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>시장 안의 기업 수</td><td>1</td><td>소수</td><td>다수</td><td>다수</td></tr>
+        <tr><td>가격에 대한 통제력</td><td>있음</td><td>있음</td><td>약간 있음</td><td>없음</td></tr>
+        <tr><td>상품의 동질성</td><td>–</td><td>동질적 혹은 차별화</td><td>차별화</td><td>동질적</td></tr>
+        <tr><td>진입장벽</td><td>매우 높음</td><td>상당히 높음</td><td>거의 없음</td><td>없음</td></tr>
+        <tr><td>비가격경쟁의 존재<br>(상품의 질, 서비스, 광고 등)</td><td>–</td><td>있음</td><td>있음</td><td>없음</td></tr>
+      </tbody>
+    </table>
+    <p class="derive t-red" style="margin-top:14px">→ 시장별 기업의 “이윤극대화(MR=MC)” 생산량은?</p>
+  </div>
+</section>
+
+<!-- ══ 4. 완전경쟁시장 (p.4) ════════════════════════════════ -->
+<section class="s-numbered">
+  <h2>완전경쟁시장 <span class="en">(perfect competition market)</span></h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:0">〈완전경쟁시장의 조건〉</p>
+    <ol>
+      <li>다수의 판매자와 구매자 (price-taker)</li>
+      <li>동질적 상품</li>
+      <li>진입장벽 X</li>
+      <li>완전한 정보공유</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 5. 완전경쟁시장에서 기업의 단기 이윤극대화 (p.5) ═════ -->
+<section>
+  <h2>완전경쟁시장에서 기업의 단기 이윤극대화</h2>
+  <div class="body">
+    <p class="lead t-define" style="font-size:var(--fs-emph);margin-bottom:2px">
+      완전경쟁시장에서 개별기업이 직면하는 수요곡선은 수평선 (price-taker)</p>
+    <svg class="fig" id="f-pc" viewBox="0 0 620 348" style="width:660px;margin:0 0 0 110px" role="img">
+      <title>가격이 주어진 개별기업의 이윤극대화 생산량과 이윤 영역</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 62, y0: 294, x1: 440, y1: 26 });
+        const S = F.scale({ x: [0, 10], y: [0, 260] });
+        const MC = S.curve([[1, 66], [2, 50], [3, 44], [4, 56], [5, 82], [6, 122], [6.8, 168], [7.4, 210]]);
+        const AC = S.curve([[1.7, 172], [2, 150], [3, 116], [4, 100], [5, 96], [6, 104], [7, 122], [8.6, 160]]);
+        const P = S.y(180);
+        const C = Fig.at(MC, { y: P });
+        const B = Fig.at(AC, { x: C[0] });
+        F.draw('#f-pc', {
+          axes: { x: 'Q', y: 'P' },
+          parts: [
+            F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${P} ${C[0]},${P} ${C[0]},${B[1]} ${F.BOX.x0},${B[1]}"/>`),
+            F.curve(AC, { variant: 'i2' }),
+            F.curve(MC),
+            F.line(F.BOX.x0, P, 470, P, { variant: 'cap' }),
+            F.raw(`<path class="guide" d="M${C[0]},${P} L${C[0]},${F.BOX.y0}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${B[1]} L${C[0]},${B[1]}"/>`),
+            F.dot(C[0], C[1], { label: 'C', lx: -4, ly: -12 }),
+            F.dot(B[0], B[1], { label: 'B', lx: 4, ly: 16 }),
+            F.annot(F.BOX.x0 - 8, P + 4, 'P*', { anchor: 'end', size: 14, tone: 'red' }),
+            F.annot(F.BOX.x0 - 8, B[1] + 4, 'A', { anchor: 'end', size: 14 }),
+            F.annot(C[0], F.BOX.y0 + 18, 'Q*', { anchor: 'middle', size: 14, tone: 'red' }),
+            F.labelIn([[F.BOX.x0, P], [C[0], P], [C[0], B[1]], [F.BOX.x0, B[1]]], '이윤', { size: 14 }),
+            F.annot(S.x(5.2), S.y(248), '한계비용곡선 (MC)', { size: 13 }),
+            F.annot(S.x(8.2), S.y(226), '평균비용곡선 (AC)', { size: 13 }),
+            F.annot(478, P + 5, '수요곡선(D)\n= 한계수입곡선', { size: 13, lh: 16 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 6~8. 생산중단 판단 세 경우 (p.6, 7, 8) ═══════════════
+     세 슬라이드가 같은 틀(MC·AC·AVC)에 가격선 높이만 다르다. 함수 하나로 그린다. -->
+<script>
+  window.pcShutdown = function (sel, price, marks) {
+    // TC = 40 + q³ − 6q² + 20q 에서 곧바로 뽑는다.
+    // 이렇게 해야 MC 가 AVC 최저점(q=3)과 AC 최저점(q≈4.15)을 정확히 지난다 —
+    // 손으로 점을 찍으면 이 관계가 깨져 "생산중단점" 설명이 그림과 어긋난다.
+    const mcF  = (q) => 3 * q * q - 18 * q + 32;
+    const avcF = (q) => q * q - 9 * q + 32;
+    const acF  = (q) => 40 / q + q * q - 9 * q + 32;
+    const qOf  = (p) => 3 + Math.sqrt((p - 5) / 3);      // MC 의 우상향 가지
+    const F = Fig.withBox({ x0: 62, y0: 274, x1: 400, y1: 26 });
+    const S = F.scale({ x: [0, 7.6], y: [0, 55] });
+    const samp = (f) => {
+      const a = [];
+      for (let q = 1.4; q <= 6.5001; q += 0.12) a.push([q, f(q)]);
+      return S.curve(a);
+    };
+    const MC = samp(mcF), AC = samp(acF), AVC = samp(avcF);
+
+    const q = qOf(price);
+    const Px = S.y(price), Qx = S.x(q);
+    const yAC = S.y(acF(q)), yAVC = S.y(avcF(q));
+    const parts = [
+      F.curve(AC,  { variant: 'i2' }),
+      F.curve(AVC, { variant: 'supply' }),
+      F.curve(MC),
+      F.line(F.BOX.x0, Px, 452, Px, { variant: 'cap' }),
+      F.raw(`<path class="guide" d="M${Qx},${Math.min(Px, yAC) - 6} L${Qx},${F.BOX.y0}"/>`),
+      F.annot(Qx, F.BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14, tone: 'red' }),
+      F.annot(S.x(4.6), S.y(52), '한계비용곡선 (MC)', { size: 13 }),
+      F.annot(S.x(6.8), S.y(47), '평균비용곡선 (AC)', { size: 13 }),
+      F.annot(S.x(6.8), S.y(39), '평균가변비용곡선 (AVC)', { size: 13 }),
+      F.annot(460, Px + 5, '수요곡선(D)\n= 한계수입곡선', { size: 13, lh: 16 }),
+    ];
+    if (marks === false) {
+      // 고정비용을 회수할 수 있으면 생산중단점은 P = AC 최저점 하나뿐이다 (원본 p.8)
+      parts.push(
+        F.dot(Qx, Px, { label: 'K', lx: -4, ly: -12 }),
+        F.annot(F.BOX.x0 - 8, Px + 5, 'P*', { anchor: 'end', size: 14, tone: 'red' }));
+    } else {
+      parts.push(
+        F.raw(`<path class="guide" d="M${F.BOX.x0},${yAC} L${Qx},${yAC}"/>`),
+        F.raw(`<path class="guide" d="M${F.BOX.x0},${yAVC} L${Qx},${yAVC}"/>`),
+        F.dot(Qx, yAC,  { label: 'K', lx: -6, ly: -10 }),
+        F.dot(Qx, Px,   { label: 'J', lx: 8,  ly: 5 }),
+        F.dot(Qx, yAVC, { label: 'I', lx: 8,  ly: 13 }),
+        F.annot(F.BOX.x0 - 8, yAC + 5,  'F',  { anchor: 'end', size: 14 }),
+        F.annot(F.BOX.x0 - 8, Px + 5,   'P*', { anchor: 'end', size: 14, tone: 'red' }),
+        F.annot(F.BOX.x0 - 8, yAVC + 5, 'H',  { anchor: 'end', size: 14 }));
+    }
+    F.draw(sel, { axes: { x: 'Q', y: 'P' }, parts });
+  };
+</script>
+
+<section class="s-split wide-fig">
+  <h2>완전경쟁시장에서 시장가격이 평균비용곡선보다 낮을 경우</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:4px">가정: 고정비용은 모두 매몰비용</p>
+      <ol class="tight">
+        <li>생산중단 시의 손실: FC = TC – VC</li>
+        <li>생산계속 시의 손실: TC – TR</li>
+      </ol>
+      <p class="shutdown">생산중단점<br>
+        &nbsp;= TC – TR 〉 TC – VC<br>
+        &nbsp;= VC 〉 TR<br>
+        &nbsp;= AVC 〉 AR = P</p>
+      <p class="sub t-red" style="margin-top:26px">생산지속이 유리한 경우</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-sd1" viewBox="0 0 560 320" style="width:540px" role="img">
+        <title>가격이 평균비용보다 낮지만 평균가변비용보다는 높아 생산을 계속하는 경우</title></svg>
+      <script>pcShutdown('#f-sd1', 15);</script>
+    </div>
+  </div>
+</section>
+
+<section class="s-split wide-fig">
+  <h2>완전경쟁시장에서 기업의 단기 이윤극대화</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:4px">가정: 고정비용은 모두 매몰비용</p>
+      <ol class="tight">
+        <li>생산중단 시의 손실: FC = TC – VC</li>
+        <li>생산계속 시의 손실: TC – TR</li>
+      </ol>
+      <p class="shutdown">생산중단점<br>
+        &nbsp;= TC – TR 〉 TC – VC<br>
+        &nbsp;= VC 〉 TR<br>
+        &nbsp;= AVC 〉 AR = P</p>
+      <p class="sub t-red" style="margin-top:26px">생산중단이 유리한 경우</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-sd2" viewBox="0 0 560 320" style="width:540px" role="img">
+        <title>가격이 평균가변비용보다도 낮아 생산을 중단하는 것이 유리한 경우</title></svg>
+      <script>pcShutdown('#f-sd2', 7);</script>
+    </div>
+  </div>
+</section>
+
+<section class="s-split wide-fig">
+  <h2>완전경쟁시장에서 기업의 단기 이윤극대화</h2>
+  <div class="body">
+    <div class="col-l">
+      <p class="sub t-red" style="margin-bottom:4px">고정비용이 모두 회수가능할 경우</p>
+      <ol class="tight">
+        <li>생산중단 시의 손실: 0</li>
+        <li>생산계속 시의 손실: TC – TR</li>
+      </ol>
+      <p class="shutdown">생산중단점<br>
+        &nbsp;= TC – TR 〉 0<br>
+        &nbsp;= TC 〉 TR</p>
+    </div>
+    <div class="col-r">
+      <svg class="fig" id="f-sd3" viewBox="0 0 560 320" style="width:540px" role="img">
+        <title>고정비용을 회수할 수 있을 때의 생산중단점 K</title></svg>
+      <script>pcShutdown('#f-sd3', 19.93, false);</script>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 9. 기업과 산업의 단기공급곡선 (p.9) ═════════════════ -->
+<section>
+  <h2>기업과 산업의 단기공급곡선</h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-emph);line-height:1.5;margin-bottom:6px">
+      시장가격이 개별기업 평균가변비용 곡선 아래일 경우 생산 0<br>
+      시장가격이 개별기업 평균가변비용 곡선 위일 경우 생산 시작<br>
+      따라서 개별기업의 공급곡선 = 개별기업의 평균가변비용 위의 한계비용곡선</p>
+    <svg class="fig" id="f-ssup" viewBox="0 0 660 300" style="width:640px;margin:0 0 0 140px" role="img">
+      <title>개별기업의 공급곡선 Sa·Sb·Sc 를 수평으로 더한 시장공급곡선 SM</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 60, y0: 250, x1: 520, y1: 24 });
+        const S = F.scale({ x: [0, 17], y: [0, 12] });
+        // 개별기업의 공급곡선 = 평균가변비용 위의 한계비용곡선. 그 역함수를 쓰면
+        // 규모만 다른 세 기업을 만들 수 있고, 시장공급은 가격마다 수량을 더하면 된다.
+        const q = (p) => 3 + Math.sqrt((p - 5) / 3);
+        const k = [1, 1.18, 1.4];
+        const mk = (f) => {
+          const a = [];
+          for (let p = 5; p <= 11.0001; p += 0.25) a.push([f(p), p]);
+          return S.curve(a);
+        };
+        const S1 = mk((p) => k[0] * q(p));
+        const S2 = mk((p) => k[1] * q(p));
+        const S3 = mk((p) => k[2] * q(p));
+        const SM = mk((p) => (k[0] + k[1] + k[2]) * q(p));
+        const P = 8;
+        F.draw('#f-ssup', {
+          axes: { x: 'Q', y: 'P' },
+          parts: [
+            F.curve(S1), F.curve(S2, { variant: 'i2' }), F.curve(S3, { variant: 'supply' }),
+            F.curve(SM, { variant: 'supply' }),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${S.y(P)} L${S.x((k[0] + k[1] + k[2]) * q(P))},${S.y(P)}"/>`),
+            F.raw(`<path class="guide" d="M${S.x(k[0] * q(P))},${S.y(P)} L${S.x(k[0] * q(P))},${F.BOX.y0}"/>`),
+            F.dot(...S.p([k[0] * q(P), P])),
+            F.annot(S.x(k[0] * q(P)), F.BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14, tone: 'red' }),
+            F.annot(S.x(4.0), S.y(11.6), 'Sa', { size: 13, anchor: 'middle' }),
+            F.annot(S.x(5.3), S.y(11.2), 'Sb', { size: 13, anchor: 'middle' }),
+            F.annot(S.x(6.6), S.y(11.6), 'Sc', { size: 13, anchor: 'middle' }),
+            F.annot(S.x(15.9), S.y(11.4), 'SM', { size: 13 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 10~11. 산업의 단기·장기 균형 (p.10, 11) ══════════════
+     좌: 시장 전체, 우: 그 가격을 받아들이는 개별기업. 두 그림의 P* 높이가 같아야
+     "시장이 정한 가격을 기업이 받는다"는 뜻이 보인다. -->
+<script>
+  window.pcMarket = function (selM, selF, opt) {
+    // 두 그림의 BOX·scale 이 같으므로, 시장 균형의 픽셀 y 를 그대로
+    // 개별기업 그림의 가격선 높이로 쓰면 좌우가 어긋날 수 없다.
+    const BOX = { x0: 56, y0: 244, x1: 300, y1: 26 };
+    const M = Fig.withBox(BOX), Ff = Fig.withBox(BOX);
+    const S = M.scale({ x: [0, 10], y: [0, 10] });
+
+    const D  = S.curve([[0.6, 9], [9.4, 1.6]]);
+    const S0 = S.curve([[0.6, 1.2], [9.4, 8.6]]);          // 진입 전 시장공급
+
+    const AC = S.curve([[1.6, 6.0], [2.4, 4.6], [3.4, 3.7], [4.4, 3.35], [5.2, 3.4],
+                        [6.2, 3.9], [7.4, 5.1], [8.6, 6.6]]);
+    const MC = S.curve([[1.4, 3.0], [2.4, 2.1], [3.4, 1.8], [4.4, 2.4], [5.4, 3.8],
+                        [6.2, 5.6], [6.8, 7.6]]);
+
+    let Sup = S0, E;
+    if (opt.entry) {
+      // 장기: 이윤이 0이 될 때까지 진입이 이어진다 = 가격이 AC 최저까지 내려간다.
+      // 그 가격에서 수요와 만나도록 공급곡선을 평행이동한다.
+      const yMin = Math.max(...AC.map((p) => p[1]));       // 픽셀 y 가 클수록 비용이 낮다
+      const want = Fig.at(D, { y: yMin });
+      Sup = Fig.shift(S0, want[0] - Fig.at(S0, { y: yMin })[0], 0);
+      E = [want[0], yMin];
+    } else {
+      E = Fig.cross(D, S0);
+    }
+    const P = E[1];
+
+    M.draw(selM, {
+      axes: { x: 'Q', y: 'P' },
+      parts: [
+        opt.entry ? M.curve(S0, { variant: 'supply', dash: '7 6' }) : '',
+        M.curve(D, { variant: 'demand' }),
+        M.curve(Sup, { variant: 'supply' }),
+        M.guide(E[0], P, { xtick: 'QM*', ytick: 'P*' }),
+        M.dot(E[0], P, { label: 'E', lx: -4, ly: -12, free: true }),
+        M.annot(S.x(6.2), S.y(9.4), '시장공급곡선', { size: 13 }),
+        M.annot(S.x(6.4), S.y(1.0), '시장수요곡선', { size: 13 }),
+        opt.entry ? M.annot(S.x(0.9), S.y(4.6), '신규기업\n진입', { size: 12, lh: 15 }) : '',
+      ],
+    });
+
+    const C = Fig.at(MC, { y: P });
+    const B = Fig.at(AC, { x: C[0] });
+    const box = [[BOX.x0, P], [C[0], P], [C[0], B[1]], [BOX.x0, B[1]]];
+    Ff.draw(selF, {
+      axes: { x: 'Q', y: 'P' },
+      parts: [
+        opt.profit ? Ff.raw(`<polygon class="area-surplus" points="${box.map((q) => q.join(',')).join(' ')}"/>`) : '',
+        opt.entry ? Ff.line(BOX.x0, Fig.cross(D, S0)[1], 322, Fig.cross(D, S0)[1], { variant: 'cap', dash: '6 5' }) : '',
+        Ff.curve(AC, { variant: 'i2' }),
+        Ff.curve(MC),
+        Ff.line(BOX.x0, P, 322, P, { variant: 'cap' }),
+        Ff.raw(`<path class="guide" d="M${C[0]},${P} L${C[0]},${BOX.y0}"/>`),
+        opt.profit ? Ff.raw(`<path class="guide" d="M${BOX.x0},${B[1]} L${C[0]},${B[1]}"/>`) : '',
+        Ff.dot(C[0], C[1], { label: 'C', lx: -4, ly: -12 }),
+        opt.profit ? Ff.dot(B[0], B[1], { label: 'B', lx: 4, ly: 15 }) : '',
+        opt.profit ? Ff.annot(BOX.x0 - 8, B[1] + 5, 'A', { anchor: 'end', size: 13 }) : '',
+        opt.profit ? Ff.labelIn(box, '이윤', { size: 13 })
+                   : Ff.annot(C[0] + 10, P + 17, '이윤 = 0', { size: 13 }),
+        Ff.annot(C[0], BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14, tone: 'red' }),
+        Ff.annot(S.x(4.2), S.y(9.6), opt.mc, { size: 13 }),
+        Ff.annot(S.x(6.6), S.y(8.6), opt.ac, { size: 13 }),
+        Ff.annot(330, P + 5, '수요곡선(D)\n= 한계수입곡선', { size: 12, lh: 15 }),
+      ],
+    });
+  };
+</script>
+
+<section class="s-pair">
+  <h2>완전경쟁시장에서 산업의 단기균형</h2>
+  <div class="body">
+    <div class="pair-cell">
+      <p class="pair-title">1) 시장균형</p>
+      <svg class="fig" id="f-se-m" viewBox="0 0 340 270" role="img">
+        <title>시장수요와 시장공급이 만나 가격 P* 가 정해지는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title">2) 개별기업의 이윤극대화</p>
+      <svg class="fig" id="f-se-f" viewBox="0 0 470 270" role="img">
+        <title>주어진 P* 에서 개별기업이 이윤을 얻는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    pcMarket('#f-se-m', '#f-se-f', { profit: true,
+      mc: '단기한계비용곡선 (SMC)', ac: '단기평균비용곡선 (SAC)' });
+  </script>
+</section>
+
+<section class="s-pair">
+  <h2>완전경쟁시장에서 산업의 장기균형</h2>
+  <div class="body">
+    <div class="pair-cell">
+      <p class="pair-title">1) 시장균형</p>
+      <svg class="fig" id="f-le-m" viewBox="0 0 340 270" role="img">
+        <title>신규기업 진입으로 시장공급곡선이 오른쪽으로 이동해 가격이 내려간 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title">2) 개별기업의 이윤극대화</p>
+      <svg class="fig" id="f-le-f" viewBox="0 0 470 270" role="img">
+        <title>가격이 장기평균비용의 최저점과 같아져 이윤이 0이 된 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    pcMarket('#f-le-m', '#f-le-f', { entry: true,
+      mc: '장기한계비용곡선 (LMC)', ac: '장기평균비용곡선 (LAC)' });
+  </script>
+</section>
+
+<!-- ══ 12. 장기균형의 의미 (p.12) ═══════════════════════════ -->
+<section>
+  <h2>완전경쟁시장에서 장기균형의 의미</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:22px">시장 안의 모든 기업들이 이윤극대화를 추구하면서도<br>
+      0의 이윤만을 얻고 있어 더 이상 진입과 이탈이 나지 않는 상태</p>
+    <ul style="margin:0 0 34px">
+      <li style="margin-bottom:8px">이윤극대화: P = LMC</li>
+      <li style="margin-bottom:8px">이윤이 0: P = LAC</li>
+      <li>수요량과 공급량이 서로 동일</li>
+    </ul>
+    <p class="sub" style="color:var(--ink);margin-bottom:8px">* 0의 이윤의 의미</p>
+    <p style="margin-bottom:6px">경제적 이윤 = 총수익 − 총회계비용 − 총기회비용</p>
+    <p>총기회비용 = 투하된 자본의 정상이윤 = 경제 내 자본의 평균수익률에 따른 수익 = 채권 이자에 따른 수익</p>
+  </div>
+</section>
+
+<!-- ══ 13. 완전경쟁시장의 함의 (p.13) ═══════════════════════ -->
+<section>
+  <h2>완전경쟁시장의 함의</h2>
+  <div class="body stack">
+    <p class="lead t-define" style="margin-bottom:44px">자원의 효율적 배분이 가능:<br>가격(P) = 한계편익(MB) = 한계비용(MC)</p>
+    <p class="lead t-define">자원의 공평한 분배가 어려움: 반드시 이상적인 형태는 아님</p>
+  </div>
+</section>
+
+<!-- ══ 14. 불완전경쟁의 이유 (p.14) ═════════════════════════ -->
+<section class="s-numbered">
+  <h2>불완전경쟁의 이유</h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:0">진입장벽의 존재 때문</p>
+    <ol>
+      <li>규모의 경제: 시장크기에 비해 최소효율규모(AC의 최저점)가 큰 경우</li>
+      <li>정부정책: 특허권 및 전매권</li>
+      <li>경쟁전략: 광고, 상품차별화, 부당염매, 유휴시설</li>
+      <li>정보부족 및 비대칭성</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 15. 독점시장 (p.15) ══════════════════════════════════ -->
+<section class="s-numbered">
+  <h2>독점시장 <span class="en">(monopoly market)</span></h2>
+  <div class="body">
+    <p class="sub t-red" style="margin-bottom:0">〈독점시장의 조건〉</p>
+    <ol>
+      <li>단 하나의 공급자</li>
+      <li>대체재가 존재하지 않음</li>
+      <li>완전한 진입장벽</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 16. 독점시장의 균형 (p.16 + p.17) ════════════════════
+     원본은 두 장이지만 뒷장이 이윤 사각형만 더한 것이라 fragment 로 합친다. -->
+<section>
+  <h2>독점시장의 균형 = 독점기업의 이윤극대화</h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-emph);margin-bottom:0">
+      독점시장에서 독점기업이 직면하는 수요곡선은 시장수요곡선이므로 우하향</p>
+    <p class="caption" style="margin-bottom:4px">(개별 기업의 생산비용에 따라 공급하므로 공급곡선은 존재 X)</p>
+    <p class="mono-note">완전경쟁시장: P = MC<br>독점시장: P 〉 MC</p>
+    <svg class="fig" id="f-mono" viewBox="0 0 600 330" style="width:580px;margin:0 0 0 190px" role="img">
+      <title>한계수입과 한계비용이 만나는 생산량에서 수요곡선이 정하는 독점가격</title>
+    </svg>
+    <script>
+      (function () {
+        const F = Fig.withBox({ x0: 58, y0: 282, x1: 440, y1: 26 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        // 수요 P = 9.4 − 0.62Q, 한계수입 MR = 9.4 − 1.24Q
+        const D  = S.curve([[0.4, 9.15], [9.6, 3.45]]);
+        const MR = S.curve([[0.4, 8.9], [7.4, 0.22]]);
+        const MC = S.curve([[1.2, 2.6], [2.2, 1.85], [3.2, 1.7], [4.2, 2.3], [5.2, 3.6], [6.0, 5.2], [6.6, 7.0]]);
+        const AC = S.curve([[1.4, 5.2], [2.2, 4.3], [3.2, 3.7], [4.2, 3.55], [5.2, 3.8], [6.4, 4.5], [8.0, 5.9], [9.2, 7.0]]);
+        const Q = Fig.cross(MC, MR);                 // MR = MC 인 생산량
+        const E = Fig.at(D,  { x: Q[0] });           // 그 수량에서 수요곡선이 정하는 가격
+        const B = Fig.at(AC, { x: Q[0] });
+        const box = [[F.BOX.x0, E[1]], [Q[0], E[1]], [Q[0], B[1]], [F.BOX.x0, B[1]]];
+        F.draw('#f-mono', {
+          axes: { x: 'Q', y: 'P' },
+          parts: [
+            F.raw(`<polygon class="area-surplus fragment" points="${box.map((q) => q.join(',')).join(' ')}"/>`),
+            F.curve(D, { variant: 'cap' }),
+            F.curve(MR, { variant: 'i3' }),
+            F.curve(AC, { variant: 'i2' }),
+            F.curve(MC),
+            F.raw(`<path class="guide" d="M${Q[0]},${E[1]} L${Q[0]},${F.BOX.y0}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${E[1]} L${Q[0]},${E[1]}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${B[1]} L${Q[0]},${B[1]}"/>`),
+            F.dot(...E, { label: 'E', lx: -4, ly: -12 }),
+            F.dot(...B, { label: 'B', lx: -4, ly: -11 }),
+            F.dot(...Q, { label: 'C', lx: -4, ly: 17 }),
+            F.annot(F.BOX.x0 - 8, E[1] + 5, 'Pm', { anchor: 'end', size: 14, tone: 'red' }),
+            F.annot(F.BOX.x0 - 8, B[1] + 5, 'A', { anchor: 'end', size: 14 }),
+            F.annot(Q[0], F.BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14 }),
+            F.labelIn(box, '(장기) 이윤', { size: 13, fragment: true }),
+            F.annot(S.x(4.8), S.y(9.7), '한계비용곡선 (MC)', { size: 13 }),
+            F.annot(S.x(7.6), S.y(8.6), '평균비용곡선 (AC)', { size: 13 }),
+            F.annot(S.x(8.6), S.y(2.6), '수요곡선(D)', { size: 13 }),
+            F.annot(S.x(6.4), S.y(0.5), '한계수입곡선(MR)', { size: 13 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 17. 독점의 경제적 효과 (p.18) ════════════════════════ -->
+<section>
+  <h2>독점의 경제적 효과</h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-emph);margin-bottom:2px">
+      완전경쟁시장에 비해 독점시장에서 생산량은 더 낮고 (Qm 〈 Qc), 가격은 더 높게 책정 (Pm 〉 Pc)</p>
+    <svg class="fig" id="f-dwl" viewBox="0 0 730 330" style="width:730px;margin:0 0 0 92px" role="img">
+      <title>독점생산량과 경쟁생산량 사이에 생기는 후생손실 삼각형</title>
+    </svg>
+    <script>
+      (function () {
+        // 왼쪽에 "(독점가격) Pm" 같은 긴 눈금이 붙으므로 플롯을 오른쪽으로 밀어 자리를 낸다
+        const F = Fig.withBox({ x0: 148, y0: 282, x1: 520, y1: 26 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        const D  = S.curve([[0.4, 9.15], [9.6, 3.45]]);
+        const MR = S.curve([[0.4, 8.9], [7.4, 0.22]]);
+        const MC = S.curve([[1.2, 2.6], [2.2, 1.85], [3.2, 1.7], [4.2, 2.3], [5.2, 3.6], [6.0, 5.2], [6.6, 7.0]]);
+        const B  = Fig.cross(MC, MR);                // MR = MC → 독점 생산량 Qm
+        const E  = Fig.at(D,  { x: B[0] });          // 그 수량의 수요가격 = 독점가격 Pm
+        const Fc = Fig.cross(MC, D);                 // 공급 = 수요 → 완전경쟁 균형
+        const A  = [B[0], Fc[1]];                    // 경쟁가격 Pc 높이의 독점생산량
+        F.draw('#f-dwl', {
+          axes: { x: 'Q', y: 'P' },
+          parts: [
+            F.raw(`<polygon class="area-surplus" points="${F.BOX.x0},${E[1]} ${B[0]},${E[1]} ${B[0]},${Fc[1]} ${F.BOX.x0},${Fc[1]}"/>`),
+            F.raw(`<polygon class="area-dwl" points="${E[0]},${E[1]} ${B[0]},${B[1]} ${Fc[0]},${Fc[1]}"/>`),
+            F.curve(D, { variant: 'cap' }),
+            F.curve(MR, { variant: 'i3' }),
+            F.curve(MC),
+            F.raw(`<path class="guide" d="M${B[0]},${E[1]} L${B[0]},${F.BOX.y0}"/>`),
+            F.raw(`<path class="guide" d="M${Fc[0]},${Fc[1]} L${Fc[0]},${F.BOX.y0}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${E[1]} L${B[0]},${E[1]}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${Fc[1]} L${Fc[0]},${Fc[1]}"/>`),
+            F.dot(...E, { label: 'E', lx: -4, ly: -11 }),
+            F.dot(...A, { label: 'A', lx: -14, ly: 13, free: true }),
+            F.dot(...B, { label: 'B', lx: -4, ly: 18 }),
+            F.dot(...Fc, { label: 'F', lx: 7, ly: -6 }),
+            F.annot(F.BOX.x0 - 8, E[1] + 5, '(독점가격) Pm', { anchor: 'end', size: 13, tone: 'red' }),
+            F.annot(F.BOX.x0 - 8, Fc[1] + 5, '(경쟁가격) Pc', { anchor: 'end', size: 13, tone: 'red' }),
+            F.annot(B[0], F.BOX.y0 + 20, 'Qm', { anchor: 'middle', size: 13 }),
+            F.annot(Fc[0], F.BOX.y0 + 20, 'Qc', { anchor: 'middle', size: 13 }),
+            F.annot(S.x(5.6), S.y(9.4), '공급곡선\n(한계비용곡선 (MC))', { size: 13, lh: 16 }),
+            F.annot(S.x(8.6), S.y(2.6), '수요곡선(D)', { size: 13 }),
+            F.annot(S.x(6.4), S.y(0.5), '한계수입곡선(MR)', { size: 13 }),
+            F.annot(S.x(6.7), S.y(6.9), 'EBF = 후생삼각형\n= 후생손실(deadweight loss)', { size: 13, tone: 'red', lh: 17 }),
+            F.annot(S.x(6.7), S.y(5.5), 'EAF = 소비자잉여의 증가\nABF = 생산자잉여의 증가', { size: 11, lh: 14 }),
+            F.annot(S.x(0.2), 44, 'PmPcEA: 소비자잉여가\n독점이윤으로 바뀌는 부분', { size: 11, lh: 14 }),
+          ],
+        });
+      })();
+    </script>
+  </div>
+</section>
+
+<!-- ══ 18. 독점에 대한 정부정책 (p.19) ══════════════════════ -->
+<section class="s-numbered">
+  <h2>독점에 대한 정부정책</h2>
+  <div class="body">
+    <ol>
+      <li>국유화</li>
+      <li>가격규제</li>
+      <li>경쟁촉진정책: 전기산업, 철도산업, 통신산업 등</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 19. 독점기업의 가격차별화 (p.20) ═════════════════════ -->
+<section class="s-pair">
+  <h2>독점기업의 가격차별화</h2>
+  <p class="pd-lead sub t-red">가능조건: 소비자를 특성에 따라 두 개 이상의 다른 집단으로 구분할 수 있을 경우</p>
+  <p class="pd-sub caption">(예. 영화관, 놀이공원의 대인 / 소인 가격 차이)</p>
+  <div class="body" style="margin-top:44px">
+    <div class="pair-cell">
+      <p class="pair-title" style="text-align:center;font-weight:700">A시장</p>
+      <p class="pd-note">높은 가격을 지불할 용의가 있는 집단<br>= 가격탄력성이 낮은 집단</p>
+      <svg class="fig" id="f-pdA" viewBox="0 0 420 260" role="img">
+        <title>탄력성이 낮은 A시장에서 더 높은 가격 PA 가 매겨지는 그림</title></svg>
+    </div>
+    <div class="pair-cell">
+      <p class="pair-title" style="text-align:center;font-weight:700">B시장</p>
+      <p class="pd-note">높은 가격을 지불할 용의가 없는 집단<br>= 가격탄력성이 높은 집단</p>
+      <svg class="fig" id="f-pdB" viewBox="0 0 420 260" role="img">
+        <title>탄력성이 높은 B시장에서 더 낮은 가격 PB 가 매겨지는 그림</title></svg>
+    </div>
+  </div>
+  <script>
+    (function () {
+      // 같은 한계비용(수평선) 아래에서 수요의 기울기만 다르면 가격이 갈린다
+      const draw = (sel, d0, d1, label, price, side) => {
+        const F = Fig.withBox({ x0: 50, y0: 216, x1: 360, y1: 24 });
+        const S = F.scale({ x: [0, 10], y: [0, 10] });
+        // 수요 P = a − bQ 이면 한계수입은 P = a − 2bQ. 절편은 같고 기울기가 두 배다.
+        const x0 = 0.3, x1 = 9.6, b = (d0 - d1) / (x1 - x0);
+        const D  = S.curve([[x0, d0], [x1, d1]]);
+        const MR = S.curve([[x0, d0], [x0 + (d0 - 0.4) / (2 * b), 0.4]]);
+        const mc = 3.2;
+        const Q  = Fig.at(MR, { y: S.y(mc) });
+        const E  = Fig.at(D,  { x: Q[0] });
+        F.draw(sel, {
+          axes: { x: 'Q', y: 'P' },
+          parts: [
+            F.curve(D, { variant: 'cap' }),
+            F.curve(MR, { variant: 'i3' }),
+            F.line(F.BOX.x0, S.y(mc), S.x(9.2), S.y(mc), { variant: 'supply' }),
+            F.raw(`<path class="guide" d="M${Q[0]},${E[1]} L${Q[0]},${F.BOX.y0}"/>`),
+            F.raw(`<path class="guide" d="M${F.BOX.x0},${E[1]} L${Q[0]},${E[1]}"/>`),
+            F.dot(...E, { label: label, lx: 7, ly: -6 }),
+            F.annot(F.BOX.x0 - 8, E[1] + 5, price, { anchor: 'end', size: 14, tone: 'red' }),
+            F.annot(Q[0], F.BOX.y0 + 19, 'Q*', { anchor: 'middle', size: 13 }),
+            F.annot(S.x(9.8), S.y(mc) + 4, 'MC', { size: 13 }),
+            F.annot(S.x(9.8), S.y(d1), 'D' + side, { size: 13 }),
+            F.annot(S.x(x0 + (d0 - 0.4) / (2 * b)) + 6, S.y(0.9), 'MR' + side, { size: 13 }),
+          ],
+        });
+      };
+      draw('#f-pdA', 9.2, 2.2, 'E', 'PA', 'A');   // 완만한 수요 → 높은 가격
+      draw('#f-pdB', 7.6, 0.6, 'F', 'PB', 'B');   // 가파른 수요 → 낮은 가격
+    })();
+  </script>
+</section>
+
+<!-- ══ 20~22. 독점경쟁시장 (p.21, 22, 23) ═══════════════════
+     단기에는 독점과 같은 그림, 장기에는 수요곡선이 왼쪽으로 밀려 LAC 에 접한다. -->
+<script>
+  window.mcMarket = function (sel, opt) {
+    // 비용은 TC = 40 + q³ − 9q² + 32q 하나에서 모두 뽑는다.
+    // AC 를 손으로 그리고 MC 를 따로 그리면 장기균형의 두 조건
+    //   ① 수요곡선이 LAC 에 접한다  ② MR = LMC
+    // 가 서로 다른 생산량에서 성립해 그림이 어긋난다. 같은 비용함수에서 유도하면
+    // 이 둘은 반드시 같은 q 에서 만난다.
+    const ac  = (q) => 40 / q + q * q - 9 * q + 32;
+    const acD = (q) => -40 / (q * q) + 2 * q - 9;
+    const mc  = (q) => 3 * q * q - 18 * q + 32;
+
+    const F = Fig.withBox({ x0: 100, y0: 268, x1: 470, y1: 26 });
+    const S = F.scale({ x: [0, 9], y: [0, 46] });
+    const samp = (f, lo, hi, st) => {
+      const a = [];
+      for (let q = lo; q <= hi + 1e-9; q += st) a.push([q, f(q)]);
+      return S.curve(a);
+    };
+    const AC = samp(ac, 2.0, 6.6, 0.1);
+    const MC = samp(mc, 2.0, 6.4, 0.1);
+
+    // 수요곡선은 기울기 −3.5 의 직선. 장기에는 LAC 에 접하는 자리까지 왼쪽으로 밀린다.
+    const b = 3.5;
+    const line = (a0) => (q) => a0 - b * q;
+    const A_LONG = 36;                       // q=4 에서 LAC 에 접한다 (LAC'(4) = −3.5)
+    const A_SHORT = 44;
+    const parts = [];
+
+    const drawPair = (a0, dashD) => {
+      const D  = samp(line(a0), 0.4, 8.4, 0.2);
+      const MR = samp((q) => a0 - 2 * b * q, 0.4, (a0 - 2.4) / (2 * b), 0.2);
+      return { D, MR };
+    };
+
+    if (opt.stage === 'short') {
+      const { D, MR } = drawPair(A_SHORT);
+      const C = Fig.cross(MC, MR);                    // MR = MC
+      const E = Fig.at(D,  { x: C[0] });
+      const B = Fig.at(AC, { x: C[0] });
+      const box = [[F.BOX.x0, E[1]], [C[0], E[1]], [C[0], B[1]], [F.BOX.x0, B[1]]];
+      parts.push(
+        F.raw(`<polygon class="area-surplus" points="${box.map((q) => q.join(',')).join(' ')}"/>`),
+        F.curve(D, { variant: 'cap' }), F.curve(MR, { variant: 'i3' }),
+        F.curve(AC, { variant: 'i2' }), F.curve(MC),
+        F.raw(`<path class="guide" d="M${C[0]},${E[1]} L${C[0]},${F.BOX.y0}"/>`),
+        F.raw(`<path class="guide" d="M${F.BOX.x0},${E[1]} L${C[0]},${E[1]}"/>`),
+        F.raw(`<path class="guide" d="M${F.BOX.x0},${B[1]} L${C[0]},${B[1]}"/>`),
+        F.dot(...E, { label: 'E', lx: -4, ly: -12 }),
+        F.dot(...B, { label: 'B', lx: 7, ly: -6 }),
+        F.dot(...C, { label: 'C', lx: 7, ly: 5 }),
+        F.annot(F.BOX.x0 - 8, E[1] + 5, 'P*', { anchor: 'end', size: 14, tone: 'red' }),
+        F.annot(F.BOX.x0 - 8, B[1] + 5, 'A', { anchor: 'end', size: 14 }),
+        F.annot(C[0], F.BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14 }),
+        F.labelIn(box, '단기이윤', { size: 13 }),
+        F.annot(S.x(3.6), S.y(45), '단기한계비용곡선 (SMC)', { size: 13 }),
+        F.annot(S.x(6.2), S.y(41), '단기평균비용곡선 (SAC)', { size: 13 }),
+        F.annot(S.x(8.6), S.y(15), 'A기업의 수요곡선(D)', { size: 13 }),
+        F.annot(S.x(5.9), S.y(4.4), 'A기업의 한계수입곡선(MR)', { size: 13 }));
+    } else {
+      const prev = drawPair(A_SHORT);
+      const { D, MR } = drawPair(A_LONG);
+      const t = 4;                                     // 접점 — LAC'(4) = −3.5 = 수요곡선 기울기
+      const Fp = S.p([t, ac(t)]);
+      const C  = Fig.cross(MC, MR);                    // 같은 q 에서 만난다
+      parts.push(
+        F.curve(prev.D, { variant: 'cap', dash: '7 6' }),
+        F.curve(D, { variant: 'cap' }), F.curve(MR, { variant: 'i3' }),
+        F.curve(AC, { variant: 'i2' }), F.curve(MC),
+        F.raw(`<path class="guide" d="M${Fp[0]},${Fp[1]} L${Fp[0]},${F.BOX.y0}"/>`),
+        F.raw(`<path class="guide" d="M${F.BOX.x0},${Fp[1]} L${Fp[0]},${Fp[1]}"/>`),
+        F.dot(...Fp, { label: 'F', lx: 8, ly: -6 }),
+        F.dot(...C),
+        F.annot(F.BOX.x0 - 8, Fp[1] + 5, 'P*', { anchor: 'end', size: 14, tone: 'red' }),
+        F.annot(Fp[0], F.BOX.y0 + 20, 'Q*', { anchor: 'middle', size: 14 }),
+        F.arrow(S.x(6.6), S.y(24), S.x(7.2), S.y(15), { tone: 'green' }),
+        F.annot(S.x(3.6), S.y(45), '장기한계비용곡선 (LMC)', { size: 13 }),
+        F.annot(S.x(6.2), S.y(41), '장기평균비용곡선 (LAC)', { size: 13 }),
+        F.annot(S.x(8.6), S.y(16), '이전 A기업의 수요곡선(D)', { size: 13 }),
+        F.annot(S.x(8.6), S.y(7.5), 'A기업의 수요곡선(D)', { size: 13 }),
+        F.annot(S.x(5.1), S.y(2.2), 'A기업의 한계수입곡선(MR)', { size: 13 }));
+      if (opt.compare) {
+        // 완전경쟁이라면 LAC 최저점에서 생산한다 — 이분법으로 LAC'(q)=0 을 푼다
+        let lo = 4, hi = 8;
+        for (let i = 0; i < 60; i++) {
+          const m = (lo + hi) / 2;
+          if (acD(m) < 0) lo = m; else hi = m;
+        }
+        const qc = (lo + hi) / 2;
+        const Pc = S.p([qc, ac(qc)]);
+        parts.push(
+          F.raw(`<path class="guide" d="M${Pc[0]},${Pc[1]} L${Pc[0]},${F.BOX.y0}"/>`),
+          F.raw(`<path class="guide" d="M${F.BOX.x0},${Pc[1]} L${Pc[0]},${Pc[1]}"/>`),
+          F.annot(F.BOX.x0 - 8, Pc[1] + 5, 'Pc', { anchor: 'end', size: 14, tone: 'red' }),
+          F.annot(Pc[0], F.BOX.y0 + 20, 'Qc', { anchor: 'middle', size: 14 }));
+      }
+    }
+    F.draw(sel, { axes: { x: 'Q', y: 'P' }, parts });
+  };
+</script>
+
+<section>
+  <h2>독점경쟁시장 <span class="en">(monopolistic competition market)</span></h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-emph);line-height:1.5;margin-bottom:2px">
+      다수의 기업이 존재하고 진입의 자유가 보장되어 있지만, 기업마다 상품차별화가 가능한 시장<br>
+      → 제품별 별도의 시장이 존재할 수 있기 때문에 단기에는 독점시장과 균형조건이 같음</p>
+    <svg class="fig" id="f-mc1" viewBox="0 0 700 316" style="width:700px;margin:0 0 0 120px" role="img">
+      <title>독점경쟁 기업이 단기에 이윤을 얻는 그림</title></svg>
+    <script>mcMarket('#f-mc1', { stage: 'short' });</script>
+  </div>
+</section>
+
+<section>
+  <h2>독점경쟁시장 <span class="en">(monopolistic competition market)</span></h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-emph);line-height:1.5;margin-bottom:2px">
+      다수의 기업이 존재하고 진입의 자유가 보장되어 있지만, 기업마다 상품차별화가 가능한 시장<br>
+      → 제품별 별도의 시장이 존재할 수 있기 때문에 단기에는 독점시장과 균형조건이 같음<br>
+      → 하지만 이윤을 보고 기업들이 계속 진입해서 A기업 수요곡선이 LAC와 접하는 F 지점에서 장기균형 형성</p>
+    <svg class="fig" id="f-mc2" viewBox="0 0 700 300" style="width:700px;margin:0 0 0 120px" role="img">
+      <title>수요곡선이 장기평균비용곡선에 접하는 F 에서 장기균형이 이루어지는 그림</title></svg>
+    <script>mcMarket('#f-mc2', { stage: 'long' });</script>
+  </div>
+</section>
+
+<section>
+  <h2>독점경쟁시장 <span class="en">(monopolistic competition market)</span>의 자원배분</h2>
+  <div class="body">
+    <p class="sub t-red" style="font-size:var(--fs-emph);line-height:1.5;margin-bottom:2px">
+      장기균형상태에서도 완전경쟁시장에 비해서 생산량 수준이 낮고(Q* 〈 Qc), 가격은 높은 상황이 발생<br>
+      → 기업은 수요를 높이기 위해서 비가격경쟁(광고 등)을 더 활발히 할 가능성 높음</p>
+    <svg class="fig" id="f-mc3" viewBox="0 0 700 308" style="width:700px;margin:0 0 0 120px" role="img">
+      <title>장기균형 생산량이 평균비용 최저점보다 왼쪽에 있음을 보이는 그림</title></svg>
+    <script>mcMarket('#f-mc3', { stage: 'long', compare: true });</script>
+  </div>
+</section>
+
+<!-- ══ 23. 과점시장 (p.24) ══════════════════════════════════ -->
+<section>
+  <h2>과점시장 <span class="en">(oligopoly market)</span></h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:56px">소수의 기업만이 상품을 생산/공급하는 시장</p>
+    <p class="sub t-red" style="margin-bottom:10px">Q) 과점시장의 문제?</p>
+    <p style="margin-bottom:8px">과점시장은 소수 기업들이 서로의 행동을 매우 신경써야 함 (예. 통신산업에서 보조금 문제)</p>
+    <p style="margin-bottom:16px">그 과정에서 기업들 간 이윤 보장을 위하여 담함(collusion)의 가능성이 매우 높음</p>
+    <p class="derive t-red">→ 기업의 전략적 행동을 다루는 분야: 산업조직론 + 게임이론</p>
+  </div>
+</section>
+
+<!-- ══ 24. 게임이론 (p.25) ══════════════════════════════════ -->
+<section>
+  <h2>게임이론 <span class="en">(game theory)</span></h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:24px">전략적 상황에 처한 경제주체의 행동을 분석하기 위한 경제학의 한 분야</p>
+    <img class="gt-poster" src="../assets/beautiful-mind.jpeg"
+         alt="영화 〈뷰티풀 마인드〉 포스터">
+  </div>
+</section>
+
+<!-- ══ 25. 게임의 기본 골격 (p.26) ══════════════════════════ -->
+<section class="s-numbered">
+  <h2>게임의 기본 골격</h2>
+  <div class="body">
+    <ol>
+      <li>경기자 (player)</li>
+      <li>전략 (strategy)</li>
+      <li>보수 (payoff)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══ 26~28. 용의자의 딜레마 (p.27, 28, 29) ════════════════ -->
+<section>
+  <h2>용의자의 딜레마 <span class="en">(Prisoner’s Dilemma)</span></h2>
+  <div class="body stack">
+    <table class="tbl-payoff">
+      <colgroup><col style="width:112px"><col style="width:98px"><col><col></colgroup>
+      <tr><td class="corner" rowspan="2" colspan="2">보수행렬</td><th colspan="2">김씨</th></tr>
+      <tr><th>부인</th><th>자백</th></tr>
+      <tr><th class="rowhead" rowspan="2">박씨</th><th>부인</th>
+          <td>둘다 1년 형</td><td>박씨 15년, 김씨 방면</td></tr>
+      <tr><th>자백</th><td>박씨 방면, 김씨 15년</td><td>둘다 5년 형</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>우월전략 <span class="en">(dominant strategy)</span></h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:4px">상대방의 전략과 상관없이 자신에게 언제나 유리한 결과를 가져다주는 전략</p>
+    <p class="derive t-red" style="margin-bottom:24px">→ 우월전략균형: 우월전략의 결과로서 발생한 균형상태</p>
+    <table class="tbl-payoff">
+      <colgroup><col style="width:112px"><col style="width:98px"><col><col></colgroup>
+      <tr><td class="corner" rowspan="2" colspan="2">보수행렬</td><th colspan="2">김씨</th></tr>
+      <tr><th>부인</th><th>자백</th></tr>
+      <tr><th class="rowhead" rowspan="2">박씨</th><th>부인</th>
+          <td>둘다 1년 형</td><td>박씨 15년, 김씨 방면</td></tr>
+      <tr><th>자백</th><td>박씨 방면, 김씨 15년</td><td class="hi">둘다 5년 형</td></tr>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>게임규칙의 중요성</h2>
+  <div class="body">
+    <div class="rule-row">
+      <p class="sub t-red">협조가능여부</p>
+      <p class="sub t-red">반복과 처벌여부</p>
+      <p class="sub t-red">보수행렬의 변화</p>
+    </div>
+    <table class="tbl-payoff">
+      <colgroup><col style="width:112px"><col style="width:98px"><col><col></colgroup>
+      <tr><td class="corner" rowspan="2" colspan="2">보수행렬</td><th colspan="2">김씨</th></tr>
+      <tr><th>부인</th><th>자백</th></tr>
+      <tr><th class="rowhead" rowspan="2">박씨</th><th>부인</th>
+          <td>둘다 1년 형</td><td>박씨 15년, 김씨 방면</td></tr>
+      <tr><th>자백</th><td>박씨 방면, 김씨 15년</td><td>둘다 5년 형</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══ 29. 카르텔 (p.30) ════════════════════════════════════ -->
+<section>
+  <h2>용의자 딜레마 게임의 응용: 카르텔</h2>
+  <div class="body">
+    <p class="lead t-define" style="margin-bottom:22px">카르텔: 과점시장에서 기업들 간 완전한 담합이 이루어지는 경우</p>
+    <table class="tbl-payoff">
+      <colgroup><col style="width:112px"><col style="width:98px"><col><col></colgroup>
+      <tr><td class="corner" rowspan="2" colspan="2">보수행렬</td><th colspan="2">SKT</th></tr>
+      <tr><th>협정준수</th><th>협정위반</th></tr>
+      <tr><th class="rowhead" rowspan="2">KT</th><th>협정준수</th>
+          <td>(8, 8)</td><td>(1, 10)</td></tr>
+      <tr><th>협정위반</th><td>(10, 1)</td><td>(4, 4)</td></tr>
+    </table>
+    <p class="caption" style="margin-top:8px">단위: 억원</p>
+    <p class="sub t-red" style="margin-top:26px">Q) 위 보수행렬에서 우월전략은?</p>
+  </div>
+</section>
+
+<!-- ══ 30. Q & A (p.31) ═════════════════════════════════════ -->
+<section class="s-closing">
+  <p class="qa">Q &amp; A</p>
+  <div class="qa-rule"></div>
+  <p class="contact">권규상 <span class="en">Kyusang Kwon</span><br>
+    <span class="en">(kyusang.kwon@chungbuk.ac.kr)</span></p>
+</section>
+
+</div></div>
+
+<script src="../../_shared/vendor/reveal/reveal.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/notes.js"></script>
+<script src="../../_shared/vendor/reveal/plugin/math.js"></script>
+<script src="../../_shared/js/deck-init.js"></script>
+</body>
+</html>
